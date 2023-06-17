@@ -11,6 +11,21 @@ datasource db {
   url      = "postgresql://postgres:scholarspaceadmin123@db.eeikbrtyntwckpyfphlm.supabase.co:5432/postgres"
 }
 
+model Profile {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  avatar      String
+  description String
+  aboutMe     String
+  skills      String[]
+  achievements String[]
+  education   String[]
+  researchExperience String[]
+  researchInterest String[]
+  collabStatus String[]
+}
+
 model Workspace {
   id          String   @id @default(cuid())
   userId      String
@@ -29,5 +44,18 @@ model Member {
   avatar      String?
   workspaceId String
   workspace   Workspace @relation(fields: [workspaceId], references: [id])
+}
+
+model ResearchPosts {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  avatar      String
+  title       String
+  author      String
+  document    String
+  content     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 

@@ -1,5 +1,6 @@
 import { type AppType } from "next/app";
 import { ClerkProvider } from "@clerk/nextjs";
+import { ChakraProvider } from '@chakra-ui/react'
 
 import { NavBar } from "~/components/NavBar";
 import { SideBar } from "~/components/SideBar";
@@ -11,6 +12,7 @@ import "~/styles/globals.css";
 const MyApp: AppType = ({ Component, pageProps }) => {
   return (
     <ClerkProvider {...pageProps}>
+      <ChakraProvider>
       <div className="flex min-h-screen">
         <SideBar />
         <div className="light:black flex-grow dark:text-white">
@@ -18,6 +20,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
           <Component {...pageProps} />
         </div>
       </div>
+      </ChakraProvider>
     </ClerkProvider>
   );
 };
