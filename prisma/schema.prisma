@@ -11,26 +11,6 @@ datasource db {
   url      = "postgresql://postgres:scholarspaceadmin123@db.eeikbrtyntwckpyfphlm.supabase.co:5432/postgres"
 }
 
-model Listing {
-  id          String    @id @default(cuid())
-  userId      String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  name        String
-  description String
-  price       Float
-  Message     Message[]
-}
-
-model Message {
-  id           String  @id @default(cuid())
-  fromUser     String
-  fromUserName String
-  message      String
-  listingId    String
-  listing      Listing @relation(fields: [listingId], references: [id])
-}
-
 model Workspace {
   id          String   @id @default(cuid())
   userId      String
