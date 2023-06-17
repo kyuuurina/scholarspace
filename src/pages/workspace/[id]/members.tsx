@@ -23,7 +23,7 @@ const Members: NextPage = () => {
     value: string;
   } | null>(null);
 
-  const users = api.profile.getAllUsers.useQuery();
+  const users = api.account.getAllUsers.useQuery();
   const userArray: { label: string; value: string }[] = [];
 
   if (users.data) {

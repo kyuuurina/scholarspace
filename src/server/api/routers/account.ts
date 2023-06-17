@@ -3,7 +3,7 @@ import { TRPCError } from "@trpc/server";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
-export const profileRouter = createTRPCRouter({
+export const accountRouter = createTRPCRouter({
   getAllUsers: publicProcedure.query(async () => {
     const users = await clerkClient.users.getUserList();
 
