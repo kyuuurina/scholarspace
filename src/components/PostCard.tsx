@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import EditPostModal from "./EditPostModal";
 
 interface PostCardProps {
   title: string;
@@ -9,23 +8,20 @@ interface PostCardProps {
 
 const PostCard: React.FC<PostCardProps> = ({ title, author, description }) => {
   const [showDropdown, setShowDropdown] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
 
   const handleToggleDropdown = () => {
     setShowDropdown(!showDropdown);
   };
 
   const handleEdit = () => {
-    setShowEditModal(true);
+    // Logic to edit the post
+    console.log("Edit post:", title);
     setShowDropdown(false);
   };
 
   const handleDelete = () => {
-    const confirmDelete = window.confirm("Delete this post?");
-    if (confirmDelete) {
-      // Logic to delete the post
-      console.log("Delete post:", title);
-    }
+    // Logic to delete the post
+    console.log("Delete post:", title);
     setShowDropdown(false);
   };
 
@@ -71,14 +67,6 @@ const PostCard: React.FC<PostCardProps> = ({ title, author, description }) => {
       <h2 className="text-lg font-bold">{title}</h2>
       <p className="text-gray-500">Author: {author}</p>
       <p className="mt-2">{description}</p>
-      {showEditModal && (
-        <EditPostModal
-          title={title}
-          author={author}
-          description={description}
-          onClose={() => setShowEditModal(false)}
-        />
-      )}
     </div>
   );
 };
