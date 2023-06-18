@@ -17,10 +17,22 @@ const NewPostForm: React.FC = () => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <input type="text" {...register('title')} placeholder="Title" />
-      <input type="text" {...register('uploadDocument')} placeholder="Upload Document" />
-      <input type="text" {...register('description')} placeholder="Description" />
-      <input type="text" {...register('author')} placeholder="Author" />
+      <div className="form-row">
+        <label htmlFor="title">Title</label>
+        <input type="text" {...register('title')} id="title" placeholder="Title" />
+      </div>
+      <div className="form-row">
+        <label htmlFor="uploadDocument">Upload Document</label>
+        <input type="text" {...register('uploadDocument')} id="uploadDocument" placeholder="Upload Document" />
+      </div>
+      <div className="form-row">
+        <label htmlFor="description">Description</label>
+        <input type="text" {...register('description')} id="description" placeholder="Description" />
+      </div>
+      <div className="form-row">
+        <label htmlFor="author">Author</label>
+        <input type="text" {...register('author')} id="author" placeholder="Author" />
+      </div>
       <button type="submit">Post</button>
     </form>
   );

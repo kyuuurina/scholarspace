@@ -1,50 +1,5 @@
-// // PostCard.tsx
-// type PostCardProps = {
-//     title: string;
-//     uploadDocument: string;
-//     description: string;
-//     author: string;
-//     onDelete: () => void;
-//   };
-  
-//   const PostCard: React.FC<PostCardProps> = ({
-//     title,
-//     uploadDocument,
-//     description,
-//     author,
-//     onDelete,
-//   }) => {
-//     const handleEdit = () => {
-//       // Implement edit functionality, e.g., show NewPostForm with pre-filled data
-//     };
-  
-//     const handleDelete = () => {
-//       // Implement delete functionality, e.g., show confirmation message
-//     };
-  
-//     return (
-//       <div className="card">
-//         <div className="card-content">
-//           <h2>{title}</h2>
-//           <p>{uploadDocument}</p>
-//           <p>{description}</p>
-//           <p>{author}</p>
-//         </div>
-//         <div className="card-actions">
-//           <div className="kebab-icon">
-//             <div className="dropdown-menu">
-//               <button onClick={handleEdit}>Edit</button>
-//               <button onClick={handleDelete}>Delete</button>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//     );
-//   };
-  
-//   export default PostCard;
-  
-import React from "react";
+import React, { useState } from "react";
+import EditPostModal from "./EditPostModal";
 
 interface PostCardProps {
   title: string;
@@ -53,11 +8,77 @@ interface PostCardProps {
 }
 
 const PostCard: React.FC<PostCardProps> = ({ title, author, description }) => {
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+
+  const handleToggleDropdown = () => {
+    setShowDropdown(!showDropdown);
+  };
+
+  const handleEdit = () => {
+    setShowEditModal(true);
+    setShowDropdown(false);
+  };
+
+  const handleDelete = () => {
+    const confirmDelete = window.confirm("Delete this post?");
+    if (confirmDelete) {
+      // Logic to delete the post
+      console.log("Delete post:", title);
+    }
+    setShowDropdown(false);
+  };
+
   return (
-    <div className="post-card">
-      <h3>{title}</h3>
-      <p>Author: {author}</p>
-      <p>{description}</p>
+    <div className="relative bg-white rounded-lg p-4 mb-4">
+      <div className="absolute top-0 right-0">
+        <button
+          className="p-2 rounded-full hover:bg-gray-200"
+          onClick={handleToggleDropdown}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+            />
+          </svg>
+        </button>
+        {showDropdown && (
+          <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-10">
+            <button
+              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+              onClick={handleEdit}
+            >
+              Edit
+            </button>
+            <button
+              className="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 w-full text-left"
+              onClick={handleDelete}
+            >
+              Delete
+            </button>
+          </div>
+        )}
+      </div>
+      <h2 className="text-lg font-bold">{title}</h2>
+      <p className="text-gray-500">Author: {author}</p>
+      <p className="mt-2">{description}</p>
+      {showEditModal && (
+        <EditPostModal
+          title={title}
+          author={author}
+          description={description}
+          onClose={() => setShowEditModal(false)}
+        />
+      )}
     </div>
   );
 };
