@@ -87,31 +87,66 @@ const ManageRWP: NextPage = () => {
 
         <div>
           {posts.map((post, index) => (
-           <PostCard
-           key={index}
-           title={post.title}
-           author={post.author}
-           description={post.description}
-            onEdit={handleEdit}
-           onDelete={handleDelete}
-         />
+            <PostCard
+              key={index}
+              title={post.title}
+              author={post.author}
+              description={post.description}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
           ))}
         </div>
 
         {showNewPostModal && (
           <NewPostModal show={showNewPostModal} onClose={handleCancel}>
             <form onSubmit={handleSubmit(handleSave)}>
-              <label htmlFor="title">Title:</label>
-              <input type="text" id="title" {...register("title")} />
+              <div className="mb-4">
+                <label htmlFor="title" className="block mb-1 font-bold text-gray-700">
+                  Title:
+                </label>
+                <input
+                  type="text"
+                  id="title"
+                  {...register("title")}
+                  className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
 
-              <label htmlFor="author">Author:</label>
-              <input type="text" id="author" {...register("author")} />
+              <div className="mb-4">
+                <label htmlFor="author" className="block mb-1 font-bold text-gray-700">
+                  Author:
+                </label>
+                <input
+                  type="text"
+                  id="author"
+                  {...register("author")}
+                  className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
 
-              <label htmlFor="description">Description:</label>
-              <textarea id="description" {...register("description")} />
+              <div className="mb-4">
+                <label htmlFor="description" className="block mb-1 font-bold text-gray-700">
+                  Description:
+                </label>
+                <textarea
+                  id="description"
+                  {...register("description")}
+                  className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
 
-              <label htmlFor="file">File:</label>
-              <input type="file" id="file" {...register("file")} />
+              <div className="mb-4">
+                <label htmlFor="file" className="block mb-1 font-bold text-gray-700">
+                  File:
+                </label>
+                <input
+                  type="file"
+                  id="file"
+                  {...register("file")}
+                  className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
 
               <div className="flex justify-end mt-4">
                 <button

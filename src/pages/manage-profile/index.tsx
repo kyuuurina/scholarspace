@@ -1,58 +1,45 @@
 import React, { useState } from 'react';
-import Select from 'react-select'
 
 const ProfilePage = () => {
-const [profilePicture, setProfilePicture] = useState<string | undefined>('');
-const [username, setUsername] = useState<string | undefined>('');
-const [collaborationStatus, setCollaborationStatus] = useState<string | undefined>('');
-const [aboutMe, setAboutMe] = useState<string | undefined>('');
-const [skills, setSkills] = useState<string[]>([]);
-const [education, setEducation] = useState<{ year: string; place: string }[]>([]);
-const [achievements, setAchievements] = useState<{ year: string; name: string; issuer: string }[]>([]);
-const [researchInterests, setResearchInterests] = useState<string[]>([]);
-const [researchHistory, setResearchHistory] = useState<{ year: string; title: string; author: string }[]>([]);
-const [isEditing, setIsEditing] = useState(false);
+  const [profilePicture, setProfilePicture] = useState('');
+  const [username, setUsername] = useState('');
+  const [collaborationStatus, setCollaborationStatus] = useState('');
+  const [aboutMe, setAboutMe] = useState('');
+  const [skills, setSkills] = useState<string[]>([]);
+  const [education, setEducation] = useState<{ yearStart: string; yearEnd: string; institutionName: string }[]>([]);
+  const [achievements, setAchievements] = useState<{ year: string; institutionName: string }[]>([]);
+  const [researchInterests, setResearchInterests] = useState<string[]>([]);
+  const [researchHistory, setResearchHistory] = useState<{ year: string; author: string; title: string }[]>([]);
+  const [isEditing, setIsEditing] = useState(false);
 
-  
-    const handleProfilePictureChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files && event.target.files[0];
+  const handleProfilePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (file) {
-      setProfilePicture(file.name);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfilePicture(reader.result as string);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
-    const handleSkillChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    setSkills((prevSkills) => [...prevSkills, value]);
-  };
-
-  const handleEducationChange = (index: number, field: 'year' | 'place', value: string) => {
-    setEducation((prevEducation) =>
-      prevEducation.map((edu, i) => (i === index ? { ...edu, [field]: value } : edu))
-    );
-  };
-
-  const handleAchievementChange = (index: number, field: 'year' | 'name' | 'issuer', value: string) => {
-    setAchievements((prevAchievements) =>
-      prevAchievements.map((achievement, i) => (i === index ? { ...achievement, [field]: value } : achievement))
-    );
-  };
-
-  const handleResearchHistoryChange = (index: number, field: 'year' | 'title' | 'author', value: string) => {
-    setResearchHistory((prevResearchHistory) =>
-      prevResearchHistory.map((history, i) => (i === index ? { ...history, [field]: value } : history))
-    );
+  const handleSkillChange = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      const value = e.currentTarget.value;
+      if (value) {
+        setSkills((prevSkills) => [...prevSkills, value]);
+        e.currentTarget.value = '';
+      }
+    }
   };
 
   const handleSaveChanges = () => {
-    // Handle saving changes here
+    // Save changes to the database or API
     setIsEditing(false);
   };
 
   const handleCancelChanges = () => {
-    // Reset the state to cancel changes
-    setIsEditing(false);
-    // Reset all the fields to their initial values
+    // Revert changes back to the initial state
     setProfilePicture('');
     setUsername('');
     setCollaborationStatus('');
@@ -62,11 +49,16 @@ const [isEditing, setIsEditing] = useState(false);
     setAchievements([]);
     setResearchInterests([]);
     setResearchHistory([]);
+    setIsEditing(false);
+  };
+
+  const handleEdit = () => {
+    setIsEditing(true);
   };
 
   return (
     <div className="flex flex-col items-center justify-center p-8">
-      <div className="max-w-lg">
+      <div className="w-full max-w-4xl">
         <div className="bg-white shadow-lg rounded-lg p-6">
           <div className="mb-6">
             <label htmlFor="profilePicture" className="block mb-2 font-bold text-gray-700">
@@ -76,10 +68,9 @@ const [isEditing, setIsEditing] = useState(false);
               type="file"
               id="profilePicture"
               onChange={handleProfilePictureChange}
-              className="border-gray-300 rounded-md px-4 py-2 w-64"
+              className="border-gray-300 rounded-md px-4 py-2 w-72"
             />
           </div>
-
           <div className="mb-6">
             <label htmlFor="username" className="block mb-2 font-bold text-gray-700">
               Username
@@ -88,26 +79,31 @@ const [isEditing, setIsEditing] = useState(false);
               type="text"
               id="username"
               value={username}
-              onChange={(event) => setUsername(event.target.value)}
-              className="border-gray-300 rounded-md px-4 py-2 w-64"
-              disabled={!isEditing}
+              onChange={(e) => setUsername(e.target.value)}
+              className="border-gray-300 rounded-md px-4 py-2 w-full"
+              readOnly={!isEditing}
             />
           </div>
-
           <div className="mb-6">
             <label htmlFor="collaborationStatus" className="block mb-2 font-bold text-gray-700">
               Collaboration Status
             </label>
-            <input
-              type="text"
-              id="collaborationStatus"
-              value={collaborationStatus}
-              onChange={(event) => setCollaborationStatus(event.target.value)}
-              className="border-gray-300 rounded-md px-4 py-2 w-64"
-              disabled={!isEditing}
-            />
+            {isEditing ? (
+              <select
+                id="collaborationStatus"
+                value={collaborationStatus}
+                onChange={(e) => setCollaborationStatus(e.target.value)}
+                className="border-gray-300 rounded-md px-4 py-2 w-full"
+              >
+                <option value="">Select an option</option>
+                <option value="Open For Collaboration">Open For Collaboration</option>
+              </select>
+            ) : (
+              <span className="bg-blue-100 text-blue-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300">
+                {collaborationStatus}
+              </span>
+            )}
           </div>
-
           <div className="mb-6">
             <label htmlFor="aboutMe" className="block mb-2 font-bold text-gray-700">
               About Me
@@ -115,177 +111,187 @@ const [isEditing, setIsEditing] = useState(false);
             <textarea
               id="aboutMe"
               value={aboutMe}
-              onChange={(event) => setAboutMe(event.target.value)}
-              className="border-gray-300 rounded-md px-4 py-2 w-64 h-32"
-              disabled={!isEditing}
+              onChange={(e) => setAboutMe(e.target.value)}
+              className="border-gray-300 rounded-md px-4 py-2 w-full"
+              readOnly={!isEditing}
             />
           </div>
-
           <div className="mb-6">
-            <label className="block mb-2 font-bold text-gray-700">Skills</label>
-            <div className="flex space-x-2">
-              {skills.map((skill, index) => (
-                <span key={index} className="bg-blue-500 text-white px-3 py-1 rounded-full">
-                  {skill}
-                </span>
-              ))}
-            </div>
-            {isEditing && (
-              <input
-                type="text"
-                placeholder="Add skill"
-                onChange={handleSkillChange}
-                className="border-gray-300 rounded-md px-4 py-2 w-64 mt-2"
-              />
-            )}
-          </div>
-
-          <div className="mb-6">
-            <label className="block mb-2 font-bold text-gray-700">Education</label>
-            {education.map((edu, index) => (
-              <div key={index} className="flex items-center space-x-2 mb-2">
+            <label htmlFor="skills" className="block mb-2 font-bold text-gray-700">
+              Skills
+            </label>
+            {isEditing ? (
+              <div className="flex mb-2">
                 <input
                   type="text"
-                  placeholder="Year"
-                  value={edu.year}
-                  onChange={(event) => handleEducationChange(index, 'year', event.target.value)}
-                  className="border-gray-300 rounded-md px-4 py-2 w-24"
-                  disabled={!isEditing}
-                />
-                <input
-                  type="text"
-                  placeholder="Instituition Name"
-                  value={edu.place}
-                  onChange={(event) => handleEducationChange(index, 'place', event.target.value)}
-                  className="border-gray-300 rounded-md px-4 py-2 w-64"
-                  disabled={!isEditing}
+                  id="skills"
+                  onKeyUp={(e) => e.key === 'Enter' && handleSkillChange(e)}
+                  className="border-gray-300 rounded-md px-4 py-2 w-full"
                 />
               </div>
-            ))}
-            {isEditing && (
-              <button
-                onClick={() => setEducation([...education, { year: '', place: '' }])}
-                className="text-blue-500 underline"
-              >
-                + Add Education
-              </button>
-            )}
-          </div>
-
-          <div className="mb-6">
-            <label className="block mb-2 font-bold text-gray-700">Achievements</label>
-            {achievements.map((achievement, index) => (
-              <div key={index} className="flex items-center space-x-2 mb-2">
-                <input
-                  type="text"
-                  placeholder="Year"
-                  value={achievement.year}
-                  onChange={(event) => handleAchievementChange(index, 'year', event.target.value)}
-                  className="border-gray-300 rounded-md px-4 py-2 w-24"
-                  disabled={!isEditing}
-                />
-                <input
-                  type="text"
-                  placeholder="Achievement Name"
-                  value={achievement.name}
-                  onChange={(event) => handleAchievementChange(index, 'name', event.target.value)}
-                  className="border-gray-300 rounded-md px-4 py-2 w-64"
-                  disabled={!isEditing}
-                />
-                <input
-                  type="text"
-                  placeholder="Issuer"
-                  value={achievement.issuer}
-                  onChange={(event) => handleAchievementChange(index, 'issuer', event.target.value)}
-                  className="border-gray-300 rounded-md px-4 py-2 w-64"
-                  disabled={!isEditing}
-                />
+            ) : (
+              <div className="flex flex-wrap">
+                {skills.map((skill, index) => (
+                  <span
+                    key={index}
+                    className="bg-blue-100 text-blue-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300"
+                  >
+                    {skill}
+                  </span>
+                ))}
               </div>
-            ))}
-            {isEditing && (
-              <button
-                onClick={() => setAchievements([...achievements, { year: '', name: '', issuer: '' }])}
-                className="text-blue-500 underline"
-              >
-                + Add Achievement
-              </button>
             )}
           </div>
-
-          <div className="mb-6">
-            <label className="block mb-2 font-bold text-gray-700">Research Interests</label>
-            <div className="flex space-x-2">
-              {researchInterests.map((interest, index) => (
-                <span key={index} className="bg-blue-500 text-white px-3 py-1 rounded-full">
-                  {interest}
-                </span>
-              ))}
-            </div>
-            {isEditing && (
-              <input
-                type="text"
-                placeholder="Add research interest"
-                onChange={(event) => setResearchInterests([...researchInterests, event.target.value])}
-                className="border-gray-300 rounded-md px-4 py-2 w-64 mt-2"
-              />
-            )}
-          </div>
-
-          <div className="mb-6">
-            <label className="block mb-2 font-bold text-gray-700">Research History</label>
-            {researchHistory.map((history, index) => (
-              <div key={index} className="flex items-center space-x-2 mb-2">
-                <input
-                  type="text"
-                  placeholder="Year"
-                  value={history.year}
-                  onChange={(event) => handleResearchHistoryChange(index, 'year', event.target.value)}
-                  className="border-gray-300 rounded-md px-4 py-2 w-24"
-                  disabled={!isEditing}
-                />
-                <input
-                  type="text"
-                  placeholder="Research Title"
-                  value={history.title}
-                  onChange={(event) => handleResearchHistoryChange(index, 'title', event.target.value)}
-                  className="border-gray-300 rounded-md px-4 py-2 w-64"
-                  disabled={!isEditing}
-                />
-                <input
-                  type="text"
-                  placeholder="Author"
-                  value={history.author}
-                  onChange={(event) => handleResearchHistoryChange(index, 'author', event.target.value)}
-                  className="border-gray-300 rounded-md px-4 py-2 w-64"
-                  disabled={!isEditing}
-                />
-              </div>
-            ))}
-            {isEditing && (
-              <button
-                onClick={() => setResearchHistory([...researchHistory, { year: '', title: '', author: '' }])}
-                className="text-blue-500 underline"
-              >
-                + Add Research History
-              </button>
-            )}
-          </div>
-
-          {!isEditing && (
-            <button onClick={() => setIsEditing(true)} className="bg-blue-500 text-white px-4 py-2 rounded-md mr-2">
-              Edit Profile
-            </button>
-          )}
-
-          {isEditing && (
+          {/* Add/Edit Achievements */}
+          {isEditing ? (
             <>
-              <button onClick={handleSaveChanges} className="bg-green-500 text-white px-4 py-2 rounded-md mr-2">
-                Save
+              <div className="mb-6">
+                <label htmlFor="achievementYear" className="block mb-2 font-bold text-gray-700">
+                  Achievement Year
+                </label>
+                <input
+                  type="text"
+                  id="achievementYear"
+                  className="border-gray-300 rounded-md px-4 py-2 w-full"
+                />
+              </div>
+              <div className="mb-6">
+                <label htmlFor="achievementInstitution" className="block mb-2 font-bold text-gray-700">
+                  Achievement Institution
+                </label>
+                <input
+                  type="text"
+                  id="achievementInstitution"
+                  className="border-gray-300 rounded-md px-4 py-2 w-full"
+                />
+              </div>
+            </>
+          ) : (
+            <div className="mb-6">
+              <h3 className="text-lg font-bold mb-2">Achievements</h3>
+              {achievements.map((achievement, index) => (
+                <p key={index}>
+                  {achievement.year} - {achievement.institutionName}
+                </p>
+              ))}
+            </div>
+          )}
+          {/* Add/Edit Education Background */}
+          {isEditing ? (
+            <>
+              <div className="mb-6">
+                <label htmlFor="educationYearStart" className="block mb-2 font-bold text-gray-700">
+                  Education Year Start
+                </label>
+                <input
+                  type="text"
+                  id="educationYearStart"
+                  className="border-gray-300 rounded-md px-4 py-2 w-full"
+                />
+              </div>
+              <div className="mb-6">
+                <label htmlFor="educationYearEnd" className="block mb-2 font-bold text-gray-700">
+                  Education Year End
+                </label>
+                <input
+                  type="text"
+                  id="educationYearEnd"
+                  className="border-gray-300 rounded-md px-4 py-2 w-full"
+                />
+              </div>
+              <div className="mb-6">
+                <label htmlFor="educationInstitution" className="block mb-2 font-bold text-gray-700">
+                  Education Institution
+                </label>
+                <input
+                  type="text"
+                  id="educationInstitution"
+                  className="border-gray-300 rounded-md px-4 py-2 w-full"
+                />
+              </div>
+            </>
+          ) : (
+            <div className="mb-6">
+              <h3 className="text-lg font-bold mb-2">Education Background</h3>
+              {education.map((edu, index) => (
+                <p key={index}>
+                  {edu.yearStart} - {edu.yearEnd} : {edu.institutionName}
+                </p>
+              ))}
+            </div>
+          )}
+          {/* Add/Edit Research History */}
+          {isEditing ? (
+            <>
+              <div className="mb-6">
+                <label htmlFor="researchYear" className="block mb-2 font-bold text-gray-700">
+                  Research Year
+                </label>
+                <input
+                  type="text"
+                  id="researchYear"
+                  className="border-gray-300 rounded-md px-4 py-2 w-full"
+                />
+              </div>
+              <div className="mb-6">
+                <label htmlFor="researchAuthor" className="block mb-2 font-bold text-gray-700">
+                  Research Author
+                </label>
+                <input
+                  type="text"
+                  id="researchAuthor"
+                  className="border-gray-300 rounded-md px-4 py-2 w-full"
+                />
+              </div>
+              <div className="mb-6">
+                <label htmlFor="researchTitle" className="block mb-2 font-bold text-gray-700">
+                  Research Title
+                </label>
+                <input
+                  type="text"
+                  id="researchTitle"
+                  className="border-gray-300 rounded-md px-4 py-2 w-full"
+                />
+              </div>
+            </>
+          ) : (
+            <div className="mb-6">
+              <h3 className="text-lg font-bold mb-2">Research History</h3>
+              {researchHistory.map((research, index) => (
+                <p key={index}>
+                  {research.year} - {research.title} by {research.author}
+                </p>
+              ))}
+            </div>
+          )}
+          {/* Rest of the code... */}
+          {isEditing ? (
+            <div className="flex justify-end mt-6">
+              <button
+                type="button"
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 mr-2 rounded"
+                onClick={handleSaveChanges}
+              >
+                Save Changes
               </button>
-              <button onClick={handleCancelChanges} className="bg-red-500 text-white px-4 py-2 rounded-md">
+              <button
+                type="button"
+                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                onClick={handleCancelChanges}
+              >
                 Cancel
               </button>
-            </>
+            </div>
+          ) : (
+            <div className="flex justify-end mt-6">
+              <button
+                type="button"
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                onClick={handleEdit}
+              >
+                Edit Profile
+              </button>
+            </div>
           )}
         </div>
       </div>
