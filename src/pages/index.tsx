@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { type NextPage } from "next";
 import Head from "next/head";
-import 'src\styles\globals.css';
+
 
 const Home: NextPage = () => {
   return (
