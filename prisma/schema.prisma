@@ -37,6 +37,7 @@ model Workspace {
 
 model Member {
   id          String    @id @default(cuid())
+  userId      String
   role        String?
   name        String?
   email       String?
