@@ -166,7 +166,7 @@ export function SideBar() {
                 </li>
                 <li className=" rounded-sm">
                   <Link
-                    href="/my-activity"
+                    href="/manage-profile"
                     className={`flex items-center space-x-3 rounded-md p-2 hover:bg-purple-800 ${
                       open ? "text-gray-100" : "text-gray-100"
                     }`}
@@ -174,13 +174,13 @@ export function SideBar() {
                   >
                     <FiActivity className="h-6 w-6" />
                     <span className={`${open ? "text-gray-100" : "sr-only"}`}>
-                      My Activity
+                      My Profile
                     </span>
                   </Link>
                 </li>
                 <li className="rounded-sm">
                   <Link
-                    href="/messages"
+                    href="/"
                     className={`flex items-center space-x-3 rounded-md p-2 hover:bg-purple-800 ${
                       open ? "text-gray-100" : "text-gray-100"
                     }`}
@@ -194,7 +194,7 @@ export function SideBar() {
                 </li>
                 <li className="rounded-sm">
                   <Link
-                    href="/projects"
+                    href="/home-rwp/cljdykk4m0008vu6kufa5klp9"
                     className={`flex items-center space-x-3 rounded-md p-2 hover:bg-purple-800 ${
                       open ? "text-gray-100" : "text-gray-100"
                     }`}
