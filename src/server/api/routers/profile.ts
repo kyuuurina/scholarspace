@@ -1,77 +1,72 @@
 import { z } from "zod";
+import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { PrismaClient } from "@prisma/client";
 
-import {
-  createTRPCRouter,
-  protectedProcedure,
-  publicProcedure,
-} from "~/server/api/trpc";
+const prisma = new PrismaClient();
 
-export const profileRouter = createTRPCRouter({
-  get: publicProcedure
-    .input(z.object({ workspaceId: z.string() }))
-    .query(({ ctx, input }) => {
-      return ctx.prisma.workspace.findUnique({
-        where: {
-          id: input.workspaceId,
-        },
-      });
-    }),
-  list: protectedProcedure.query(async ({ ctx }) => {
-    const userId = ctx.auth.userId;
-    const workspaces = await ctx.prisma.workspace.findMany({
-      where: {
-        userId,
-      },
-    });
-
-    // Extract and return the workspace names
-    return workspaces;
-  }),
-  create: protectedProcedure
-    .input(z.object({ name: z.string(), description: z.string() }))
-    .mutation(async ({ input, ctx }) => {
-      const workspace = await ctx.prisma.workspace.create({
-        data: {
-          ...input,
-          userId: ctx.auth.userId,
-        },
-      });
-      return workspace;
-    }),
-  update: protectedProcedure
+const profileRouter = createTRPCRouter({
+  updateProfile: protectedProcedure
     .input(
       z.object({
-        workspaceId: z.string(),
+        profileId: z.string(),
         name: z.string(),
-        description: z.string(),
+        avatar: z.string(),
+        aboutMe: z.string(),
+        skills: z.array(z.string()),
+        achievements: z.array(z.string()),
+        education: z.array(z.string()),
+        researchExperience: z.array(z.string()),
+        researchInterest: z.array(z.string()),
+        collabStatus: z.array(z.string()),
       })
     )
-    .mutation(async ({ input, ctx }) => {
-      const { workspaceId, name, description } = input;
+    .mutation(async ({ input }) => {
+      const {
+        profileId,
+        name,
+        avatar,
+        aboutMe,
+        skills,
+        achievements,
+        education,
+        researchExperience,
+        researchInterest,
+        collabStatus,
+      } = input;
 
-      const updatedWorkspace = await ctx.prisma.workspace.update({
-        where: {
-          id: workspaceId,
-        },
-        data: {
-          name,
-          description,
-        },
-      });
+      try {
+        const profile = await prisma.profile.findUnique({
+          where: {
+            id: profileId,
+          },
+        });
 
-      return updatedWorkspace;
-    }),
-  delete: protectedProcedure
-    .input(z.object({ workspaceId: z.string() }))
-    .mutation(async ({ input, ctx }) => {
-      const { workspaceId } = input;
+        if (!profile) {
+          throw new Error("Profile not found");
+        }
 
-      await ctx.prisma.workspace.delete({
-        where: {
-          id: workspaceId,
-        },
-      });
+        const updatedProfile = await prisma.profile.update({
+          where: {
+            id: profileId,
+          },
+          data: {
+            name,
+            avatar,
+            aboutMe,
+            skills,
+            achievements,
+            education,
+            researchExperience,
+            researchInterest,
+            collabStatus,
+          },
+        });
 
-      return { success: true };
+        return updatedProfile;
+      } catch (error: any) {
+        throw new Error(`Failed to update profile: ${error.message}`);
+      }
     }),
 });
+
+export default profileRouter;
