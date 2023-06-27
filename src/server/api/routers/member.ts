@@ -27,6 +27,7 @@ export const memberRouter = createTRPCRouter({
         data: {
           role: "Researcher",
           workspaceId: input.workspaceId,
+          userId: input.id,
         },
       });
 

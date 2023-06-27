@@ -44,6 +44,7 @@ export const workspaceRouter = createTRPCRouter({
         data: {
           role: "Researcher Admin", // Set the desired role for the user
           workspaceId: workspace.id,
+          userId: userId,
         },
       });
 

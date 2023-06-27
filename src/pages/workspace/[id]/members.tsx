@@ -44,7 +44,9 @@ const Members: NextPage = () => {
   );
 
   if (users.data && workspaceMembers.data) {
-    const workspaceMemberIds = workspaceMembers.data.map((member) => member.id);
+    const workspaceMemberIds = workspaceMembers.data.map(
+      (member) => member.userId
+    );
 
     users.data.forEach((user) => {
       const firstEmailAddress = user.emailAddresses[0]?.emailAddress || "";
