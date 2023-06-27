@@ -16,7 +16,6 @@ model Profile {
   userId      String
   name        String
   avatar      String
-  description String
   aboutMe     String
   skills      String[]
   achievements String[]
