@@ -40,9 +40,8 @@ export const workspaceRouter = createTRPCRouter({
         },
       });
 
-      await ctx.prisma.member.create({
+      const member = await ctx.prisma.member.create({
         data: {
-          id: userId,
           role: "Researcher Admin", // Set the desired role for the user
           workspaceId: workspace.id,
         },
@@ -55,7 +54,7 @@ export const workspaceRouter = createTRPCRouter({
 
       // Update the member record with the user's name, email, and avatar
       await ctx.prisma.member.update({
-        where: { id: userId },
+        where: { id: member.id },
         data: { name, email, avatar },
       });
 

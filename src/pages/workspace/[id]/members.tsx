@@ -50,13 +50,14 @@ const Members: NextPage = () => {
       const firstEmailAddress = user.emailAddresses[0]?.emailAddress || "";
       const userId = user.id;
 
-      // Check if the user is already a member of the workspace
-      if (!workspaceMemberIds.includes(userId)) {
+      const isMember = workspaceMemberIds.includes(userId);
+
+      // Check if the user is not a member of the workspace
+      if (!isMember) {
         userArray.push({ label: firstEmailAddress, value: userId });
       }
     });
   }
-
   const addMember = api.member.addMember.useMutation();
 
   const onSubmit = async () => {

@@ -25,13 +25,12 @@ export const memberRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const member = await ctx.prisma.member.create({
         data: {
-          id: input.id,
           role: "Researcher",
           workspaceId: input.workspaceId,
         },
       });
 
-      const user = await clerkClient.users.getUser(member.id);
+      const user = await clerkClient.users.getUser(input.id);
       const name = user.firstName ?? ""; // Use empty string as default value if user.firstName is null
       const email = user.emailAddresses[0]?.emailAddress || "";
       const avatar = user.imageUrl;
