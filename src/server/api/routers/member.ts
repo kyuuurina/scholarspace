@@ -79,8 +79,7 @@ export const memberRouter = createTRPCRouter({
     .mutation(async ({ input, ctx }) => {
       const { id } = input;
 
-      await ctx.prisma.member
-      .delete({
+      await ctx.prisma.member.delete({
         where: {
           id,
         },

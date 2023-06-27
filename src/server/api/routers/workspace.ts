@@ -1,3 +1,4 @@
+import { clerkClient } from "@clerk/nextjs";
 import { z } from "zod";
 
 import {
@@ -30,12 +31,34 @@ export const workspaceRouter = createTRPCRouter({
   create: protectedProcedure
     .input(z.object({ name: z.string(), description: z.string() }))
     .mutation(async ({ input, ctx }) => {
+      const userId = ctx.auth.userId;
+
       const workspace = await ctx.prisma.workspace.create({
         data: {
           ...input,
           userId: ctx.auth.userId,
         },
       });
+
+      await ctx.prisma.member.create({
+        data: {
+          id: userId,
+          role: "Researcher Admin", // Set the desired role for the user
+          workspaceId: workspace.id,
+        },
+      });
+
+      const user = await clerkClient.users.getUser(userId);
+      const name = user.firstName ?? ""; // Use empty string as default value if user.firstName is null
+      const email = user.emailAddresses[0]?.emailAddress || "";
+      const avatar = user.imageUrl;
+
+      // Update the member record with the user's name, email, and avatar
+      await ctx.prisma.member.update({
+        where: { id: userId },
+        data: { name, email, avatar },
+      });
+
       return workspace;
     }),
   update: protectedProcedure
@@ -66,6 +89,14 @@ export const workspaceRouter = createTRPCRouter({
     .mutation(async ({ input, ctx }) => {
       const { workspaceId } = input;
 
+      // Delete all members associated with the workspace
+      await ctx.prisma.member.deleteMany({
+        where: {
+          workspaceId,
+        },
+      });
+
+      // Delete the workspace
       await ctx.prisma.workspace.delete({
         where: {
           id: workspaceId,

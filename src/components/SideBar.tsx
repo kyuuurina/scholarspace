@@ -3,9 +3,17 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { useState } from "react";
+
+// React and Next hooks
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
+import { useRouter } from "next/router";
+
+// clerk
+import { useUser } from "@clerk/nextjs";
+
+// icons
 import {
   FiHome,
   FiActivity,
@@ -15,50 +23,65 @@ import {
 
 import { api } from "~/utils/api";
 
+// components
 import { Modal } from "./Modal";
 
 type WorkspaceForm = {
   name: string;
   description: string;
+  id: string;
 };
 
 export function SideBar() {
   const [open, setOpen] = useState(false);
   const [workspaceMenu, setWorkspaceMenu] = useState(false);
+  const router = useRouter();
+
+  const user = useUser();
 
   const workspaces = api.workspace.list.useQuery();
   const createWorkspace = api.workspace.create.useMutation();
-  const workspaceArray: { id: string; name: string }[] = [];
+  const [modalIsOpen, setModalIsOpen] = useState(false);
   const { register, handleSubmit, reset } = useForm<WorkspaceForm>();
 
-  const onSubmit = (formData: WorkspaceForm) => {
-    createWorkspace
-      .mutateAsync({
-        ...formData,
-      })
-      .then(() => {
-        setModalIsOpen(false);
-        reset();
-      });
-  };
+  const workspaceArray: { id: string; name: string }[] = workspaces.data
+    ? workspaces.data.map((workspace) => ({
+        id: workspace.id,
+        name: workspace.name,
+      }))
+    : [];
 
-  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const onSubmit = async (formData: WorkspaceForm) => {
+    try {
+      const response = await createWorkspace.mutateAsync({
+        ...formData,
+      });
+
+      console.log(response);
+      setModalIsOpen(false);
+      reset();
+
+      // Navigate to the newly created project dashboard
+      router.push(`/workspace/${response.id}`);
+    } catch (error) {
+      // Handle any errors
+      console.error(error);
+    }
+  };
 
   const handleToggle = () => {
     setOpen(!open);
   };
 
-  if (workspaces.data) {
-    workspaces.data.forEach((workspace) => {
-      const id = workspace.id;
-      const name = workspace.name;
-      workspaceArray.push({ id, name });
-    });
-  }
-
   const handleToggleWorkspace = () => {
-    setWorkspaceMenu(!workspaceMenu); // Update to workspaceMenu state
+    setWorkspaceMenu(!workspaceMenu);
   };
+
+  useEffect(() => {
+    if (createWorkspace.isSuccess) {
+      workspaces.refetch();
+    }
+  }, [createWorkspace.isSuccess, workspaces.refetch]);
 
   return (
     <>
@@ -205,33 +228,35 @@ export function SideBar() {
                         ></path>
                       </svg>
                     </button>
-                    <div
-                      className={`z-10 ${
-                        workspaceMenu ? "" : "hidden"
-                      } w-44 divide-y divide-gray-100 rounded-sm bg-white shadow dark:divide-gray-600 dark:bg-gray-700`}
-                    >
-                      <ul className="py-2 text-sm text-gray-700 dark:text-gray-200">
-                        {workspaceArray.map((workspace) => (
-                          <Link
-                            key={workspace.id}
-                            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                            href={`/workspace/${workspace.id}`}
+                    {user.isSignedIn && (
+                      <div
+                        className={`z-10 ${
+                          workspaceMenu ? "" : "hidden"
+                        } w-44 divide-y divide-gray-100 rounded-sm bg-white shadow dark:divide-gray-600 dark:bg-gray-700`}
+                      >
+                        <ul className="py-2 text-sm text-gray-700 dark:text-gray-200">
+                          {workspaceArray.map((workspace) => (
+                            <Link
+                              key={workspace.id}
+                              className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                              href={`/workspace/${workspace.id}`}
+                            >
+                              {workspace.name}
+                            </Link>
+                          ))}
+                        </ul>
+                        <div className="w-full py-2">
+                          <button
+                            onClick={() => {
+                              setModalIsOpen(true);
+                            }}
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600 dark:hover:text-white"
                           >
-                            {workspace.name}
-                          </Link>
-                        ))}
-                      </ul>
-                      <div className="w-full py-2">
-                        <button
-                          onClick={() => {
-                            setModalIsOpen(true);
-                          }}
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600 dark:hover:text-white"
-                        >
-                          Add Workspace
-                        </button>
+                            Add Workspace
+                          </button>
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </li>
                 )}
               </ul>
@@ -242,3 +267,5 @@ export function SideBar() {
     </>
   );
 }
+
+export default SideBar;

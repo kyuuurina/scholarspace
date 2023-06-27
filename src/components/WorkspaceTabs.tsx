@@ -4,6 +4,10 @@ import { useRouter } from "next/router";
 export function WorkspaceTabs() {
   const router = useRouter();
 
+  // Check if router.query and router.query.id are defined before accessing their values
+  const workspaceId =
+    router.query && router.query.id ? router.query.id.toString() : "";
+
   return (
     <div className="mb-4 border-b border-gray-200 dark:border-gray-700">
       <ul
@@ -13,30 +17,27 @@ export function WorkspaceTabs() {
         role="tablist"
       >
         <li className="mr-2" role="presentation">
-          <Link href={`/workspace/${router.query.id.toString()}`}>
+          <Link href={`/workspace/${workspaceId}`}>
             <span
               className={`inline-block rounded-t-lg border-b-2 border-transparent p-4 ${
-                router.asPath === `/workspace/${router.query.id.toString()}`
+                router.asPath === `/workspace/${workspaceId}`
                   ? "border-blue-500 text-blue-500"
                   : "hover:border-gray-300 hover:text-gray-600 dark:hover:text-gray-300"
               }`}
               id="dashboard-tab"
               role="tab"
               aria-controls="dashboard"
-              aria-selected={
-                router.asPath === `/workspace/${router.query.id.toString()}`
-              }
+              aria-selected={router.asPath === `/workspace/${workspaceId}`}
             >
               Dashboard
             </span>
           </Link>
         </li>
         <li role="presentation">
-          <Link href={`/workspace/${router.query.id.toString()}/members`}>
+          <Link href={`/workspace/${workspaceId}/members`}>
             <span
               className={`inline-block rounded-t-lg border-b-2 border-transparent p-4 ${
-                router.asPath ===
-                `/workspace/${router.query.id.toString()}/members`
+                router.asPath === `/workspace/${workspaceId}/members`
                   ? "border-blue-500 text-blue-500"
                   : "hover:border-gray-300 hover:text-gray-600 dark:hover:text-gray-300"
               }`}
@@ -44,8 +45,7 @@ export function WorkspaceTabs() {
               role="tab"
               aria-controls="contacts"
               aria-selected={
-                router.asPath ===
-                `/workspace/${router.query.id.toString()}/members`
+                router.asPath === `/workspace/${workspaceId}/members`
               }
             >
               Members
@@ -53,11 +53,10 @@ export function WorkspaceTabs() {
           </Link>
         </li>
         <li className="mr-2" role="presentation">
-          <Link href={`/workspace/${router.query.id.toString()}/settings`}>
+          <Link href={`/workspace/${workspaceId}/settings`}>
             <span
               className={`inline-block rounded-t-lg border-b-2 border-transparent p-4 ${
-                router.asPath ===
-                `/workspace/${router.query.id.toString()}/settings`
+                router.asPath === `/workspace/${workspaceId}/settings`
                   ? "border-blue-500 text-blue-500"
                   : "hover:border-gray-300 hover:text-gray-600 dark:hover:text-gray-300"
               }`}
@@ -65,8 +64,7 @@ export function WorkspaceTabs() {
               role="tab"
               aria-controls="settings"
               aria-selected={
-                router.asPath ===
-                `/workspace/${router.query.id.toString()}/settings`
+                router.asPath === `/workspace/${workspaceId}/settings`
               }
             >
               Settings

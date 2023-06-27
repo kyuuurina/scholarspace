@@ -9,6 +9,7 @@ import { Modal } from "~/components/Modal";
 import { WorkspaceTabs } from "~/components/WorkspaceTabs";
 import { useForm } from "react-hook-form";
 import EditableDropDown from "~/components/EditableDropDown";
+import { useUser } from "@clerk/clerk-react";
 
 // next hooks
 import { useRouter } from "next/router";
@@ -16,6 +17,14 @@ import { useRouter } from "next/router";
 const Members: NextPage = () => {
   const { handleSubmit } = useForm();
   const router = useRouter();
+  const { user } = useUser();
+  const userId = user?.id;
+
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(event.target.value);
+  };
 
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<{
@@ -25,12 +34,26 @@ const Members: NextPage = () => {
 
   const users = api.account.getAllUsers.useQuery();
   const userArray: { label: string; value: string }[] = [];
+  const workspaceMembers = api.member.getWorkspaceMembers.useQuery(
+    {
+      workspaceId: router.query.id as string,
+    },
+    {
+      enabled: !!router.query.id,
+    }
+  );
 
-  if (users.data) {
+  if (users.data && workspaceMembers.data) {
+    const workspaceMemberIds = workspaceMembers.data.map((member) => member.id);
+
     users.data.forEach((user) => {
       const firstEmailAddress = user.emailAddresses[0]?.emailAddress || "";
       const userId = user.id;
-      userArray.push({ label: firstEmailAddress, value: userId });
+
+      // Check if the user is already a member of the workspace
+      if (!workspaceMemberIds.includes(userId)) {
+        userArray.push({ label: firstEmailAddress, value: userId });
+      }
     });
   }
 
@@ -50,6 +73,7 @@ const Members: NextPage = () => {
         // Reset the form and close the modal
         setSelectedUser(null);
         setModalIsOpen(false);
+        router.reload();
       } catch (error) {
         // Handle any errors that occur during member creation
         console.error("Failed to create member:", error);
@@ -71,15 +95,6 @@ const Members: NextPage = () => {
       });
   };
 
-  const workspaceMembers = api.member.getWorkspaceMembers.useQuery(
-    {
-      workspaceId: router.query.id as string,
-    },
-    {
-      enabled: !!router.query.id,
-    }
-  );
-
   const workspaceMembersArray: {
     id: string;
     name: string;
@@ -99,6 +114,13 @@ const Members: NextPage = () => {
     });
   }
 
+  const filteredMembers = workspaceMembersArray.filter((member) => {
+    const memberName = member.name.toLowerCase();
+    const memberEmail = member.email.toLowerCase();
+    const query = searchQuery.toLowerCase();
+    return memberName.includes(query) || memberEmail.includes(query);
+  });
+
   const updateRole = api.member.update.useMutation();
 
   const deleteMember = api.member.delete.useMutation();
@@ -109,7 +131,7 @@ const Members: NextPage = () => {
         id: memberId,
       })
       .then(() => {
-        router.push("/");
+        router.reload();
       });
   };
 
@@ -186,6 +208,8 @@ const Members: NextPage = () => {
                   id="table-search-users"
                   className="block w-80 rounded-lg border border-gray-300 bg-gray-50 p-2 pl-10 text-sm text-gray-900 focus:border-purple-500 focus:ring-purple-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-purple-500 dark:focus:ring-purple-500"
                   placeholder="Search for users"
+                  value={searchQuery}
+                  onChange={handleSearch}
                 />
               </div>
 
@@ -214,7 +238,7 @@ const Members: NextPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {workspaceMembersArray.map((member) => (
+                {filteredMembers.map((member) => (
                   <tr
                     key={member.id}
                     className="bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-600"
@@ -243,15 +267,17 @@ const Members: NextPage = () => {
                       />
                     </td>
                     <td className="px-6 py-4">
-                      <a
-                        href="#"
-                        type="button"
-                        data-modal-show="removeModal"
-                        className="font-medium text-purple-600 hover:underline dark:text-purple-500"
-                        onClick={() => handleDeleteMember(member.id)}
-                      >
-                        Remove user
-                      </a>
+                      {member.id != userId && (
+                        <a
+                          href="#"
+                          type="button"
+                          data-modal-show="removeModal"
+                          className="font-medium text-purple-600 hover:underline dark:text-purple-500"
+                          onClick={() => handleDeleteMember(member.id)}
+                        >
+                          Remove user
+                        </a>
+                      )}
                     </td>
                   </tr>
                 ))}

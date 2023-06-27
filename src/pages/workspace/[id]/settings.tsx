@@ -1,14 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-floating-promises */
-import { type NextPage } from "next";
+import { NextPage } from "next";
 import Head from "next/head";
 import { api } from "~/utils/api";
-
-// react hooks
-import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-
-// local components
+import { useState, useEffect } from "react";
 import EditableText from "~/components/EditableText";
 import { WorkspaceTabs } from "~/components/WorkspaceTabs";
 
@@ -38,6 +34,7 @@ const Settings: NextPage = () => {
   }, [workspaceData]);
 
   const updateWorkspace = api.workspace.update.useMutation();
+  const deleteWorkspace = api.workspace.delete.useMutation();
 
   const handleWorkspaceNameUpdate = (newText: string) => {
     setWorkspaceName(newText);
@@ -52,18 +49,6 @@ const Settings: NextPage = () => {
       });
   };
 
-  const deleteWorkspace = api.workspace.delete.useMutation();
-
-  const handleDeleteWorkspace = () => {
-    deleteWorkspace
-      .mutateAsync({
-        workspaceId: router.query.id as string,
-      })
-      .then(() => {
-        router.push("/");
-      });
-  };
-
   const handleWorkspaceDescriptionUpdate = (newText: string) => {
     setWorkspaceDescription(newText);
     updateWorkspace
@@ -74,10 +59,27 @@ const Settings: NextPage = () => {
       })
       .then(() => {
         console.log("workspace updated");
+        router.replace("/");
+      });
+  };
+
+  const handleDeleteWorkspace = () => {
+    deleteWorkspace
+      .mutateAsync({
+        workspaceId: router.query.id as string,
+      })
+      .then(() => {
+        console.log("Workspace deleted");
+        router.push("/");
+        alert("Workspace successfully deleted");
+      })
+      .catch((error) => {
+        console.error("Error deleting workspace:", error);
       });
   };
 
   if (!workspaceData) {
+    router.push("/");
     return null;
   }
 
