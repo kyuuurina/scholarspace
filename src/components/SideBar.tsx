@@ -10,9 +10,6 @@ import { useForm } from "react-hook-form";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
-// clerk
-import { useUser } from "@clerk/nextjs";
-
 // icons
 import {
   FiHome,
@@ -36,8 +33,6 @@ export function SideBar() {
   const [open, setOpen] = useState(false);
   const [workspaceMenu, setWorkspaceMenu] = useState(false);
   const router = useRouter();
-
-  const user = useUser();
 
   const workspaces = api.workspace.list.useQuery();
   const createWorkspace = api.workspace.create.useMutation();
@@ -228,7 +223,7 @@ export function SideBar() {
                         ></path>
                       </svg>
                     </button>
-                    {user.isSignedIn && (
+                    {/* {user.isSignedIn && (
                       <div
                         className={`z-10 ${
                           workspaceMenu ? "" : "hidden"
@@ -256,7 +251,7 @@ export function SideBar() {
                           </button>
                         </div>
                       </div>
-                    )}
+                    )} */}
                   </li>
                 )}
               </ul>

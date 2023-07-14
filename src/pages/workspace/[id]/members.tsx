@@ -9,7 +9,7 @@ import { Modal } from "~/components/Modal";
 import { WorkspaceTabs } from "~/components/WorkspaceTabs";
 import { useForm } from "react-hook-form";
 import EditableDropDown from "~/components/EditableDropDown";
-import { useUser } from "@clerk/clerk-react";
+// import { useUser } from "@clerk/clerk-react";
 
 // next hooks
 import { useRouter } from "next/router";
@@ -17,8 +17,8 @@ import { useRouter } from "next/router";
 const Members: NextPage = () => {
   const { handleSubmit } = useForm();
   const router = useRouter();
-  const { user } = useUser();
-  const userId = user?.id;
+  // const { user } = useUser();
+  // const userId = user?.id;
 
   const [searchQuery, setSearchQuery] = useState("");
 
