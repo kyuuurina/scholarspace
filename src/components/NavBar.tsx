@@ -1,7 +1,8 @@
 import Link from "next/link";
 
-export function NavBar() {
+import { SignoutButton } from "./SignoutButton";
 
+export function NavBar() {
   return (
     <nav className="border-gray-200 bg-purple-950 dark:bg-gray-900">
       <div className="flex flex-wrap items-center justify-between p-4">
@@ -24,6 +25,9 @@ export function NavBar() {
             {/* <li>
               <UserButton />
             </li> */}
+            <li>
+              <SignoutButton />
+            </li>
           </ul>
         </div>
       </div>
