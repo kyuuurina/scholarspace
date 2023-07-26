@@ -1,10 +1,12 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { router, protectedProcedure } from "~/server/api/trpc";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-const profileRouter = createTRPCRouter({
+const profileRouter = router({
   updateProfile: protectedProcedure
     .input(
       z.object({

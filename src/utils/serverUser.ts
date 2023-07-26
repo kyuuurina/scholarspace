@@ -14,6 +14,5 @@ export const getUserFromContext = async (
   const {
     data: { user },
   } = await supabaseServerClient.auth.getUser();
-
   return user;
 };

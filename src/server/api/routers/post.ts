@@ -1,11 +1,11 @@
 // post.ts
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { router, protectedProcedure } from "~/server/api/trpc";
 import { PrismaClient, ResearchPosts } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export const postRouter = createTRPCRouter({
+export const postRouter = router({
   create: protectedProcedure
     .input(
       z.object({

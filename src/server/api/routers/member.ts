@@ -1,13 +1,7 @@
 import { z } from "zod";
-import {
-  createTRPCRouter,
-  protectedProcedure,
-  publicProcedure,
-} from "~/server/api/trpc";
+import { router, protectedProcedure, publicProcedure } from "~/server/api/trpc";
 
-import { clerkClient } from "@clerk/nextjs";
-
-export const memberRouter = createTRPCRouter({
+export const memberRouter = router({
   list: publicProcedure.query(({ ctx }) => {
     return ctx.prisma.member.findMany();
   }),
@@ -20,30 +14,30 @@ export const memberRouter = createTRPCRouter({
         },
       });
     }),
-  addMember: protectedProcedure
-    .input(z.object({ id: z.string(), workspaceId: z.string() }))
-    .mutation(async ({ ctx, input }) => {
-      const member = await ctx.prisma.member.create({
-        data: {
-          role: "Researcher",
-          workspaceId: input.workspaceId,
-          userId: input.id,
-        },
-      });
+  // addMember: protectedProcedure
+  //   .input(z.object({ id: z.string(), workspaceId: z.string() }))
+  //   .mutation(async ({ ctx, input }) => {
+  //     const member = await ctx.prisma.member.create({
+  //       data: {
+  //         role: "Researcher",
+  //         workspaceId: input.workspaceId,
+  //         userId: input.id,
+  //       },
+  //     });
 
-      const user = await clerkClient.users.getUser(input.id);
-      const name = user.firstName ?? ""; // Use empty string as default value if user.firstName is null
-      const email = user.emailAddresses[0]?.emailAddress || "";
-      const avatar = user.imageUrl;
+  //     const user = await clerkClient.users.getUser(input.id);
+  //     const name = user.firstName ?? ""; // Use empty string as default value if user.firstName is null
+  //     const email = user.emailAddresses[0]?.emailAddress || "";
+  //     const avatar = user.imageUrl;
 
-      // Update the member record with the user's name, email, and avatar
-      const updatedMember = await ctx.prisma.member.update({
-        where: { id: member.id },
-        data: { name, email, avatar },
-      });
+  //     // Update the member record with the user's name, email, and avatar
+  //     const updatedMember = await ctx.prisma.member.update({
+  //       where: { id: member.id },
+  //       data: { name, email, avatar },
+  //     });
 
-      return updatedMember;
-    }),
+  //     return updatedMember;
+  //   }),
   getWorkspaceMembers: protectedProcedure
     .input(z.object({ workspaceId: z.string() }))
     .query(async ({ ctx, input }) => {
