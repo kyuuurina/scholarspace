@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
-import { useSessionContext } from '@supabase/auth-helpers-react';
-import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useSessionContext } from "@supabase/auth-helpers-react";
+import { useRouter } from "next/router";
+import { useState } from "react";
 
-import { GoogleButton } from '~/components/auth/GoogleButton';
-import { LoadingSpinner } from '~/components/LoadingSpinner';
+import { GoogleButton } from "~/components/auth/GoogleButton";
+import { LoadingSpinner } from "~/components/LoadingSpinner";
 
 export const SignUpForm: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState<string>();
   const [loading, setLoading] = useState(false);
 
@@ -45,9 +45,9 @@ export const SignUpForm: React.FC = () => {
 
     // if there is a session it means that we do not need to verify the email beforehand
     if (session) {
-      router.push('/');
+      router.push("/");
     } else {
-      router.push('/auth/verify');
+      router.push("/auth/verify");
     }
   };
 
@@ -61,7 +61,10 @@ export const SignUpForm: React.FC = () => {
       className="space-y-6"
     >
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+        <label
+          htmlFor="email"
+          className="block text-sm font-medium text-gray-700"
+        >
           Email
         </label>
         <div className="mt-1">
@@ -73,13 +76,16 @@ export const SignUpForm: React.FC = () => {
             onChange={(event) => setEmail(event.target.value)}
             autoComplete="email"
             required
-            className="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-primary focus:outline-none focus:ring-primary sm:text-sm"
+            className="focus:border-primary focus:ring-primary block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:outline-none sm:text-sm"
           />
         </div>
       </div>
 
       <div className="space-y-1">
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+        <label
+          htmlFor="password"
+          className="block text-sm font-medium text-gray-700"
+        >
           Password
         </label>
         <div className="mt-1">
@@ -91,7 +97,7 @@ export const SignUpForm: React.FC = () => {
             onChange={(event) => setPassword(event.target.value)}
             autoComplete="current-password"
             required
-            className="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-primary focus:outline-none focus:ring-primary sm:text-sm"
+            className="focus:border-primary focus:ring-primary block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:outline-none sm:text-sm"
           />
         </div>
       </div>
@@ -102,9 +108,9 @@ export const SignUpForm: React.FC = () => {
         <button
           type="submit"
           disabled={loading}
-          className="flex w-full justify-center rounded-md border border-transparent bg-primary px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+          className="flex w-full justify-center rounded-lg bg-purple-700 px-3 py-2 text-center text-sm font-medium text-white shadow-md hover:bg-purple-800 focus:outline-none focus:ring-4 focus:ring-purple-300 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900"
         >
-          {loading ? <LoadingSpinner /> : 'Sign up'}
+          {loading ? <LoadingSpinner /> : "Sign Up"}
         </button>
 
         <GoogleButton type="signup" />
