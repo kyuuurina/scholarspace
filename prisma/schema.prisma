@@ -32,7 +32,7 @@ model Workspace {
   updatedAt   DateTime @updatedAt
   name        String
   description String
-  members     Member[]
+  // members     Member[]
 }
 
 model Member {
@@ -42,8 +42,8 @@ model Member {
   name        String?
   email       String?
   avatar      String?
-  workspaceId String
-  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  // workspaceId String
+  // workspace   Workspace @relation(fields: [workspaceId], references: [id])
 }
 
 model ResearchPosts {

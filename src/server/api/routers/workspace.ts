@@ -31,28 +31,9 @@ export const workspaceRouter = router({
       const workspace = await ctx.prisma.workspace.create({
         data: {
           ...input,
-          userId: ctx.user.id,
+          userId,
         },
       });
-
-      //     const member = await ctx.prisma.member.create({
-      //       data: {
-      //         role: "Researcher Admin", // Set the desired role for the user
-      //         workspaceId: workspace.id,
-      //         userId: userId,
-      //       },
-      //     });
-
-      //     const user = await clerkClient.users.getUser(userId);
-      //     const name = user.firstName ?? ""; // Use empty string as default value if user.firstName is null
-      //     const email = user.emailAddresses[0]?.emailAddress || "";
-      //     const avatar = user.imageUrl;
-
-      //     // Update the member record with the user's name, email, and avatar
-      //     await ctx.prisma.member.update({
-      //       where: { id: member.id },
-      //       data: { name, email, avatar },
-      //     });
 
       return workspace;
     }),

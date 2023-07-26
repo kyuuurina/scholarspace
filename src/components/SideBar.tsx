@@ -9,6 +9,7 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useSessionContext, useUser } from "@supabase/auth-helpers-react";
 
 // icons
 import {
@@ -33,6 +34,8 @@ export function SideBar() {
   const [open, setOpen] = useState(false);
   const [workspaceMenu, setWorkspaceMenu] = useState(false);
   const router = useRouter();
+
+  const user = useUser();
 
   const workspaces = api.workspace.list.useQuery();
   const createWorkspace = api.workspace.create.useMutation();
@@ -223,7 +226,7 @@ export function SideBar() {
                         ></path>
                       </svg>
                     </button>
-                    {/* {user.isSignedIn && (
+                    {user && (
                       <div
                         className={`z-10 ${
                           workspaceMenu ? "" : "hidden"
@@ -251,7 +254,7 @@ export function SideBar() {
                           </button>
                         </div>
                       </div>
-                    )} */}
+                    )}
                   </li>
                 )}
               </ul>
