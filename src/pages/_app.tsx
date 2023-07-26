@@ -1,29 +1,31 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { type AppType } from "next/app";
+/* eslint-disable @typescript-eslint/ban-types */
+import type { ReactElement, ReactNode } from "react";
+import { useState } from "react";
+import type { NextPage } from "next";
+import type { AppProps } from "next/app";
+import Head from "next/head";
+
 import {
   createPagesBrowserClient,
   type Session,
 } from "@supabase/auth-helpers-nextjs";
 import { SessionContextProvider } from "@supabase/auth-helpers-react";
-import Head from "next/head";
-import { useState } from "react";
 
-type Props = {
+import { api } from "~/utils/api";
+import "~/styles/globals.css";
+
+export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
+  getLayout?: (page: ReactElement) => ReactNode;
+};
+
+type AppPropsWithLayout = AppProps & {
+  Component: NextPageWithLayout;
   initialSession: Session;
 };
 
-// components
-import { NavBar } from "~/components/NavBar";
-import { SideBar } from "~/components/SideBar";
-
-import { api } from "~/utils/api";
-
-import "~/styles/globals.css";
-
-const MyApp: AppType<Props> = ({ Component, pageProps }) => {
+const MyApp = ({ Component, pageProps }: AppPropsWithLayout) => {
   const [supabaseClient] = useState(() => createPagesBrowserClient());
+  const getLayout = Component.getLayout ?? ((page) => page);
 
   return (
     <>
@@ -34,13 +36,7 @@ const MyApp: AppType<Props> = ({ Component, pageProps }) => {
         supabaseClient={supabaseClient}
         initialSession={pageProps.initialSession}
       >
-        <div className="flex min-h-screen">
-          <SideBar />
-          <div className="light:black flex-grow dark:text-white">
-            <NavBar />
-            <Component {...pageProps} />
-          </div>
-        </div>
+        {getLayout(<Component {...pageProps} />)}
       </SessionContextProvider>
     </>
   );
