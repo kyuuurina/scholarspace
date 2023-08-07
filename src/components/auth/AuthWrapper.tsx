@@ -27,11 +27,11 @@ export const AuthWrapper: React.FC<Props> = ({ children, type }) => {
   return (
     <>
       <Head title={authTypeToText(type)} />
-      <div className="flex min-h-screen">
-        <div className="flex flex-1 flex-col justify-center px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
-          <div className="mx-auto w-auto lg:w-96">
+      <div className="flex">
+        <div className="flex w-96 flex-1 flex-col justify-center rounded-lg bg-white py-12 shadow dark:border dark:border-gray-700 dark:bg-gray-800 sm:max-w-md sm:px-6 lg:px-20">
+          <div className="mx-auto">
             <div>
-              <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
+              <h2 className="text-3xl font-extrabold text-gray-900">
                 {type === "signup" && "Sign Up"}
                 {type === "signin" && "Sign In"}
                 {type === "forgot" && "Forgot password"}
