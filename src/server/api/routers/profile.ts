@@ -7,6 +7,23 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 const profileRouter = router({
+  validate: protectedProcedure.query(async ({ ctx }) => {
+    const userId = ctx.user?.id;
+
+    // check if this user has a profile
+    const profile = await ctx.prisma.profile.findFirst({
+      where: {
+        userId,
+      },
+    });
+
+    if (!profile) {
+      return false;
+    }
+
+    return true;
+  }),
+
   updateProfile: protectedProcedure
     .input(
       z.object({
