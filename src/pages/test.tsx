@@ -1,3 +1,5 @@
+// This file is for prototyping and testing pages
+
 import { type NextPage } from "next";
 import Head from "next/head";
 

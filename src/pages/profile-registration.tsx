@@ -2,7 +2,7 @@
 import { useUser } from "@supabase/auth-helpers-react";
 import type { NextPage } from "next";
 
-import { SignoutButton } from "~/components/SignoutButton";
+import { SignoutButton } from "~/components/auth/SignoutButton";
 
 const SignUp: NextPage = () => {
   const user = useUser();

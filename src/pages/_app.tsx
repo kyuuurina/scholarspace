@@ -5,6 +5,7 @@ import type { NextPage } from "next";
 import type { AppProps } from "next/app";
 import Head from "next/head";
 
+// supabase helpers for authentication and authorization
 import {
   createPagesBrowserClient,
   type Session,
@@ -20,10 +21,12 @@ export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
 
 type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
-  initialSession: Session;
 };
 
-const MyApp = ({ Component, pageProps }: AppPropsWithLayout) => {
+const MyApp = ({
+  Component,
+  pageProps: { initialSession, ...pageProps },
+}: AppPropsWithLayout) => {
   const [supabaseClient] = useState(() => createPagesBrowserClient());
   const getLayout = Component.getLayout ?? ((page) => page);
 
@@ -34,7 +37,7 @@ const MyApp = ({ Component, pageProps }: AppPropsWithLayout) => {
       </Head>
       <SessionContextProvider
         supabaseClient={supabaseClient}
-        initialSession={pageProps.initialSession}
+        initialSession={initialSession as Session}
       >
         {getLayout(<Component {...pageProps} />)}
       </SessionContextProvider>
