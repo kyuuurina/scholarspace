@@ -22,7 +22,7 @@ import {
 import { api } from "~/utils/api";
 
 // components
-import { Modal } from "./Modal";
+import { Modal } from "../Modal";
 
 type WorkspaceForm = {
   name: string;
