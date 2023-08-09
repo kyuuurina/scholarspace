@@ -125,7 +125,7 @@ export function SideBar() {
         <div
           className={`${
             open ? "w-56" : "w-16"
-          } flex min-h-full flex-row overflow-y-auto bg-purple-950 px-2 py-7 shadow duration-300`}
+          } flex min-h-full flex-row overflow-y-auto bg-purple-950 px-2 py-6 shadow duration-300`}
         >
           <div className="min-w-full space-y-3 font-medium">
             <div className="ml-2 flex cursor-pointer items-center">

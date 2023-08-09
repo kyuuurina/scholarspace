@@ -3,7 +3,7 @@ import type { ReactElement, ReactNode } from "react";
 import { useState } from "react";
 import type { NextPage } from "next";
 import type { AppProps } from "next/app";
-import Head from "next/head";
+import { Head } from "~/components/layout/Head";
 
 // supabase helpers for authentication and authorization
 import {
@@ -32,9 +32,7 @@ const MyApp = ({
 
   return (
     <>
-      <Head>
-        <link rel="shortcut icon" href="/favicon.ico" />
-      </Head>
+      <Head />
       <SessionContextProvider
         supabaseClient={supabaseClient}
         initialSession={initialSession as Session}

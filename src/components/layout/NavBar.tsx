@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { SignoutButton } from "../auth/SignoutButton";
+import { AvatarPlaceholder } from "../AvatarPlaceholder";
 import { useUser, type User } from "@supabase/auth-helpers-react";
 
 export function NavBar() {
@@ -11,6 +12,8 @@ export function NavBar() {
   const [isNotifOverlayVisible, setIsNotifOverlayVisible] = useState(false);
   const notifOverlayRef = useRef<HTMLDivElement>(null);
   const avatarUrl = user?.user_metadata?.avatar_url as string;
+
+  console.log(user);
 
   const toggleUserOverlay = () => {
     setIsUserOverlayVisible(!isUserOverlayVisible);
@@ -55,8 +58,8 @@ export function NavBar() {
   }, []);
 
   return (
-    <nav className="fixed left-0 top-0 z-20 w-full bg-purple-950">
-      <div className="mx-2 flex flex-wrap items-center justify-between px-5 py-3">
+    <nav className="w-full bg-purple-950">
+      <div className="mx-2 flex flex-wrap items-center justify-between p-3">
         <Link href="/" className="flex items-center">
           <Image
             src="/scholarspace-logo-x.png"
@@ -66,7 +69,6 @@ export function NavBar() {
           />
         </Link>
 
-        {/* Render user information based on the session */}
         <div className="flex items-center gap-x-4 text-white">
           {/* Notifications */}
           <div className="mt-2">
@@ -110,7 +112,7 @@ export function NavBar() {
                         <span className="font-semibold text-gray-900 dark:text-white">
                           Jese Leos
                         </span>
-                        : "Hey, what's up? All set for the presentation?"
+                        <p>: Hey, what's up? All set for the presentation?</p>
                       </div>
                       <div className="text-xs text-blue-600 dark:text-blue-500">
                         a few moments ago
@@ -124,7 +126,16 @@ export function NavBar() {
           {/* User Menu  */}
           <div>
             <div className="cursor-pointer" onClick={toggleUserOverlay}>
-              <Image src={avatarUrl} width={32} height={32} alt="User avatar" />
+              {avatarUrl ? (
+                <Image
+                  src={avatarUrl}
+                  width={32}
+                  height={32}
+                  alt="User avatar"
+                />
+              ) : (
+                <AvatarPlaceholder name="Khairina Atiqah" />
+              )}
             </div>
             {/* Display user information */}
             {isUserOverlayVisible && (

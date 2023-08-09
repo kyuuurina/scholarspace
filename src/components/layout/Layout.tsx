@@ -14,7 +14,7 @@ export default function Layout({ children }: LayoutProps) {
         <SideBar />
         <div className="light:black flex-grow dark:text-white">
           <NavBar />
-          {children}
+          <div className="p-8">{children}</div>
         </div>
       </div>
     </>
