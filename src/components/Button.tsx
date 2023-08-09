@@ -1,10 +1,10 @@
 import React from "react";
 
-interface PrimaryButtonProps {
+interface ButtonProps {
   name: string;
 }
 
-export const PrimaryButton: React.FC<PrimaryButtonProps> = ({ name }) => {
+export const Button: React.FC<ButtonProps> = ({ name }) => {
   return (
     <button
       type="button"

@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { SignoutButton } from "./SignoutButton";
+import { SignoutButton } from "../auth/SignoutButton";
 
 export function NavBar() {
   return (

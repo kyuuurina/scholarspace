@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { useSessionContext } from '@supabase/auth-helpers-react';
 
-import { GoogleIcon } from '~/components/Icons';
+import { GoogleIcon } from '~/components/auth/Icons';
 
 type Props = {
   type: 'signin' | 'signup';

@@ -1,3 +1,5 @@
+// This file is for prototyping and testing components
+
 import { useState } from "react";
 
 import Select from "react-select";

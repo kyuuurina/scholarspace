@@ -8,12 +8,12 @@ import type { ReactElement } from "react";
 import { useRouter } from "next/router";
 
 // local components
-import { WorkspaceTabs } from "~/components/WorkspaceTabs";
-import { PrimaryButton } from "~/components/PrimaryButton";
-import { ProjectCard } from "~/components/ProjectCard";
-import { ScoreChart } from "~/components/ScoreChart";
+import { WorkspaceTabs } from "~/components/workspace/WorkspaceTabs";
+import { Button } from "~/components/Button";
+import { ProjectCard } from "~/components/project/ProjectCard";
+import { ScoreChart } from "~/components/chart/ScoreChart";
 
-import Layout from "~/components/Layout";
+import Layout from "~/components/layout/Layout";
 import type { NextPageWithLayout } from "~/pages/_app";
 
 const Workspace: NextPageWithLayout = () => {
@@ -50,7 +50,7 @@ const Workspace: NextPageWithLayout = () => {
             <h1 className="line-clamp-3 text-4xl">{workspaceData.name}</h1>
             <div className="flex justify-between">
               <WorkspaceTabs />
-              <PrimaryButton name="Add Project" />
+              <Button name="Add Project" />
             </div>
             <div className="grid gap-5">
               <h5 className="text-xl font-medium text-gray-900 dark:text-white">

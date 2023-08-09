@@ -6,7 +6,7 @@ import { useState } from "react";
 import Select from "react-select";
 import { api } from "~/utils/api";
 import { Modal } from "~/components/Modal";
-import { WorkspaceTabs } from "~/components/WorkspaceTabs";
+import { WorkspaceTabs } from "~/components/workspace/WorkspaceTabs";
 import { useForm } from "react-hook-form";
 import EditableDropDown from "~/components/EditableDropDown";
 // import { useUser } from "@clerk/clerk-react";

@@ -6,7 +6,7 @@ import { api } from "~/utils/api";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import EditableText from "~/components/EditableText";
-import { WorkspaceTabs } from "~/components/WorkspaceTabs";
+import { WorkspaceTabs } from "~/components/workspace/WorkspaceTabs";
 
 const Settings: NextPage = () => {
   const router = useRouter();
