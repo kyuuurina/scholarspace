@@ -13,25 +13,29 @@ export const workspaceRouter = router({
         },
       });
     }),
-  list: protectedProcedure.query(async ({ ctx }) => {
-    const userId = ctx.user.id;
-    const workspaces = await ctx.prisma.workspace.findMany({
-      where: {
-        userId,
-      },
-    });
-    return workspaces;
-  }),
+    
+    listUserWorkspaces: protectedProcedure.query(async ({ ctx }) => {
+      const userid = ctx.user.id;
+      const workspaces = await ctx.prisma.workspace_user.findMany({
+        where: {
+          userid,
+        },
+        include: {
+          workspace: true,
+        },
+      });
+      return workspaces;
+    }),
 
   create: protectedProcedure
-    .input(z.object({ name: z.string(), description: z.string() }))
+    .input(z.object({ name: z.string(), description: z.string(), coverImg: z.string() }))
     .mutation(async ({ input, ctx }) => {
-      const userId = ctx.user.id;
+      const userid = ctx.user.id;
 
-      const workspace = await ctx.prisma.workspace.create({
+      const workspace = await ctx.prisma.workspace_user.create({
         data: {
           ...input,
-          userId,
+          userid,
         },
       });
 

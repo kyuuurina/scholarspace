@@ -37,15 +37,18 @@ export function SideBar() {
 
   const user = useUser();
 
-  const workspaces = api.workspace.list.useQuery();
+  const workspaces = api.workspace.listUserWorkspaces.useQuery();
+
+  const workspacesData = workspaces.data;
+  console.log(workspacesData);
   const createWorkspace = api.workspace.create.useMutation();
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const { register, handleSubmit, reset } = useForm<WorkspaceForm>();
 
-  const workspaceArray: { id: string; name: string }[] = workspaces.data
-    ? workspaces.data.map((workspace) => ({
-        id: workspace.id,
-        name: workspace.name,
+  const workspaceArray: { id: string; name: string | null }[] = workspaces.data
+    ? workspaces.data.map((w) => ({
+        id: w.workspace.id,
+        name: w.workspace.name,
       }))
     : [];
 
