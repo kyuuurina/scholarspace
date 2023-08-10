@@ -28,14 +28,21 @@ export const workspaceRouter = router({
     }),
 
   create: protectedProcedure
-    .input(z.object({ name: z.string(), description: z.string(), coverImg: z.string() }))
+    .input(z.object({ name: z.string(), description: z.string(), cover_img: z.string() }))
     .mutation(async ({ input, ctx }) => {
       const userid = ctx.user.id;
 
-      const workspace = await ctx.prisma.workspace_user.create({
+      const workspace = await ctx.prisma.workspace.create({
         data: {
           ...input,
+        },
+      });
+
+      await ctx.prisma.workspace_user.create({
+        data: {
           userid,
+          workspaceid: workspace.id,
+          workspace_role: "Researcher Admin",
         },
       });
 
