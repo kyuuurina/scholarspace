@@ -1,11 +1,17 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import Image from "next/image";
+import { useRouter } from "next/router";
 import { type ZodType, z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Modal } from "../Modal";
+import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { v4 as uuidv4 } from "uuid";
 import { api } from "~/utils/api";
-import { useRouter } from "next/router";
-import { Button } from "../Button";
+
+// local components
 import { FormErrorMessage } from "../FormErrorMessage";
+import { Modal } from "../Modal";
+import { Button } from "../Button";
 
 type ModalProps = {
   openModal: boolean;
@@ -15,16 +21,25 @@ type ModalProps = {
 type WorkspaceFormData = {
   name: string;
   description: string;
-  cover_img: string;
+  cover_img: string | null;
 };
 
 export const WorkspaceModal: React.FC<ModalProps> = ({
   openModal,
   onClick,
 }) => {
-  const createWorkspace = api.workspace.create.useMutation();
-  const router = useRouter();
+  // image variables
+  const [imagePlaceholder, setImagePlaceholder] = useState<string | null>(null);
+  const [imageValue, setImageValue] = useState<File | null | undefined>(null);
+  const imgId: string = uuidv4();
 
+  const router = useRouter();
+  const user = useUser();
+  const supabase = useSupabaseClient();
+
+  const createWorkspace = api.workspace.create.useMutation();
+
+  // schema for form validation
   const schema: ZodType<WorkspaceFormData> = z.object({
     name: z
       .string()
@@ -34,12 +49,10 @@ export const WorkspaceModal: React.FC<ModalProps> = ({
       .string()
       .min(2, "Description must be at least 2 characters long.")
       .max(200, "Description must be at most 200 characters long."),
-    cover_img: z
-      .string()
-      .min(2, "Cover image must be at least 2 characters long.")
-      .max(100, "Cover image must be at most 100 characters long."),
+    cover_img: z.string().nullable(),
   });
 
+  // react-hook-form
   const {
     register,
     handleSubmit,
@@ -47,17 +60,31 @@ export const WorkspaceModal: React.FC<ModalProps> = ({
     formState: { errors },
   } = useForm<WorkspaceFormData>({
     resolver: zodResolver(schema),
+    defaultValues: {
+      cover_img: null,
+    },
   });
 
+  // handler for onSubmit form
   const onSubmit = async (formData: WorkspaceFormData) => {
     try {
+      // Upload the image to the storage bucket
+      if (imageValue && user) {
+        formData.cover_img = imgId;
+        const fileUrl = `/${user?.id}/${imgId}`;
+        const { data, error } = await supabase.storage
+          .from("workspace-covers")
+          .upload(fileUrl, imageValue);
+
+        console.log(error);
+        console.log(data);
+      }
       const response = await createWorkspace.mutateAsync({
         ...formData,
       });
-
-      console.log(response);
       onClick();
       reset();
+      setImagePlaceholder(null);
 
       // Navigate to the newly created project dashboard
       await router.push(`/workspace/${response.id}`);
@@ -67,9 +94,38 @@ export const WorkspaceModal: React.FC<ModalProps> = ({
     }
   };
 
+  // handler for onChange input for image upload
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      if (!e.target.files) return;
+      const file = e.target.files[0];
+      const reader = new FileReader();
+
+      // Read the image as a data URL
+      if (file) {
+        reader.readAsDataURL(file);
+        reader.onloadend = () => {
+          const displayImg = reader.result as string;
+          setImagePlaceholder(displayImg);
+        };
+
+        setImageValue(file);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div>
-      <Modal show={openModal} onClose={onClick}>
+      <Modal
+        show={openModal}
+        onClose={() => {
+          onClick();
+          reset();
+          setImagePlaceholder(null);
+        }}
+      >
         <form
           autoComplete="off"
           className="flex flex-col gap-4"
@@ -109,19 +165,56 @@ export const WorkspaceModal: React.FC<ModalProps> = ({
 
           <div>
             <label
-              htmlFor="description"
+              htmlFor="cImage"
               className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
             >
-              Workspace Description
+              Cover Image
             </label>
-            <textarea
-              id="description"
-              className="block w-full "
-              {...register("cover_img", { required: true })}
-            />
-            {errors.cover_img && (
-              <FormErrorMessage text={errors.cover_img.message} />
-            )}
+            <div className="flex w-full items-center justify-center">
+              <label className="relative flex h-64 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 ">
+                {imagePlaceholder ? (
+                  <Image
+                    src={imagePlaceholder}
+                    alt="cover image"
+                    style={{ objectFit: "contain" }}
+                    fill
+                  />
+                ) : (
+                  <div className="flex flex-col items-center justify-center pb-6 pt-5">
+                    <svg
+                      className="mb-4 h-8 w-8 text-gray-500"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 20 16"
+                    >
+                      <path
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
+                      />
+                    </svg>
+                    <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                      <span className="font-semibold">Click to upload</span> or
+                      drag and drop
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      PNG, JPG or JPEG
+                    </p>
+                  </div>
+                )}
+                <input
+                  type="file"
+                  className="hidden"
+                  accept="image/png, image/jpeg, image/jpg"
+                  onChange={(e) => {
+                    void handleOnChange(e);
+                  }}
+                />
+              </label>
+            </div>
           </div>
 
           <Button name="Create Workspace" type="submit" />

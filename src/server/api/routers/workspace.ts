@@ -28,7 +28,7 @@ export const workspaceRouter = router({
     }),
 
   create: protectedProcedure
-    .input(z.object({ name: z.string(), description: z.string(), cover_img: z.string() }))
+    .input(z.object({ name: z.string(), description: z.string(), cover_img: z.string().nullable() }))
     .mutation(async ({ input, ctx }) => {
       const userid = ctx.user.id;
 

@@ -34,6 +34,7 @@
     "react-select": "^5.7.3",
     "superjson": "1.12.2",
     "tailwindscss": "^0.3.0",
+    "uuidv4": "^6.2.13",
     "zod": "^3.21.4"
   },
   "devDependencies": {
