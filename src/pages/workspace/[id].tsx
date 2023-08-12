@@ -16,6 +16,8 @@ import { ScoreChart } from "~/components/chart/ScoreChart";
 import Layout from "~/components/layout/Layout";
 import type { NextPageWithLayout } from "~/pages/_app";
 
+import { useUser } from "@supabase/auth-helpers-react";
+
 const Workspace: NextPageWithLayout = () => {
   const router = useRouter();
 
@@ -35,6 +37,9 @@ const Workspace: NextPageWithLayout = () => {
   }
 
   console.log(workspaceData);
+  const user = useUser();
+
+  const imgUrl = `https://eeikbrtyntwckpyfphlm.supabase.co/storage/v1/object/public/workspace-covers/${user.id}/${workspaceData.cover_img}`;
 
   return (
     <>
@@ -47,6 +52,7 @@ const Workspace: NextPageWithLayout = () => {
       <main className="flex-grow flex-col p-10">
         <div className="grid grid-cols-12 gap-x-10">
           <div className="col-span-8 grid gap-y-5">
+            <img src={imgUrl} />
             <h1 className="line-clamp-3 text-4xl">{workspaceData.name}</h1>
             <div className="flex justify-between">
               <WorkspaceTabs />
