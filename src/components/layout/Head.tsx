@@ -2,7 +2,7 @@
 import NextHead from "next/head";
 
 type Props = {
-  title?: string;
+  title?: string | undefined | null;
 };
 
 const getTitle = (title?: string) => {

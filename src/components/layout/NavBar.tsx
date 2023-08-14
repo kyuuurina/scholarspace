@@ -58,11 +58,11 @@ export function NavBar() {
   }, []);
 
   return (
-    <nav className="w-full bg-purple-950">
+    <nav className="w-full border-b bg-white">
       <div className="mx-2 flex flex-wrap items-center justify-between p-3">
         <Link href="/" className="flex items-center">
           <Image
-            src="/scholarspace-logo-x.png"
+            src="/scholarspace-logo-x1.png"
             width={100}
             height={100}
             alt="Scholarspace logo"
@@ -73,7 +73,7 @@ export function NavBar() {
           {/* Notifications */}
           <div className="mt-2">
             <button
-              className="inline-flex items-center text-center text-sm font-medium text-white hover:text-gray-200 focus:outline-none"
+              className="inline-flex items-center text-center text-sm font-medium text-gray-600 hover:text-purple-accent-2 focus:outline-none"
               onClick={toggleNotifOverlay}
               type="button"
             >
@@ -102,7 +102,7 @@ export function NavBar() {
                 <div className="divide-y divide-gray-100">
                   {/* map notifications here */}
                   <Link
-                    href="/dashboard"
+                    href="/"
                     className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700"
                   >
                     <div className="flex-shrink-0"></div>

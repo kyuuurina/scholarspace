@@ -5,30 +5,36 @@ import { router, protectedProcedure, publicProcedure } from "~/server/api/trpc";
 
 export const workspaceRouter = router({
   get: publicProcedure
-    .input(z.object({ workspaceId: z.string() }))
+    .input(z.object({ id: z.string() }))
     .query(({ ctx, input }) => {
       return ctx.prisma.workspace.findUnique({
         where: {
-          id: input.workspaceId,
+          id: input.id,
         },
       });
-    }),
-    
-    listUserWorkspaces: protectedProcedure.query(async ({ ctx }) => {
-      const userid = ctx.user.id;
-      const workspaces = await ctx.prisma.workspace_user.findMany({
-        where: {
-          userid,
-        },
-        include: {
-          workspace: true,
-        },
-      });
-      return workspaces;
     }),
 
+  listUserWorkspaces: protectedProcedure.query(async ({ ctx }) => {
+    const userid = ctx.user.id;
+    const workspaces = await ctx.prisma.workspace_user.findMany({
+      where: {
+        userid,
+      },
+      include: {
+        workspace: true,
+      },
+    });
+    return workspaces;
+  }),
+
   create: protectedProcedure
-    .input(z.object({ name: z.string(), description: z.string(), cover_img: z.string().nullable() }))
+    .input(
+      z.object({
+        name: z.string(),
+        description: z.string(),
+        cover_img: z.string().nullable(),
+      })
+    )
     .mutation(async ({ input, ctx }) => {
       const userid = ctx.user.id;
 
@@ -49,49 +55,50 @@ export const workspaceRouter = router({
       return workspace;
     }),
 
-  // update: protectedProcedure
-  //   .input(
-  //     z.object({
-  //       workspaceId: z.string(),
-  //       name: z.string(),
-  //       description: z.string(),
-  //     })
-  //   )
-  //   .mutation(async ({ input, ctx }) => {
-  //     const { workspaceId, name, description } = input;
+  update: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        name: z.string(),
+        description: z.string(),
+        cover_img: z.string().nullable(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { id, name, description, cover_img } = input;
 
-  //     const updatedWorkspace = await ctx.prisma.workspace.update({
-  //       where: {
-  //         id: workspaceId,
-  //       },
-  //       data: {
-  //         name,
-  //         description,
-  //       },
-  //     });
+      const updatedWorkspace = await ctx.prisma.workspace.update({
+        where: {
+          id,
+        },
+        data: {
+          name,
+          description,
+          cover_img,
+        },
+      });
 
-  //     return updatedWorkspace;
-  //   }),
+      return updatedWorkspace;
+    }),
 
-  // delete: protectedProcedure
-  //   .input(z.object({ workspaceId: z.string() }))
-  //   .mutation(async ({ input, ctx }) => {
-  //     const { workspaceId } = input;
+  delete: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      const { id } = input;
 
-  //     // Delete all members associated with the workspace
-  //     await ctx.prisma.member.deleteMany({
-  //       where: {
-  //         workspaceId,
-  //       },
-  //     });
+      // Delete the workspace
+      await ctx.prisma.workspace.delete({
+        where: {
+          id,
+        },
+      });
 
-  //     // Delete the workspace
-  //     await ctx.prisma.workspace.delete({
-  //       where: {
-  //         id: workspaceId,
-  //       },
-  //     });
+      await ctx.prisma.workspace_user.deleteMany({
+        where: {
+          workspaceid: id,
+        },
+      });
 
-  //     return { success: true };
-  //   }),
+      return { success: true };
+    }),
 });

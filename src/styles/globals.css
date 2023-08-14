@@ -9,16 +9,19 @@
   }
 
   div {
-    @apply font-primary tracking-wide text-slate-700;
+    @apply font-primary text-gray-600;
   }
 
   main {
-    @apply bg-purple-bg;
+    @apply bg-grey-bg;
   }
 
   h1,
   h2,
-  h3 {
-    @apply text-purple-text;
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply text-dark-purple;
   }
 }

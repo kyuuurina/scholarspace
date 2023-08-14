@@ -1,14 +1,17 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-floating-promises */
-import { NextPage } from "next";
-import Head from "next/head";
-import { api } from "~/utils/api";
-import { useRouter } from "next/router";
+import type { ReactElement } from "react";
 import { useState, useEffect } from "react";
+import type { NextPageWithLayout } from "~/pages/_app";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import { api } from "~/utils/api";
+
 import EditableText from "~/components/EditableText";
 import { WorkspaceTabs } from "~/components/workspace/WorkspaceTabs";
+import Layout from "~/components/layout/Layout";
 
-const Settings: NextPage = () => {
+const Settings: NextPageWithLayout = () => {
   const router = useRouter();
 
   const [workspaceName, setWorkspaceName] = useState("");
@@ -17,7 +20,7 @@ const Settings: NextPage = () => {
 
   const workspace = api.workspace.get.useQuery(
     {
-      workspaceId: router.query.id as string,
+      id: router.query.id as string,
     },
     {
       enabled: !!router.query.id,
@@ -40,7 +43,7 @@ const Settings: NextPage = () => {
     setWorkspaceName(newText);
     updateWorkspace
       .mutateAsync({
-        workspaceId: router.query.id as string,
+        id: router.query.id as string,
         name: newText,
         description: workspaceDescription,
       })
@@ -53,7 +56,7 @@ const Settings: NextPage = () => {
     setWorkspaceDescription(newText);
     updateWorkspace
       .mutateAsync({
-        workspaceId: router.query.id as string,
+        id: router.query.id as string,
         name: workspaceName,
         description: newText,
       })
@@ -66,7 +69,7 @@ const Settings: NextPage = () => {
   const handleDeleteWorkspace = () => {
     deleteWorkspace
       .mutateAsync({
-        workspaceId: router.query.id as string,
+        id: router.query.id as string,
       })
       .then(() => {
         console.log("Workspace deleted");
@@ -183,6 +186,14 @@ const Settings: NextPage = () => {
           </div>
         </div>
       </main>
+    </>
+  );
+};
+
+Settings.getLayout = function getLayout(page: ReactElement) {
+  return (
+    <>
+      <Layout>{page}</Layout>
     </>
   );
 };

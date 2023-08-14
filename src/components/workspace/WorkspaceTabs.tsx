@@ -9,9 +9,9 @@ export function WorkspaceTabs() {
     router.query && router.query.id ? router.query.id.toString() : "";
 
   return (
-    <div className="mb-4 border-b border-gray-200 dark:border-gray-700">
+    <div className="border-b border-gray-200 dark:border-gray-700">
       <ul
-        className="-mb-px flex flex-wrap text-center text-sm font-medium"
+        className="flex flex-wrap text-center text-sm font-medium"
         id="myTab"
         data-tabs-toggle="#myTabContent"
         role="tablist"

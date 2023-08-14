@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { NextPage } from "next";
 import type { AppProps } from "next/app";
 import { Head } from "~/components/layout/Head";
-import { Poppins } from "next/font/google";
+import { Inter } from "next/font/google";
 
 // supabase helpers for authentication and authorization
 import {
@@ -24,9 +24,9 @@ type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
 };
 
-export const poppins = Poppins({
+export const poppins = Inter({
   subsets: ["latin"],
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+  weight: ["300", "400", "500", "600", "700", "800"],
 });
 
 const MyApp = ({

@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 /* eslint-disable @typescript-eslint/no-misused-promises */
-import { NextPage } from "next";
+import type { ReactElement } from "react";
+import type { NextPageWithLayout } from "~/pages/_app";
 import Head from "next/head";
 import { useState } from "react";
 import Select from "react-select";
@@ -9,12 +10,12 @@ import { Modal } from "~/components/Modal";
 import { WorkspaceTabs } from "~/components/workspace/WorkspaceTabs";
 import { useForm } from "react-hook-form";
 import EditableDropDown from "~/components/EditableDropDown";
-// import { useUser } from "@clerk/clerk-react";
+import Layout from "~/components/layout/Layout";
 
 // next hooks
 import { useRouter } from "next/router";
 
-const Members: NextPage = () => {
+const Members: NextPageWithLayout = () => {
   const { handleSubmit } = useForm();
   const router = useRouter();
   // const { user } = useUser();
@@ -36,7 +37,7 @@ const Members: NextPage = () => {
   const userArray: { label: string; value: string }[] = [];
   const workspaceMembers = api.member.getWorkspaceMembers.useQuery(
     {
-      workspaceId: router.query.id as string,
+      id: router.query.id as string,
     },
     {
       enabled: !!router.query.id,
@@ -70,7 +71,7 @@ const Members: NextPage = () => {
         // Call the addMember procedural function to create a member
         await addMember.mutateAsync({
           id: memberId,
-          workspaceId: router.query.id as string,
+          id: router.query.id as string,
         });
 
         // Reset the form and close the modal
@@ -289,6 +290,14 @@ const Members: NextPage = () => {
           </div>
         </div>
       </main>
+    </>
+  );
+};
+
+Members.getLayout = function getLayout(page: ReactElement) {
+  return (
+    <>
+      <Layout>{page}</Layout>
     </>
   );
 };

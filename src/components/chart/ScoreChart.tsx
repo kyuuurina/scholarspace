@@ -13,8 +13,8 @@ export const ScoreChart: React.FC<ScoreChartProps> = ({ score }) => {
             {
                 label: "Collaborativity Score",
                 data: [score, 100 - score],
-                backgroundColor: ["#8B5CF6", "#D1D5DB"],
-                borderColor: ["#8B5CF6", "#D1D5DB"],
+                backgroundColor: ["#935FEF", "#D1D5DB"],
+                borderColor: ["#935FEF", "#D1D5DB"],
                 borderWidth: 1,
             },
         ],
