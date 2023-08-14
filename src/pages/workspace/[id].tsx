@@ -21,6 +21,7 @@ import { useUser } from "@supabase/auth-helpers-react";
 const Workspace: NextPageWithLayout = () => {
   const router = useRouter();
 
+  const user = useUser();
   const workspace = api.workspace.get.useQuery(
     {
       workspaceId: router.query.id as string,
@@ -37,7 +38,6 @@ const Workspace: NextPageWithLayout = () => {
   }
 
   console.log(workspaceData);
-  const user = useUser();
 
   const imgUrl = `https://eeikbrtyntwckpyfphlm.supabase.co/storage/v1/object/public/workspace-covers/${user.id}/${workspaceData.cover_img}`;
 
@@ -52,8 +52,10 @@ const Workspace: NextPageWithLayout = () => {
       <main className="flex-grow flex-col p-10">
         <div className="grid grid-cols-12 gap-x-10">
           <div className="col-span-8 grid gap-y-5">
-            <img src={imgUrl} />
-            <h1 className="line-clamp-3 text-4xl">{workspaceData.name}</h1>
+            {workspaceData.cover_img ? <img src={imgUrl} /> : null}
+            <h1 className="line-clamp-3 text-4xl font-bold">
+              {workspaceData.name}
+            </h1>
             <div className="flex justify-between">
               <WorkspaceTabs />
               <Button name="Add Project" />

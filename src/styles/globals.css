@@ -7,4 +7,18 @@
   textarea {
     @apply rounded-md border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 shadow-sm outline-none focus:border-indigo-400;
   }
+
+  div {
+    @apply font-primary tracking-wide text-slate-700;
+  }
+
+  main {
+    @apply bg-purple-bg;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply text-purple-text;
+  }
 }

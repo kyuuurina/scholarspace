@@ -13,6 +13,9 @@ export default {
         "purple-accent-2": "#8F8CF1",
         "blue-accent": "#6AB4F7",
       },
+      fontFamily: {
+        primary: ["var(--font-poppins)", "sans-serif"],
+      },
     },
   },
   plugins: [],

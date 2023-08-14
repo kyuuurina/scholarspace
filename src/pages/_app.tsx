@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { NextPage } from "next";
 import type { AppProps } from "next/app";
 import { Head } from "~/components/layout/Head";
+import { Poppins } from "next/font/google";
 
 // supabase helpers for authentication and authorization
 import {
@@ -23,6 +24,11 @@ type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
 };
 
+export const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+});
+
 const MyApp = ({
   Component,
   pageProps: { initialSession, ...pageProps },
@@ -37,7 +43,9 @@ const MyApp = ({
         supabaseClient={supabaseClient}
         initialSession={initialSession as Session}
       >
-        {getLayout(<Component {...pageProps} />)}
+        <div className={`${poppins.className}`}>
+          {getLayout(<Component {...pageProps} />)}
+        </div>
       </SessionContextProvider>
     </>
   );
