@@ -86,16 +86,16 @@ export const workspaceRouter = router({
     .mutation(async ({ input, ctx }) => {
       const { id } = input;
 
+      await ctx.prisma.workspace_user.deleteMany({
+        where: {
+          workspaceid: id,
+        },
+      });
+
       // Delete the workspace
       await ctx.prisma.workspace.delete({
         where: {
           id,
-        },
-      });
-
-      await ctx.prisma.workspace_user.deleteMany({
-        where: {
-          workspaceid: id,
         },
       });
 

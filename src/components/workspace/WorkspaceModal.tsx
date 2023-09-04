@@ -13,8 +13,8 @@ import type { WorkspaceFormData } from "~/types/workspace";
 
 // local components
 import { FormErrorMessage } from "../FormErrorMessage";
-import { Modal } from "../Modal";
-import { Button } from "../Button";
+import { Modal } from "../modal/Modal";
+import { Button } from "../button/Button";
 
 type ModalProps = {
   openModal: boolean;
@@ -122,6 +122,7 @@ export const WorkspaceModal: React.FC<ModalProps> = ({
           reset();
           setImagePlaceholder(null);
         }}
+        title="Add Workspace"
       >
         <form
           autoComplete="off"

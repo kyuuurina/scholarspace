@@ -17,11 +17,13 @@ import Layout from "~/components/layout/Layout";
 import { Head } from "~/components/layout/Head";
 import { WorkspaceTabs } from "~/components/workspace/WorkspaceTabs";
 import { FormErrorMessage } from "~/components/FormErrorMessage";
+import { DeleteWorkspaceModal } from "~/components/workspace/DeleteWorkspaceModal";
 
 const Settings: NextPageWithLayout = () => {
   // constants
   const router = useRouter();
   const { id } = router.query;
+  const [modalIsOpen, setModalIsOpen] = useState(false);
 
   // schema for form validation
   const schema: ZodType<WorkspaceFormData> = z.object({
@@ -47,21 +49,11 @@ const Settings: NextPageWithLayout = () => {
   );
 
   const updateWorkspace = api.workspace.update.useMutation();
-  // const deleteWorkspace = api.workspace.delete.useMutation();
-
-  // useEffect(() => {
-  //   if (!isLoading) {
-  //     setWorkspaceName(workspace?.name as string);
-  //     setWorkspaceDescription(workspace?.description as string);
-  //     setWorkspaceImage(workspace?.cover_img as string);
-  //   }
-  // }, [workspace, isLoading]);
 
   // react-hook-form
   const {
     register,
     handleSubmit,
-    reset,
     setValue,
     formState: { errors, isDirty },
   } = useForm<WorkspaceFormData>({
@@ -96,28 +88,18 @@ const Settings: NextPageWithLayout = () => {
     }
   };
 
-  // const handleDeleteWorkspace = () => {
-  //   deleteWorkspace
-  //     .mutateAsync({
-  //       id: router.query.id as string,
-  //     })
-  //     .then(() => {
-  //       console.log("Workspace deleted");
-  //       router.push("/");
-  //       alert("Workspace successfully deleted");
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error deleting workspace:", error);
-  //     });
-  // };
-
   if (isLoading) {
-    // If data is still loading, you can display a loading indicator or message
     return <div>Loading...</div>;
   }
 
   return (
     <>
+      <DeleteWorkspaceModal
+        openModal={modalIsOpen}
+        onClick={() => setModalIsOpen(false)}
+        name={workspace?.name}
+        id={id}
+      />
       <main className="flex min-h-screen flex-col">
         <div className="container flex flex-col p-10">
           <div className="grid gap-y-5">
@@ -204,13 +186,13 @@ const Settings: NextPageWithLayout = () => {
                       <p className="mb-4 font-normal">
                         Deleting this workspace will also remove all projects.
                       </p>
-                      {/* <button
+                      <button
                         type="button"
-                        className="w-32 rounded-lg border border-red-700 py-2 text-center text-sm font-medium text-red-700 hover:bg-red-800 hover:text-white focus:outline-none focus:ring-4 focus:ring-red-300 dark:border-red-500 dark:text-red-500 dark:hover:bg-red-600 dark:hover:text-white dark:focus:ring-red-900"
-                        onClick={handleDeleteWorkspace}
+                        className="w-auto rounded-lg border border-red-700 p-2 text-center text-sm font-medium text-red-700 hover:bg-red-800 hover:text-white focus:outline-none"
+                        onClick={() => setModalIsOpen(true)}
                       >
                         Delete Workspace
-                      </button> */}
+                      </button>
                     </div>
                   </div>
                 </div>

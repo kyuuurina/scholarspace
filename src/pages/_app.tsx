@@ -5,6 +5,7 @@ import type { NextPage } from "next";
 import type { AppProps } from "next/app";
 import { Head } from "~/components/layout/Head";
 import { Inter } from "next/font/google";
+import { Toaster } from "react-hot-toast";
 
 // supabase helpers for authentication and authorization
 import {
@@ -45,6 +46,7 @@ const MyApp = ({
       >
         <div className={`${poppins.className}`}>
           {getLayout(<Component {...pageProps} />)}
+          <Toaster />
         </div>
       </SessionContextProvider>
     </>
