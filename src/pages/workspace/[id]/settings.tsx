@@ -157,8 +157,8 @@ const Settings: NextPageWithLayout = () => {
                     Workspace Description
                   </label>
                   <textarea {...register("description")} />
-                  {errors.descripton && (
-                    <FormErrorMessage text={errors.descripton.message} />
+                  {errors.description && (
+                    <FormErrorMessage text={errors.description.message} />
                   )}
                 </div>
                 <div className="flex justify-end space-x-3">
