@@ -8,6 +8,9 @@ import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { v4 as uuidv4 } from "uuid";
 import { api } from "~/utils/api";
 
+// types
+import type { WorkspaceFormData } from "~/types/workspace";
+
 // local components
 import { FormErrorMessage } from "../FormErrorMessage";
 import { Modal } from "../Modal";
@@ -16,12 +19,6 @@ import { Button } from "../Button";
 type ModalProps = {
   openModal: boolean;
   onClick: () => void;
-};
-
-type WorkspaceFormData = {
-  name: string;
-  description: string;
-  cover_img: string | null;
 };
 
 export const WorkspaceModal: React.FC<ModalProps> = ({

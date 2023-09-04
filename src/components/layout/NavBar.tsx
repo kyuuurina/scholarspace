@@ -13,8 +13,6 @@ export function NavBar() {
   const notifOverlayRef = useRef<HTMLDivElement>(null);
   const avatarUrl = user?.user_metadata?.avatar_url as string;
 
-  console.log(user);
-
   const toggleUserOverlay = () => {
     setIsUserOverlayVisible(!isUserOverlayVisible);
   };

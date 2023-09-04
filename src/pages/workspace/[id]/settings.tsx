@@ -2,145 +2,178 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 import type { ReactElement } from "react";
 import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
 import type { NextPageWithLayout } from "~/pages/_app";
-import Head from "next/head";
 import { useRouter } from "next/router";
+import { type ZodType, z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { api } from "~/utils/api";
 
-import EditableText from "~/components/EditableText";
-import { WorkspaceTabs } from "~/components/workspace/WorkspaceTabs";
+// types
+import type { WorkspaceFormData } from "~/types/workspace";
+
+// components
 import Layout from "~/components/layout/Layout";
+import { Head } from "~/components/layout/Head";
+import { WorkspaceTabs } from "~/components/workspace/WorkspaceTabs";
+import { FormErrorMessage } from "~/components/FormErrorMessage";
 
 const Settings: NextPageWithLayout = () => {
+  // constants
   const router = useRouter();
+  const { id } = router.query;
 
-  const [workspaceName, setWorkspaceName] = useState("");
-  const [workspaceDescription, setWorkspaceDescription] = useState("");
-  const [key, setKey] = useState(0); // Add a key state
+  // schema for form validation
+  const schema: ZodType<WorkspaceFormData> = z.object({
+    name: z
+      .string()
+      .min(2, "Name must be at least 2 characters long.")
+      .max(100, "Name must be at most 100 characters long."),
+    description: z
+      .string()
+      .min(2, "Description must be at least 2 characters long.")
+      .max(200, "Description must be at most 200 characters long."),
+    cover_img: z.string().nullable(),
+  });
 
-  const workspace = api.workspace.get.useQuery(
+  // define functions
+  const { data: workspace, isLoading } = api.workspace.get.useQuery(
     {
-      id: router.query.id as string,
+      id: id as string,
     },
     {
-      enabled: !!router.query.id,
+      enabled: !!id,
     }
   );
-  const workspaceData = workspace.data;
-
-  useEffect(() => {
-    if (workspaceData) {
-      setWorkspaceName(workspaceData.name);
-      setWorkspaceDescription(workspaceData.description);
-      setKey((prevKey) => prevKey + 1); // Increment the key to force re-render
-    }
-  }, [workspaceData]);
 
   const updateWorkspace = api.workspace.update.useMutation();
-  const deleteWorkspace = api.workspace.delete.useMutation();
+  // const deleteWorkspace = api.workspace.delete.useMutation();
 
-  const handleWorkspaceNameUpdate = (newText: string) => {
-    setWorkspaceName(newText);
-    updateWorkspace
-      .mutateAsync({
-        id: router.query.id as string,
-        name: newText,
-        description: workspaceDescription,
-      })
-      .then(() => {
-        console.log("workspace updated");
+  // useEffect(() => {
+  //   if (!isLoading) {
+  //     setWorkspaceName(workspace?.name as string);
+  //     setWorkspaceDescription(workspace?.description as string);
+  //     setWorkspaceImage(workspace?.cover_img as string);
+  //   }
+  // }, [workspace, isLoading]);
+
+  // react-hook-form
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    formState: { errors, isDirty },
+  } = useForm<WorkspaceFormData>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      name: workspace?.name,
+      description: workspace?.description,
+      cover_img: workspace?.cover_img,
+    },
+  });
+
+  useEffect(() => {
+    if (!isLoading && workspace) {
+      setValue("name", workspace.name || "");
+      setValue("description", workspace.description || "");
+      setValue("cover_img", workspace.cover_img || "");
+    }
+  }, [isLoading, workspace, setValue]);
+
+  const handleUpdateWorkspace = async (formData: WorkspaceFormData) => {
+    try {
+      await updateWorkspace.mutateAsync({
+        id: id as string,
+        ...formData,
       });
+      console.log(formData);
+      // refresh the page
+      router.reload();
+    } catch (error) {
+      // Handle any errors
+      console.error(error);
+    }
   };
 
-  const handleWorkspaceDescriptionUpdate = (newText: string) => {
-    setWorkspaceDescription(newText);
-    updateWorkspace
-      .mutateAsync({
-        id: router.query.id as string,
-        name: workspaceName,
-        description: newText,
-      })
-      .then(() => {
-        console.log("workspace updated");
-        router.replace("/");
-      });
-  };
+  // const handleDeleteWorkspace = () => {
+  //   deleteWorkspace
+  //     .mutateAsync({
+  //       id: router.query.id as string,
+  //     })
+  //     .then(() => {
+  //       console.log("Workspace deleted");
+  //       router.push("/");
+  //       alert("Workspace successfully deleted");
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error deleting workspace:", error);
+  //     });
+  // };
 
-  const handleDeleteWorkspace = () => {
-    deleteWorkspace
-      .mutateAsync({
-        id: router.query.id as string,
-      })
-      .then(() => {
-        console.log("Workspace deleted");
-        router.push("/");
-        alert("Workspace successfully deleted");
-      })
-      .catch((error) => {
-        console.error("Error deleting workspace:", error);
-      });
-  };
-
-  if (!workspaceData) {
-    router.push("/");
-    return null;
+  if (isLoading) {
+    // If data is still loading, you can display a loading indicator or message
+    return <div>Loading...</div>;
   }
 
   return (
     <>
-      <Head>
-        <title>Create T3 App</title>
-        <meta name="description" content="Generated by create-t3-app" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
       <main className="flex min-h-screen flex-col">
         <div className="container flex flex-col p-10">
           <div className="grid gap-y-5">
             <h1 className="line-clamp-3 text-4xl">
-              {workspaceData.name} Settings
+              {workspace?.name} Settings
             </h1>
             <WorkspaceTabs />
           </div>
 
           <div className="grid gap-5">
-            <div className="max-w mt-2 w-full rounded-lg border border-gray-200 bg-white p-4 shadow dark:border-gray-700 dark:bg-gray-800 sm:p-6 md:p-8">
-              <form className="space-y-6" action="#">
-                <div className="grid grid-cols-3 gap-6">
-                  <div className="col-span-1">
-                    <h5 className="text-xl font-medium text-gray-900 dark:text-white">
-                      General Settings
-                    </h5>
-                  </div>
-                  <div className="col-span-2">
-                    <div>
-                      <label
-                        htmlFor="workspace-name"
-                        className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-                      >
-                        Workspace Name
-                      </label>
-                      <EditableText
-                        key={key} // Add the key prop
-                        text={workspaceName}
-                        onUpdate={handleWorkspaceNameUpdate}
-                        multiline={false}
-                      />
-                    </div>
-                    <div>
-                      <label
-                        htmlFor="workspace-description"
-                        className="mb-2 mt-4 block text-sm font-medium text-gray-900 dark:text-white"
-                      >
-                        Workspace Description
-                      </label>
-                      <EditableText
-                        key={key} // Add the key prop
-                        text={workspaceDescription}
-                        onUpdate={handleWorkspaceDescriptionUpdate}
-                        multiline={true}
-                      />
-                    </div>
-                  </div>
+            <div className="max-w mt-2 w-full rounded-lg border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
+              <form
+                className="space-y-6"
+                autoComplete="off"
+                onSubmit={handleSubmit(handleUpdateWorkspace)}
+              >
+                <h5 className="text-xl font-medium text-gray-900 dark:text-white">
+                  General Settings
+                </h5>
+                <div>
+                  <label
+                    htmlFor="workspace-name"
+                    className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    Workspace Name
+                  </label>
+                  <input {...register("name")} />
+                  {errors.name && (
+                    <FormErrorMessage text={errors.name.message} />
+                  )}
+                </div>
+                <div>
+                  <label
+                    htmlFor="workspace-description"
+                    className="mb-2 mt-4 block text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    Workspace Description
+                  </label>
+                  <textarea {...register("description")} />
+                  {errors.descripton && (
+                    <FormErrorMessage text={errors.descripton.message} />
+                  )}
+                </div>
+                <div className="flex justify-end space-x-3">
+                  <button>Cancel</button>
+                  <button
+                    type="submit"
+                    className={`${
+                      isDirty
+                        ? "bg-green-500 hover:bg-green-600"
+                        : "bg-grey-100"
+                    } rounded px-4 py-2 text-white`}
+                    disabled={!isDirty}
+                  >
+                    Save
+                  </button>
                 </div>
               </form>
             </div>
@@ -171,13 +204,13 @@ const Settings: NextPageWithLayout = () => {
                       <p className="mb-4 font-normal">
                         Deleting this workspace will also remove all projects.
                       </p>
-                      <button
+                      {/* <button
                         type="button"
                         className="w-32 rounded-lg border border-red-700 py-2 text-center text-sm font-medium text-red-700 hover:bg-red-800 hover:text-white focus:outline-none focus:ring-4 focus:ring-red-300 dark:border-red-500 dark:text-red-500 dark:hover:bg-red-600 dark:hover:text-white dark:focus:ring-red-900"
                         onClick={handleDeleteWorkspace}
                       >
                         Delete Workspace
-                      </button>
+                      </button> */}
                     </div>
                   </div>
                 </div>
