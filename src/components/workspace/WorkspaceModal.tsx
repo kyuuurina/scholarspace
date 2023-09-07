@@ -14,7 +14,7 @@ import type { WorkspaceFormData } from "~/types/workspace";
 // local components
 import { FormErrorMessage } from "../FormErrorMessage";
 import { Modal } from "../modal/Modal";
-import { Button } from "../button/Button";
+import { PrimaryButton } from "../button/PrimaryButton";
 
 type ModalProps = {
   openModal: boolean;
@@ -127,7 +127,7 @@ export const WorkspaceModal: React.FC<ModalProps> = ({
         <form
           autoComplete="off"
           className="flex flex-col gap-4"
-          onSubmit={handleSubmit(onSubmit)}
+          onSubmit={void handleSubmit(onSubmit)}
         >
           <div>
             <label
@@ -215,7 +215,7 @@ export const WorkspaceModal: React.FC<ModalProps> = ({
             </div>
           </div>
 
-          <Button name="Create Workspace" type="submit" />
+          <PrimaryButton name="Create Workspace" type="submit" />
         </form>
       </Modal>
     </div>

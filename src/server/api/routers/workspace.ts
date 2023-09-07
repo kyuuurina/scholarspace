@@ -77,6 +77,7 @@ export const workspaceRouter = router({
           cover_img,
         },
       });
+      console.log(updatedWorkspace);
 
       return updatedWorkspace;
     }),

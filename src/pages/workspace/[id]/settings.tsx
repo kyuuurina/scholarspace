@@ -1,16 +1,14 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-floating-promises */
-import type { ReactElement } from "react";
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import type { NextPageWithLayout } from "~/pages/_app";
 import { useRouter } from "next/router";
+import { api } from "~/utils/api";
 import { type ZodType, z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { api } from "~/utils/api";
 import toast from "react-hot-toast";
 
 // types
+import type { ReactElement } from "react";
+import type { NextPageWithLayout } from "~/pages/_app";
 import type { WorkspaceFormData } from "~/types/workspace";
 
 // components
@@ -41,7 +39,7 @@ const Settings: NextPageWithLayout = () => {
     cover_img: z.string().nullable(),
   });
 
-  // define functions
+  // queries and mutations
   const { data: workspace, isLoading } = api.workspace.get.useQuery(
     {
       id: id as string,
@@ -54,7 +52,6 @@ const Settings: NextPageWithLayout = () => {
   const updateWorkspace = api.workspace.update.useMutation({
     onSuccess: () => {
       toast.custom(() => <SuccessToast message="Workspace updated" />);
-      router.reload();
     },
     onError: () => {
       toast.custom(() => <ErrorToast message="Error updating workspace" />);
@@ -77,6 +74,7 @@ const Settings: NextPageWithLayout = () => {
     },
   });
 
+  // set form values to workspace data
   useEffect(() => {
     if (!isLoading && workspace) {
       setValue("name", workspace.name || "");
@@ -85,6 +83,7 @@ const Settings: NextPageWithLayout = () => {
     }
   }, [isLoading, workspace, setValue]);
 
+  //handlers
   const handleUpdateWorkspace = async (formData: WorkspaceFormData) => {
     try {
       await updateWorkspace.mutateAsync({
@@ -98,10 +97,6 @@ const Settings: NextPageWithLayout = () => {
     }
   };
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
   const handleCancel = () => {
     reset({
       name: workspace?.name || "",
@@ -110,14 +105,21 @@ const Settings: NextPageWithLayout = () => {
     });
   };
 
+  // loader
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <>
-      <Head title={`${workspace?.name} Settings`} />
+      <Head
+        title={workspace?.name ? `${workspace.name} Settings` : "Settings"}
+      />
       <DeleteWorkspaceModal
         openModal={modalIsOpen}
         onClick={() => setModalIsOpen(false)}
         name={workspace?.name}
-        id={id}
+        id={id as string}
       />
       <main className="flex min-h-screen flex-col">
         <div className="container flex flex-col p-10">
@@ -128,12 +130,13 @@ const Settings: NextPageWithLayout = () => {
             <WorkspaceTabs />
           </div>
 
+          {/* Update Workspace Section  */}
           <div className="grid gap-5">
-            <div className="max-w mt-2 w-full rounded-lg border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
+            <section className="max-w mt-2 w-full rounded-lg border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
               <form
                 className="space-y-6"
                 autoComplete="off"
-                onSubmit={handleSubmit(handleUpdateWorkspace)}
+                onSubmit={void handleSubmit(handleUpdateWorkspace)}
               >
                 <h5 className="text-xl font-medium text-gray-900 dark:text-white">
                   General Settings
@@ -166,8 +169,10 @@ const Settings: NextPageWithLayout = () => {
                   <button
                     type="button"
                     className={`${
-                      isDirty ? "bg-red-500 hover:bg-red-600" : "bg-grey-100"
-                    } rounded px-4 py-2 text-white`}
+                      isDirty
+                        ? "bg-white hover:bg-grey-bg hover:text-purple-accent-1"
+                        : ""
+                    } rounded-lg border border-gray-200 px-3 py-2 text-center text-sm font-medium focus:outline-none`}
                     // reverts the input values to the original values
                     onClick={handleCancel}
                     disabled={!isDirty}
@@ -178,17 +183,19 @@ const Settings: NextPageWithLayout = () => {
                     type="submit"
                     className={`${
                       isDirty
-                        ? "bg-green-500 hover:bg-green-600"
-                        : "bg-grey-100"
-                    } rounded px-4 py-2 text-white`}
+                        ? "bg-purple-accent-1 hover:bg-purple-accent-2"
+                        : ""
+                    } rounded-lg px-3 py-2 text-center text-sm font-medium text-white focus:outline-none`}
                     disabled={!isDirty}
                   >
                     Save
                   </button>
                 </div>
               </form>
-            </div>
-            <div className="max-w w-full rounded-lg border border-gray-200 bg-white p-4 shadow dark:border-gray-700 dark:bg-gray-800 sm:p-6 md:p-8">
+            </section>
+
+            {/* Delete Workspace Section  */}
+            <section className="max-w w-full rounded-lg border border-gray-200 bg-white p-4 shadow dark:border-gray-700 dark:bg-gray-800 sm:p-6 md:p-8">
               <form className="space-y-6" action="#">
                 <h5 className="text-xl font-medium text-gray-900 dark:text-white">
                   Danger Zone
@@ -226,7 +233,7 @@ const Settings: NextPageWithLayout = () => {
                   </div>
                 </div>
               </form>
-            </div>
+            </section>
           </div>
         </div>
       </main>

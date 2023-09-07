@@ -39,8 +39,8 @@ export const DeleteWorkspaceModal: React.FC<ModalProps> = ({
       while (deletionLoading) {
         console.log("Deleting...");
       }
-      toast.custom(() => <SuccessToast message="Workspace deleted" />);
       void router.push("/");
+      toast.custom(() => <SuccessToast message="Workspace deleted" />);
     } catch (error) {
       console.error("Error deleting workspace:", error);
       toast.custom(() => <ErrorToast message="Error deleting workspace" />);
@@ -54,7 +54,7 @@ export const DeleteWorkspaceModal: React.FC<ModalProps> = ({
         onClose={() => {
           onClick();
         }}
-        title={`Confirm deletion of ${name}`}
+        title={name ? `Delete ${name}` : "Delete Workspace"}
       >
         <div>
           <p className="text-md mb-2">
@@ -76,10 +76,9 @@ export const DeleteWorkspaceModal: React.FC<ModalProps> = ({
 
         <DeleteButton
           name="Delete Workspace"
-          onClick={() => {
-            console.log("delete workspace");
-            handleDeleteWorkspace();
-          }}
+          onClick={
+            inputValue === name ? handleDeleteWorkspace : () => console.log("")
+          }
           disabled={inputValue !== name}
         />
       </Modal>

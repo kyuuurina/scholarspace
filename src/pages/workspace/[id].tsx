@@ -11,7 +11,7 @@ import { useUser } from "@supabase/auth-helpers-react";
 import Layout from "~/components/layout/Layout";
 import { Head } from "~/components/layout/Head";
 import { WorkspaceTabs } from "~/components/workspace/WorkspaceTabs";
-import { Button } from "~/components/button/Button";
+import { PrimaryButton } from "~/components/button/PrimaryButton";
 import { ProjectCard } from "~/components/project/ProjectCard";
 import { ScoreChart } from "~/components/chart/ScoreChart";
 
@@ -62,7 +62,7 @@ const Workspace: NextPageWithLayout = () => {
             <div className="flex items-center justify-between">
               <WorkspaceTabs />
               <div className="flex-shrink-0">
-                <Button name="Add Project" />
+                <PrimaryButton name="Add Project" />
               </div>
             </div>
             <div className="grid gap-5">
