@@ -52,6 +52,7 @@ const Settings: NextPageWithLayout = () => {
   const updateWorkspace = api.workspace.update.useMutation({
     onSuccess: () => {
       toast.custom(() => <SuccessToast message="Workspace updated" />);
+      router.reload();
     },
     onError: () => {
       toast.custom(() => <ErrorToast message="Error updating workspace" />);
@@ -136,7 +137,7 @@ const Settings: NextPageWithLayout = () => {
               <form
                 className="space-y-6"
                 autoComplete="off"
-                onSubmit={void handleSubmit(handleUpdateWorkspace)}
+                onSubmit={handleSubmit(handleUpdateWorkspace)}
               >
                 <h5 className="text-xl font-medium text-gray-900 dark:text-white">
                   General Settings
@@ -166,25 +167,22 @@ const Settings: NextPageWithLayout = () => {
                   )}
                 </div>
                 <div className="flex justify-end space-x-3">
-                  <button
-                    type="button"
-                    className={`${
-                      isDirty
-                        ? "bg-white hover:bg-grey-bg hover:text-purple-accent-1"
-                        : ""
-                    } rounded-lg border border-gray-200 px-3 py-2 text-center text-sm font-medium focus:outline-none`}
-                    // reverts the input values to the original values
-                    onClick={handleCancel}
-                    disabled={!isDirty}
-                  >
-                    Cancel
-                  </button>
+                  {isDirty && (
+                    <button
+                      type="button"
+                      className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-center text-sm font-medium hover:bg-grey-bg hover:text-purple-accent-1 focus:outline-none"
+                      // reverts the input values to the original values
+                      onClick={handleCancel}
+                    >
+                      Cancel
+                    </button>
+                  )}
                   <button
                     type="submit"
                     className={`${
                       isDirty
                         ? "bg-purple-accent-1 hover:bg-purple-accent-2"
-                        : ""
+                        : "bg-gray-200"
                     } rounded-lg px-3 py-2 text-center text-sm font-medium text-white focus:outline-none`}
                     disabled={!isDirty}
                   >

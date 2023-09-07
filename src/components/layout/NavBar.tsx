@@ -15,6 +15,7 @@ export function NavBar() {
 
   const toggleUserOverlay = () => {
     setIsUserOverlayVisible(!isUserOverlayVisible);
+    console.log(user);
   };
 
   const handleClickOutsideUser = (event: MouseEvent) => {

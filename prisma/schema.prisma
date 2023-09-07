@@ -314,6 +314,7 @@ model workspace {
   name           String?
   description    String?
   cover_img      String?
+  is_personal     Boolean          @default(false)
   workspace_user workspace_user[]
 
   @@schema("public")
@@ -323,7 +324,9 @@ model workspace_user {
   workspaceid    String    @db.Uuid
   userid         String    @db.Uuid
   workspace_role String?   @default("Researcher")
+  ownerid        String?   
   users          users     @relation(fields: [userid], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  is_collaborator Boolean? @default(false)
   workspace      workspace @relation(fields: [workspaceid], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@id([workspaceid, userid])
