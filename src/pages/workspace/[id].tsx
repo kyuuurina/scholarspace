@@ -10,6 +10,7 @@ import { useUser } from "@supabase/auth-helpers-react";
 // local components
 import Layout from "~/components/layout/Layout";
 import { Head } from "~/components/layout/Head";
+import { AvatarPlaceholder } from "~/components/AvatarPlaceholder";
 import { WorkspaceTabs } from "~/components/workspace/WorkspaceTabs";
 import { PrimaryButton } from "~/components/button/PrimaryButton";
 import { ProjectCard } from "~/components/project/ProjectCard";
@@ -53,7 +54,9 @@ const Workspace: NextPageWithLayout = () => {
                     style={{ objectFit: "contain" }}
                     alt=""
                   />
-                ) : null}
+                ) : (
+                  <AvatarPlaceholder name={workspaceData?.name} shape="square" />
+                )}
               </div>
               <h1 className="line-clamp-3 text-4xl font-bold">
                 {workspaceData.name}

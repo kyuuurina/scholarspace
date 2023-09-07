@@ -193,45 +193,47 @@ const Settings: NextPageWithLayout = () => {
             </section>
 
             {/* Delete Workspace Section  */}
-            <section className="max-w w-full rounded-lg border border-gray-200 bg-white p-4 shadow dark:border-gray-700 dark:bg-gray-800 sm:p-6 md:p-8">
-              <form className="space-y-6" action="#">
-                <h5 className="text-xl font-medium text-gray-900 dark:text-white">
-                  Danger Zone
-                </h5>
-                <div className="flex flex-col rounded-lg bg-red-50 p-6 text-sm text-red-800 dark:bg-gray-800 dark:text-red-400">
-                  <div className="flex">
-                    <svg
-                      className="mr-2 h-5 w-5"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                      aria-hidden="true"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
-                      ></path>
-                    </svg>
-                    <div>
-                      <p className="mb-1 font-medium">Delete Workspace</p>
-                      <p className="mb-4 font-normal">
-                        Deleting this workspace will also remove all projects.
-                      </p>
-                      <button
-                        type="button"
-                        className="w-auto rounded-lg border border-red-700 p-2 text-center text-sm font-medium text-red-700 hover:bg-red-800 hover:text-white focus:outline-none"
-                        onClick={() => setModalIsOpen(true)}
+            {workspace?.is_personal ? (
+              <section className="max-w w-full rounded-lg border border-gray-200 bg-white p-4 shadow dark:border-gray-700 dark:bg-gray-800 sm:p-6 md:p-8">
+                <form className="space-y-6" action="#">
+                  <h5 className="text-xl font-medium text-gray-900 dark:text-white">
+                    Danger Zone
+                  </h5>
+                  <div className="flex flex-col rounded-lg bg-red-50 p-6 text-sm text-red-800 dark:bg-gray-800 dark:text-red-400">
+                    <div className="flex">
+                      <svg
+                        className="mr-2 h-5 w-5"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                        aria-hidden="true"
                       >
-                        Delete Workspace
-                      </button>
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
+                        ></path>
+                      </svg>
+                      <div>
+                        <p className="mb-1 font-medium">Delete Workspace</p>
+                        <p className="mb-4 font-normal">
+                          Deleting this workspace will also remove all projects.
+                        </p>
+                        <button
+                          type="button"
+                          className="w-auto rounded-lg border border-red-700 p-2 text-center text-sm font-medium text-red-700 hover:bg-red-800 hover:text-white focus:outline-none"
+                          onClick={() => setModalIsOpen(true)}
+                        >
+                          Delete Workspace
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </form>
-            </section>
+                </form>
+              </section>
+            ) : null}
           </div>
         </div>
       </main>

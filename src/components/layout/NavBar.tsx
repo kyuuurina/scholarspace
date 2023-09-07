@@ -15,7 +15,6 @@ export function NavBar() {
 
   const toggleUserOverlay = () => {
     setIsUserOverlayVisible(!isUserOverlayVisible);
-    console.log(user);
   };
 
   const handleClickOutsideUser = (event: MouseEvent) => {
@@ -133,7 +132,9 @@ export function NavBar() {
                   alt="User avatar"
                 />
               ) : (
-                <AvatarPlaceholder name="Khairina Atiqah" />
+                <div className="h-9 w-9">
+                  <AvatarPlaceholder name="Khairina Atiqah" />
+                </div>
               )}
             </div>
             {/* Display user information */}
