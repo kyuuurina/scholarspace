@@ -8,6 +8,7 @@ import { useRouter } from "next/router";
 import { type ZodType, z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { api } from "~/utils/api";
+import toast from "react-hot-toast";
 
 // types
 import type { WorkspaceFormData } from "~/types/workspace";
@@ -18,6 +19,8 @@ import { Head } from "~/components/layout/Head";
 import { WorkspaceTabs } from "~/components/workspace/WorkspaceTabs";
 import { FormErrorMessage } from "~/components/FormErrorMessage";
 import { DeleteWorkspaceModal } from "~/components/workspace/DeleteWorkspaceModal";
+import { SuccessToast } from "~/components/toast/SuccessToast";
+import { ErrorToast } from "~/components/toast/ErrorToast";
 
 const Settings: NextPageWithLayout = () => {
   // constants
@@ -48,13 +51,22 @@ const Settings: NextPageWithLayout = () => {
     }
   );
 
-  const updateWorkspace = api.workspace.update.useMutation();
+  const updateWorkspace = api.workspace.update.useMutation({
+    onSuccess: () => {
+      toast.custom(() => <SuccessToast message="Workspace updated" />);
+      router.reload();
+    },
+    onError: () => {
+      toast.custom(() => <ErrorToast message="Error updating workspace" />);
+    },
+  });
 
   // react-hook-form
   const {
     register,
     handleSubmit,
     setValue,
+    reset,
     formState: { errors, isDirty },
   } = useForm<WorkspaceFormData>({
     resolver: zodResolver(schema),
@@ -80,8 +92,6 @@ const Settings: NextPageWithLayout = () => {
         ...formData,
       });
       console.log(formData);
-      // refresh the page
-      router.reload();
     } catch (error) {
       // Handle any errors
       console.error(error);
@@ -92,8 +102,17 @@ const Settings: NextPageWithLayout = () => {
     return <div>Loading...</div>;
   }
 
+  const handleCancel = () => {
+    reset({
+      name: workspace?.name || "",
+      description: workspace?.description || "",
+      cover_img: workspace?.cover_img || "",
+    });
+  };
+
   return (
     <>
+      <Head title={`${workspace?.name} Settings`} />
       <DeleteWorkspaceModal
         openModal={modalIsOpen}
         onClick={() => setModalIsOpen(false)}
@@ -144,7 +163,17 @@ const Settings: NextPageWithLayout = () => {
                   )}
                 </div>
                 <div className="flex justify-end space-x-3">
-                  <button>Cancel</button>
+                  <button
+                    type="button"
+                    className={`${
+                      isDirty ? "bg-red-500 hover:bg-red-600" : "bg-grey-100"
+                    } rounded px-4 py-2 text-white`}
+                    // reverts the input values to the original values
+                    onClick={handleCancel}
+                    disabled={!isDirty}
+                  >
+                    Cancel
+                  </button>
                   <button
                     type="submit"
                     className={`${
