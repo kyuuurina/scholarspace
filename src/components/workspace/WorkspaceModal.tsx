@@ -127,7 +127,7 @@ export const WorkspaceModal: React.FC<ModalProps> = ({
         <form
           autoComplete="off"
           className="flex flex-col gap-4"
-          onSubmit={void handleSubmit(onSubmit)}
+          onSubmit={handleSubmit(onSubmit)}
         >
           <div>
             <label

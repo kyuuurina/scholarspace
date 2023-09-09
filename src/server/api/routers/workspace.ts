@@ -102,4 +102,21 @@ export const workspaceRouter = router({
 
       return { success: true };
     }),
+
+  listWorkspaceMembers: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const { id } = input;
+
+      const members = await ctx.prisma.workspace_user.findMany({
+        where: {
+          workspaceid: id,
+        },
+        include: {
+          users: true,
+        },
+      });
+
+      return members;
+    }),
 });

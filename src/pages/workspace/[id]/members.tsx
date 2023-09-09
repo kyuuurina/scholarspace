@@ -1,67 +1,93 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
-/* eslint-disable @typescript-eslint/no-misused-promises */
-import type { ReactElement } from "react";
-import type { NextPageWithLayout } from "~/pages/_app";
-import Head from "next/head";
-import { useState } from "react";
-import Select from "react-select";
+// not in use anymore!
+
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { useRouter } from "next/router";
+import { useUser } from "@supabase/auth-helpers-react";
 import { api } from "~/utils/api";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import Select from "react-select";
+
+// local components
+import Layout from "~/components/layout/Layout";
 import { Modal } from "~/components/modal/Modal";
 import { WorkspaceTabs } from "~/components/workspace/WorkspaceTabs";
-import { useForm } from "react-hook-form";
 import EditableDropDown from "~/components/EditableDropDown";
-import Layout from "~/components/layout/Layout";
 
-// next hooks
-import { useRouter } from "next/router";
+// types
+import type { ReactElement } from "react";
+import type { NextPageWithLayout } from "~/pages/_app";
+import { PrimaryButton } from "~/components/button/PrimaryButton";
 
 const Members: NextPageWithLayout = () => {
-  const { handleSubmit } = useForm();
+  // constants
   const router = useRouter();
-  // const { user } = useUser();
-  // const userId = user?.id;
-
+  const { id } = router.query;
+  const user = useUser();
+  const userId = user?.id;
+  const supabase = useSupabaseClient();
   const [searchQuery, setSearchQuery] = useState("");
-
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(event.target.value);
-  };
-
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<{
     label: string;
     value: string;
   } | null>(null);
 
-  const users = api.account.getAllUsers.useQuery();
-  const userArray: { label: string; value: string }[] = [];
-  const workspaceMembers = api.member.getWorkspaceMembers.useQuery(
-    {
-      id: router.query.id as string,
-    },
-    {
-      enabled: !!router.query.id,
-    }
-  );
+  // queries and mutation calls
 
-  if (users.data && workspaceMembers.data) {
-    const workspaceMemberIds = workspaceMembers.data.map(
-      (member) => member.userId
-    );
+  const { handleSubmit } = useForm();
 
-    users.data.forEach((user) => {
-      const firstEmailAddress = user.emailAddresses[0]?.emailAddress || "";
-      const userId = user.id;
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(event.target.value);
+  };
 
-      const isMember = workspaceMemberIds.includes(userId);
+  // users in the system
 
-      // Check if the user is not a member of the workspace
-      if (!isMember) {
-        userArray.push({ label: firstEmailAddress, value: userId });
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    async function fetchUsers() {
+      try {
+        const { data, error } = await supabase.auth.admin.listUsers();
+
+        if (error) {
+          throw error;
+        }
+
+        setUsers(data.users);
+      } catch (error) {
+        console.log("error", error);
       }
-    });
-  }
-  const addMember = api.member.addMember.useMutation();
+    }
+
+    fetchUsers();
+    console.log(users);
+  }, []);
+  const userArray: { label: string; value: string }[] = [];
+
+  // members in the workspace
+  const workspaceMembers = api.workspace.listWorkspaceMembers.useQuery({
+    id: id as string,
+  });
+
+  // if (users.data && workspaceMembers.data) {
+  //   const workspaceMemberIds = workspaceMembers.data.map(
+  //     (member) => member.userId
+  //   );
+
+  //   users.data.forEach((user) => {
+  //     const firstEmailAddress = user.emailAddresses[0]?.emailAddress || "";
+  //     const userId = user.id;
+
+  //     const isMember = workspaceMemberIds.includes(userId);
+
+  //     // Check if the user is not a member of the workspace
+  //     if (!isMember) {
+  //       userArray.push({ label: firstEmailAddress, value: userId });
+  //     }
+  //   });
+  // }
+  // const addMember = api.member.addMember.useMutation();
 
   const onSubmit = async () => {
     if (selectedUser) {
@@ -109,11 +135,11 @@ const Members: NextPageWithLayout = () => {
 
   if (workspaceMembers.data) {
     workspaceMembers.data.forEach((member) => {
-      const id = member.id;
-      const name = member.name || "";
-      const email = member.email || "";
-      const role = member.role || ""; // Use empty string as default value if role is null
-      const avatarUrl = member.avatar || ""; // Use empty string as default value if avatar is null
+      const id = member.userid;
+      const name = member.users.email;
+      const email = member.users.email;
+      const role = member.workspace_role;
+      const avatarUrl = member.users.raw_user_meta_data?.avatar_url as string;
       workspaceMembersArray.push({ id, name, email, role, avatarUrl });
     });
   }
@@ -141,13 +167,11 @@ const Members: NextPageWithLayout = () => {
 
   return (
     <>
-      <Head>
-        <title>Workspace Members</title>
-        <meta name="description" content="Generated by create-t3-app" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <Modal show={modalIsOpen} onClose={() => setModalIsOpen(false)}>
+      <Modal
+        title="Add Member"
+        show={modalIsOpen}
+        onClose={() => setModalIsOpen(false)}
+      >
         <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
           <div>
             <label
@@ -167,12 +191,7 @@ const Members: NextPageWithLayout = () => {
             />
           </div>
 
-          <button
-            type="submit"
-            className="mb-2 mr-2 rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-          >
-            Add Member
-          </button>
+          <PrimaryButton type="submit" name="Add Member" />
         </form>
       </Modal>
 
