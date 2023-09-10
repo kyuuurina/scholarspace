@@ -4,6 +4,7 @@ import { fetchUserWorkspaces } from "~/utils/userWorkspaces";
 import { FiPlusCircle } from "react-icons/fi";
 import { useUser } from "@supabase/auth-helpers-react";
 import Image from "next/image";
+import { AvatarPlaceholder } from "../AvatarPlaceholder";
 
 type Props = {
   onClick: () => void;
@@ -18,6 +19,10 @@ export const Dropdown: React.FC<Props> = ({ onClick }) => {
   const handleToggleWorkspace = () => {
     setWorkspaceMenu(!workspaceMenu);
   };
+
+  if (user?.id === undefined) {
+    return null;
+  }
 
   return (
     <div>
@@ -55,15 +60,19 @@ export const Dropdown: React.FC<Props> = ({ onClick }) => {
               key={workspace.id}
               className="flex w-full px-5 hover:bg-gray-100"
             >
-              <Image
-                src={`https://eeikbrtyntwckpyfphlm.supabase.co/storage/v1/object/public/workspace-covers/${user?.id}/${workspace.cover_img}`}
-                alt={workspace?.name as string}
-                width={50}
-                height={50}
-              />
+              {workspace.cover_img ? (
+                <Image
+                  src={`https://eeikbrtyntwckpyfphlm.supabase.co/storage/v1/object/public/workspace-covers/${user?.id}/${workspace.cover_img}`}
+                  alt={workspace?.name || ""}
+                  width={50}
+                  height={50}
+                />
+              ) : (
+                <AvatarPlaceholder name={workspace.name} />
+              )}
               <Link
                 key={workspace.id}
-                className="block px-4 py-2 text-clip overflow-hidden"
+                className="block overflow-hidden text-clip px-4 py-2"
                 href={`/workspace/${workspace.id}`}
               >
                 {workspace.name}

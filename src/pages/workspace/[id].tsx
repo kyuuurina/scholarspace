@@ -37,7 +37,13 @@ const Workspace: NextPageWithLayout = () => {
 
   console.log(workspaceData);
 
-  const imgUrl = `https://eeikbrtyntwckpyfphlm.supabase.co/storage/v1/object/public/workspace-covers/${user?.id}/${workspaceData.cover_img}`;
+  let imgUrl = "";
+
+  if (workspaceData.cover_img) {
+    imgUrl = user?.id
+      ? `https://eeikbrtyntwckpyfphlm.supabase.co/storage/v1/object/public/workspace-covers/${user.id}/${workspaceData.cover_img}`
+      : "";
+  }
 
   return (
     <>
@@ -55,7 +61,10 @@ const Workspace: NextPageWithLayout = () => {
                     alt=""
                   />
                 ) : (
-                  <AvatarPlaceholder name={workspaceData?.name} shape="square" />
+                  <AvatarPlaceholder
+                    name={workspaceData?.name}
+                    shape="square"
+                  />
                 )}
               </div>
               <h1 className="line-clamp-3 text-4xl font-bold">

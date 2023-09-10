@@ -6,7 +6,7 @@ export const fetchUserWorkspaces = () => {
 
   const workspaceListings: {
     id: string;
-    name: string | null;
+    name: string;
     cover_img: string | null;
   }[] = workspacesData
     ? workspacesData.map((w) => ({

@@ -2,18 +2,18 @@ import { z } from "zod";
 import { router, protectedProcedure, publicProcedure } from "~/server/api/trpc";
 
 export const memberRouter = router({
-  list: publicProcedure.query(({ ctx }) => {
-    return ctx.prisma.member.findMany();
-  }),
-  get: publicProcedure
-    .input(z.object({ memberId: z.string() }))
-    .query(({ ctx, input }) => {
-      return ctx.prisma.member.findUnique({
-        where: {
-          id: input.memberId,
-        },
-      });
-    }),
+  // list: publicProcedure.query(({ ctx }) => {
+  //   return ctx.prisma.member.findMany();
+  // }),
+  // get: publicProcedure
+  //   .input(z.object({ memberId: z.string() }))
+  //   .query(({ ctx, input }) => {
+  //     return ctx.prisma.member.findUnique({
+  //       where: {
+  //         id: input.memberId,
+  //       },
+  //     });
+  //   }),
   // addMember: protectedProcedure
   //   .input(z.object({ id: z.string(), workspaceId: z.string() }))
   //   .mutation(async ({ ctx, input }) => {
@@ -38,47 +38,47 @@ export const memberRouter = router({
 
   //     return updatedMember;
   //   }),
-  getWorkspaceMembers: protectedProcedure
-    .input(z.object({ workspaceId: z.string() }))
-    .query(async ({ ctx, input }) => {
-      return ctx.prisma.member.findMany({
-        where: {
-          workspaceId: input.workspaceId,
-        },
-      });
-    }),
-  update: protectedProcedure
-    .input(
-      z.object({
-        id: z.string(),
-        role: z.string(),
-      })
-    )
-    .mutation(async ({ input, ctx }) => {
-      const { id, role } = input;
+  // getWorkspaceMembers: protectedProcedure
+  //   .input(z.object({ workspaceId: z.string() }))
+  //   .query(async ({ ctx, input }) => {
+  //     return ctx.prisma.member.findMany({
+  //       where: {
+  //         workspaceId: input.workspaceId,
+  //       },
+  //     });
+  //   }),
+  // update: protectedProcedure
+  //   .input(
+  //     z.object({
+  //       id: z.string(),
+  //       role: z.string(),
+  //     })
+  //   )
+  //   .mutation(async ({ input, ctx }) => {
+  //     const { id, role } = input;
 
-      const updatedMember = await ctx.prisma.member.update({
-        where: {
-          id,
-        },
-        data: {
-          role,
-        },
-      });
+  //     const updatedMember = await ctx.prisma.member.update({
+  //       where: {
+  //         id,
+  //       },
+  //       data: {
+  //         role,
+  //       },
+  //     });
 
-      return updatedMember;
-    }),
-  delete: protectedProcedure
-    .input(z.object({ id: z.string() }))
-    .mutation(async ({ input, ctx }) => {
-      const { id } = input;
+  //     return updatedMember;
+  //   }),
+  // delete: protectedProcedure
+  //   .input(z.object({ id: z.string() }))
+  //   .mutation(async ({ input, ctx }) => {
+  //     const { id } = input;
 
-      await ctx.prisma.member.delete({
-        where: {
-          id,
-        },
-      });
+  //     await ctx.prisma.member.delete({
+  //       where: {
+  //         id,
+  //       },
+  //     });
 
-      return { success: true };
-    }),
+  //     return { success: true };
+  //   }),
 });

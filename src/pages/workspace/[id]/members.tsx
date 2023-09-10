@@ -45,30 +45,30 @@ const Members: NextPageWithLayout = () => {
 
   const [users, setUsers] = useState([]);
 
-  useEffect(() => {
-    async function fetchUsers() {
-      try {
-        const { data, error } = await supabase.auth.admin.listUsers();
+  // useEffect(() => {
+  //   async function fetchUsers() {
+  //     try {
+  //       const { data, error } = await supabase.auth.admin.listUsers();
 
-        if (error) {
-          throw error;
-        }
+  //       if (error) {
+  //         throw error;
+  //       }
 
-        setUsers(data.users);
-      } catch (error) {
-        console.log("error", error);
-      }
-    }
+  //       setUsers(data.users);
+  //     } catch (error) {
+  //       console.log("error", error);
+  //     }
+  //   }
 
-    fetchUsers();
-    console.log(users);
-  }, []);
-  const userArray: { label: string; value: string }[] = [];
+  //   fetchUsers();
+  //   console.log(users);
+  // }, []);
+  // const userArray: { label: string; value: string }[] = [];
 
   // members in the workspace
-  const workspaceMembers = api.workspace.listWorkspaceMembers.useQuery({
-    id: id as string,
-  });
+  // const workspaceMembers = api.workspace.listWorkspaceMembers.useQuery({
+  //   id: id as string,
+  // });
 
   // if (users.data && workspaceMembers.data) {
   //   const workspaceMemberIds = workspaceMembers.data.map(
@@ -89,85 +89,85 @@ const Members: NextPageWithLayout = () => {
   // }
   // const addMember = api.member.addMember.useMutation();
 
-  const onSubmit = async () => {
-    if (selectedUser) {
-      const memberId = selectedUser.value;
+  // const onSubmit = async () => {
+  //   if (selectedUser) {
+  //     const memberId = selectedUser.value;
 
-      try {
-        // Call the addMember procedural function to create a member
-        await addMember.mutateAsync({
-          id: memberId,
-          id: router.query.id as string,
-        });
+  //     try {
+  //       // Call the addMember procedural function to create a member
+  //       await addMember.mutateAsync({
+  //         id: memberId,
+  //         id: router.query.id as string,
+  //       });
 
-        // Reset the form and close the modal
-        setSelectedUser(null);
-        setModalIsOpen(false);
-        router.reload();
-      } catch (error) {
-        // Handle any errors that occur during member creation
-        console.error("Failed to create member:", error);
-      }
-    }
-  };
+  //       // Reset the form and close the modal
+  //       setSelectedUser(null);
+  //       setModalIsOpen(false);
+  //       router.reload();
+  //     } catch (error) {
+  //       // Handle any errors that occur during member creation
+  //       console.error("Failed to create member:", error);
+  //     }
+  //   }
+  // };
 
-  const handleRoleChange = (memberId: string, newRole: string) => {
-    updateRole
-      .mutateAsync({
-        id: memberId,
-        role: newRole,
-      })
-      .then(() => {
-        console.log("workspace updated");
-      })
-      .catch((error) => {
-        console.error("Failed to update role:", error);
-      });
-  };
+  // const handleRoleChange = (memberId: string, newRole: string) => {
+  //   updateRole
+  //     .mutateAsync({
+  //       id: memberId,
+  //       role: newRole,
+  //     })
+  //     .then(() => {
+  //       console.log("workspace updated");
+  //     })
+  //     .catch((error) => {
+  //       console.error("Failed to update role:", error);
+  //     });
+  // };
 
-  const workspaceMembersArray: {
-    id: string;
-    name: string;
-    email: string;
-    role: string;
-    avatarUrl: string;
-  }[] = [];
+  // const workspaceMembersArray: {
+  //   id: string;
+  //   name: string;
+  //   email: string;
+  //   role: string;
+  //   avatarUrl: string;
+  // }[] = [];
 
-  if (workspaceMembers.data) {
-    workspaceMembers.data.forEach((member) => {
-      const id = member.userid;
-      const name = member.users.email;
-      const email = member.users.email;
-      const role = member.workspace_role;
-      const avatarUrl = member.users.raw_user_meta_data?.avatar_url as string;
-      workspaceMembersArray.push({ id, name, email, role, avatarUrl });
-    });
-  }
+  // if (workspaceMembers.data) {
+  //   workspaceMembers.data.forEach((member) => {
+  //     const id = member.userid;
+  //     const name = member.users.email;
+  //     const email = member.users.email;
+  //     const role = member.workspace_role;
+  //     const avatarUrl = member.users.raw_user_meta_data?.avatar_url as string;
+  //     workspaceMembersArray.push({ id, name, email, role, avatarUrl });
+  //   });
+  // }
 
-  const filteredMembers = workspaceMembersArray.filter((member) => {
-    const memberName = member.name.toLowerCase();
-    const memberEmail = member.email.toLowerCase();
-    const query = searchQuery.toLowerCase();
-    return memberName.includes(query) || memberEmail.includes(query);
-  });
+  // const filteredMembers = workspaceMembersArray.filter((member) => {
+  //   const memberName = member.name.toLowerCase();
+  //   const memberEmail = member.email.toLowerCase();
+  //   const query = searchQuery.toLowerCase();
+  //   return memberName.includes(query) || memberEmail.includes(query);
+  // });
 
-  const updateRole = api.member.update.useMutation();
+  // const updateRole = api.member.update.useMutation();
 
-  const deleteMember = api.member.delete.useMutation();
+  // const deleteMember = api.member.delete.useMutation();
 
-  const handleDeleteMember = (memberId: string) => {
-    deleteMember
-      .mutateAsync({
-        id: memberId,
-      })
-      .then(() => {
-        router.reload();
-      });
-  };
+  // const handleDeleteMember = (memberId: string) => {
+  //   deleteMember
+  //     .mutateAsync({
+  //       id: memberId,
+  //     })
+  //     .then(() => {
+  //       router.reload();
+  //     });
+  // };
 
   return (
     <>
-      <Modal
+      {/* <Modal
         title="Add Member"
         show={modalIsOpen}
         onClose={() => setModalIsOpen(false)}
@@ -193,7 +193,7 @@ const Members: NextPageWithLayout = () => {
 
           <PrimaryButton type="submit" name="Add Member" />
         </form>
-      </Modal>
+      </Modal> */}
 
       <main className="flex min-h-screen flex-col">
         <div className="container flex flex-col p-10">
@@ -236,7 +236,7 @@ const Members: NextPageWithLayout = () => {
                 />
               </div>
 
-              <button
+              {/* <button
                 onClick={() => {
                   setModalIsOpen(true);
                 }}
@@ -305,7 +305,8 @@ const Members: NextPageWithLayout = () => {
                   </tr>
                 ))}
               </tbody>
-            </table>
+            </table> */}
+            </div>
           </div>
         </div>
       </main>
