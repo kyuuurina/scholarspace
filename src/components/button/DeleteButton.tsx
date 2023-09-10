@@ -7,7 +7,7 @@ type ButtonProps = {
 export const DeleteButton: React.FC<ButtonProps> = ({
   name,
   onClick,
-  disabled,
+  disabled = false,
 }) => {
   return (
     <button
