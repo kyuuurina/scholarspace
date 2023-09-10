@@ -35,6 +35,7 @@ This folder stores the components used for account registration and authenticati
 #### Google Button
 
 ![Alt text](image.png)
+
 This button allows users to sign in with their Google account. Pass in "signin" or "signup" as a prop to determine the button's functionality.
 
 ```js
