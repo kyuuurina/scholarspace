@@ -6,6 +6,7 @@ import type { AppProps } from "next/app";
 import { Head } from "~/components/layout/Head";
 import { Inter } from "next/font/google";
 import { Toaster } from "react-hot-toast";
+import ErrorBoundary from "~/components/ErrorBoundary";
 
 // supabase helpers for authentication and authorization
 import {
@@ -40,15 +41,17 @@ const MyApp = ({
   return (
     <>
       <Head />
-      <SessionContextProvider
-        supabaseClient={supabaseClient}
-        initialSession={initialSession as Session}
-      >
-        <div className={`${poppins.className}`}>
-          {getLayout(<Component {...pageProps} />)}
-          <Toaster />
-        </div>
-      </SessionContextProvider>
+      <ErrorBoundary>
+        <SessionContextProvider
+          supabaseClient={supabaseClient}
+          initialSession={initialSession as Session}
+        >
+          <div className={`${poppins.className}`}>
+            {getLayout(<Component {...pageProps} />)}
+            <Toaster />
+          </div>
+        </SessionContextProvider>
+      </ErrorBoundary>
     </>
   );
 };

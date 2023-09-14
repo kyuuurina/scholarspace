@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
-/* eslint-disable @typescript-eslint/no-misused-promises */
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "~/pages/_app";
 import Image from "next/image";
@@ -15,6 +13,8 @@ import { WorkspaceTabs } from "~/components/workspace/WorkspaceTabs";
 import { PrimaryButton } from "~/components/button/PrimaryButton";
 import { ProjectCard } from "~/components/project/ProjectCard";
 import { ScoreChart } from "~/components/chart/ScoreChart";
+import ErrorPage from "~/components/ErrorPage";
+import Loading from "../loading";
 
 const Workspace: NextPageWithLayout = () => {
   const router = useRouter();
@@ -31,15 +31,25 @@ const Workspace: NextPageWithLayout = () => {
 
   const workspaceData = workspace.data;
 
-  if (!workspaceData) {
-    return null;
-  }
-
   console.log(workspaceData);
 
   let imgUrl = "";
 
-  if (workspaceData.cover_img) {
+  if (workspace.isLoading) {
+    return <Loading />;
+  }
+
+  if (router.isFallback) {
+    // Return the loading component while the page is still loading
+    return <Loading />;
+  }
+
+  if (workspace.error) {
+    // Handle errors from the server here
+    return <ErrorPage error={workspace.error.message} />;
+  }
+
+  if (workspaceData?.cover_img) {
     imgUrl = user?.id
       ? `https://eeikbrtyntwckpyfphlm.supabase.co/storage/v1/object/public/workspace-covers/${user.id}/${workspaceData.cover_img}`
       : "";
@@ -47,13 +57,13 @@ const Workspace: NextPageWithLayout = () => {
 
   return (
     <>
-      <Head title={workspaceData.name} />
+      <Head title={workspaceData?.name} />
       <main className="flex-col p-10">
         <div className="grid grid-cols-12 gap-x-10">
           <div className="col-span-8 grid gap-y-5">
             <div className="flex items-center space-x-5">
               <div className="relative h-12 w-12">
-                {workspaceData.cover_img ? (
+                {workspaceData?.cover_img ? (
                   <Image
                     src={imgUrl}
                     fill
@@ -62,13 +72,13 @@ const Workspace: NextPageWithLayout = () => {
                   />
                 ) : (
                   <AvatarPlaceholder
-                    name={workspaceData?.name}
+                    name={workspaceData?.name || "SS"}
                     shape="square"
                   />
                 )}
               </div>
               <h1 className="line-clamp-3 text-4xl font-bold">
-                {workspaceData.name}
+                {workspaceData?.name}
               </h1>
             </div>
             <div className="flex items-center justify-between">
@@ -91,7 +101,7 @@ const Workspace: NextPageWithLayout = () => {
             <div>
               <h6 className="text-lg font-bold dark:text-white">About</h6>
               <p className="line-clamp-5 text-sm text-gray-900 dark:text-white">
-                {workspaceData.description}
+                {workspaceData?.description}
               </p>
             </div>
             <div>
