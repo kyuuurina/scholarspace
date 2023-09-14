@@ -2,11 +2,7 @@ type ButtonProps = {
   name: string;
   type?: "button" | "submit"; // Allow "button" and "submit" as valid values
 };
-
-export const PrimaryButton: React.FC<ButtonProps> = ({
-  name,
-  type = "button",
-}) => {
+const PrimaryButton: React.FC<ButtonProps> = ({ name, type = "button" }) => {
   return (
     <button
       type={type}
@@ -16,3 +12,5 @@ export const PrimaryButton: React.FC<ButtonProps> = ({
     </button>
   );
 };
+
+export default PrimaryButton;

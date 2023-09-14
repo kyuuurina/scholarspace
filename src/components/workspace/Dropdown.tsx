@@ -4,7 +4,7 @@ import { fetchUserWorkspaces } from "~/utils/userWorkspaces";
 import { FiPlusCircle } from "react-icons/fi";
 import { useUser } from "@supabase/auth-helpers-react";
 import Image from "next/image";
-import { AvatarPlaceholder } from "../AvatarPlaceholder";
+import AvatarPlaceholder from "../AvatarPlaceholder";
 
 type Props = {
   onClick: () => void;

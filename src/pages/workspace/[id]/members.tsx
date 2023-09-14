@@ -11,13 +11,13 @@ import Select from "react-select";
 // local components
 import Layout from "~/components/layout/Layout";
 import { Modal } from "~/components/modal/Modal";
-import { WorkspaceTabs } from "~/components/workspace/WorkspaceTabs";
+import WorkspaceTabs from "~/components/workspace/WorkspaceTabs";
 import EditableDropDown from "~/components/EditableDropDown";
 
 // types
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "~/pages/_app";
-import { PrimaryButton } from "~/components/button/PrimaryButton";
+import PrimaryButton from "~/components/button/PrimaryButton";
 
 const Members: NextPageWithLayout = () => {
   // constants

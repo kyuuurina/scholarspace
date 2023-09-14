@@ -3,7 +3,7 @@ import type { ReactElement, ReactNode } from "react";
 import { useState } from "react";
 import type { NextPage } from "next";
 import type { AppProps } from "next/app";
-import { Head } from "~/components/layout/Head";
+import Head from "~/components/layout/Head";
 import { Inter } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import ErrorBoundary from "~/components/ErrorBoundary";

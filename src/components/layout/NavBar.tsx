@@ -1,18 +1,27 @@
-import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { SignoutButton } from "../auth/SignoutButton";
-import { AvatarPlaceholder } from "../AvatarPlaceholder";
-import { useUser, type User } from "@supabase/auth-helpers-react";
+import { useState, useRef, useEffect } from "react";
+import { useUser } from "@supabase/auth-helpers-react";
 
-export function NavBar() {
-  const user: User | null = useUser();
-  const [isUserOverlayVisible, setIsUserOverlayVisible] = useState(false);
-  const overlayRef = useRef<HTMLDivElement>(null);
-  const [isNotifOverlayVisible, setIsNotifOverlayVisible] = useState(false);
-  const notifOverlayRef = useRef<HTMLDivElement>(null);
+// local components
+import AvatarPlaceholder from "../AvatarPlaceholder";
+import SignoutButton from "../auth/SignoutButton";
+
+type NavbarProps = {
+  toggleSidebar: () => void;
+};
+
+const NavBar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
+  const user = useUser();
   const avatarUrl = user?.user_metadata?.avatar_url as string;
 
+  // constants for overlay
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const notifOverlayRef = useRef<HTMLDivElement>(null);
+  const [isUserOverlayVisible, setIsUserOverlayVisible] = useState(false);
+  const [isNotifOverlayVisible, setIsNotifOverlayVisible] = useState(false);
+
+  // logic for user overlay
   const toggleUserOverlay = () => {
     setIsUserOverlayVisible(!isUserOverlayVisible);
   };
@@ -34,6 +43,7 @@ export function NavBar() {
     };
   }, []);
 
+  // logic for notification overlay
   const toggleNotifOverlay = () => {
     setIsNotifOverlayVisible(!isNotifOverlayVisible);
   };
@@ -56,16 +66,34 @@ export function NavBar() {
   }, []);
 
   return (
-    <nav className="w-full border-b bg-white">
+    <nav className="w-screen border-b bg-white">
       <div className="mx-2 flex flex-wrap items-center justify-between p-3">
-        <Link href="/" className="flex items-center">
-          <Image
-            src="/scholarspace-logo-x1.png"
-            width={100}
-            height={100}
-            alt="Scholarspace logo"
-          />
-        </Link>
+        <div className="flex">
+          <span className="cursor-pointer sm:hidden" onClick={toggleSidebar}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6 text-purple-accent-2"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M4 6h16M4 12h8m-8 6h16"
+              />
+            </svg>
+          </span>
+          <Link href="/" className="flex items-center">
+            <Image
+              src="/scholarspace-logo-x1.png"
+              width={100}
+              height={100}
+              alt="Scholarspace logo"
+            />
+          </Link>
+        </div>
 
         <div className="flex items-center gap-x-4 text-white">
           {/* Notifications */}
@@ -165,4 +193,6 @@ export function NavBar() {
       </div>
     </nav>
   );
-}
+};
+
+export default NavBar;

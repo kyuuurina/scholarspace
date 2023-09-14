@@ -1,7 +1,5 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
-/* eslint-disable @typescript-eslint/no-misused-promises */
 import type { ReactElement } from "react";
-import { Head } from "~/components/layout/Head";
+import Head from "~/components/layout/Head";
 
 import Layout from "~/components/layout/Layout";
 import type { NextPageWithLayout } from "~/pages/_app";

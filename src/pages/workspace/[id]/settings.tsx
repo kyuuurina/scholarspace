@@ -13,8 +13,8 @@ import type { WorkspaceFormData } from "~/types/workspace";
 
 // components
 import Layout from "~/components/layout/Layout";
-import { Head } from "~/components/layout/Head";
-import { WorkspaceTabs } from "~/components/workspace/WorkspaceTabs";
+import Head from "~/components/layout/Head";
+import WorkspaceTabs from "~/components/workspace/WorkspaceTabs";
 import { FormErrorMessage } from "~/components/FormErrorMessage";
 import { DeleteWorkspaceModal } from "~/components/workspace/DeleteWorkspaceModal";
 import { SuccessToast } from "~/components/toast/SuccessToast";
