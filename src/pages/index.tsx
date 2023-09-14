@@ -7,7 +7,7 @@ import Layout from "~/components/layout/Layout";
 import type { NextPageWithLayout } from "~/pages/_app";
 
 const Page: NextPageWithLayout = () => {
-  return <p>Whereas disregard and contempt for human rights have resulted</p>;
+  return <></>;
 };
 
 Page.getLayout = function getLayout(page: ReactElement) {

@@ -1,17 +1,27 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { z } from "zod";
+import { TRPCError } from "@trpc/server";
 
 import { router, protectedProcedure, publicProcedure } from "~/server/api/trpc";
 
 export const workspaceRouter = router({
   get: publicProcedure
     .input(z.object({ id: z.string() }))
-    .query(({ ctx, input }) => {
-      return ctx.prisma.workspace.findUnique({
+    .query(async ({ ctx, input }) => {
+      const workspace = await ctx.prisma.workspace.findUnique({
         where: {
           id: input.id,
         },
       });
+
+      if (!workspace) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Workspace not found",
+        });
+      }
+
+      return workspace;
     }),
 
   listUserWorkspaces: protectedProcedure.query(async ({ ctx }) => {
