@@ -12,8 +12,7 @@ const getTitle = (title?: string) => {
 
   return process.env.NEXT_PUBLIC_APP_NAME;
 };
-
-export const Head: React.FC<Props> = ({ title }) => (
+const Head: React.FC<Props> = ({ title }) => (
   <NextHead>
     <title>{getTitle(title)}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -31,3 +30,5 @@ export const Head: React.FC<Props> = ({ title }) => (
     <link rel="icon" href="/scholarspace-logo.ico" />
   </NextHead>
 );
+
+export default Head;

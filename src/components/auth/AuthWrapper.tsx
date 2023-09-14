@@ -1,4 +1,4 @@
-import { Head } from "~/components/layout/Head";
+import Head from "~/components/layout/Head";
 import { Link } from "~/components/Link";
 
 type AuthType = "signin" | "signup" | "forgot" | "set" | "verify" | "success";

@@ -1,25 +1,33 @@
+import Image from "next/image";
+
+// hooks
+import { useRouter } from "next/router";
+import { useUser } from "@supabase/auth-helpers-react";
+
+// utils
+import { api } from "~/utils/api";
+
+// types
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "~/pages/_app";
-import Image from "next/image";
-import { useRouter } from "next/router";
-import { api } from "~/utils/api";
-import { useUser } from "@supabase/auth-helpers-react";
+
+// pages
+import ErrorPage from "~/pages/error-page";
 
 // local components
 import Layout from "~/components/layout/Layout";
-import { Head } from "~/components/layout/Head";
-import { AvatarPlaceholder } from "~/components/AvatarPlaceholder";
-import { WorkspaceTabs } from "~/components/workspace/WorkspaceTabs";
-import { PrimaryButton } from "~/components/button/PrimaryButton";
-import { ProjectCard } from "~/components/project/ProjectCard";
-import { ScoreChart } from "~/components/chart/ScoreChart";
-import ErrorPage from "~/components/ErrorPage";
-import Loading from "../loading";
+import Head from "~/components/layout/Head";
+import LoadingSpinner from "~/components/LoadingSpinner";
+import AvatarPlaceholder from "~/components/AvatarPlaceholder";
+import WorkspaceTabs from "~/components/workspace/WorkspaceTabs";
+import PrimaryButton from "~/components/button/PrimaryButton";
+import ProjectCard from "~/components/project/ProjectCard";
+import ScoreChart from "~/components/chart/ScoreChart";
 
 const Workspace: NextPageWithLayout = () => {
   const router = useRouter();
-
   const user = useUser();
+
   const workspace = api.workspace.get.useQuery(
     {
       id: router.query.id as string,
@@ -29,41 +37,38 @@ const Workspace: NextPageWithLayout = () => {
     }
   );
 
-  const workspaceData = workspace.data;
-
-  console.log(workspaceData);
-
-  let imgUrl = "";
+  const { name, description, cover_img } = workspace.data || {
+    name: "Default workspace",
+    description: "This is the default workspace.",
+  };
 
   if (workspace.isLoading) {
-    return <Loading />;
-  }
-
-  if (router.isFallback) {
-    // Return the loading component while the page is still loading
-    return <Loading />;
+    return <LoadingSpinner />;
   }
 
   if (workspace.error) {
-    // Handle errors from the server here
     return <ErrorPage error={workspace.error.message} />;
   }
 
-  if (workspaceData?.cover_img) {
+  // store workspace cover image url
+  let imgUrl = "";
+  if (cover_img) {
     imgUrl = user?.id
-      ? `https://eeikbrtyntwckpyfphlm.supabase.co/storage/v1/object/public/workspace-covers/${user.id}/${workspaceData.cover_img}`
+      ? `https://eeikbrtyntwckpyfphlm.supabase.co/storage/v1/object/public/workspace-covers/${user.id}/${cover_img}`
       : "";
   }
 
   return (
     <>
-      <Head title={workspaceData?.name} />
+      <Head title={name} />
       <main className="flex-col p-10">
         <div className="grid grid-cols-12 gap-x-10">
+          {/* Left section of workspace dashboard */}
           <div className="col-span-8 grid gap-y-5">
             <div className="flex items-center space-x-5">
+              {/* Workspace header */}
               <div className="relative h-12 w-12">
-                {workspaceData?.cover_img ? (
+                {cover_img ? (
                   <Image
                     src={imgUrl}
                     fill
@@ -71,82 +76,50 @@ const Workspace: NextPageWithLayout = () => {
                     alt=""
                   />
                 ) : (
-                  <AvatarPlaceholder
-                    name={workspaceData?.name || "SS"}
-                    shape="square"
-                  />
+                  <AvatarPlaceholder name={name || "SS"} shape="square" />
                 )}
               </div>
-              <h1 className="line-clamp-3 text-4xl font-bold">
-                {workspaceData?.name}
-              </h1>
+              <h1 className="line-clamp-3 text-4xl font-bold">{name}</h1>
             </div>
+            {/* Navigation Section */}
             <div className="flex items-center justify-between">
               <WorkspaceTabs />
               <div className="flex-shrink-0">
                 <PrimaryButton name="Add Project" />
               </div>
             </div>
+            {/* Projects Section */}
             <div className="grid gap-5">
-              <h5 className="text-xl font-medium text-gray-900 dark:text-white">
-                Projects
-              </h5>
+              <h5 className="text-xl font-medium text-gray-900 ">Projects</h5>
 
               <ProjectCard />
               <ProjectCard />
               <ProjectCard />
             </div>
           </div>
-          <div className="col-span-4 grid gap-0.5">
+          {/* Right section of workspace dashboard */}
+          <div className="col-span-4 grid">
             <div>
-              <h6 className="text-lg font-bold dark:text-white">About</h6>
-              <p className="line-clamp-5 text-sm text-gray-900 dark:text-white">
-                {workspaceData?.description}
+              <h6 className="text-lg font-bold">About</h6>
+              <p className="line-clamp-5 text-sm text-gray-900">
+                {description}
               </p>
             </div>
             <div>
-              <hr className="h-px bg-gray-200 dark:bg-gray-700" />
-              <h6 className="text-lg font-bold dark:text-white">Members</h6>
+              <hr className="bg-gray-200" />
+              <h6 className="text-lg font-bold">Members</h6>
               <div className="flex flex-row gap-2">
-                <img
-                  className="h-10 w-10 rounded-full"
-                  src="https://i.pravatar.cc/300"
-                  alt="Rounded avatar"
-                />
-                <img
-                  className="h-10 w-10 rounded-full"
-                  src="https://i.pravatar.cc/300"
-                  alt="Rounded avatar"
-                />
-                <img
-                  className="h-10 w-10 rounded-full"
-                  src="https://i.pravatar.cc/300"
-                  alt="Rounded avatar"
-                />
-                <img
-                  className="h-10 w-10 rounded-full"
-                  src="https://i.pravatar.cc/300"
-                  alt="Rounded avatar"
-                />
-                <img
-                  className="h-10 w-10 rounded-full"
-                  src="https://i.pravatar.cc/300"
-                  alt="Rounded avatar"
-                />
+                <p> Test </p>
               </div>
             </div>
-            <hr className="h-px bg-gray-200 dark:bg-gray-700" />
+            <hr className=" bg-gray-200" />
             <div>
-              <h6 className="mb-5 text-lg font-bold dark:text-white">
-                Collaborativity Score
-              </h6>
+              <h6 className="mb-5 text-lg font-bold">Collaborativity Score</h6>
               <ScoreChart score={90} />
             </div>
-            <hr className="h-px bg-gray-200 dark:bg-gray-700" />
+            <hr className=" bg-gray-200 " />
             <div>
-              <h6 className="mb-5 text-lg font-bold dark:text-white">
-                Productivity Score
-              </h6>
+              <h6 className="mb-5 text-lg font-bold">Productivity Score</h6>
               <ScoreChart score={70} />
             </div>
           </div>

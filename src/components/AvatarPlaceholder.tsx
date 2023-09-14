@@ -5,7 +5,7 @@ type AvatarPlaceholderProps = {
   shape?: "circle" | "square";
 };
 
-export const AvatarPlaceholder: React.FC<AvatarPlaceholderProps> = ({
+const AvatarPlaceholder: React.FC<AvatarPlaceholderProps> = ({
   name,
   shape = "circle",
 }) => {
@@ -23,3 +23,5 @@ export const AvatarPlaceholder: React.FC<AvatarPlaceholderProps> = ({
     </div>
   );
 };
+
+export default AvatarPlaceholder;

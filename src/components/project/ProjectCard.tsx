@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export function ProjectCard() {
+const ProjectCard: React.FC = () => {
   return (
     <Link
       href="/project"
@@ -26,4 +26,6 @@ export function ProjectCard() {
       </div>
     </Link>
   );
-}
+};
+
+export default ProjectCard;

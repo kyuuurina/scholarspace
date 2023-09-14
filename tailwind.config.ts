@@ -1,8 +1,13 @@
 import { type Config } from "tailwindcss";
+import defaultTheme from "tailwindcss/defaultTheme";
 
 export default {
   content: ["./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
+    screens: {
+      xs: "10px",
+      ...defaultTheme.screens,
+    },
     extend: {
       colors: {
         "grey-bg": "#F9FAFB",

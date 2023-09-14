@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 
-export function WorkspaceTabs() {
+const WorkspaceTabs: React.FC = () => {
   const router = useRouter();
 
   // Check if router.query and router.query.id are defined before accessing their values
@@ -74,4 +74,6 @@ export function WorkspaceTabs() {
       </ul>
     </div>
   );
-}
+};
+
+export default WorkspaceTabs;

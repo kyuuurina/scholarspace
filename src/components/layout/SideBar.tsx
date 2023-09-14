@@ -1,9 +1,3 @@
-/* eslint-disable @typescript-eslint/no-misused-promises */
-/* eslint-disable @typescript-eslint/no-floating-promises */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-
 // React and Next hooks
 import { useState } from "react";
 import Link from "next/link";
@@ -21,13 +15,16 @@ import { IconContext } from "react-icons";
 import { Dropdown } from "../workspace/Dropdown";
 import { WorkspaceModal } from "../workspace/WorkspaceModal";
 
-export function SideBar() {
-  const [open, setOpen] = useState(false);
-  const [modalIsOpen, setModalIsOpen] = useState(false);
+type SideBarProps = {
+  toggleSidebar: () => void;
+  open: boolean;
+};
 
-  const handleToggle = () => {
-    setOpen(!open);
-  };
+export const SideBar: React.FC<SideBarProps> = ({
+  toggleSidebar,
+  open
+}) => {
+  const [modalIsOpen, setModalIsOpen] = useState(false);
 
   return (
     <>
@@ -36,13 +33,19 @@ export function SideBar() {
         onClick={() => setModalIsOpen(false)}
       />
       <div
-        className={`${
-          open ? "w-56" : "w-14"
-        } flex min-h-screen bg-dark-purple p-3 py-6 shadow duration-300`}
+        className={`min-h-screen transition-transform ${
+          open
+            ? "sm:14 translate-x-0"
+            : "-translate-x-full sm:w-56 sm:translate-x-0"
+        } sm:duration-300" fixed left-0 top-0 z-40
+           bg-dark-purple p-4 sm:static
+         sm:flex sm:shadow
+         `}
+        tabIndex={-1}
       >
-        <div className="flex min-w-full space-y-6 flex-col font-medium">
+        <div className="flex min-w-full flex-col space-y-6 font-medium">
           <div className="flex cursor-pointer items-center">
-            <span onClick={handleToggle}>
+            <span onClick={toggleSidebar}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-6 w-6 text-purple-accent-2"
@@ -67,7 +70,7 @@ export function SideBar() {
                     open ? "text-purple-accent-2" : "text-purple-accent-2"
                   }`}
                   href="/"
-                  onClick={handleToggle}
+                  onClick={toggleSidebar}
                 >
                   <FiHome className="h-6 w-6" />
                   <span
@@ -83,7 +86,7 @@ export function SideBar() {
                   className={`flex items-center space-x-3 rounded-md hover:bg-purple-800 ${
                     open ? "text-purple-accent-2" : "text-purple-accent-2"
                   }`}
-                  onClick={handleToggle}
+                  onClick={toggleSidebar}
                 >
                   <FiActivity className="h-6 w-6" />
                   <span
@@ -99,7 +102,7 @@ export function SideBar() {
                   className={`flex items-center space-x-3 rounded-md hover:bg-purple-800 ${
                     open ? "text-purple-accent-2" : "text-purple-accent-2"
                   }`}
-                  onClick={handleToggle}
+                  onClick={toggleSidebar}
                 >
                   <FiMessageCircle className="h-6 w-6" />
                   <span
