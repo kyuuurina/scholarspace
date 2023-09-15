@@ -19,10 +19,11 @@ import Layout from "~/components/layout/Layout";
 import Head from "~/components/layout/Head";
 import LoadingSpinner from "~/components/LoadingSpinner";
 import AvatarPlaceholder from "~/components/AvatarPlaceholder";
-import WorkspaceTabs from "~/components/workspace/WorkspaceTabs";
 import PrimaryButton from "~/components/button/PrimaryButton";
 import ProjectCard from "~/components/project/ProjectCard";
 import ScoreChart from "~/components/chart/ScoreChart";
+import HeaderButton from "~/components/workspace/HeaderButton";
+import Card from "~/components/Card";
 
 const Workspace: NextPageWithLayout = () => {
   const router = useRouter();
@@ -61,67 +62,64 @@ const Workspace: NextPageWithLayout = () => {
   return (
     <>
       <Head title={name} />
-      <main className="flex-col p-10">
-        <div className="grid grid-cols-12 gap-x-10">
-          {/* Left section of workspace dashboard */}
-          <div className="col-span-8 grid gap-y-5">
-            <div className="flex items-center space-x-5">
-              {/* Workspace header */}
+      <main className="flex flex-col">
+        {/* Workspace header */}
+        <div className="flex w-full justify-between border-b bg-white px-5 py-2 sm:py-5">
+          <div className="flex items-center gap-x-3">
+            {cover_img ? (
               <div className="relative h-12 w-12">
-                {cover_img ? (
-                  <Image
-                    src={imgUrl}
-                    fill
-                    style={{ objectFit: "contain" }}
-                    alt=""
-                  />
-                ) : (
-                  <AvatarPlaceholder name={name || "SS"} shape="square" />
-                )}
+                <Image
+                  src={imgUrl}
+                  fill
+                  style={{ objectFit: "contain" }}
+                  alt=""
+                />
               </div>
-              <h1 className="line-clamp-3 text-4xl font-bold">{name}</h1>
-            </div>
-            {/* Navigation Section */}
-            <div className="flex items-center justify-between">
-              <WorkspaceTabs />
-              <div className="flex-shrink-0">
-                <PrimaryButton name="Add Project" />
-              </div>
-            </div>
-            {/* Projects Section */}
-            <div className="grid gap-5">
+            ) : (
+              <AvatarPlaceholder name={name || "SS"} shape="square" />
+            )}
+            <h1 className="truncate text-2xl font-bold sm:text-4xl">{name}</h1>
+          </div>
+          <div className="flex items-center gap-x-2">
+            <HeaderButton type={"members"} />
+            <HeaderButton type={"settings"} />
+          </div>
+        </div>
+        <div className="grid p-5 md:grid-cols-12 md:gap-x-5">
+          {/* Left section of workspace dashboard */}
+          {/* Projects Section */}
+          <div className="w-full md:col-span-8">
+            <div className="mb-5 flex items-center justify-between">
               <h5 className="text-xl font-medium text-gray-900 ">Projects</h5>
-
+              <PrimaryButton name="Add Project" />
+            </div>
+            <div className="grid gap-5 md:grid-cols-2">
+              <ProjectCard />
+              <ProjectCard />
+              <ProjectCard />
               <ProjectCard />
               <ProjectCard />
               <ProjectCard />
             </div>
           </div>
           {/* Right section of workspace dashboard */}
-          <div className="col-span-4 grid">
-            <div>
-              <h6 className="text-lg font-bold">About</h6>
+          <div className="grid w-full gap-y-2 py-5 md:py-1 md:col-span-4">
+            <Card title={"About"}>
               <p className="line-clamp-5 text-sm text-gray-900">
                 {description}
               </p>
-            </div>
-            <div>
-              <hr className="bg-gray-200" />
-              <h6 className="text-lg font-bold">Members</h6>
+            </Card>
+            <Card title={"Members"}>
               <div className="flex flex-row gap-2">
                 <p> Test </p>
               </div>
-            </div>
-            <hr className=" bg-gray-200" />
-            <div>
-              <h6 className="mb-5 text-lg font-bold">Collaborativity Score</h6>
+            </Card>
+            <Card title={"Collaborativity Score"} center>
               <ScoreChart score={90} />
-            </div>
-            <hr className=" bg-gray-200 " />
-            <div>
-              <h6 className="mb-5 text-lg font-bold">Productivity Score</h6>
+            </Card>
+            <Card title={"Productivity Score"} center>
               <ScoreChart score={70} />
-            </div>
+            </Card>
           </div>
         </div>
       </main>
