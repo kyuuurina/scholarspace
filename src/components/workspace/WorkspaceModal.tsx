@@ -21,10 +21,7 @@ type ModalProps = {
   onClick: () => void;
 };
 
-export const WorkspaceModal: React.FC<ModalProps> = ({
-  openModal,
-  onClick,
-}) => {
+const WorkspaceModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
   // image variables
   const [imagePlaceholder, setImagePlaceholder] = useState<string | null>(null);
   const [imageValue, setImageValue] = useState<File | null | undefined>(null);
@@ -221,3 +218,5 @@ export const WorkspaceModal: React.FC<ModalProps> = ({
     </div>
   );
 };
+
+export default WorkspaceModal;

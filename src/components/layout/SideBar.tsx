@@ -12,18 +12,15 @@ import {
 import { IconContext } from "react-icons";
 
 // components
-import { Dropdown } from "../workspace/Dropdown";
-import { WorkspaceModal } from "../workspace/WorkspaceModal";
+import WorkspaceDropdown from "../workspace/WorkspaceDropdown";
+import WorkspaceModal from "../workspace/WorkspaceModal";
 
 type SideBarProps = {
   toggleSidebar: () => void;
   open: boolean;
 };
 
-export const SideBar: React.FC<SideBarProps> = ({
-  toggleSidebar,
-  open
-}) => {
+export const SideBar: React.FC<SideBarProps> = ({ toggleSidebar, open }) => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
 
   return (
@@ -33,17 +30,15 @@ export const SideBar: React.FC<SideBarProps> = ({
         onClick={() => setModalIsOpen(false)}
       />
       <div
-        className={`min-h-screen transition-transform ${
+        className={`min-h-screen transition-all duration-300 ${
           open
-            ? "sm:14 translate-x-0"
-            : "-translate-x-full sm:w-56 sm:translate-x-0"
-        } sm:duration-300" fixed left-0 top-0 z-40
-           bg-dark-purple p-4 sm:static
-         sm:flex sm:shadow
-         `}
+            ? "translate-x-0 sm:w-56"
+            : "-translate-x-full sm:w-16 sm:translate-x-0"
+        } fixed left-0 top-0 z-40 bg-dark-purple
+           p-4 sm:static sm:flex`}
         tabIndex={-1}
       >
-        <div className="flex min-w-full flex-col space-y-6 font-medium">
+        <div className="flex flex-col space-y-6 font-medium">
           <div className="flex cursor-pointer items-center">
             <span onClick={toggleSidebar}>
               <svg
@@ -74,7 +69,11 @@ export const SideBar: React.FC<SideBarProps> = ({
                 >
                   <FiHome className="h-6 w-6" />
                   <span
-                    className={`${open ? "text-purple-accent-2" : "sr-only"}`}
+                    className={`transition-all duration-500 ${
+                      open
+                        ? "text-purple-accent-2 opacity-100"
+                        : "sr-only opacity-0"
+                    }`}
                   >
                     Home
                   </span>
@@ -90,7 +89,11 @@ export const SideBar: React.FC<SideBarProps> = ({
                 >
                   <FiActivity className="h-6 w-6" />
                   <span
-                    className={`${open ? "text-purple-accent-2" : "sr-only"}`}
+                    className={`transition-all duration-500 ${
+                      open
+                        ? "text-purple-accent-2 opacity-100"
+                        : "sr-only opacity-0"
+                    }`}
                   >
                     My Profile
                   </span>
@@ -106,7 +109,11 @@ export const SideBar: React.FC<SideBarProps> = ({
                 >
                   <FiMessageCircle className="h-6 w-6" />
                   <span
-                    className={`${open ? "text-purple-accent-2" : "sr-only"}`}
+                    className={`transition-all duration-500 ${
+                      open
+                        ? "text-purple-accent-2 opacity-100"
+                        : "sr-only opacity-0"
+                    }`}
                   >
                     Messages
                   </span>
@@ -120,13 +127,24 @@ export const SideBar: React.FC<SideBarProps> = ({
                   }`}
                 >
                   <FiBriefcase className="h-6 w-6" />
-                  <span className={`${open ? "" : "sr-only"}`}>Projects</span>
+                  <span
+                    className={`transition-all duration-500 ${
+                      open
+                        ? "text-purple-accent-2 opacity-100"
+                        : "sr-only opacity-0"
+                    }`}
+                  >
+                    Projects
+                  </span>
                 </Link>
               </li>
               {open && (
-                <li className="p-2">
-                  <hr className="max-w-1/2 m-2 my-6 border-purple-accent-2" />
-                  <Dropdown onClick={() => setModalIsOpen(true)} />
+                <li
+                  className={`max-w-1/2 m-2 my-6 border-purple-accent-2 transition-all duration-500 ${
+                    open ? "opacity-100" : "opacity-0"
+                  }`}
+                >
+                  <WorkspaceDropdown onClick={() => setModalIsOpen(true)} />
                 </li>
               )}
             </ul>
@@ -135,6 +153,6 @@ export const SideBar: React.FC<SideBarProps> = ({
       </div>
     </>
   );
-}
+};
 
 export default SideBar;

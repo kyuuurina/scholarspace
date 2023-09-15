@@ -66,9 +66,9 @@ const NavBar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
   }, []);
 
   return (
-    <nav className="w-screen border-b bg-white">
+    <nav className="fixed z-10 w-full border-b bg-white">
       <div className="mx-2 flex flex-wrap items-center justify-between p-3">
-        <div className="flex">
+        <div className="flex gap-x-1">
           <span className="cursor-pointer sm:hidden" onClick={toggleSidebar}>
             <svg
               xmlns="http://www.w3.org/2000/svg"

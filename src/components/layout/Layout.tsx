@@ -18,9 +18,9 @@ export default function Layout({ children }: LayoutProps) {
     <>
       <div className="flex min-h-screen">
         <SideBar open={open} toggleSidebar={handleToggle} />
-        <div className="">
+        <div className="w-full">
           <NavBar toggleSidebar={handleToggle} />
-          {children}
+          <div className="relative top-16">{children}</div>
         </div>
       </div>
     </>
