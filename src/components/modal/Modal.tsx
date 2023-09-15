@@ -7,7 +7,7 @@ type ModalProps = {
 
 import { GrClose } from "react-icons/gr";
 
-export function Modal({ show, onClose, children, title }: ModalProps) {
+const Modal: React.FC<ModalProps> = ({ show, onClose, children, title }) => {
   if (!show) return null;
 
   return (
@@ -36,3 +36,5 @@ export function Modal({ show, onClose, children, title }: ModalProps) {
     </div>
   );
 }
+
+export default Modal;

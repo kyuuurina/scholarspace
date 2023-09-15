@@ -122,7 +122,7 @@ export const workspaceRouter = router({
           workspaceid: id,
         },
         include: {
-          users: true,
+          user: true,
         },
       });
 
