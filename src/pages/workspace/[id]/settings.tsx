@@ -14,17 +14,21 @@ import type { WorkspaceFormData } from "~/types/workspace";
 // components
 import Layout from "~/components/layout/Layout";
 import Head from "~/components/layout/Head";
-import WorkspaceTabs from "~/components/workspace/WorkspaceTabs";
 import { FormErrorMessage } from "~/components/FormErrorMessage";
 import { DeleteWorkspaceModal } from "~/components/workspace/DeleteWorkspaceModal";
 import { SuccessToast } from "~/components/toast/SuccessToast";
 import { ErrorToast } from "~/components/toast/ErrorToast";
+import Header from "~/components/workspace/Header";
+import { useFetchWorkspace } from "~/utils/workspace";
 
 const Settings: NextPageWithLayout = () => {
   // constants
   const router = useRouter();
   const { id } = router.query;
   const [modalIsOpen, setModalIsOpen] = useState(false);
+
+  const { name, description, cover_img, isLoading, is_personal, imgUrl } =
+    useFetchWorkspace();
 
   // schema for form validation
   const schema: ZodType<WorkspaceFormData> = z.object({
@@ -38,16 +42,6 @@ const Settings: NextPageWithLayout = () => {
       .max(200, "Description must be at most 200 characters long."),
     cover_img: z.string().nullable(),
   });
-
-  // queries and mutations
-  const { data: workspace, isLoading } = api.workspace.get.useQuery(
-    {
-      id: id as string,
-    },
-    {
-      enabled: !!id,
-    }
-  );
 
   const updateWorkspace = api.workspace.update.useMutation({
     onSuccess: () => {
@@ -69,20 +63,20 @@ const Settings: NextPageWithLayout = () => {
   } = useForm<WorkspaceFormData>({
     resolver: zodResolver(schema),
     defaultValues: {
-      name: workspace?.name,
-      description: workspace?.description,
-      cover_img: workspace?.cover_img,
+      name: name,
+      description: description,
+      cover_img: cover_img,
     },
   });
 
   // set form values to workspace data
   useEffect(() => {
-    if (!isLoading && workspace) {
-      setValue("name", workspace.name || "");
-      setValue("description", workspace.description || "");
-      setValue("cover_img", workspace.cover_img || "");
+    if (!isLoading) {
+      setValue("name", name || "");
+      setValue("description", description || "");
+      setValue("cover_img", cover_img || "");
     }
-  }, [isLoading, workspace, setValue]);
+  }, [isLoading, setValue]);
 
   //handlers
   const handleUpdateWorkspace = async (formData: WorkspaceFormData) => {
@@ -100,9 +94,9 @@ const Settings: NextPageWithLayout = () => {
 
   const handleCancel = () => {
     reset({
-      name: workspace?.name || "",
-      description: workspace?.description || "",
-      cover_img: workspace?.cover_img || "",
+      name: name || "",
+      description: description || "",
+      cover_img: cover_img || "",
     });
   };
 
@@ -113,27 +107,20 @@ const Settings: NextPageWithLayout = () => {
 
   return (
     <>
-      <Head
-        title={workspace?.name ? `${workspace.name} Settings` : "Settings"}
-      />
+      <Head title={name ? `${name} Settings` : "Settings"} />
       <DeleteWorkspaceModal
         openModal={modalIsOpen}
         onClick={() => setModalIsOpen(false)}
-        name={workspace?.name}
+        name={name}
         id={id as string}
       />
-      <main className="flex min-h-screen flex-col">
-        <div className="container flex flex-col p-10">
-          <div className="grid gap-y-5">
-            <h1 className="line-clamp-3 text-4xl">
-              {workspace?.name} Settings
-            </h1>
-            <WorkspaceTabs />
-          </div>
-
+      <main className="min-h-screen w-full">
+        {/* Workspace header */}
+        <Header name={name || ""} imgUrl={imgUrl} />
+        <div className="p-5">
           {/* Update Workspace Section  */}
-          <div className="grid gap-5">
-            <section className="max-w mt-2 w-full rounded-lg border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
+          <div className="grid gap-y-5">
+            <section className="mt-2 w-full rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
               <form
                 className="space-y-6"
                 autoComplete="off"
@@ -170,7 +157,7 @@ const Settings: NextPageWithLayout = () => {
                   {isDirty && (
                     <button
                       type="button"
-                      className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-center text-sm font-medium hover:bg-grey-bg hover:text-purple-accent-1 focus:outline-none"
+                      className="rounded-sm border border-gray-200 bg-white px-3 py-2 text-center text-sm font-medium hover:bg-grey-bg hover:text-purple-accent-1 focus:outline-none"
                       // reverts the input values to the original values
                       onClick={handleCancel}
                     >
@@ -183,7 +170,7 @@ const Settings: NextPageWithLayout = () => {
                       isDirty
                         ? "bg-purple-accent-1 hover:bg-purple-accent-2"
                         : "bg-gray-200"
-                    } rounded-lg px-3 py-2 text-center text-sm font-medium text-white focus:outline-none`}
+                    } rounded-sm px-3 py-2 text-center text-sm font-medium text-white focus:outline-none`}
                     disabled={!isDirty}
                   >
                     Save
@@ -193,13 +180,13 @@ const Settings: NextPageWithLayout = () => {
             </section>
 
             {/* Delete Workspace Section  */}
-            {workspace?.is_personal === false ? (
-              <section className="max-w w-full rounded-lg border border-gray-200 bg-white p-4 shadow dark:border-gray-700 dark:bg-gray-800 sm:p-6 md:p-8">
+            {is_personal === false ? (
+              <section className="w-full rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
                 <form className="space-y-6" action="#">
-                  <h5 className="text-xl font-medium text-gray-900 dark:text-white">
+                  <h5 className="text-xl font-medium text-gray-900">
                     Danger Zone
                   </h5>
-                  <div className="flex flex-col rounded-lg bg-red-50 p-6 text-sm text-red-800 dark:bg-gray-800 dark:text-red-400">
+                  <div className="flex flex-col rounded-sm bg-red-50 p-6 text-sm text-red-800 dark:text-red-400">
                     <div className="flex">
                       <svg
                         className="mr-2 h-5 w-5"
@@ -223,7 +210,7 @@ const Settings: NextPageWithLayout = () => {
                         </p>
                         <button
                           type="button"
-                          className="w-auto rounded-lg border border-red-700 p-2 text-center text-sm font-medium text-red-700 hover:bg-red-800 hover:text-white focus:outline-none"
+                          className="w-auto rounded-sm border border-red-700 p-2 text-center text-sm font-medium text-red-700 hover:bg-red-800 hover:text-white focus:outline-none"
                           onClick={() => setModalIsOpen(true)}
                         >
                           Delete Workspace

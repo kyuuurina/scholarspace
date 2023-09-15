@@ -6,6 +6,7 @@ import { useUser } from "@supabase/auth-helpers-react";
 
 // utils
 import { api } from "~/utils/api";
+import { useFetchWorkspace } from "~/utils/workspace";
 
 // types
 import type { ReactElement } from "react";
@@ -18,37 +19,23 @@ import ErrorPage from "~/pages/error-page";
 import Layout from "~/components/layout/Layout";
 import Head from "~/components/layout/Head";
 import LoadingSpinner from "~/components/LoadingSpinner";
-import AvatarPlaceholder from "~/components/AvatarPlaceholder";
 import PrimaryButton from "~/components/button/PrimaryButton";
 import ProjectCard from "~/components/project/ProjectCard";
 import ScoreChart from "~/components/chart/ScoreChart";
-import HeaderButton from "~/components/workspace/HeaderButton";
 import Card from "~/components/Card";
+import Header from "~/components/workspace/Header";
 
 const Workspace: NextPageWithLayout = () => {
-  const router = useRouter();
   const user = useUser();
 
-  const workspace = api.workspace.get.useQuery(
-    {
-      id: router.query.id as string,
-    },
-    {
-      enabled: !!router.query.id,
-    }
-  );
+  const { name, description, cover_img, isLoading, error } = useFetchWorkspace();
 
-  const { name, description, cover_img } = workspace.data || {
-    name: "Default workspace",
-    description: "This is the default workspace.",
-  };
-
-  if (workspace.isLoading) {
+  if (isLoading) {
     return <LoadingSpinner />;
   }
 
-  if (workspace.error) {
-    return <ErrorPage error={workspace.error.message} />;
+  if (error) {
+    return <ErrorPage error={error.message} />;
   }
 
   // store workspace cover image url
@@ -64,27 +51,7 @@ const Workspace: NextPageWithLayout = () => {
       <Head title={name} />
       <main className="flex flex-col">
         {/* Workspace header */}
-        <div className="flex w-full justify-between border-b bg-white px-5 py-2 sm:py-5">
-          <div className="flex items-center gap-x-3">
-            {cover_img ? (
-              <div className="relative h-12 w-12">
-                <Image
-                  src={imgUrl}
-                  fill
-                  style={{ objectFit: "contain" }}
-                  alt=""
-                />
-              </div>
-            ) : (
-              <AvatarPlaceholder name={name || "SS"} shape="square" />
-            )}
-            <h1 className="truncate text-2xl font-bold sm:text-4xl">{name}</h1>
-          </div>
-          <div className="flex items-center gap-x-2">
-            <HeaderButton type={"members"} />
-            <HeaderButton type={"settings"} />
-          </div>
-        </div>
+        <Header name={name|| ""} imgUrl={imgUrl} />
         <div className="grid p-5 md:grid-cols-12 md:gap-x-5">
           {/* Left section of workspace dashboard */}
           {/* Projects Section */}

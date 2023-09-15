@@ -1,5 +1,3 @@
-// not in use anymore!
-
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
@@ -13,11 +11,15 @@ import Layout from "~/components/layout/Layout";
 import { Modal } from "~/components/modal/Modal";
 import WorkspaceTabs from "~/components/workspace/WorkspaceTabs";
 import EditableDropDown from "~/components/EditableDropDown";
+import Header from "~/components/workspace/Header";
 
 // types
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "~/pages/_app";
 import PrimaryButton from "~/components/button/PrimaryButton";
+
+// utils
+import { useFetchWorkspace } from "~/utils/workspace";
 
 const Members: NextPageWithLayout = () => {
   // constants
@@ -32,6 +34,8 @@ const Members: NextPageWithLayout = () => {
     label: string;
     value: string;
   } | null>(null);
+
+  const { name, description, cover_img, isLoading, is_personal, imgUrl } = useFetchWorkspace();
 
   // queries and mutation calls
 
@@ -195,16 +199,9 @@ const Members: NextPageWithLayout = () => {
         </form>
       </Modal> */}
 
-      <main className="flex min-h-screen flex-col">
-        <div className="container flex flex-col p-10">
-          <h1 className="line-clamp-3 text-4xl">
-            Malaysia Special Interest Group in Software Resilience, Quality &
-            Automation
-          </h1>
-          <div className="flex">
-            <WorkspaceTabs />
-          </div>
-
+      <main className="min-h-screen w-full">
+        <Header name={name || ""} imgUrl={imgUrl} />
+        <div className="p-5">
           <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
             <div className="mx-4 flex items-center bg-white py-4 dark:bg-gray-800">
               <label htmlFor="table-search" className="sr-only">
