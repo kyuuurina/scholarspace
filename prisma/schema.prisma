@@ -258,44 +258,43 @@ model sso_providers {
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model users {
-  instance_id                 String?          @db.Uuid
-  id                          String           @id @db.Uuid
-  aud                         String?          @db.VarChar(255)
-  role                        String?          @db.VarChar(255)
-  email                       String?          @db.VarChar(255)
-  encrypted_password          String?          @db.VarChar(255)
-  email_confirmed_at          DateTime?        @db.Timestamptz(6)
-  invited_at                  DateTime?        @db.Timestamptz(6)
-  confirmation_token          String?          @db.VarChar(255)
-  confirmation_sent_at        DateTime?        @db.Timestamptz(6)
-  recovery_token              String?          @db.VarChar(255)
-  recovery_sent_at            DateTime?        @db.Timestamptz(6)
-  email_change_token_new      String?          @db.VarChar(255)
-  email_change                String?          @db.VarChar(255)
-  email_change_sent_at        DateTime?        @db.Timestamptz(6)
-  last_sign_in_at             DateTime?        @db.Timestamptz(6)
+  instance_id                 String?       @db.Uuid
+  id                          String        @id @db.Uuid
+  aud                         String?       @db.VarChar(255)
+  role                        String?       @db.VarChar(255)
+  email                       String?       @db.VarChar(255)
+  encrypted_password          String?       @db.VarChar(255)
+  email_confirmed_at          DateTime?     @db.Timestamptz(6)
+  invited_at                  DateTime?     @db.Timestamptz(6)
+  confirmation_token          String?       @db.VarChar(255)
+  confirmation_sent_at        DateTime?     @db.Timestamptz(6)
+  recovery_token              String?       @db.VarChar(255)
+  recovery_sent_at            DateTime?     @db.Timestamptz(6)
+  email_change_token_new      String?       @db.VarChar(255)
+  email_change                String?       @db.VarChar(255)
+  email_change_sent_at        DateTime?     @db.Timestamptz(6)
+  last_sign_in_at             DateTime?     @db.Timestamptz(6)
   raw_app_meta_data           Json?
   raw_user_meta_data          Json?
   is_super_admin              Boolean?
-  created_at                  DateTime?        @db.Timestamptz(6)
-  updated_at                  DateTime?        @db.Timestamptz(6)
-  phone                       String?          @unique
-  phone_confirmed_at          DateTime?        @db.Timestamptz(6)
-  phone_change                String?          @default("")
-  phone_change_token          String?          @default("") @db.VarChar(255)
-  phone_change_sent_at        DateTime?        @db.Timestamptz(6)
-  confirmed_at                DateTime?        @default(dbgenerated("LEAST(email_confirmed_at, phone_confirmed_at)")) @db.Timestamptz(6)
-  email_change_token_current  String?          @default("") @db.VarChar(255)
-  email_change_confirm_status Int?             @default(0) @db.SmallInt
-  banned_until                DateTime?        @db.Timestamptz(6)
-  reauthentication_token      String?          @default("") @db.VarChar(255)
-  reauthentication_sent_at    DateTime?        @db.Timestamptz(6)
-  is_sso_user                 Boolean          @default(false)
-  deleted_at                  DateTime?        @db.Timestamptz(6)
+  created_at                  DateTime?     @db.Timestamptz(6)
+  updated_at                  DateTime?     @db.Timestamptz(6)
+  phone                       String?       @unique
+  phone_confirmed_at          DateTime?     @db.Timestamptz(6)
+  phone_change                String?       @default("")
+  phone_change_token          String?       @default("") @db.VarChar(255)
+  phone_change_sent_at        DateTime?     @db.Timestamptz(6)
+  confirmed_at                DateTime?     @default(dbgenerated("LEAST(email_confirmed_at, phone_confirmed_at)")) @db.Timestamptz(6)
+  email_change_token_current  String?       @default("") @db.VarChar(255)
+  email_change_confirm_status Int?          @default(0) @db.SmallInt
+  banned_until                DateTime?     @db.Timestamptz(6)
+  reauthentication_token      String?       @default("") @db.VarChar(255)
+  reauthentication_sent_at    DateTime?     @db.Timestamptz(6)
+  is_sso_user                 Boolean       @default(false)
+  deleted_at                  DateTime?     @db.Timestamptz(6)
   identities                  identities[]
   mfa_factors                 mfa_factors[]
   sessions                    sessions[]
-  workspace_user              workspace_user[]
 
   @@index([instance_id])
   @@schema("auth")
@@ -325,8 +324,8 @@ model workspace_user {
   userid          String    @db.Uuid
   workspace_role  String?   @default("Researcher")
   ownerid         String?
-  users           users     @relation(fields: [userid], references: [id], onDelete: NoAction, onUpdate: NoAction)
   is_collaborator Boolean?  @default(false)
+  user            user      @relation(fields: [userid], references: [id], onDelete: NoAction, onUpdate: NoAction)
   workspace       workspace @relation(fields: [workspaceid], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@id([workspaceid, userid])
@@ -334,10 +333,11 @@ model workspace_user {
 }
 
 model user {
-  id         String   @id
-  name       String?
-  avatar_url String?
-  email      String?
+  id             String           @id @db.Uuid
+  name           String?
+  avatar_url     String?
+  email          String?
+  workspace_user workspace_user[]
 
   @@schema("public")
 }

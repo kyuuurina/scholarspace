@@ -13,7 +13,7 @@ import type { WorkspaceFormData } from "~/types/workspace";
 
 // local components
 import { FormErrorMessage } from "../FormErrorMessage";
-import { Modal } from "../modal/Modal";
+import Modal from "../modal/Modal";
 import PrimaryButton from "../button/PrimaryButton";
 
 type ModalProps = {

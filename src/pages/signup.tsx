@@ -4,7 +4,7 @@ import type { NextPage } from "next";
 import { useRouter } from "next/router";
 
 import { AuthWrapper } from "~/components/auth/AuthWrapper";
-import { SignUpForm } from "~/components/auth/SignUpForm";
+import SignUpForm from "~/components/auth/SignUpForm";
 
 const SignUp: NextPage = () => {
   const user = useUser();

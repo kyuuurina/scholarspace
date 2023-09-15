@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useSessionContext } from "@supabase/auth-helpers-react";
 
 import { Link } from "~/components/Link";
-import { LoadingSpinner } from "~/components/LoadingSpinner";
+import LoadingSpinner from "~/components/LoadingSpinner";
 import { GoogleButton } from "~/components/auth/GoogleButton";
 
 export const SignInForm: React.FC = () => {

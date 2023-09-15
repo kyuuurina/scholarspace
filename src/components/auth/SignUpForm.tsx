@@ -4,9 +4,9 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 
 import { GoogleButton } from "~/components/auth/GoogleButton";
-import { LoadingSpinner } from "~/components/LoadingSpinner";
+import LoadingSpinner from "~/components/LoadingSpinner";
 
-export const SignUpForm: React.FC = () => {
+const SignUpForm: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState<string>();
@@ -118,3 +118,5 @@ export const SignUpForm: React.FC = () => {
     </form>
   );
 };
+
+export default SignUpForm;

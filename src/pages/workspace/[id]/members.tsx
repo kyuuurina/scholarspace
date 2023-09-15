@@ -8,71 +8,51 @@ import Select from "react-select";
 
 // local components
 import Layout from "~/components/layout/Layout";
-import { Modal } from "~/components/modal/Modal";
-import WorkspaceTabs from "~/components/workspace/WorkspaceTabs";
+import Modal from "~/components/modal/Modal";
 import EditableDropDown from "~/components/EditableDropDown";
 import Header from "~/components/workspace/Header";
+import PrimaryButton from "~/components/button/PrimaryButton";
 
 // types
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "~/pages/_app";
-import PrimaryButton from "~/components/button/PrimaryButton";
 
 // utils
-import { useFetchWorkspace } from "~/utils/workspace";
+import { useFetchWorkspace, useFetchWorkspaceMembers } from "~/utils/workspace";
+import { useRouterId } from "~/utils/routerId";
 
 const Members: NextPageWithLayout = () => {
-  // constants
-  const router = useRouter();
-  const { id } = router.query;
-  const user = useUser();
-  const userId = user?.id;
-  const supabase = useSupabaseClient();
-  const [searchQuery, setSearchQuery] = useState("");
+  const workspaceId = useRouterId();
+
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<{
-    label: string;
-    value: string;
-  } | null>(null);
-
-  const { name, description, cover_img, isLoading, is_personal, imgUrl } = useFetchWorkspace();
-
-  // queries and mutation calls
-
-  const { handleSubmit } = useForm();
-
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(event.target.value);
-  };
-
-  // users in the system
-
-  const [users, setUsers] = useState([]);
-
-  // useEffect(() => {
-  //   async function fetchUsers() {
-  //     try {
-  //       const { data, error } = await supabase.auth.admin.listUsers();
-
-  //       if (error) {
-  //         throw error;
-  //       }
-
-  //       setUsers(data.users);
-  //     } catch (error) {
-  //       console.log("error", error);
-  //     }
-  //   }
-
-  //   fetchUsers();
-  //   console.log(users);
-  // }, []);
-  // const userArray: { label: string; value: string }[] = [];
+  const { name, isLoading, imgUrl } = useFetchWorkspace();
 
   // members in the workspace
-  // const workspaceMembers = api.workspace.listWorkspaceMembers.useQuery({
-  //   id: id as string,
-  // });
+  const { workspaceMembers, isLoading: isLoadingMembers } =
+    useFetchWorkspaceMembers();
+
+  console.log(workspaceMembers);
+
+  // users in the system
+  const [users, setUsers] = useState([]);
+  // const userArray: { label: string; value: string }[] = [];
+
+  // constants
+  // const user = useUser();
+  // const userId = user?.id;
+
+  // const [searchQuery, setSearchQuery] = useState("");
+  // const [selectedUser, setSelectedUser] = useState<{
+  //   label: string;
+  //   value: string;
+  // } | null>(null);
+
+  // queries and mutation calls
+  // const { handleSubmit } = useForm();
+
+  // const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   setSearchQuery(event.target.value);
+  // };
 
   // if (users.data && workspaceMembers.data) {
   //   const workspaceMemberIds = workspaceMembers.data.map(
@@ -129,25 +109,6 @@ const Members: NextPageWithLayout = () => {
   //     });
   // };
 
-  // const workspaceMembersArray: {
-  //   id: string;
-  //   name: string;
-  //   email: string;
-  //   role: string;
-  //   avatarUrl: string;
-  // }[] = [];
-
-  // if (workspaceMembers.data) {
-  //   workspaceMembers.data.forEach((member) => {
-  //     const id = member.userid;
-  //     const name = member.users.email;
-  //     const email = member.users.email;
-  //     const role = member.workspace_role;
-  //     const avatarUrl = member.users.raw_user_meta_data?.avatar_url as string;
-  //     workspaceMembersArray.push({ id, name, email, role, avatarUrl });
-  //   });
-  // }
-
   // const filteredMembers = workspaceMembersArray.filter((member) => {
   //   const memberName = member.name.toLowerCase();
   //   const memberEmail = member.email.toLowerCase();
@@ -171,12 +132,12 @@ const Members: NextPageWithLayout = () => {
 
   return (
     <>
-      {/* <Modal
+      <Modal
         title="Add Member"
         show={modalIsOpen}
         onClose={() => setModalIsOpen(false)}
       >
-        <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
+        {/* <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
           <div>
             <label
               htmlFor="id"
@@ -196,8 +157,8 @@ const Members: NextPageWithLayout = () => {
           </div>
 
           <PrimaryButton type="submit" name="Add Member" />
-        </form>
-      </Modal> */}
+        </form> */}
+      </Modal>
 
       <main className="min-h-screen w-full">
         <Header name={name || ""} imgUrl={imgUrl} />
@@ -228,12 +189,12 @@ const Members: NextPageWithLayout = () => {
                   id="table-search-users"
                   className="block w-80 rounded-lg border border-gray-300 bg-gray-50 p-2 pl-10 text-sm text-gray-900 focus:border-purple-500 focus:ring-purple-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-purple-500 dark:focus:ring-purple-500"
                   placeholder="Search for users"
-                  value={searchQuery}
-                  onChange={handleSearch}
+                  // value={searchQuery}
+                  // onChange={handleSearch}
                 />
               </div>
 
-              {/* <button
+              <button
                 onClick={() => {
                   setModalIsOpen(true);
                 }}
@@ -257,7 +218,7 @@ const Members: NextPageWithLayout = () => {
                   </th>
                 </tr>
               </thead>
-              <tbody>
+              {/* <tbody>
                 {filteredMembers.map((member) => (
                   <tr
                     key={member.id}
@@ -301,9 +262,8 @@ const Members: NextPageWithLayout = () => {
                     </td>
                   </tr>
                 ))}
-              </tbody>
-            </table> */}
-            </div>
+              </tbody> */}
+            </table>
           </div>
         </div>
       </main>
