@@ -133,22 +133,23 @@ export const workspaceRouter = router({
     .input(
       z.object({
         workspaceId: z.string(),
-        userId: z.string(),
+        email: z.string(),
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const { workspaceId, userId } = input;
+      const { workspaceId, email } = input;
 
-      const user = await ctx.prisma.user.findUnique({
+      const user = await ctx.prisma.user.findFirst({
         where: {
-          id: userId,
+          email: email,
         },
       });
 
       if (!user) {
+        // User with the provided email does not exist, throw an error
         throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "User not found",
+          code: "INTERNAL_SERVER_ERROR",
+          message: "User with this email does not exist.",
         });
       }
 
@@ -163,7 +164,7 @@ export const workspaceRouter = router({
         const workspaceUser = await ctx.prisma.workspace_user.create({
           data: {
             workspaceid: workspaceId,
-            userid: userId,
+            userid: user.id,
             workspace_role: "Researcher",
             is_collaborator: true,
             ownerid: owner?.userid,
@@ -205,7 +206,7 @@ export const workspaceRouter = router({
       return workspaceUser;
     }),
 
-    deleteWorkspaceMember: protectedProcedure
+  deleteWorkspaceMember: protectedProcedure
     .input(
       z.object({
         workspaceId: z.string(),

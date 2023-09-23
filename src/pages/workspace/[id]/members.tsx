@@ -3,8 +3,8 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import { useUser } from "@supabase/auth-helpers-react";
 import { api } from "~/utils/api";
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
-import Select from "react-select";
+import { type ZodType, z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
 import Image from "next/image";
 
@@ -16,6 +16,8 @@ import Header from "~/components/workspace/Header";
 import PrimaryButton from "~/components/button/PrimaryButton";
 import { SuccessToast } from "~/components/toast/SuccessToast";
 import AvatarPlaceholder from "~/components/AvatarPlaceholder";
+import { FormErrorMessage } from "~/components/FormErrorMessage";
+import InviteUserButton from "~/components/button/InviteUserButton";
 
 // types
 import type { ReactElement } from "react";
@@ -27,12 +29,36 @@ import { useFetchUsers } from "~/utils/user";
 import { useRouterId } from "~/utils/routerId";
 import { router } from "~/server/api/trpc";
 
+type addMemberData = {
+  email: string;
+};
+
 const Members: NextPageWithLayout = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const { name, isLoading, imgUrl } = useFetchWorkspace();
   const workspaceId = useRouterId();
   const router = useRouter();
   const user = useUser();
+
+  // schema for form validation
+  const schema: ZodType<addMemberData> = z.object({
+    email: z
+      .string()
+      .min(2, "Email must be at least 2 characters long.")
+      .max(100, "Name must be at most 100 characters long."),
+  });
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isDirty },
+    watch,
+  } = useForm<addMemberData>({
+    resolver: zodResolver(schema),
+    defaultValues: { email: "" },
+  });
+
+  const emailValue = watch("email");
 
   // members in the workspace
   const { workspaceMembers, isLoading: isLoadingMembers } =
@@ -62,14 +88,6 @@ const Members: NextPageWithLayout = () => {
   // const [users, setUsers] = useState([]);
   const userArray: { label: string; value: string }[] = [];
 
-  const [selectedUser, setSelectedUser] = useState<{
-    label: string;
-    value: string;
-  } | null>(null);
-
-  // queries and mutation calls
-  const { handleSubmit } = useForm();
-
   const addMember = api.workspace.addWorkspaceMember.useMutation({
     onSuccess: () => {
       toast.custom(() => <SuccessToast message="Member added" />);
@@ -97,19 +115,14 @@ const Members: NextPageWithLayout = () => {
 
   console.log(filteredMembers);
 
-  const onSubmit = async () => {
-    if (selectedUser) {
-      const memberId = selectedUser.value;
-      try {
-        await addMember.mutateAsync({
-          workspaceId: workspaceId,
-          userId: memberId,
-        });
-        // Handle success
-      } catch (error) {
-        // Handle error
-        console.error("Error adding member to workspace:", error);
-      }
+  const onSubmit = async (data: { email: string }) => {
+    try {
+      await addMember.mutateAsync({
+        workspaceId: workspaceId,
+        email: data.email,
+      });
+    } catch (error) {
+      console.error("Failed to add member:", error);
     }
   };
 
@@ -162,24 +175,29 @@ const Members: NextPageWithLayout = () => {
       >
         <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
           <div>
-            <label
-              htmlFor="id"
-              className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-            >
-              Add Member
-            </label>
-            <Select
-              className="basic-single"
-              classNamePrefix="select"
-              value={selectedUser}
-              isSearchable={true}
-              options={userArray}
-              onChange={(choice) => setSelectedUser(choice)}
-              isClearable={true}
-            />
+            <div className="flex">
+              <input
+                id="email"
+                className="block w-full rounded-sm"
+                {...register("email", { required: true })}
+              />
+              {addMember.error ? (
+                <>
+                  <InviteUserButton email={emailValue} />
+                </>
+              ) : null}
+            </div>
+            {addMember.error ? (
+              <>
+                <FormErrorMessage text={addMember.error.message} />
+              </>
+            ) : null}
           </div>
-
-          <PrimaryButton type="submit" name="Add Member" />
+          {isDirty ? (
+            <PrimaryButton type="submit" name="Add Member" />
+          ) : (
+            <PrimaryButton type="submit" name="Add Member" disabled />
+          )}
         </form>
       </Modal>
 

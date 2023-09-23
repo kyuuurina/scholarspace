@@ -20,7 +20,7 @@ export default function Layout({ children }: LayoutProps) {
         <SideBar open={open} toggleSidebar={handleToggle} />
         <div className="w-full">
           <NavBar toggleSidebar={handleToggle} />
-          <div className="relative top-16">{children}</div>
+          {children}
         </div>
       </div>
     </>
