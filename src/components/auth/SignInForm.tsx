@@ -5,6 +5,7 @@ import { useSessionContext } from "@supabase/auth-helpers-react";
 import { Link } from "~/components/Link";
 import LoadingSpinner from "~/components/LoadingSpinner";
 import { GoogleButton } from "~/components/auth/GoogleButton";
+import { setCookie } from "cookies-next";
 
 export const SignInForm: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -26,7 +27,8 @@ export const SignInForm: React.FC = () => {
       password,
     });
 
-    setLoading(false);
+    const userId = data.user?.id;
+    setCookie("User ID", userId);
 
     if (error) {
       setErrorMessage(error.message);
@@ -36,7 +38,9 @@ export const SignInForm: React.FC = () => {
     // invalidate the stored language cookie
     // this will cause a DB re-fetch of the language preference on the next request
 
-    if (data) void router.push("/");
+    if (data) {
+      void router.push("/");
+    }
   };
 
   return (

@@ -1,58 +1,59 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
-import { useUser } from "@supabase/auth-helpers-react";
 import { api } from "~/utils/api";
 import { type ZodType, z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
 import Image from "next/image";
+import { getCookie } from "cookies-next";
+import { FiUserPlus } from "react-icons/fi";
 
 // local components
 import Layout from "~/components/layout/Layout";
 import Modal from "~/components/modal/Modal";
-import EditableDropDown from "~/components/EditableDropDown";
+import Select from "~/components/Select";
 import Header from "~/components/workspace/Header";
 import PrimaryButton from "~/components/button/PrimaryButton";
 import { SuccessToast } from "~/components/toast/SuccessToast";
 import AvatarPlaceholder from "~/components/AvatarPlaceholder";
 import { FormErrorMessage } from "~/components/FormErrorMessage";
+import { ErrorToast } from "~/components/toast/ErrorToast";
 import InviteUserButton from "~/components/button/InviteUserButton";
 
 // types
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "~/pages/_app";
+type addMemberData = {
+  email: string;
+};
 
 // utils
 import { useFetchWorkspace, useFetchWorkspaceMembers } from "~/utils/workspace";
 import { useFetchUsers } from "~/utils/user";
 import { useRouterId } from "~/utils/routerId";
-import { router } from "~/server/api/trpc";
-
-type addMemberData = {
-  email: string;
-};
 
 const Members: NextPageWithLayout = () => {
-  const [modalIsOpen, setModalIsOpen] = useState(false);
-  const { name, isLoading, imgUrl } = useFetchWorkspace();
-  const workspaceId = useRouterId();
+  const userId = getCookie("User ID");
   const router = useRouter();
-  const user = useUser();
+  const workspaceId = useRouterId();
+  const { name, imgUrl } = useFetchWorkspace();
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>("");
 
-  // schema for form validation
+  // form validation
   const schema: ZodType<addMemberData> = z.object({
     email: z
       .string()
       .min(2, "Email must be at least 2 characters long.")
-      .max(100, "Name must be at most 100 characters long."),
+      .email("Please enter a valid email."),
   });
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isDirty },
     watch,
+    formState: { errors, isDirty },
   } = useForm<addMemberData>({
     resolver: zodResolver(schema),
     defaultValues: { email: "" },
@@ -61,9 +62,9 @@ const Members: NextPageWithLayout = () => {
   const emailValue = watch("email");
 
   // members in the workspace
-  const { workspaceMembers, isLoading: isLoadingMembers } =
-    useFetchWorkspaceMembers();
+  const { workspaceMembers } = useFetchWorkspaceMembers();
 
+  // search bar functions
   const [searchQuery, setSearchQuery] = useState("");
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value);
@@ -85,15 +86,7 @@ const Members: NextPageWithLayout = () => {
   });
 
   // users in the system
-  // const [users, setUsers] = useState([]);
   const userArray: { label: string; value: string }[] = [];
-
-  const addMember = api.workspace.addWorkspaceMember.useMutation({
-    onSuccess: () => {
-      toast.custom(() => <SuccessToast message="Member added" />);
-      router.reload();
-    },
-  });
   const { users } = useFetchUsers();
 
   if (users && workspaceMembers) {
@@ -113,7 +106,13 @@ const Members: NextPageWithLayout = () => {
     });
   }
 
-  console.log(filteredMembers);
+  // add member
+  const addMember = api.workspace.addWorkspaceMember.useMutation({
+    onSuccess: () => {
+      toast.custom(() => <SuccessToast message="Member added" />);
+      router.reload();
+    },
+  });
 
   const onSubmit = async (data: { email: string }) => {
     try {
@@ -126,9 +125,21 @@ const Members: NextPageWithLayout = () => {
     }
   };
 
+  // form error
+  const resetForm = () => {
+    setErrorMessage(null);
+  };
+  useEffect(() => {
+    setErrorMessage(addMember.error?.message || "");
+  }, [addMember.error]);
+
+  // update member role
   const updateRole = api.workspace.updateRole.useMutation({
     onSuccess: () => {
       toast.custom(() => <SuccessToast message="Role updated" />);
+    },
+    onError: (error) => {
+      toast.custom(() => <ErrorToast message={error.message} />);
     },
   });
   const handleRoleChange = (memberId: string, newRole: string) => {
@@ -146,6 +157,7 @@ const Members: NextPageWithLayout = () => {
       });
   };
 
+  // delete member
   const deleteMember = api.workspace.deleteWorkspaceMember.useMutation({
     onSuccess: () => {
       toast.custom(() => <SuccessToast message="Member deleted" />);
@@ -168,6 +180,7 @@ const Members: NextPageWithLayout = () => {
 
   return (
     <>
+      {/* add member modal */}
       <Modal
         title="Add Member"
         show={modalIsOpen}
@@ -181,15 +194,19 @@ const Members: NextPageWithLayout = () => {
                 className="block w-full rounded-sm"
                 {...register("email", { required: true })}
               />
-              {addMember.error ? (
+              {errorMessage ? (
                 <>
-                  <InviteUserButton email={emailValue} />
+                  <InviteUserButton email={emailValue} onSuccess={resetForm} />
                 </>
               ) : null}
             </div>
-            {addMember.error ? (
+            {errorMessage || errors ? (
               <>
-                <FormErrorMessage text={addMember.error.message} />
+                {errorMessage ? (
+                  <FormErrorMessage text={errorMessage} />
+                ) : (
+                  <FormErrorMessage text={errors.email?.message} />
+                )}
               </>
             ) : null}
           </div>
@@ -204,15 +221,14 @@ const Members: NextPageWithLayout = () => {
       <main className="min-h-screen w-full">
         <Header name={name || ""} imgUrl={imgUrl} />
         <div className="p-5">
-          <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-            <div className="mx-4 flex items-center bg-white py-4 dark:bg-gray-800">
-              <label htmlFor="table-search" className="sr-only">
-                Search
-              </label>
+          <div className="relative overflow-x-auto rounded-lg shadow-md">
+            {/* search and add member section  */}
+            <div className="flex items-center bg-white px-4 py-4">
+              <label className="sr-only">Search</label>
               <div className="relative mr-4">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                   <svg
-                    className="h-5 w-5 text-gray-500 dark:text-gray-400"
+                    className="h-5 w-5 text-gray-500"
                     aria-hidden="true"
                     fill="currentColor"
                     viewBox="0 0 20 20"
@@ -227,26 +243,26 @@ const Members: NextPageWithLayout = () => {
                 </div>
                 <input
                   type="text"
-                  id="table-search-users"
-                  className="block w-80 rounded-lg border border-gray-300 bg-gray-50 p-2 pl-10 text-sm text-gray-900 focus:border-purple-500 focus:ring-purple-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-purple-500 dark:focus:ring-purple-500"
+                  className="block w-80 rounded-lg border border-gray-300 bg-gray-50 p-2 pl-10 text-sm text-gray-900 "
                   placeholder="Search for users"
                   value={searchQuery}
                   onChange={handleSearch}
                 />
               </div>
-
               <button
                 onClick={() => {
                   setModalIsOpen(true);
                 }}
-                className="dark:focus:ring-purple-900y rounded-lg bg-purple-700 px-3 py-2 text-center text-sm font-medium text-white hover:bg-purple-800 focus:outline-none focus:ring-4 focus:ring-purple-300 dark:bg-purple-600 dark:hover:bg-purple-700"
+                className="flex items-center justify-between rounded-lg bg-purple-700 px-3 py-2 text-center text-sm font-medium text-white hover:bg-purple-800 "
               >
+                <FiUserPlus className="mr-2" />
                 Add Member
               </button>
             </div>
 
-            <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
-              <thead className="bg-gray-50 text-xs uppercase text-gray-700 dark:bg-gray-700 dark:text-gray-400">
+            {/* member table  */}
+            <table className="w-full text-left text-sm text-gray-500">
+              <thead className="bg-gray-50 text-xs uppercase text-gray-700">
                 <tr>
                   <th scope="col" className="px-6 py-3">
                     Name
@@ -263,9 +279,9 @@ const Members: NextPageWithLayout = () => {
                 {filteredMembers.map((member) => (
                   <tr
                     key={member.memberId}
-                    className="bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-600"
+                    className="bg-white hover:bg-gray-50"
                   >
-                    <td className="flex items-center whitespace-nowrap px-6 py-4 font-medium text-gray-900 dark:text-white">
+                    <td className="flex items-center whitespace-nowrap px-6 py-4 font-medium text-gray-900">
                       {member.memberAvatarUrl ? (
                         <Image
                           src={member.memberAvatarUrl || ""}
@@ -289,7 +305,7 @@ const Members: NextPageWithLayout = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <EditableDropDown
+                      <Select
                         initialValue={member.memberRole || "Researcher"}
                         onValueChange={(newRole) =>
                           handleRoleChange(member.memberId, newRole)
@@ -297,12 +313,10 @@ const Members: NextPageWithLayout = () => {
                       />
                     </td>
                     <td className="px-6 py-4">
-                      {member.memberId != user.id && (
+                      {member.memberId != userId && (
                         <a
-                          href="#"
                           type="button"
-                          data-modal-show="removeModal"
-                          className="font-medium text-purple-600 hover:underline dark:text-purple-500"
+                          className="cursor-pointer font-medium text-purple-600 hover:underline"
                           onClick={() => handleDeleteMember(member.memberId)}
                         >
                           Remove user

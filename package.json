@@ -22,6 +22,7 @@
     "@trpc/react-query": "^10.26.0",
     "@trpc/server": "^10.26.0",
     "chart.js": "^4.3.0",
+    "cookies-next": "^4.0.0",
     "d3": "^7.8.5",
     "framer-motion": "^10.12.16",
     "next": "^13.4.19",

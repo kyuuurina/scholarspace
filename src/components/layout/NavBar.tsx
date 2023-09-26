@@ -169,7 +169,7 @@ const NavBar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
             {isUserOverlayVisible && (
               <div
                 ref={overlayRef}
-                className="min-w-44 absolute right-5 divide-y divide-gray-100 rounded-lg bg-white shadow"
+                className="min-w-44 absolute right-5 z-10 divide-y divide-gray-100 rounded-lg bg-white shadow"
               >
                 <div className="px-4 py-3 text-sm text-gray-900">
                   <div>{user?.user_metadata?.full_name}</div>
