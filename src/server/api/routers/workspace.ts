@@ -173,6 +173,12 @@ export const workspaceRouter = router({
 
         return workspaceUser;
       } catch (error) {
+        if (error.code === "P2002") {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "User is already in workspace",
+          });
+        }
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to add member to workspace",
@@ -190,6 +196,29 @@ export const workspaceRouter = router({
     )
     .mutation(async ({ input, ctx }) => {
       const { workspaceId, userId, role } = input;
+
+      // checks if workspace only has one researcher admin when role is changed to researcher
+      if (role === "Researcher") {
+        const workspace = await ctx.prisma.workspace.findUnique({
+          where: {
+            id: workspaceId,
+          },
+          include: {
+            workspace_user: true,
+          },
+        });
+        // check if the workspace has only one researcher admin
+        const researcherAdmins = workspace?.workspace_user.filter(
+          (user) => user.workspace_role === "Researcher Admin"
+        );
+        if (researcherAdmins?.length === 1) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message:
+              "Workspace must have at least one researcher admin. Please add another researcher admin before changing this user's role.",
+          });
+        }
+      }
 
       const workspaceUser = await ctx.prisma.workspace_user.update({
         where: {

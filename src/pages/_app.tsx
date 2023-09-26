@@ -3,20 +3,19 @@ import type { ReactElement, ReactNode } from "react";
 import { useState } from "react";
 import type { NextPage } from "next";
 import type { AppProps } from "next/app";
+import { api } from "~/utils/api";
 import Head from "~/components/layout/Head";
-import { Inter } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import ErrorBoundary from "~/components/ErrorBoundary";
+import "~/styles/globals.css";
+import { Inter } from "next/font/google";
 
 // supabase helpers for authentication and authorization
+import { createPagesBrowserClient } from "@supabase/auth-helpers-nextjs";
 import {
-  createPagesBrowserClient,
+  SessionContextProvider,
   type Session,
-} from "@supabase/auth-helpers-nextjs";
-import { SessionContextProvider } from "@supabase/auth-helpers-react";
-
-import { api } from "~/utils/api";
-import "~/styles/globals.css";
+} from "@supabase/auth-helpers-react";
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;

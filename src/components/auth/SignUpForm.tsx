@@ -2,6 +2,7 @@
 import { useSessionContext } from "@supabase/auth-helpers-react";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import { setCookie } from "cookies-next";
 
 import { GoogleButton } from "~/components/auth/GoogleButton";
 import LoadingSpinner from "~/components/LoadingSpinner";
@@ -45,6 +46,7 @@ const SignUpForm: React.FC = () => {
 
     // if there is a session it means that we do not need to verify the email beforehand
     if (session) {
+      setCookie("session", JSON.stringify(session));
       router.push("/");
     } else {
       router.push("/auth/verify");
