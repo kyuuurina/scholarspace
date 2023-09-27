@@ -12,7 +12,7 @@ import { api } from "~/utils/api";
 import type { WorkspaceFormData } from "~/types/workspace";
 
 // local components
-import { FormErrorMessage } from "../FormErrorMessage";
+import FormErrorMessage from "../FormErrorMessage";
 import Modal from "../modal/Modal";
 import PrimaryButton from "../button/PrimaryButton";
 

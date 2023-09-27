@@ -1,65 +1,30 @@
 import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
-import { api } from "~/utils/api";
-import { type ZodType, z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
-import Image from "next/image";
-import { getCookie } from "cookies-next";
 import { FiUserPlus } from "react-icons/fi";
 
 // local components
 import Layout from "~/components/layout/Layout";
-import Modal from "~/components/modal/Modal";
-import Select from "~/components/Select";
 import Header from "~/components/workspace/Header";
-import PrimaryButton from "~/components/button/PrimaryButton";
-import { SuccessToast } from "~/components/toast/SuccessToast";
-import AvatarPlaceholder from "~/components/AvatarPlaceholder";
-import { FormErrorMessage } from "~/components/FormErrorMessage";
-import { ErrorToast } from "~/components/toast/ErrorToast";
-import InviteUserButton from "~/components/button/InviteUserButton";
+import MemberModal from "~/components/members/MemberModal";
+import MemberTable from "~/components/members/MemberTable";
+import SuccessToast from "~/components/toast/SuccessToast";
+import ErrorToast from "~/components/toast/ErrorToast";
 
 // types
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "~/pages/_app";
-type addMemberData = {
-  email: string;
-};
 
 // utils
+import { api } from "~/utils/api";
 import { useFetchWorkspace, useFetchWorkspaceMembers } from "~/utils/workspace";
-import { useFetchUsers } from "~/utils/user";
 import { useRouterId } from "~/utils/routerId";
 
 const Members: NextPageWithLayout = () => {
-  const userId = getCookie("User ID");
   const router = useRouter();
   const workspaceId = useRouterId();
   const { name, imgUrl } = useFetchWorkspace();
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>("");
-
-  // form validation
-  const schema: ZodType<addMemberData> = z.object({
-    email: z
-      .string()
-      .min(2, "Email must be at least 2 characters long.")
-      .email("Please enter a valid email."),
-  });
-
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors, isDirty },
-  } = useForm<addMemberData>({
-    resolver: zodResolver(schema),
-    defaultValues: { email: "" },
-  });
-
-  const emailValue = watch("email");
 
   // members in the workspace
   const { workspaceMembers } = useFetchWorkspaceMembers();
@@ -85,27 +50,6 @@ const Members: NextPageWithLayout = () => {
     return memberName.includes(query) || memberEmail.includes(query);
   });
 
-  // users in the system
-  const userArray: { label: string; value: string }[] = [];
-  const { users } = useFetchUsers();
-
-  if (users && workspaceMembers) {
-    const workspaceMemberIds = workspaceMembers.map(
-      (member) => member.memberId
-    );
-
-    users.forEach((user) => {
-      const email = user.userEmail || "";
-      const userId = user.userId;
-      const isMember = workspaceMemberIds.includes(userId);
-
-      // Check if the user is not a member of the workspace
-      if (!isMember) {
-        userArray.push({ label: email, value: userId });
-      }
-    });
-  }
-
   // add member
   const addMember = api.workspace.addWorkspaceMember.useMutation({
     onSuccess: () => {
@@ -125,12 +69,10 @@ const Members: NextPageWithLayout = () => {
     }
   };
 
-  // form error
-  const resetForm = () => {
-    setErrorMessage(null);
-  };
+  // add member error message from server
+  let addMemberErrorMsg = addMember.error?.message;
   useEffect(() => {
-    setErrorMessage(addMember.error?.message || "");
+    addMemberErrorMsg = addMember.error?.message;
   }, [addMember.error]);
 
   // update member role
@@ -178,45 +120,20 @@ const Members: NextPageWithLayout = () => {
       });
   };
 
+  // get workspace role
+  const workspaceRole = api.workspace.getWorkspaceRole.useQuery({
+    workspaceId: workspaceId,
+  });
+
   return (
     <>
       {/* add member modal */}
-      <Modal
-        title="Add Member"
-        show={modalIsOpen}
+      <MemberModal
+        openModal={modalIsOpen}
         onClose={() => setModalIsOpen(false)}
-      >
-        <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
-          <div>
-            <div className="flex">
-              <input
-                id="email"
-                className="block w-full rounded-sm"
-                {...register("email", { required: true })}
-              />
-              {errorMessage ? (
-                <>
-                  <InviteUserButton email={emailValue} onSuccess={resetForm} />
-                </>
-              ) : null}
-            </div>
-            {errorMessage || errors ? (
-              <>
-                {errorMessage ? (
-                  <FormErrorMessage text={errorMessage} />
-                ) : (
-                  <FormErrorMessage text={errors.email?.message} />
-                )}
-              </>
-            ) : null}
-          </div>
-          {isDirty ? (
-            <PrimaryButton type="submit" name="Add Member" />
-          ) : (
-            <PrimaryButton type="submit" name="Add Member" disabled />
-          )}
-        </form>
-      </Modal>
+        onSubmit={onSubmit}
+        addMemberError={addMemberErrorMsg}
+      />
 
       <main className="min-h-screen w-full">
         <Header name={name || ""} imgUrl={imgUrl} />
@@ -261,72 +178,12 @@ const Members: NextPageWithLayout = () => {
             </div>
 
             {/* member table  */}
-            <table className="w-full text-left text-sm text-gray-500">
-              <thead className="bg-gray-50 text-xs uppercase text-gray-700">
-                <tr>
-                  <th scope="col" className="px-6 py-3">
-                    Name
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    Role
-                  </th>
-                  <th scope="col" className="px-6 py-3">
-                    Action
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredMembers.map((member) => (
-                  <tr
-                    key={member.memberId}
-                    className="bg-white hover:bg-gray-50"
-                  >
-                    <td className="flex items-center whitespace-nowrap px-6 py-4 font-medium text-gray-900">
-                      {member.memberAvatarUrl ? (
-                        <Image
-                          src={member.memberAvatarUrl || ""}
-                          alt="Jese image"
-                          width={40}
-                          height={40}
-                          className="h-10 w-10 rounded-full"
-                        />
-                      ) : (
-                        <div className="h-10 w-10 rounded-full">
-                          <AvatarPlaceholder name={member.memberEmail || ""} />
-                        </div>
-                      )}
-                      <div className="pl-3">
-                        <div className="text-base font-semibold">
-                          {member.memberName}
-                        </div>
-                        <div className="font-normal text-gray-500">
-                          {member.memberEmail}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <Select
-                        initialValue={member.memberRole || "Researcher"}
-                        onValueChange={(newRole) =>
-                          handleRoleChange(member.memberId, newRole)
-                        }
-                      />
-                    </td>
-                    <td className="px-6 py-4">
-                      {member.memberId != userId && (
-                        <a
-                          type="button"
-                          className="cursor-pointer font-medium text-purple-600 hover:underline"
-                          onClick={() => handleDeleteMember(member.memberId)}
-                        >
-                          Remove user
-                        </a>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <MemberTable
+              filteredMembers={filteredMembers}
+              handleRoleChange={handleRoleChange}
+              handleDeleteMember={handleDeleteMember}
+              userWorkspaceRole={workspaceRole.data}
+            />
           </div>
         </div>
       </main>

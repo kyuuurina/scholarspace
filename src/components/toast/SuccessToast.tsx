@@ -2,7 +2,7 @@ type SuccessToastProps = {
   message: string;
 };
 
-export const SuccessToast: React.FC<SuccessToastProps> = ({
+const SuccessToast: React.FC<SuccessToastProps> = ({
   message = "Success!",
 }) => {
   return (
@@ -34,3 +34,5 @@ export const SuccessToast: React.FC<SuccessToastProps> = ({
     </div>
   );
 };
+
+export default SuccessToast;
