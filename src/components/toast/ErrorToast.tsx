@@ -2,9 +2,7 @@ type SuccessToastProps = {
   message: string;
 };
 
-export const ErrorToast: React.FC<SuccessToastProps> = ({
-  message = "Success!",
-}) => {
+const ErrorToast: React.FC<SuccessToastProps> = ({ message = "Success!" }) => {
   return (
     <div className="pointer-events-auto flex w-full max-w-md rounded-lg bg-red-500 shadow-lg ring-1 ring-black ring-opacity-5">
       <div className="w-0 flex-1 p-4">
@@ -34,3 +32,5 @@ export const ErrorToast: React.FC<SuccessToastProps> = ({
     </div>
   );
 };
+
+export default ErrorToast;

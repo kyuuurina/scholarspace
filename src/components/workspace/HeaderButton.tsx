@@ -14,25 +14,39 @@ const HeaderButton: React.FC<HeaderButtonProps> = ({ type }) => {
   let icon = null;
   let url = "/";
 
-  switch (type) {
-    case "members":
-      icon = <FiUsers />;
-      url = `/workspace/${workspaceId}/members`;
-      break;
-    case "settings":
-      icon = <FiSettings />;
-      url = `/workspace/${workspaceId}/settings`;
-      break;
-    default:
-      break;
+  if (workspaceId) {
+    switch (type) {
+      case "members":
+        icon = <FiUsers />;
+        url = `/workspace/${workspaceId}/members`;
+        break;
+      case "settings":
+        icon = <FiSettings />;
+        url = `/workspace/${workspaceId}/settings`;
+        break;
+      default:
+        break;
+    }
   }
 
   return (
-    <Link href={url}>
-      <button className="rounded-md border border-gray-300 bg-gray-200 p-2 hover:bg-gray-400">
-        {icon}
-      </button>
-    </Link>
+    <>
+      {workspaceId ? (
+        <Link href={url}>
+          <button className="rounded-md border border-gray-300 bg-gray-200 p-2 hover:bg-gray-400">
+            {icon}
+          </button>
+        </Link>
+      ) : (
+        // fallback
+        <button
+          className="cursor-not-allowed rounded-md border border-gray-300 bg-gray-200 p-2"
+          disabled
+        >
+          {icon}
+        </button>
+      )}
+    </>
   );
 };
 

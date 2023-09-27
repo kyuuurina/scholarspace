@@ -14,15 +14,19 @@ import type { WorkspaceFormData } from "~/types/workspace";
 // components
 import Layout from "~/components/layout/Layout";
 import Head from "~/components/layout/Head";
-import { FormErrorMessage } from "~/components/FormErrorMessage";
+import FormErrorMessage from "~/components/FormErrorMessage";
 import { DeleteWorkspaceModal } from "~/components/workspace/DeleteWorkspaceModal";
-import { SuccessToast } from "~/components/toast/SuccessToast";
-import { ErrorToast } from "~/components/toast/ErrorToast";
+import SuccessToast from "~/components/toast/SuccessToast";
+import ErrorToast from "~/components/toast/ErrorToast";
 import Header from "~/components/workspace/Header";
 import { useFetchWorkspace } from "~/utils/workspace";
 
+// utils
+import { useGetWorkspaceRole } from "~/utils/userWorkspaces";
+
 const Settings: NextPageWithLayout = () => {
   // constants
+  const userWorkspaceRole = useGetWorkspaceRole();
   const router = useRouter();
   const { id } = router.query;
   const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -180,7 +184,8 @@ const Settings: NextPageWithLayout = () => {
             </section>
 
             {/* Delete Workspace Section  */}
-            {is_personal === false ? (
+            {is_personal === false &&
+            userWorkspaceRole === "Researcher Admin" ? (
               <section className="w-full rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
                 <form className="space-y-6" action="#">
                   <h5 className="text-xl font-medium text-gray-900">

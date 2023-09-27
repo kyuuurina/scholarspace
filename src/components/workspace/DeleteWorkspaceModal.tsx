@@ -6,8 +6,8 @@ import toast from "react-hot-toast";
 // local components
 import Modal from "../modal/Modal";
 import { DeleteButton } from "../button/DeleteButton";
-import { SuccessToast } from "../toast/SuccessToast";
-import { ErrorToast } from "../toast/ErrorToast";
+import SuccessToast from "../toast/SuccessToast";
+import ErrorToast from "../toast/ErrorToast";
 
 type ModalProps = {
   openModal: boolean;

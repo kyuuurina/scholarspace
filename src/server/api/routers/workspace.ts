@@ -75,6 +75,22 @@ export const workspaceRouter = router({
     )
     .mutation(async ({ input, ctx }) => {
       const { id, name, description, cover_img } = input;
+      // throw error if user is not admin
+      const authUser = await ctx.prisma.workspace_user.findUnique({
+        where: {
+          workspaceid_userid: {
+            workspaceid: id,
+            userid: ctx.user.id,
+          },
+        },
+      });
+
+      if (authUser?.workspace_role !== "Researcher Admin") {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You are not authorized to perform this action.",
+        });
+      }
 
       const updatedWorkspace = await ctx.prisma.workspace.update({
         where: {
@@ -95,6 +111,23 @@ export const workspaceRouter = router({
     .input(z.object({ id: z.string() }))
     .mutation(async ({ input, ctx }) => {
       const { id } = input;
+
+      // throw error if user is not admin
+      const authUser = await ctx.prisma.workspace_user.findUnique({
+        where: {
+          workspaceid_userid: {
+            workspaceid: id,
+            userid: ctx.user.id,
+          },
+        },
+      });
+
+      if (authUser?.workspace_role !== "Researcher Admin") {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You are not authorized to perform this action.",
+        });
+      }
 
       await ctx.prisma.workspace_user.deleteMany({
         where: {
@@ -173,11 +206,14 @@ export const workspaceRouter = router({
 
         return workspaceUser;
       } catch (error) {
-        if (error.code === "P2002") {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "User is already in workspace",
-          });
+        if (error instanceof Error) {
+          const errnoError = error as NodeJS.ErrnoException;
+          if (errnoError.code === "P2002") {
+            throw new TRPCError({
+              code: "INTERNAL_SERVER_ERROR",
+              message: "User is already a member of the workspace",
+            });
+          }
         }
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
@@ -197,6 +233,23 @@ export const workspaceRouter = router({
     .mutation(async ({ input, ctx }) => {
       const { workspaceId, userId, role } = input;
 
+      // allow authenticated user to have researcher admin role only to do this update role procedure
+      const authUser = await ctx.prisma.workspace_user.findUnique({
+        where: {
+          workspaceid_userid: {
+            workspaceid: workspaceId,
+            userid: ctx.user.id,
+          },
+        },
+      });
+
+      if (authUser?.workspace_role !== "Researcher Admin") {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You are not authorized to perform this action.",
+        });
+      }
+
       // checks if workspace only has one researcher admin when role is changed to researcher
       if (role === "Researcher") {
         const workspace = await ctx.prisma.workspace.findUnique({
@@ -214,8 +267,7 @@ export const workspaceRouter = router({
         if (researcherAdmins?.length === 1) {
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
-            message:
-              "Workspace must have at least one researcher admin. Please add another researcher admin before changing this user's role.",
+            message: "Workspace must have at least one researcher admin.",
           });
         }
       }
@@ -245,6 +297,23 @@ export const workspaceRouter = router({
     .mutation(async ({ input, ctx }) => {
       const { workspaceId, userId } = input;
 
+      // throw error if signed in user is not admin
+      const authUser = await ctx.prisma.workspace_user.findUnique({
+        where: {
+          workspaceid_userid: {
+            workspaceid: workspaceId,
+            userid: ctx.user.id,
+          },
+        },
+      });
+
+      if (authUser?.workspace_role !== "Researcher Admin") {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You are not authorized to perform this action.",
+        });
+      }
+
       const workspaceUser = await ctx.prisma.workspace_user.delete({
         where: {
           workspaceid_userid: {
@@ -255,5 +324,23 @@ export const workspaceRouter = router({
       });
 
       return workspaceUser;
+    }),
+
+  getWorkspaceRole: protectedProcedure
+    .input(
+      z.object({
+        workspaceId: z.string(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const authUser = await ctx.prisma.workspace_user.findUnique({
+        where: {
+          workspaceid_userid: {
+            workspaceid: input.workspaceId,
+            userid: ctx.user.id,
+          },
+        },
+      });
+      return authUser?.workspace_role;
     }),
 });
