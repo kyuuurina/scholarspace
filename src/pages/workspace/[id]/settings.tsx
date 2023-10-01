@@ -140,7 +140,7 @@ const Settings: NextPageWithLayout = () => {
                   >
                     Workspace Name
                   </label>
-                  <input {...register("name")} />
+                  <input className="w-full" {...register("name")} />
                   {errors.name && (
                     <FormErrorMessage text={errors.name.message} />
                   )}
@@ -152,7 +152,7 @@ const Settings: NextPageWithLayout = () => {
                   >
                     Workspace Description
                   </label>
-                  <textarea {...register("description")} />
+                  <textarea className="w-full" {...register("description")} />
                   {errors.description && (
                     <FormErrorMessage text={errors.description.message} />
                   )}
