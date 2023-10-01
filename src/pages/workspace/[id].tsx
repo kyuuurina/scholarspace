@@ -1,8 +1,3 @@
-import Image from "next/image";
-
-// hooks
-import { useUser } from "@supabase/auth-helpers-react";
-
 // utils
 import { useFetchWorkspace } from "~/utils/workspace";
 
@@ -24,9 +19,7 @@ import Card from "~/components/Card";
 import Header from "~/components/workspace/Header";
 
 const Workspace: NextPageWithLayout = () => {
-  const user = useUser();
-
-  const { name, description, cover_img, isLoading, error } = useFetchWorkspace();
+  const { name, description, isLoading, error, imgUrl } = useFetchWorkspace();
 
   if (isLoading) {
     return <LoadingSpinner />;
@@ -36,20 +29,12 @@ const Workspace: NextPageWithLayout = () => {
     return <ErrorPage error={error.message} />;
   }
 
-  // store workspace cover image url
-  let imgUrl = "";
-  if (cover_img) {
-    imgUrl = user?.id
-      ? `https://eeikbrtyntwckpyfphlm.supabase.co/storage/v1/object/public/workspace-covers/${user.id}/${cover_img}`
-      : "";
-  }
-
   return (
     <>
       <Head title={name} />
       <main className="flex flex-col">
         {/* Workspace header */}
-        <Header name={name|| ""} imgUrl={imgUrl} />
+        <Header name={name || ""} imgUrl={imgUrl} />
         <div className="grid p-5 md:grid-cols-12 md:gap-x-5">
           {/* Left section of workspace dashboard */}
           {/* Projects Section */}
@@ -68,7 +53,7 @@ const Workspace: NextPageWithLayout = () => {
             </div>
           </div>
           {/* Right section of workspace dashboard */}
-          <div className="grid w-full gap-y-2 py-5 md:py-1 md:col-span-4">
+          <div className="grid w-full gap-y-2 py-5 md:col-span-4 md:py-1">
             <Card title={"About"}>
               <p className="line-clamp-5 text-sm text-gray-900">
                 {description}

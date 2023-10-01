@@ -12,17 +12,12 @@ type Props = {
 
 const WorkspaceDropdown: React.FC<Props> = ({ onClick }) => {
   const [workspaceMenu, setWorkspaceMenu] = useState(false);
-  const user = useUser();
 
   const { workspaceListings } = fetchUserWorkspaces();
 
   const handleToggleWorkspace = () => {
     setWorkspaceMenu(!workspaceMenu);
   };
-
-  if (user?.id === undefined) {
-    return null;
-  }
 
   return (
     <div>
@@ -62,7 +57,7 @@ const WorkspaceDropdown: React.FC<Props> = ({ onClick }) => {
             >
               {workspace.cover_img ? (
                 <Image
-                  src={`https://eeikbrtyntwckpyfphlm.supabase.co/storage/v1/object/public/workspace-covers/${user?.id}/${workspace.cover_img}`}
+                  src={`https://eeikbrtyntwckpyfphlm.supabase.co/storage/v1/object/public/workspace-covers/${workspace.cover_img}`}
                   alt={workspace?.name || ""}
                   width={50}
                   height={50}
