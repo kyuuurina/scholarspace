@@ -23,27 +23,26 @@ export const DeleteWorkspaceModal: React.FC<ModalProps> = ({
   id,
 }) => {
   const router = useRouter();
+  const [isDeleting, setIsDeleting] = useState(false);
 
-  const { mutateAsync: deleteWorkspace, isLoading: deletionLoading } =
-    api.workspace.delete.useMutation();
+  const { mutateAsync: deleteWorkspace } = api.workspace.delete.useMutation();
 
   const [inputValue, setInputValue] = useState("");
 
   const handleDeleteWorkspace = async () => {
+    if (isDeleting) return;
     try {
+      setIsDeleting(true);
       await deleteWorkspace({
         id: id,
       });
-
-      // Wait for the deletion to complete
-      while (deletionLoading) {
-        console.log("Deleting...");
-      }
-      void router.push("/");
-      toast.custom(() => <SuccessToast message="Workspace deleted" />);
     } catch (error) {
       console.error("Error deleting workspace:", error);
       toast.custom(() => <ErrorToast message="Error deleting workspace" />);
+    } finally {
+      setIsDeleting(false);
+      void router.push("/");
+      toast.custom(() => <SuccessToast message="Workspace deleted" />);
     }
   };
 
@@ -77,7 +76,9 @@ export const DeleteWorkspaceModal: React.FC<ModalProps> = ({
         <DeleteButton
           name="Delete Workspace"
           onClick={
-            inputValue === name ? handleDeleteWorkspace : () => console.log("")
+            inputValue === name
+              ? handleDeleteWorkspace
+              : () => console.log("Test")
           }
           disabled={inputValue !== name}
         />

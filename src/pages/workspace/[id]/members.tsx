@@ -92,7 +92,7 @@ const Members: NextPageWithLayout = () => {
         role: newRole,
       })
       .then(() => {
-        console.log("workspace updated");
+        router.reload();
       })
       .catch((error) => {
         console.error("Failed to update role:", error);

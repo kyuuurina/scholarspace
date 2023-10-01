@@ -2,8 +2,8 @@ import { api } from "./api";
 import { useRouterId } from "./routerId";
 
 export const fetchUserWorkspaces = () => {
-  const workspaces = api.workspace.listUserWorkspaces.useQuery();
-  const workspacesData = workspaces.data;
+  const {data: workspaces, isLoading} = api.workspace.listUserWorkspaces.useQuery();
+  const workspacesData = workspaces;
 
   const workspaceListings: {
     id: string;
@@ -17,7 +17,7 @@ export const fetchUserWorkspaces = () => {
       }))
     : [];
 
-  return { workspacesData, workspaceListings };
+  return { workspacesData, workspaceListings, isLoading };
 };
 
 export const useGetWorkspaceRole = () => {
