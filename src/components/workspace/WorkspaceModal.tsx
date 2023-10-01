@@ -65,7 +65,7 @@ const WorkspaceModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
       // Upload the image to the storage bucket
       if (imageValue && user) {
         formData.cover_img = imgId;
-        const fileUrl = `/${user?.id}/${imgId}`;
+        const fileUrl = `/${imgId}`;
         const { data, error } = await supabase.storage
           .from("workspace-covers")
           .upload(fileUrl, imageValue);
