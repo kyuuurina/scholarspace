@@ -43,11 +43,9 @@ console.log(user);
 # Notification using React Hot Toast
 1. On terminal, run: npm install react-hot-toast
 2. import on necessary pages to use:
-```
+``` 
 import toast, { Toaster } from 'react-hot-toast';
-
 const notify = () => toast('Here is your toast.');
-
 const App = () => {
   return (
     <div>
@@ -57,4 +55,4 @@ const App = () => {
   );
 };
 ```
-3. On terminal, run npm run dev
+4. On terminal, run npm run dev
