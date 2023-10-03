@@ -39,3 +39,20 @@ import { useUser } from "@supabase/supabase-js";
 const { user } = useUser();
 console.log(user);
 ```
+
+# Notification using React Hot Toast
+1. On terminal, run: npm install react-hot-toast
+2. import on necessary pages to use:
+``` 
+import toast, { Toaster } from 'react-hot-toast';
+const notify = () => toast('Here is your toast.');
+const App = () => {
+  return (
+    <div>
+      <button onClick={notify}>Make me a toast</button>
+      <Toaster />
+    </div>
+  );
+};
+```
+4. On terminal, run npm run dev
