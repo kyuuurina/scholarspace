@@ -33,3 +33,23 @@ const isAuthed = t.middleware(({ ctx, next }) => {
 export const publicProcedure = t.procedure;
 // Protected procedure
 export const protectedProcedure = t.procedure.use(isAuthed);
+
+// trpc.ts
+
+// ... (previous code)
+
+
+// Procedure to handle password reset
+// export const forgotPasswordProcedure = t.procedure
+//   .query.input.zod({ email: z.string() })
+//   .mutation.shape(async ({ input }) => {
+//     // Use Supabase Auth to send a password reset email
+//     const { error } = await supabase.auth.api.resetPasswordForEmail(input.email);
+    
+//     if (error) {
+//       throw new TRPCError({ code: "FORGOT_PASSWORD_ERROR", message: error.message });
+//     }
+
+//     return true;
+//   });
+
