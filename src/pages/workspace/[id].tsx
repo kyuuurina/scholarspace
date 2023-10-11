@@ -1,5 +1,6 @@
 // utils
-import { useFetchWorkspace } from "~/utils/workspace";
+import { useFetchWorkspace, useFetchWorkspaceMembers } from "~/utils/workspace";
+import { useRouterId } from "~/utils/routerId";
 
 // types
 import type { ReactElement } from "react";
@@ -17,9 +18,15 @@ import ProjectCard from "~/components/project/ProjectCard";
 import ScoreChart from "~/components/chart/ScoreChart";
 import Card from "~/components/Card";
 import Header from "~/components/workspace/Header";
+import AvatarPlaceholder from "~/components/AvatarPlaceholder";
+
+import Image from "next/image";
+import Link from "next/link";
 
 const Workspace: NextPageWithLayout = () => {
   const { name, description, isLoading, error, imgUrl } = useFetchWorkspace();
+  const { workspaceMembers } = useFetchWorkspaceMembers();
+  const workspaceId = useRouterId();
 
   if (isLoading) {
     return <LoadingSpinner />;
@@ -61,7 +68,30 @@ const Workspace: NextPageWithLayout = () => {
             </Card>
             <Card title={"Members"}>
               <div className="flex flex-row gap-2">
-                <p> Test </p>
+                {workspaceMembers?.slice(0, 5).map((member) =>
+                  member.memberAvatarUrl ? (
+                    <Image
+                      key={member.memberId}
+                      src={member.memberAvatarUrl}
+                      alt="Workspace member avatar"
+                      width={40}
+                      height={40}
+                      className="rounded-full"
+                    />
+                  ) : (
+                    <div key={member.memberId} className="w-10 rounded-full">
+                      <AvatarPlaceholder name={member.memberEmail || "SS"} />
+                    </div>
+                  )
+                )}
+                {workspaceMembers.length > 5 && (
+                  <Link
+                    className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-white bg-gray-700 text-xs font-medium text-white"
+                    href={`/workspace/${workspaceId}/members`}
+                  >
+                    <span>{workspaceMembers.length - 5}+</span>
+                  </Link>
+                )}
               </div>
             </Card>
             <Card title={"Collaborativity Score"} center>
