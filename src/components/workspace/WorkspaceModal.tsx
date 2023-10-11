@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { type ZodType, z } from "zod";
+import { type ZodType, z, set } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { v4 as uuidv4 } from "uuid";
@@ -25,6 +25,7 @@ const WorkspaceModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
   // image variables
   const [imagePlaceholder, setImagePlaceholder] = useState<string | null>(null);
   const [imageValue, setImageValue] = useState<File | null | undefined>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const imgId: string = uuidv4();
 
   const router = useRouter();
@@ -61,7 +62,9 @@ const WorkspaceModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
 
   // handler for onSubmit form
   const onSubmit = async (formData: WorkspaceFormData) => {
+    if (isSubmitting) return;
     try {
+      setIsSubmitting(true);
       // Upload the image to the storage bucket
       if (imageValue && user) {
         formData.cover_img = imgId;
@@ -82,6 +85,7 @@ const WorkspaceModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
 
       // Navigate to the newly created project dashboard
       await router.push(`/workspace/${response.id}`);
+      setIsSubmitting(false);
     } catch (error) {
       // Handle any errors
       console.error(error);

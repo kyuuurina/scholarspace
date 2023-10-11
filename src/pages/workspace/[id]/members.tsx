@@ -166,15 +166,17 @@ const Members: NextPageWithLayout = () => {
                   onChange={handleSearch}
                 />
               </div>
-              <button
-                onClick={() => {
-                  setModalIsOpen(true);
-                }}
-                className="flex items-center justify-between rounded-lg bg-purple-700 px-3 py-2 text-center text-sm font-medium text-white hover:bg-purple-800 "
-              >
-                <FiUserPlus className="mr-2" />
-                Add Member
-              </button>
+              {workspaceRole.data === "Researcher Admin" && (
+                <button
+                  onClick={() => {
+                    setModalIsOpen(true);
+                  }}
+                  className="flex items-center justify-between rounded-lg bg-purple-700 px-3 py-2 text-center text-sm font-medium text-white hover:bg-purple-800 "
+                >
+                  <FiUserPlus className="mr-2" />
+                  Add Member
+                </button>
+              )}
             </div>
 
             {/* member table  */}
