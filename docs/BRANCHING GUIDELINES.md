@@ -44,9 +44,9 @@
 2. If there are feature branches that are no longer needed after completing pull requests, you can delete them locally and remotely:
    - Delete locally:
      ```shell
-     git branch -d feature/<initials>/<user-story-code>
+     git branch -d <initials>/<user-story-code>
      ```
    - Delete remotely:
      ```shell
-     git push -d origin feature/<initials>/<user-story-code>
+     git push -d origin <initials>/<user-story-code>
      ```
