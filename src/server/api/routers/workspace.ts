@@ -128,4 +128,102 @@ export const workspaceRouter = router({
 
       return members;
     }),
+
+  addWorkspaceMember: protectedProcedure
+    .input(
+      z.object({
+        workspaceId: z.string(),
+        userId: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { workspaceId, userId } = input;
+
+      const user = await ctx.prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
+      });
+
+      if (!user) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "User not found",
+        });
+      }
+
+      const owner = await ctx.prisma.workspace_user.findFirst({
+        where: {
+          workspaceid: workspaceId,
+          is_collaborator: false,
+        },
+      });
+
+      try {
+        const workspaceUser = await ctx.prisma.workspace_user.create({
+          data: {
+            workspaceid: workspaceId,
+            userid: userId,
+            workspace_role: "Researcher",
+            is_collaborator: true,
+            ownerid: owner?.userid,
+          },
+        });
+
+        return workspaceUser;
+      } catch (error) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to add member to workspace",
+        });
+      }
+    }),
+
+  updateRole: protectedProcedure
+    .input(
+      z.object({
+        workspaceId: z.string(),
+        userId: z.string(),
+        role: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { workspaceId, userId, role } = input;
+
+      const workspaceUser = await ctx.prisma.workspace_user.update({
+        where: {
+          workspaceid_userid: {
+            workspaceid: workspaceId,
+            userid: userId,
+          },
+        },
+        data: {
+          workspace_role: role,
+        },
+      });
+
+      return workspaceUser;
+    }),
+
+    deleteWorkspaceMember: protectedProcedure
+    .input(
+      z.object({
+        workspaceId: z.string(),
+        userId: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { workspaceId, userId } = input;
+
+      const workspaceUser = await ctx.prisma.workspace_user.delete({
+        where: {
+          workspaceid_userid: {
+            workspaceid: workspaceId,
+            userid: userId,
+          },
+        },
+      });
+
+      return workspaceUser;
+    }),
 });

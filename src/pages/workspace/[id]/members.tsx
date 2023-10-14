@@ -5,6 +5,8 @@ import { useUser } from "@supabase/auth-helpers-react";
 import { api } from "~/utils/api";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import Select from "react-select";
+import toast from "react-hot-toast";
+import Image from "next/image";
 
 // local components
 import Layout from "~/components/layout/Layout";
@@ -12,6 +14,8 @@ import Modal from "~/components/modal/Modal";
 import EditableDropDown from "~/components/EditableDropDown";
 import Header from "~/components/workspace/Header";
 import PrimaryButton from "~/components/button/PrimaryButton";
+import { SuccessToast } from "~/components/toast/SuccessToast";
+import AvatarPlaceholder from "~/components/AvatarPlaceholder";
 
 // types
 import type { ReactElement } from "react";
@@ -19,116 +23,135 @@ import type { NextPageWithLayout } from "~/pages/_app";
 
 // utils
 import { useFetchWorkspace, useFetchWorkspaceMembers } from "~/utils/workspace";
+import { useFetchUsers } from "~/utils/user";
 import { useRouterId } from "~/utils/routerId";
+import { router } from "~/server/api/trpc";
 
 const Members: NextPageWithLayout = () => {
-  const workspaceId = useRouterId();
-
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const { name, isLoading, imgUrl } = useFetchWorkspace();
+  const workspaceId = useRouterId();
+  const router = useRouter();
+  const user = useUser();
 
   // members in the workspace
   const { workspaceMembers, isLoading: isLoadingMembers } =
     useFetchWorkspaceMembers();
 
-  console.log(workspaceMembers);
+  const [searchQuery, setSearchQuery] = useState("");
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(event.target.value);
+  };
+
+  const filteredMembers = workspaceMembers.filter((member) => {
+    if (!member.memberEmail) {
+      return; // Skip this member if it's null or undefined
+    }
+
+    let memberName = "";
+    if (member.memberName) {
+      memberName = member.memberName.toLowerCase();
+    }
+
+    const memberEmail = member.memberEmail.toLowerCase();
+    const query = searchQuery.toLowerCase();
+    return memberName.includes(query) || memberEmail.includes(query);
+  });
 
   // users in the system
-  const [users, setUsers] = useState([]);
-  // const userArray: { label: string; value: string }[] = [];
+  // const [users, setUsers] = useState([]);
+  const userArray: { label: string; value: string }[] = [];
 
-  // constants
-  // const user = useUser();
-  // const userId = user?.id;
-
-  // const [searchQuery, setSearchQuery] = useState("");
-  // const [selectedUser, setSelectedUser] = useState<{
-  //   label: string;
-  //   value: string;
-  // } | null>(null);
+  const [selectedUser, setSelectedUser] = useState<{
+    label: string;
+    value: string;
+  } | null>(null);
 
   // queries and mutation calls
-  // const { handleSubmit } = useForm();
+  const { handleSubmit } = useForm();
 
-  // const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   setSearchQuery(event.target.value);
-  // };
+  const addMember = api.workspace.addWorkspaceMember.useMutation({
+    onSuccess: () => {
+      toast.custom(() => <SuccessToast message="Member added" />);
+      router.reload();
+    },
+  });
+  const { users } = useFetchUsers();
 
-  // if (users.data && workspaceMembers.data) {
-  //   const workspaceMemberIds = workspaceMembers.data.map(
-  //     (member) => member.userId
-  //   );
+  if (users && workspaceMembers) {
+    const workspaceMemberIds = workspaceMembers.map(
+      (member) => member.memberId
+    );
 
-  //   users.data.forEach((user) => {
-  //     const firstEmailAddress = user.emailAddresses[0]?.emailAddress || "";
-  //     const userId = user.id;
+    users.forEach((user) => {
+      const email = user.userEmail || "";
+      const userId = user.userId;
+      const isMember = workspaceMemberIds.includes(userId);
 
-  //     const isMember = workspaceMemberIds.includes(userId);
+      // Check if the user is not a member of the workspace
+      if (!isMember) {
+        userArray.push({ label: email, value: userId });
+      }
+    });
+  }
 
-  //     // Check if the user is not a member of the workspace
-  //     if (!isMember) {
-  //       userArray.push({ label: firstEmailAddress, value: userId });
-  //     }
-  //   });
-  // }
-  // const addMember = api.member.addMember.useMutation();
+  console.log(filteredMembers);
 
-  // const onSubmit = async () => {
-  //   if (selectedUser) {
-  //     const memberId = selectedUser.value;
+  const onSubmit = async () => {
+    if (selectedUser) {
+      const memberId = selectedUser.value;
+      try {
+        await addMember.mutateAsync({
+          workspaceId: workspaceId,
+          userId: memberId,
+        });
+        // Handle success
+      } catch (error) {
+        // Handle error
+        console.error("Error adding member to workspace:", error);
+      }
+    }
+  };
 
-  //     try {
-  //       // Call the addMember procedural function to create a member
-  //       await addMember.mutateAsync({
-  //         id: memberId,
-  //         id: router.query.id as string,
-  //       });
+  const updateRole = api.workspace.updateRole.useMutation({
+    onSuccess: () => {
+      toast.custom(() => <SuccessToast message="Role updated" />);
+    },
+  });
+  const handleRoleChange = (memberId: string, newRole: string) => {
+    updateRole
+      .mutateAsync({
+        workspaceId: workspaceId,
+        userId: memberId,
+        role: newRole,
+      })
+      .then(() => {
+        console.log("workspace updated");
+      })
+      .catch((error) => {
+        console.error("Failed to update role:", error);
+      });
+  };
 
-  //       // Reset the form and close the modal
-  //       setSelectedUser(null);
-  //       setModalIsOpen(false);
-  //       router.reload();
-  //     } catch (error) {
-  //       // Handle any errors that occur during member creation
-  //       console.error("Failed to create member:", error);
-  //     }
-  //   }
-  // };
+  const deleteMember = api.workspace.deleteWorkspaceMember.useMutation({
+    onSuccess: () => {
+      toast.custom(() => <SuccessToast message="Member deleted" />);
+    },
+  });
 
-  // const handleRoleChange = (memberId: string, newRole: string) => {
-  //   updateRole
-  //     .mutateAsync({
-  //       id: memberId,
-  //       role: newRole,
-  //     })
-  //     .then(() => {
-  //       console.log("workspace updated");
-  //     })
-  //     .catch((error) => {
-  //       console.error("Failed to update role:", error);
-  //     });
-  // };
-
-  // const filteredMembers = workspaceMembersArray.filter((member) => {
-  //   const memberName = member.name.toLowerCase();
-  //   const memberEmail = member.email.toLowerCase();
-  //   const query = searchQuery.toLowerCase();
-  //   return memberName.includes(query) || memberEmail.includes(query);
-  // });
-
-  // const updateRole = api.member.update.useMutation();
-
-  // const deleteMember = api.member.delete.useMutation();
-
-  // const handleDeleteMember = (memberId: string) => {
-  //   deleteMember
-  //     .mutateAsync({
-  //       id: memberId,
-  //     })
-  //     .then(() => {
-  //       router.reload();
-  //     });
-  // };
+  const handleDeleteMember = (memberId: string) => {
+    deleteMember
+      .mutateAsync({
+        workspaceId: workspaceId,
+        userId: memberId,
+      })
+      .then(() => {
+        router.reload();
+      })
+      .catch((error) => {
+        console.error("Failed to delete member:", error);
+      });
+  };
 
   return (
     <>
@@ -137,7 +160,7 @@ const Members: NextPageWithLayout = () => {
         show={modalIsOpen}
         onClose={() => setModalIsOpen(false)}
       >
-        {/* <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
+        <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
           <div>
             <label
               htmlFor="id"
@@ -157,7 +180,7 @@ const Members: NextPageWithLayout = () => {
           </div>
 
           <PrimaryButton type="submit" name="Add Member" />
-        </form> */}
+        </form>
       </Modal>
 
       <main className="min-h-screen w-full">
@@ -189,8 +212,8 @@ const Members: NextPageWithLayout = () => {
                   id="table-search-users"
                   className="block w-80 rounded-lg border border-gray-300 bg-gray-50 p-2 pl-10 text-sm text-gray-900 focus:border-purple-500 focus:ring-purple-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-purple-500 dark:focus:ring-purple-500"
                   placeholder="Search for users"
-                  // value={searchQuery}
-                  // onChange={handleSearch}
+                  value={searchQuery}
+                  onChange={handleSearch}
                 />
               </div>
 
@@ -218,43 +241,51 @@ const Members: NextPageWithLayout = () => {
                   </th>
                 </tr>
               </thead>
-              {/* <tbody>
+              <tbody>
                 {filteredMembers.map((member) => (
                   <tr
-                    key={member.id}
+                    key={member.memberId}
                     className="bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-600"
                   >
                     <td className="flex items-center whitespace-nowrap px-6 py-4 font-medium text-gray-900 dark:text-white">
-                      <img
-                        className="h-10 w-10 rounded-full"
-                        src={member.avatarUrl}
-                        alt="Jese image"
-                      />
+                      {member.memberAvatarUrl ? (
+                        <Image
+                          src={member.memberAvatarUrl || ""}
+                          alt="Jese image"
+                          width={40}
+                          height={40}
+                          className="h-10 w-10 rounded-full"
+                        />
+                      ) : (
+                        <div className="h-10 w-10 rounded-full">
+                          <AvatarPlaceholder name={member.memberEmail || ""} />
+                        </div>
+                      )}
                       <div className="pl-3">
                         <div className="text-base font-semibold">
-                          {member.name}
+                          {member.memberName}
                         </div>
                         <div className="font-normal text-gray-500">
-                          {member.email}
+                          {member.memberEmail}
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <EditableDropDown
-                        initialValue={member.role}
+                        initialValue={member.memberRole || "Researcher"}
                         onValueChange={(newRole) =>
-                          handleRoleChange(member.id, newRole)
+                          handleRoleChange(member.memberId, newRole)
                         }
                       />
                     </td>
                     <td className="px-6 py-4">
-                      {member.id != userId && (
+                      {member.memberId != user.id && (
                         <a
                           href="#"
                           type="button"
                           data-modal-show="removeModal"
                           className="font-medium text-purple-600 hover:underline dark:text-purple-500"
-                          onClick={() => handleDeleteMember(member.id)}
+                          onClick={() => handleDeleteMember(member.memberId)}
                         >
                           Remove user
                         </a>
@@ -262,7 +293,7 @@ const Members: NextPageWithLayout = () => {
                     </td>
                   </tr>
                 ))}
-              </tbody> */}
+              </tbody>
             </table>
           </div>
         </div>

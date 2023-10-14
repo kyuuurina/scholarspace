@@ -1,11 +1,9 @@
 import Image from "next/image";
 
 // hooks
-import { useRouter } from "next/router";
 import { useUser } from "@supabase/auth-helpers-react";
 
 // utils
-import { api } from "~/utils/api";
 import { useFetchWorkspace } from "~/utils/workspace";
 
 // types
