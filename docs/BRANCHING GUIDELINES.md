@@ -10,13 +10,13 @@
    ```shell
    git checkout develop
    git pull origin develop
-   git checkout -b <initials>/<user-story-code>
+   git checkout -b <user-story-code>/<initials>
    ```
-   Example: `git checkout -b KH/1-1-register-account`
+   Example: `git checkout -b 1-1-register-account/KH`
 
 2. Ensure you push the newly created branch to the remote repository:
    ```shell
-   git push origin <initials>/<user-story-code>
+   git push origin <user-story-code>/<initials>
    ```
 
 ## Adding Your Feature Changes to Develop
@@ -25,7 +25,7 @@
    ```shell
    git checkout develop
    git pull origin develop
-   git merge --no-ff <initials>/<user-story-code>
+   git merge --no-ff <user-story-code>/<initials>
    ```
 
 2. Resolve any conflicts that may arise during the merge process.
@@ -44,9 +44,9 @@
 2. If there are feature branches that are no longer needed after completing pull requests, you can delete them locally and remotely:
    - Delete locally:
      ```shell
-     git branch -d <initials>/<user-story-code>
+     git branch -d <user-story-code>/<initials>
      ```
    - Delete remotely:
      ```shell
-     git push -d origin <initials>/<user-story-code>
+     git push -d origin <user-story-code>/<initials>
      ```
