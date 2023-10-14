@@ -1,6 +1,3 @@
-Certainly, I can format these guidelines for a Markdown file. Here's a formatted version:
-
-```markdown
 # Branching Guidelines
 
 - **Main** - Production Branch
@@ -13,13 +10,13 @@ Certainly, I can format these guidelines for a Markdown file. Here's a formatted
    ```shell
    git checkout develop
    git pull origin develop
-   git checkout -b feature/<initials>/<user-story-code>
+   git checkout -b <initials>/<user-story-code>
    ```
-   Example: `git checkout -b feature/KH/1-1-register-account`
+   Example: `git checkout -b KH/1-1-register-account`
 
 2. Ensure you push the newly created branch to the remote repository:
    ```shell
-   git push origin feature/<initials>/<user-story-code>
+   git push origin <initials>/<user-story-code>
    ```
 
 ## Adding Your Feature Changes to Develop
@@ -28,7 +25,7 @@ Certainly, I can format these guidelines for a Markdown file. Here's a formatted
    ```shell
    git checkout develop
    git pull origin develop
-   git merge --no-ff feature/<initials>/<user-story-code>
+   git merge --no-ff <initials>/<user-story-code>
    ```
 
 2. Resolve any conflicts that may arise during the merge process.
@@ -44,7 +41,7 @@ Certainly, I can format these guidelines for a Markdown file. Here's a formatted
 
 1. Deployment to production is scheduled for every Wednesday to address pending pull requests.
 
-2. If there are feature branches that are no longer needed, you can delete them locally and remotely:
+2. If there are feature branches that are no longer needed after completing pull requests, you can delete them locally and remotely:
    - Delete locally:
      ```shell
      git branch -d feature/<initials>/<user-story-code>
@@ -53,8 +50,3 @@ Certainly, I can format these guidelines for a Markdown file. Here's a formatted
      ```shell
      git push -d origin feature/<initials>/<user-story-code>
      ```
-
-These guidelines provide a structured workflow for branching, development, and production deployment. Adjust the branching strategy as needed to fit your project's specific requirements.
-```
-
-This Markdown version should be easier to read and understand in a markdown file. Make sure to replace the Markdown code in your file, and it should render nicely when viewed in Markdown readers or repositories.
