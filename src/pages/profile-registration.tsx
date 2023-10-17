@@ -5,7 +5,7 @@ import { User } from "@supabase/supabase-js";
 import { useUser } from "@supabase/auth-helpers-react";
 
 // import custom hooks
-import { useMultistepForm } from "~/hooks/useMultistepForm";
+import { useMultistepForm } from "~/utils/useMultistepForm";
 
 // import custom components
 import PrimaryButton from "~/components/button/PrimaryButton";

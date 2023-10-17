@@ -1,5 +1,5 @@
 // i want this file
-import { SearchBar } from "../search/SearchBar";
+// import { SearchBar } from "../search/SearchBar";
 
 type ResearchData = {
   researchInterest: string[];
@@ -21,11 +21,11 @@ export function ResearchForm({ updateFields }: ResearchFormProps) {
             >
               Research Interests
             </label>
-            <SearchBar
+            {/* <SearchBar
               onChange={(options) =>
                 updateFields({ researchInterest: options })
               }
-            />
+            /> */}
           </div>
         </div>
       </div>
