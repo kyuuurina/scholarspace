@@ -1,10 +1,33 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 /* eslint-disable @typescript-eslint/no-misused-promises */
-import { type NextPage } from "next";
-import Head from "next/head";
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+//please refer to: src>pages>workspace>id.tsx
+
+//utils
+import { useRouterId } from "~/utils/routerId";
+
+// types
+import type { ReactElement } from "react";
+import type { NextPageWithLayout } from "~/pages/_app";
+
+// pages
+import ErrorPage from "~/pages/error-page";
+
+// local components
+
+import Layout from "~/components/layout/Layout";
+
+import Head from "~/components/layout/Head";
+import LoadingSpinner from "~/components/LoadingSpinner";
+import PrimaryButton from "~/components/button/PrimaryButton";
+
+
+import Card from "~/components/Card";
+import AvatarPlaceholder from "~/components/AvatarPlaceholder";
+
+import Image from "next/image";
+import Link from "next/link";
+
 
 const ResearchPostsPage = () => {
   return (
