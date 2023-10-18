@@ -62,7 +62,7 @@ const WorkspaceDropdown: React.FC<{ onClick: () => void }> = ({ onClick }) => {
               >
                 {workspace.cover_img ? (
                   <Image
-                    src={`https://eeikbrtyntwckpyfphlm.supabase.co/storage/v1/object/public/workspace-covers/${workspace.cover_img}`}
+                    src={`https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/workspace-covers/${workspace.cover_img}`}
                     alt={workspace?.name || ""}
                     width={50}
                     height={50}

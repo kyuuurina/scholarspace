@@ -1,3 +1,5 @@
+//ni tunggu dulu, All tu nanti ada dkt [id].tsx
+
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";

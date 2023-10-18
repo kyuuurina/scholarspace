@@ -29,7 +29,7 @@ export const useFetchWorkspace = () => {
 
   let imgUrl = "";
   if (cover_img) {
-    imgUrl = `https://eeikbrtyntwckpyfphlm.supabase.co/storage/v1/object/public/workspace-covers/${cover_img}`;
+    imgUrl = `https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/workspace-covers/${cover_img}`;
   }
 
   return {
