@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 /* eslint-disable @typescript-eslint/no-misused-promises */
 
-//please refer to: src>pages>workspace>id.tsx
+//This page should be displayed when user click Home Page
+//atm, it appears on localhost:3000/home-rwp/index
 
 //utils
 import { useRouterId } from "~/utils/routerId";
@@ -20,11 +21,8 @@ import Layout from "~/components/layout/Layout";
 import Head from "~/components/layout/Head";
 import LoadingSpinner from "~/components/LoadingSpinner";
 import PrimaryButton from "~/components/button/PrimaryButton";
-
-
 import Card from "~/components/Card";
 import AvatarPlaceholder from "~/components/AvatarPlaceholder";
-
 import Image from "next/image";
 import Link from "next/link";
 

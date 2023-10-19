@@ -1,6 +1,30 @@
 import React, { useState } from 'react';
+// utils
+import { useFetchWorkspace, useFetchWorkspaceMembers } from "~/utils/workspace";
+import { useRouterId } from "~/utils/routerId";
 
-const ProfilePage = () => {
+// types
+import type { ReactElement } from "react";
+import type { NextPageWithLayout } from "~/pages/_app";
+
+// pages
+import ErrorPage from "~/pages/error-page";
+
+// local components
+import Layout from "~/components/layout/Layout";
+import Head from "~/components/layout/Head";
+import LoadingSpinner from "~/components/LoadingSpinner";
+import PrimaryButton from "~/components/button/PrimaryButton";
+import ProjectCard from "~/components/project/ProjectCard";
+import ScoreChart from "~/components/chart/ScoreChart";
+import Card from "~/components/Card";
+import Header from "~/components/workspace/Header";
+import AvatarPlaceholder from "~/components/AvatarPlaceholder";
+
+import Image from "next/image";
+import Link from "next/link";
+
+const ProfilePage: NextPageWithLayout = () => {
   const [profilePicture, setProfilePicture] = useState<string | ArrayBuffer | null>('');
   const [username, setUsername] = useState('');
   const [collaborationStatus, setCollaborationStatus] = useState('');
@@ -217,5 +241,15 @@ const ProfilePage = () => {
     </div>
   );
 };
+
+// export ScholarSpace Layout
+ProfilePage.getLayout = function getLayout(page: ReactElement) {
+  return (
+    <Layout>
+      <Head title="Profile" />
+      {page}
+    </Layout>
+  );
+}
 
 export default ProfilePage;
