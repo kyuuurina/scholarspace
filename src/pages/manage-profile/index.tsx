@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
+// types
+import type { ReactElement } from "react";
+import type { NextPageWithLayout } from "~/pages/_app";
 
-const ProfilePage = () => {
+//local components
+import Layout from "~/components/layout/Layout";
+
+const ProfilePage: NextPageWithLayout = () => {
   const [profilePicture, setProfilePicture] = useState<string | ArrayBuffer | null>('');
   const [username, setUsername] = useState('');
   const [collaborationStatus, setCollaborationStatus] = useState('');
@@ -218,4 +224,11 @@ const ProfilePage = () => {
   );
 };
 
+ProfilePage.getLayout = function getLayout(page: ReactElement) {
+  return (
+    <>
+      <Layout>{page}</Layout>
+    </>
+  );
+};
 export default ProfilePage;
