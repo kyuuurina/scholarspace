@@ -31,7 +31,7 @@ const ResearchPostModal: FC<ModalProps> = ({ openModal, onClick }) => { // use F
   const user = useUser();
   const supabase = useSupabaseClient();
 
-  const createResearchWorkPost = api.researchpost.create.useMutation();
+  //const createResearchWorkPost = api.researchpost.create.useMutation();
 
   return (
     // your modal component JSX here
@@ -54,7 +54,7 @@ const ResearchPostModal: FC<ModalProps> = ({ openModal, onClick }) => { // use F
   // handler for onChange input for image upload
   
 
-      // Read the image as a data URL
+
 
 
 export default ResearchPostModal;
