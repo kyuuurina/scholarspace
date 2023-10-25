@@ -23,7 +23,8 @@ export const useFetchWorkspace = () => {
     }
   );
 
-  const { name, description, cover_img, is_personal } = workspace.data || {};
+  const { name, description, cover_img, is_personal, ownerid } =
+    workspace.data || {};
 
   const { isLoading, error } = workspace;
 
@@ -40,6 +41,7 @@ export const useFetchWorkspace = () => {
     error,
     is_personal,
     imgUrl,
+    ownerid,
   };
 };
 

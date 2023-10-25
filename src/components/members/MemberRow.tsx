@@ -9,6 +9,8 @@ type MemberRowProps = {
   handleRoleChange: (memberId: string, newRole: string) => void;
   handleDeleteMember: (memberId: string) => void;
   userWorkspaceRole: string | null | undefined;
+  isPersonal: boolean | undefined;
+  ownerId: string | undefined | null;
 };
 
 const MemberRow: React.FC<MemberRowProps> = ({
@@ -16,9 +18,13 @@ const MemberRow: React.FC<MemberRowProps> = ({
   handleRoleChange,
   handleDeleteMember,
   userWorkspaceRole,
+  isPersonal,
+  ownerId,
 }) => {
   const userId = getCookie("User ID");
-  console.log(userWorkspaceRole);
+  const isPersonalOwner = member.memberId === ownerId && isPersonal;
+  console.log(ownerId);
+  console.log(member.memberId);
   return (
     <tr className="bg-white hover:bg-gray-50">
       <td className="flex items-center whitespace-nowrap px-6 py-4 font-medium text-gray-900">
@@ -41,7 +47,7 @@ const MemberRow: React.FC<MemberRowProps> = ({
         </div>
       </td>
       <td className="px-6 py-4">
-        {userWorkspaceRole === "Researcher Admin" ? (
+        {userWorkspaceRole === "Researcher Admin" && !isPersonalOwner ? (
           <Select
             initialValue={member.memberRole || "Researcher"}
             onValueChange={(newRole) =>

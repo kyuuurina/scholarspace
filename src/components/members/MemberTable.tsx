@@ -5,6 +5,8 @@ type MemberTableProps = {
   handleRoleChange: (memberId: string, newRole: string) => void;
   handleDeleteMember: (memberId: string) => void;
   userWorkspaceRole: string | null | undefined;
+  isPersonal: boolean | undefined;
+  ownerId: string | undefined | null;
 };
 
 const MemberTable: React.FC<MemberTableProps> = ({
@@ -12,6 +14,8 @@ const MemberTable: React.FC<MemberTableProps> = ({
   handleRoleChange,
   handleDeleteMember,
   userWorkspaceRole,
+  isPersonal,
+  ownerId,
 }) => {
   return (
     <table className="w-full text-left text-sm text-gray-500">
@@ -36,6 +40,8 @@ const MemberTable: React.FC<MemberTableProps> = ({
             handleRoleChange={handleRoleChange}
             handleDeleteMember={handleDeleteMember}
             userWorkspaceRole={userWorkspaceRole}
+            isPersonal={isPersonal}
+            ownerId={ownerId}
           />
         ))}
       </tbody>

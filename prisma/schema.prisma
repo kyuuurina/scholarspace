@@ -229,6 +229,7 @@ model sessions {
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
 model sso_domains {
   id              String        @id @db.Uuid
   sso_provider_id String        @db.Uuid
@@ -243,6 +244,7 @@ model sso_domains {
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
 model sso_providers {
   id                String              @id @db.Uuid
   resource_id       String?
@@ -257,6 +259,7 @@ model sso_providers {
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
 model users {
   instance_id                 String?       @db.Uuid
   id                          String        @id @db.Uuid
@@ -314,6 +317,7 @@ model workspace {
   description    String
   cover_img      String?
   is_personal    Boolean          @default(false)
+  ownerid        String?
   workspace_user workspace_user[]
 
   @@schema("public")
@@ -323,7 +327,6 @@ model workspace_user {
   workspaceid     String    @db.Uuid
   userid          String    @db.Uuid
   workspace_role  String?   @default("Researcher")
-  ownerid         String?
   is_collaborator Boolean?  @default(false)
   user            user      @relation(fields: [userid], references: [id], onDelete: NoAction, onUpdate: NoAction)
   workspace       workspace @relation(fields: [workspaceid], references: [id], onDelete: NoAction, onUpdate: NoAction)
