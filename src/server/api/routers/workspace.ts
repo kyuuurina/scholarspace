@@ -50,6 +50,7 @@ export const workspaceRouter = router({
       const workspace = await ctx.prisma.workspace.create({
         data: {
           ...input,
+          ownerid: userid,
         },
       });
 
@@ -186,12 +187,12 @@ export const workspaceRouter = router({
         });
       }
 
-      const owner = await ctx.prisma.workspace_user.findFirst({
-        where: {
-          workspaceid: workspaceId,
-          is_collaborator: false,
-        },
-      });
+      // const owner = await ctx.prisma.workspace_user.findFirst({
+      //   where: {
+      //     workspaceid: workspaceId,
+      //     is_collaborator: false,
+      //   },
+      // });
 
       try {
         const workspaceUser = await ctx.prisma.workspace_user.create({
@@ -200,7 +201,6 @@ export const workspaceRouter = router({
             userid: user.id,
             workspace_role: "Researcher",
             is_collaborator: true,
-            ownerid: owner?.userid,
           },
         });
 
@@ -342,5 +342,24 @@ export const workspaceRouter = router({
         },
       });
       return authUser?.workspace_role;
+    }),
+
+  leave: protectedProcedure
+    .input(
+      z.object({
+        workspaceId: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const workspaceUser = await ctx.prisma.workspace_user.delete({
+        where: {
+          workspaceid_userid: {
+            workspaceid: input.workspaceId,
+            userid: ctx.user.id,
+          },
+        },
+      });
+
+      return workspaceUser;
     }),
 });

@@ -8,7 +8,7 @@ type ButtonProps = {
   visible?: boolean;
 };
 
-export const Button: React.FC<ButtonProps> = ({
+const Button: React.FC<ButtonProps> = ({
   name,
   onClick,
   type = "button",
@@ -29,3 +29,6 @@ export const Button: React.FC<ButtonProps> = ({
     </button>
   );
 };
+
+export default Button;
+

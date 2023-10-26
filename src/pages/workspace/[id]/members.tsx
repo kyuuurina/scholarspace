@@ -23,7 +23,7 @@ import { useRouterId } from "~/utils/routerId";
 const Members: NextPageWithLayout = () => {
   const router = useRouter();
   const workspaceId = useRouterId();
-  const { name, imgUrl } = useFetchWorkspace();
+  const { name, imgUrl, is_personal, ownerid } = useFetchWorkspace();
   const [modalIsOpen, setModalIsOpen] = useState(false);
 
   // members in the workspace
@@ -185,6 +185,8 @@ const Members: NextPageWithLayout = () => {
               handleRoleChange={handleRoleChange}
               handleDeleteMember={handleDeleteMember}
               userWorkspaceRole={workspaceRole.data}
+              isPersonal={is_personal}
+              ownerId={ownerid}
             />
           </div>
         </div>

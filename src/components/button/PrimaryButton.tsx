@@ -1,12 +1,18 @@
+import { on } from "events";
+
 type ButtonProps = {
   name: string;
   type?: "button" | "submit"; // Allow "button" and "submit" as valid values
   disabled?: boolean;
+  onClick?: () => void;
 };
 const PrimaryButton: React.FC<ButtonProps> = ({
   name,
   type = "button",
   disabled = false,
+  onClick = () => {
+    return undefined;
+  },
 }) => {
   return (
     <button
@@ -15,6 +21,7 @@ const PrimaryButton: React.FC<ButtonProps> = ({
       ${disabled ? "opacity-50" : ""}
       `}
       disabled={disabled}
+      onClick={onClick}
     >
       {name}
     </button>
