@@ -10,6 +10,7 @@ type Props = {
 
 const AlternativeLink: React.FC<{ type: AuthType }> = ({ type }) => {
   if (type === "signup") return <Link href="/signin">Sign In</Link>;
+  if (type === "forgot") return <Link href="/signin">Sign In</Link>;
   return <Link href="/signup">Sign Up</Link>;
 };
 

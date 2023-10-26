@@ -64,7 +64,7 @@ export const SideBar: React.FC<SideBarProps> = ({ toggleSidebar, open }) => {
                   className={`flex items-center space-x-3 rounded-md hover:bg-purple-800 ${
                     open ? "text-purple-accent-2" : "text-purple-accent-2"
                   }`}
-                  href="/"
+                  href="/home-rwp"
                   onClick={toggleSidebar}
                 >
                   <FiHome className="h-6 w-6" />
@@ -79,6 +79,7 @@ export const SideBar: React.FC<SideBarProps> = ({ toggleSidebar, open }) => {
                   </span>
                 </Link>
               </li>
+
               <li className=" rounded-sm">
                 <Link
                   href="/manage-profile"
@@ -99,6 +100,7 @@ export const SideBar: React.FC<SideBarProps> = ({ toggleSidebar, open }) => {
                   </span>
                 </Link>
               </li>
+
               <li className="rounded-sm">
                 <Link
                   href="/"
@@ -119,9 +121,10 @@ export const SideBar: React.FC<SideBarProps> = ({ toggleSidebar, open }) => {
                   </span>
                 </Link>
               </li>
+  
               <li className="rounded-sm">
                 <Link
-                  href="/home-rwp/cljdykk4m0008vu6kufa5klp9"
+                  href="/"
                   className={`flex items-center space-x-3 rounded-md hover:bg-purple-800 ${
                     open ? "text-purple-accent-2" : "text-purple-accent-2"
                   }`}
