@@ -1,5 +1,3 @@
-//Comment section on the research post card
-
 import React, { useState } from "react";
 import { FiSend } from "react-icons/fi";
 
@@ -26,17 +24,17 @@ const Comment: React.FC<CommentProps> = ({ onAddComment }) => {
       <ul>
         {/* Display existing comments here */}
       </ul>
-      <div className="flex mt-2">
+      <div className="mt-4 flex space-x-2">
         <input
           type="text"
           value={commentText}
           onChange={handleCommentChange}
           placeholder="Add a comment..."
-          className="border rounded-l-md py-1 px-2 w-full"
+          className="flex-1 py-2 px-3 rounded-md border focus:outline-none"
         />
         <button
           onClick={handleSendComment}
-          className="rounded-lg bg-purple-accent-1 px-3 py-2 text-center text-sm font-medium text-white hover:bg-purple-accent-2 focus:outline-none"
+          className="bg-purple-accent-1 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-purple-accent-2 focus:outline-none"
         >
           <FiSend size={16} className="inline-block mr-2" />
           Send
