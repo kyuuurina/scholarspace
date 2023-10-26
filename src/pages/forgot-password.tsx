@@ -1,6 +1,6 @@
 // pages/forgot-password.tsx
 
-import ForgotPassword from "src/components/auth/ForgotPassword";
+import ForgotPassword from "~/components/auth/ForgotPasswordForm";
 import { type NextPageWithLayout } from "~/pages/_app";
 import Layout from "~/components/layout/Layout";
 import Head from "~/components/layout/Head";
