@@ -26,7 +26,7 @@ const AllFollowingTabs: React.FC = () => {
         <li className="mr-2 flex-1">
           <a
             className={`inline-block p-4 rounded-t-lg hover:text-gray-600 dark:hover:text-gray-300 ${
-              activeTab === "all" ? "text-blue-600 border-b-2 border-blue-600" : "border-transparent"
+              activeTab === "all" ? "text-purple-600 border-b-2 border-purple-600" : "border-transparent"
             }`}
             onClick={() => handleTabClick("all", "/home-rwp")}
           >
@@ -38,7 +38,7 @@ const AllFollowingTabs: React.FC = () => {
         <li className="mr-2 flex-1">
           <a
             className={`inline-block p-4 rounded-t-lg hover:text-gray-600 dark:hover:text-gray-300 ${
-              activeTab === "following" ? "text-blue-600 border-b-2 border-blue-600" : "border-transparent"
+              activeTab === "following" ? "text-purple-600 border-b-2 border-purple-600" : "border-transparent"
             }`}
             onClick={() => handleTabClick("following", "/home-rwp/following-post")}
           >

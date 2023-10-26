@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 // utils
-import { useFetchWorkspace, useFetchWorkspaceMembers } from "~/utils/workspace";
 import { useRouterId } from "~/utils/routerId";
 
 // types
@@ -15,13 +14,9 @@ import Layout from "~/components/layout/Layout";
 import Head from "~/components/layout/Head";
 import LoadingSpinner from "~/components/LoadingSpinner";
 import PrimaryButton from "~/components/button/PrimaryButton";
-import ProjectCard from "~/components/project/ProjectCard";
-import ScoreChart from "~/components/chart/ScoreChart";
 import Card from "~/components/Card";
 import Header from "~/components/workspace/Header";
 import AvatarPlaceholder from "~/components/AvatarPlaceholder";
-
-import Image from "next/image";
 import Link from "next/link";
 
 const ProfilePage: NextPageWithLayout = () => {
@@ -213,11 +208,11 @@ const ProfilePage: NextPageWithLayout = () => {
           <div className="flex justify-end">
             {!isEditing && (
               <button
-                onClick={handleEdit}
-                className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mr-2"
-              >
-                Edit
-              </button>
+              onClick={handleEdit}
+              className="rounded-lg bg-purple-accent-1 px-3 py-2 text-center text-sm font-medium text-white hover:bg-purple-accent-2 focus:outline-none"
+            >
+              Edit
+            </button>
             )}
             {isEditing && (
               <>
