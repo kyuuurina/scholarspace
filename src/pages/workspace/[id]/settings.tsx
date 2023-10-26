@@ -20,6 +20,7 @@ import SuccessToast from "~/components/toast/SuccessToast";
 import ErrorToast from "~/components/toast/ErrorToast";
 import Header from "~/components/workspace/Header";
 import { useFetchWorkspace } from "~/utils/workspace";
+import LeaveModal from "~/components/modal/LeaveModal";
 
 // utils
 import { useGetWorkspaceRole } from "~/utils/userWorkspaces";
@@ -30,6 +31,7 @@ const Settings: NextPageWithLayout = () => {
   const router = useRouter();
   const { id } = router.query;
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [leaveModalIsOpen, setLeaveModalIsOpen] = useState(false);
 
   const { name, description, cover_img, isLoading, is_personal, imgUrl } =
     useFetchWorkspace();
@@ -112,6 +114,12 @@ const Settings: NextPageWithLayout = () => {
   return (
     <>
       <Head title={name ? `${name} Settings` : "Settings"} />
+      <LeaveModal
+        openModal={leaveModalIsOpen}
+        onClick={() => setLeaveModalIsOpen(false)}
+        name={name}
+        id={id as string}
+      />
       <DeleteWorkspaceModal
         openModal={modalIsOpen}
         onClick={() => setModalIsOpen(false)}
@@ -184,14 +192,28 @@ const Settings: NextPageWithLayout = () => {
             </section>
 
             {/* Delete Workspace Section  */}
-            {is_personal === false &&
-            userWorkspaceRole === "Researcher Admin" ? (
+            {is_personal === false ? (
               <section className="w-full rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
                 <form className="space-y-6" action="#">
                   <h5 className="text-xl font-medium text-gray-900">
                     Danger Zone
                   </h5>
-                  <div className="flex flex-col rounded-sm bg-red-50 p-6 text-sm text-red-800 dark:text-red-400">
+                  <div className="flex justify-between px-2 text-sm">
+                    <div>
+                      <p className="mb-1 font-medium">Leave Workspace</p>
+                      <p className="font-normal">
+                        You will lose access to this project.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      className="w-auto rounded-sm border border-gray-700 p-2 text-center text-sm font-medium text-gray-700 hover:bg-gray-800 hover:text-white focus:outline-none"
+                      onClick={() => setLeaveModalIsOpen(true)}
+                    >
+                      Leave Workspace
+                    </button>
+                  </div>
+                  <div className="flex flex-col rounded-sm bg-red-50 p-6 text-sm text-red-800">
                     <div className="flex">
                       <svg
                         className="mr-2 h-5 w-5"

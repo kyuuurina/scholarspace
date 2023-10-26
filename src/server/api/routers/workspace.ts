@@ -343,4 +343,23 @@ export const workspaceRouter = router({
       });
       return authUser?.workspace_role;
     }),
+
+  leave: protectedProcedure
+    .input(
+      z.object({
+        workspaceId: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const workspaceUser = await ctx.prisma.workspace_user.delete({
+        where: {
+          workspaceid_userid: {
+            workspaceid: input.workspaceId,
+            userid: ctx.user.id,
+          },
+        },
+      });
+
+      return workspaceUser;
+    }),
 });
