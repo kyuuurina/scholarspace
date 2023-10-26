@@ -19,7 +19,6 @@ import ErrorPage from "~/pages/error-page";
 
 import Layout from "~/components/layout/Layout";
 import Head from "~/components/layout/Head";
-import LoadingSpinner from "~/components/LoadingSpinner";
 import AllFollowingTabs from "~/components/research-post/AllFollowingTabs";
 import PrimaryButton from "~/components/button/PrimaryButton";
 import Card from "~/components/Card";
@@ -28,8 +27,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { ResearchPostCard } from "~/components/research-post/ResearchPostCard";
 import PostCard from "~/components/draft/PostCard";
-import { NewPostModal } from "~/components/draft/NewPostModal";
+//import { NewPostModal } from "~/components/draft/NewPostModal";
 import UserProfileCard from "~/components/draft/UserRecCards";
+import NewPostForm from "~/components/draft/NewPostForm";
+import Modal from "~/components/modal/Modal";
 
 
 
@@ -50,6 +51,9 @@ const ResearchPostsPage: NextPageWithLayout = () => {
         </div>
         <div className="col-span-1">
           <UserProfileCard users={users} /> {/* Takes up 1/3 of the width */}
+        </div>
+        <div>
+          <NewPostForm />
         </div>
       </div>
     </div>

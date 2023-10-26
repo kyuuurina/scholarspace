@@ -1,5 +1,5 @@
-//All tab should display home-rwp/index page
-//Following tab should display home-rwp/following page
+//All tab should display /home-rwp page
+//Following tab should display /home-rwp/following page
 
 import Link from "next/link";
 import { useRouter } from "next/router";

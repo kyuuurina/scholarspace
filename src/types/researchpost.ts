@@ -5,6 +5,7 @@ type ResearchPostFormData = {
     research_type: string;
     description: string;
     author: string | null;
+    document : File | null;
   };
   
   export type { ResearchPostFormData };
