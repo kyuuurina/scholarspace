@@ -47,13 +47,15 @@ const WorkspaceDropdown: React.FC<{ onClick: () => void }> = ({ onClick }) => {
       >
         <ul className="h-48 overflow-y-auto py-2 text-gray-700">
           {isLoading ? (
-            <MoonLoader
-              color={"#ffff"}
-              loading={true}
-              aria-label="FadeLoader"
-              data-testid="loader"
-              size={20}
-            />
+            <div className="flex items-center justify-center">
+              <MoonLoader
+                color={"#6233D5"}
+                loading={true}
+                aria-label="FadeLoader"
+                data-testid="loader"
+                size={20}
+              />
+            </div>
           ) : (
             workspaceListings.map((workspace) => (
               <li
