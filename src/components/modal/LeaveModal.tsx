@@ -34,13 +34,14 @@ const LeaveModal: React.FC<ModalProps> = ({
       await leaveWorkspace({
         workspaceId: id,
       });
+      // Display success toast when leaving the workspace is successful
+      toast.custom(() => <SuccessToast message="Successfully left" />);
+      void router.push("/");
     } catch (error) {
-      console.error("Error leaving workspace:", error);
-      toast.custom(() => <ErrorToast message="Error leaving workspace" />);
+      onClick();
+      toast.custom(() => <ErrorToast message={(error as Error).toString()} />);
     } finally {
       setIsLeaving(false);
-      void router.push("/");
-      toast.custom(() => <SuccessToast message="Successfully left" />);
     }
   };
 
