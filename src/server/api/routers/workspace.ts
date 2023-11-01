@@ -168,10 +168,11 @@ export const workspaceRouter = router({
       z.object({
         workspaceId: z.string(),
         email: z.string(),
+        role: z.string(),
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const { workspaceId, email } = input;
+      const { workspaceId, email, role } = input;
 
       const user = await ctx.prisma.user.findFirst({
         where: {
@@ -187,19 +188,12 @@ export const workspaceRouter = router({
         });
       }
 
-      // const owner = await ctx.prisma.workspace_user.findFirst({
-      //   where: {
-      //     workspaceid: workspaceId,
-      //     is_collaborator: false,
-      //   },
-      // });
-
       try {
         const workspaceUser = await ctx.prisma.workspace_user.create({
           data: {
             workspaceid: workspaceId,
             userid: user.id,
-            workspace_role: "Researcher",
+            workspace_role: role,
             is_collaborator: true,
           },
         });

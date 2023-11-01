@@ -6,6 +6,7 @@ import PrimaryButton from "../button/PrimaryButton";
 import FormErrorMessage from "../FormErrorMessage";
 import InviteUserButton from "../button/InviteUserButton";
 import { useEffect, useState } from "react";
+import Select from "~/components/Select";
 
 type MemberModalProps = {
   openModal: boolean;
@@ -16,6 +17,7 @@ type MemberModalProps = {
 
 type addMemberData = {
   email: string;
+  role: string;
 };
 
 const MemberModal: React.FC<MemberModalProps> = ({
@@ -33,20 +35,25 @@ const MemberModal: React.FC<MemberModalProps> = ({
       .string()
       .min(2, "Email must be at least 2 characters long.")
       .email("Please enter a valid email."),
+    role: z.string(),
   });
+
   const {
     register,
     handleSubmit,
     watch,
     formState: { errors, isDirty },
+    setValue,
   } = useForm<addMemberData>({
     resolver: zodResolver(schema),
-    defaultValues: { email: "" },
+    defaultValues: { email: "", role: "Researcher" }, // Include role with a default value
   });
+
   const emailValue = watch("email");
   const resetForm = () => {
     setErrorMessage(null);
   };
+
   useEffect(() => {
     if (addMemberError) {
       setErrorMessage(addMemberError);
@@ -58,16 +65,29 @@ const MemberModal: React.FC<MemberModalProps> = ({
       setErrorMessage(errors.email.message);
     }
   }, [errors]);
+
+  const handleRoleChange = (selectedRole: string) => {
+    // Use setValue to update the 'role' field in the form
+    setValue("role", selectedRole);
+  };
+
   return (
     <Modal title="Add Member" show={openModal} onClose={onClose}>
       <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
         <div>
           <div className="flex">
-            <input
-              id="email"
-              className="block w-full rounded-sm"
-              {...register("email", { required: true })}
-            />
+            <div className="flex">
+              <input
+                id="email"
+                className="block w-full rounded-sm"
+                {...register("email", { required: true })}
+              />
+              <Select
+                initialValue={"Researcher"}
+                options={["Researcher", "Researcher Admin", "Student"]}
+                onValueChange={handleRoleChange}
+              />
+            </div>
             {errorMessage === "User with this email does not exist." ? (
               <>
                 <InviteUserButton email={emailValue} onSuccess={resetForm} />

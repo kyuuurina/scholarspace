@@ -58,11 +58,12 @@ const Members: NextPageWithLayout = () => {
     },
   });
 
-  const onSubmit = async (data: { email: string }) => {
+  const onSubmit = async (data: { email: string, role: string }) => {
     try {
       await addMember.mutateAsync({
         workspaceId: workspaceId,
         email: data.email,
+        role: data.role,
       });
     } catch (error) {
       console.error("Failed to add member:", error);
