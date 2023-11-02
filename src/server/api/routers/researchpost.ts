@@ -1,4 +1,5 @@
 // post.ts
+import * as trpc from '@trpc/server';
 import { z } from "zod";
 import { router, protectedProcedure } from "~/server/api/trpc";
 import { PrismaClient, ResearchPosts } from "@prisma/client";
@@ -9,11 +10,11 @@ export const postRouter = router({
   create: protectedProcedure
     .input(
       z.object({
+        category: z.string(),
         title: z.string(),
         description: z.string(),
         author: z.string(),
-        document: z.string(), // Assuming you want to store the file path as a string
-        comments: z.array(z.string()).optional(),
+        document: z.string().nullable(), // Assuming you want to store the file path as a string
       })
     )
     .mutation(async ({ input }) => {

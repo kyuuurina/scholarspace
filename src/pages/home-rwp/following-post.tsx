@@ -16,20 +16,24 @@ import type { NextPageWithLayout } from "~/pages/_app";
 import ErrorPage from "~/pages/error-page";
 
 // local components
-
 import Layout from "~/components/layout/Layout";
 import Head from "~/components/layout/Head";
-import AllFollowingTabs from "~/components/research-post/AllFollowingTabs";
-import PrimaryButton from "~/components/button/PrimaryButton";
+import Link from "next/link";
+
 import Card from "~/components/Card";
 import AvatarPlaceholder from "~/components/AvatarPlaceholder";
-import Link from "next/link";
-import { ResearchPostCard } from "~/components/draft/ResearchPostCard";
-import PostCard from "~/components/research-post/PostCard";
-//import { NewPostModal } from "~/components/draft/NewPostModal";
-import UserProfileCard from "~/components/draft/UserRecCards";
-import NewPostForm from "~/components/draft/NewPostForm";
 import Modal from "~/components/modal/Modal";
+
+//research post components
+import AllFollowingTabs from "~/components/research-post/AllFollowingTabs";
+import PostCard from "~/components/research-post/PostCard";
+import { ResearchPostCard } from "~/components/draft/ResearchPostCard";
+import UserProfileCard from "~/components/research-post/UserRecCards";
+import AddNewPostButton from "~/components/research-post/AddNewPostButton";
+import TestModal from "~/components/research-post/AddNewPostModal";
+//import { NewPostModal } from "~/components/draft/NewPostModal";
+//import NewPostForm from "~/components/draft/NewPostForm";
+
 
 
 const FollowingPostPage: NextPageWithLayout = () => {
@@ -53,8 +57,10 @@ const FollowingPostPage: NextPageWithLayout = () => {
     },
   ];
 
+
   return (
     <div className="mx-auto max-w-screen-xl p-8">
+      <AddNewPostButton />
       {/* <h1 className="mb-4 text-3xl font-bold">Research Posts</h1> */}
       <div className="grid grid-cols-3 gap-6">
         <div className="col-span-2">

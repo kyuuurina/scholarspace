@@ -3,7 +3,7 @@ import { memberRouter } from "~/server/api/routers/member";
 import { accountRouter } from "./routers/account";
 import { router } from "~/server/api/trpc";
 import profileRouter from "./routers/profile";
-import { postRouter } from "~/server/api/routers/post";
+import { postRouter } from "~/server/api/routers/researchpost";
 import { userRouter } from "./routers/user";
 
 /**
@@ -16,7 +16,7 @@ export const appRouter = router({
   member: memberRouter,
   account: accountRouter,
   profile: profileRouter,
-  post: postRouter,
+  researchpost: postRouter,
   user: userRouter,
 });
 

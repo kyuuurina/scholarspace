@@ -9,7 +9,7 @@ import { useMultistepForm } from "~/utils/useMultistepForm";
 
 // import custom components
 import PrimaryButton from "~/components/button/PrimaryButton";
-import { Button } from "~/components/button/Button";
+import Button from "~/components/button/Button";
 // import { RoleForm } from "~/components/profile-registration/RoleForm";
 import { BasicInfoForm } from "~/components/profile-registration/BasicInfoForm";
 import { ResearchForm } from "~/components/profile-registration/ResearchForm";
