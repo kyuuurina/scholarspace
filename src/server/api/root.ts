@@ -3,8 +3,9 @@ import { memberRouter } from "~/server/api/routers/member";
 import { accountRouter } from "./routers/account";
 import { router } from "~/server/api/trpc";
 import profileRouter from "./routers/profile";
-import { postRouter } from "~/server/api/routers/post";
+import { postRouter } from "~/server/api/routers/researchpost";
 import { userRouter } from "./routers/user";
+import { projectRouter } from "./routers/project";
 
 /**
  * This is the primary router for your server.
@@ -16,8 +17,9 @@ export const appRouter = router({
   member: memberRouter,
   account: accountRouter,
   profile: profileRouter,
-  post: postRouter,
+  researchpost: postRouter,
   user: userRouter,
+  project: projectRouter,
 });
 
 // export type definition of API

@@ -19,14 +19,17 @@ import ScoreChart from "~/components/chart/ScoreChart";
 import Card from "~/components/Card";
 import Header from "~/components/workspace/Header";
 import AvatarPlaceholder from "~/components/AvatarPlaceholder";
+import CreateProjectModal from "~/components/project/CreateProjectModal";
 
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 
 const Workspace: NextPageWithLayout = () => {
   const { name, description, isLoading, error, imgUrl } = useFetchWorkspace();
   const { workspaceMembers } = useFetchWorkspaceMembers();
   const workspaceId = useRouterId();
+  const [modalIsOpen, setModalIsOpen] = useState(false);
 
   if (isLoading) {
     return <LoadingSpinner />;
@@ -39,6 +42,10 @@ const Workspace: NextPageWithLayout = () => {
   return (
     <>
       <Head title={name} />
+      <CreateProjectModal
+        openModal={modalIsOpen}
+        onClick={() => setModalIsOpen(false)}
+      />
       <main className="flex flex-col">
         {/* Workspace header */}
         <Header name={name || ""} imgUrl={imgUrl} />
@@ -48,7 +55,10 @@ const Workspace: NextPageWithLayout = () => {
           <div className="w-full md:col-span-8">
             <div className="mb-5 flex items-center justify-between">
               <h5 className="text-xl font-medium text-gray-900 ">Projects</h5>
-              <PrimaryButton name="Add Project" />
+              <PrimaryButton
+                name="Add Project"
+                onClick={() => setModalIsOpen(true)}
+              />
             </div>
             <div className="grid gap-5 md:grid-cols-2">
               <ProjectCard />
