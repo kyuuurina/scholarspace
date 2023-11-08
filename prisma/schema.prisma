@@ -310,6 +310,8 @@ model user {
   name                                        String?
   avatar_url                                  String?
   email                                       String?
+
+  //non-auth fields
   chat_message_chat_message_receiver_idTouser chat_message[]   @relation("chat_message_receiver_idTouser")
   chat_message_chat_message_sender_idTouser   chat_message[]   @relation("chat_message_sender_idTouser")
   profile                                     profile[]

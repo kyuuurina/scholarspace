@@ -1,8 +1,8 @@
 import { api } from "./api";
 import { useRouterId } from "./routerId";
+import { postRouter } from "~/server/api/routers/researchpost";
 
-
-export const useResearchPost = () => {
+export const useCreateResearchPost = () => {
   const id: string = useRouterId();
 
   const researchpost = api.researchpost.get.useQuery(
