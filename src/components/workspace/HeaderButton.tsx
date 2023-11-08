@@ -6,23 +6,24 @@ import { useRouterId } from "~/utils/routerId";
 
 type HeaderButtonProps = {
   type: "members" | "settings";
+  purpose: "workspace" | "project";
 };
 
-const HeaderButton: React.FC<HeaderButtonProps> = ({ type }) => {
-  const workspaceId = useRouterId();
+const HeaderButton: React.FC<HeaderButtonProps> = ({ type, purpose }) => {
+  const id = useRouterId();
 
   let icon = null;
   let url = "/";
 
-  if (workspaceId) {
+  if (id) {
     switch (type) {
       case "members":
         icon = <FiUsers />;
-        url = `/workspace/${workspaceId}/members`;
+        url = `/${purpose}/${id}/members`;
         break;
       case "settings":
         icon = <FiSettings />;
-        url = `/workspace/${workspaceId}/settings`;
+        url = `/${purpose}/${id}/settings`;
         break;
       default:
         break;
@@ -31,7 +32,7 @@ const HeaderButton: React.FC<HeaderButtonProps> = ({ type }) => {
 
   return (
     <>
-      {workspaceId ? (
+      {id ? (
         <Link href={url}>
           <button className="rounded-md border border-gray-300 bg-gray-200 p-2 hover:bg-gray-400">
             {icon}

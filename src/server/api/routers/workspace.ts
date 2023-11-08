@@ -168,10 +168,11 @@ export const workspaceRouter = router({
       z.object({
         workspaceId: z.string(),
         email: z.string(),
+        role: z.string(),
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const { workspaceId, email } = input;
+      const { workspaceId, email, role } = input;
 
       const user = await ctx.prisma.user.findFirst({
         where: {
@@ -187,19 +188,12 @@ export const workspaceRouter = router({
         });
       }
 
-      // const owner = await ctx.prisma.workspace_user.findFirst({
-      //   where: {
-      //     workspaceid: workspaceId,
-      //     is_collaborator: false,
-      //   },
-      // });
-
       try {
         const workspaceUser = await ctx.prisma.workspace_user.create({
           data: {
             workspaceid: workspaceId,
             userid: user.id,
-            workspace_role: "Researcher",
+            workspace_role: role,
             is_collaborator: true,
           },
         });
@@ -351,6 +345,27 @@ export const workspaceRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      // throw error if there will be no researcher admin left when leaving workspace
+      const workspace = await ctx.prisma.workspace.findUnique({
+        where: {
+          id: input.workspaceId,
+        },
+        include: {
+          workspace_user: true,
+        },
+      });
+
+      const researcherAdmins = workspace?.workspace_user.filter(
+        (user) => user.workspace_role === "Researcher Admin"
+      );
+
+      if (researcherAdmins?.length === 1) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Workspace must have at least one researcher admin.",
+        });
+      }
+
       const workspaceUser = await ctx.prisma.workspace_user.delete({
         where: {
           workspaceid_userid: {

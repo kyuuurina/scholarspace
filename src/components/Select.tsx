@@ -4,12 +4,14 @@ type SelectProps = {
   initialValue: string;
   onValueChange: (value: string) => void;
   disabled?: boolean;
+  options: string[];
 };
 
 const Select: React.FC<SelectProps> = ({
   initialValue,
   onValueChange,
   disabled = false,
+  options,
 }) => {
   const [selectedValue, setSelectedValue] = useState(initialValue);
 
@@ -24,8 +26,11 @@ const Select: React.FC<SelectProps> = ({
       onChange={(e) => handleValueChange(e.target.value)}
       disabled={disabled}
     >
-      <option value="Researcher">Researcher</option>
-      <option value="Researcher Admin">Researcher Admin</option>
+      {options.map((option, index) => (
+        <option key={index} value={option}>
+          {option}
+        </option>
+      ))}
     </select>
   );
 };
