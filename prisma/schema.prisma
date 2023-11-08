@@ -9,37 +9,6 @@ datasource db {
   schemas  = ["auth", "public"]
 }
 
-model Profile {
-  id                 String   @id @default(cuid())
-  userId             String
-  name               String
-  avatar             String
-  aboutMe            String
-  skills             String[]
-  achievements       String[]
-  education          String[]
-  researchExperience String[]
-  researchInterest   String[]
-  collabStatus       String[]
-
-  @@schema("public")
-}
-
-model ResearchPosts {
-  id        String   @id @default(cuid())
-  userId    String
-  name      String
-  avatar    String
-  title     String
-  author    String
-  document  String
-  content   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@schema("public")
-}
-
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model audit_log_entries {
   instance_id String?   @db.Uuid
@@ -318,6 +287,7 @@ model workspace {
   cover_img      String?
   is_personal    Boolean          @default(false)
   ownerid        String?
+  project        project[]
   workspace_user workspace_user[]
 
   @@schema("public")
@@ -326,7 +296,7 @@ model workspace {
 model workspace_user {
   workspaceid     String    @db.Uuid
   userid          String    @db.Uuid
-  workspace_role  String?   @default("Researcher")
+  workspace_role  String    @default("Researcher")
   is_collaborator Boolean?  @default(false)
   user            user      @relation(fields: [userid], references: [id], onDelete: NoAction, onUpdate: NoAction)
   workspace       workspace @relation(fields: [workspaceid], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -336,11 +306,88 @@ model workspace_user {
 }
 
 model user {
-  id             String           @id @db.Uuid
-  name           String?
-  avatar_url     String?
-  email          String?
-  workspace_user workspace_user[]
+  id                                          String           @id @db.Uuid
+  name                                        String?
+  avatar_url                                  String?
+  email                                       String?
+  chat_message_chat_message_receiver_idTouser chat_message[]   @relation("chat_message_receiver_idTouser")
+  chat_message_chat_message_sender_idTouser   chat_message[]   @relation("chat_message_sender_idTouser")
+  profile                                     profile[]
+  research_post                               research_post[]
+  workspace_user                              workspace_user[]
+
+  @@schema("public")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model chat_message {
+  id                                  String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  sender_id                           String   @db.Uuid
+  receiver_id                         String   @db.Uuid
+  message                             String?
+  created_at                          DateTime @default(now()) @db.Timestamptz(6)
+  is_read                             Boolean? @default(false)
+  user_chat_message_receiver_idTouser user     @relation("chat_message_receiver_idTouser", fields: [receiver_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user_chat_message_sender_idTouser   user     @relation("chat_message_sender_idTouser", fields: [sender_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("public")
+}
+
+model profile {
+  profile_id          String   @id(map: "Profile_pkey") @db.Uuid
+  user_id             String   @db.Uuid
+  name                String
+  avatar              String
+  about_me            String
+  skills              String[]
+  achievements        String[]
+  education           String[]
+  research_experience String[]
+  research_interest   String[]
+  collab_status       String[]
+  user                user     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model project {
+  project_id   String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  workspace_id String    @db.Uuid
+  name         String
+  description  String
+  c_score      Int       @default(0) @db.SmallInt
+  p_score      Int       @default(0) @db.SmallInt
+  cover_img    String?
+  workspace    workspace @relation(fields: [workspace_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model project_users {
+  user_id      String @db.Uuid
+  project_id   String @db.Uuid
+  project_role String
+
+  @@id([user_id, project_id])
+  @@schema("public")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model research_post {
+  id          String   @id(map: "ResearchPosts_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id     String   @db.Uuid
+  name        String
+  title       String
+  author      String
+  document    String
+  description String
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now())
+  category    String?
+  user        user     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@schema("public")
 }
