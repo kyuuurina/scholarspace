@@ -312,10 +312,10 @@ model user {
   email                                       String?
   chat_message_chat_message_receiver_idTouser chat_message[]   @relation("chat_message_receiver_idTouser")
   chat_message_chat_message_sender_idTouser   chat_message[]   @relation("chat_message_sender_idTouser")
+  post_likes                                  post_likes[]
   profile                                     profile[]
   research_post                               research_post[]
   workspace_user                              workspace_user[]
-  post_likes                                  post_likes[]
 
   @@schema("public")
 }
@@ -387,18 +387,18 @@ model research_post {
   created_at  DateTime     @default(now())
   updated_at  DateTime     @default(now())
   category    String?
-  user        user         @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   likes       post_likes[]
+  user        user         @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@schema("public")
 }
 
 model post_likes {
+  like_status   Boolean       @default(false)
   user_id       String        @db.Uuid
   post_id       String        @db.Uuid
-  like_status   Boolean       @default(false)
-  user          user          @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   research_post research_post @relation(fields: [post_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user          user          @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@id([user_id, post_id])
   @@index([user_id])
