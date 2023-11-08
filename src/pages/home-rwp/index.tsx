@@ -2,11 +2,12 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 
 //This page should be displayed when user click Home Page
-//atm, it appears on localhost:3000/home-rwp/index
+//atm, it appears on localhost:3000/home-rwp
 
 //utils
-import { useRouterId } from "~/utils/routerId";
-import React from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
+import toast from "react-hot-toast";
 
 // types
 import type { ReactElement } from "react";
@@ -19,7 +20,6 @@ import ErrorPage from "~/pages/error-page";
 import Layout from "~/components/layout/Layout";
 import Head from "~/components/layout/Head";
 import Link from "next/link";
-
 import Card from "~/components/Card";
 import AvatarPlaceholder from "~/components/AvatarPlaceholder";
 import Modal from "~/components/modal/Modal";
