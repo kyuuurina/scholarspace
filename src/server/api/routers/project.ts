@@ -129,4 +129,43 @@ export const projectRouter = router({
 
       return project;
     }),
+
+  update: protectedProcedure
+    .input(
+      z.object({
+        project_id: z.string(),
+        name: z.string(),
+        description: z.string(),
+        cover_img: z.string().nullable(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const projectUser = await ctx.prisma.project_users.findUnique({
+        where: {
+          user_id_project_id: {
+            user_id: ctx.user.id,
+            project_id: input.project_id,
+          },
+        },
+      });
+
+      // if user is not researcher admin, throw error
+      if (!projectUser || projectUser.project_role !== "Researcher Admin") {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You are not authorized to update this project",
+        });
+      }
+
+      const project = await ctx.prisma.project.update({
+        where: {
+          project_id: input.project_id,
+        },
+        data: {
+          ...input,
+        },
+      });
+
+      return project;
+    }),
 });

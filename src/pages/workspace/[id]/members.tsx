@@ -137,7 +137,7 @@ const Members: NextPageWithLayout = () => {
       />
 
       <main className="min-h-screen w-full">
-        <Header name={name || ""} imgUrl={imgUrl} />
+        <Header name={name || ""} imgUrl={imgUrl} purpose="workspace"/>
         <div className="p-5">
           <div className="relative overflow-x-auto rounded-lg shadow-md">
             {/* search and add member section  */}

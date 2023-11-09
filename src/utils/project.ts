@@ -30,7 +30,6 @@ export const useFetchProject = () => {
     imgUrl = `https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/project-covers/${cover_img}`;
   }
 
-  
   const { isLoading, error } = project;
 
   return {
@@ -42,6 +41,7 @@ export const useFetchProject = () => {
     users,
     isLoading,
     error,
+    cover_img,
   };
 };
 
