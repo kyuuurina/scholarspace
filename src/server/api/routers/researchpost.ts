@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { router, protectedProcedure, publicProcedure } from "~/server/api/trpc";
-import * as trpc from '@trpc/server';
+import * as trpc from "@trpc/server";
 import { PrismaClient, research_post } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -25,7 +25,7 @@ export const postRouter = router({
         data: {
           ...input,
           document: "",
-          id: String(Date.now()),
+          post_id: String(Date.now()),
           user_id: "dummy-user-id", // Replace with the actual user ID
           title: "", // Set appropriate default values
           description: "", // Set appropriate default values
@@ -37,7 +37,7 @@ export const postRouter = router({
   update: protectedProcedure
     .input(
       z.object({
-        id: z.string(),
+        post_id: z.string(),
         category: z.string(),
         title: z.string(),
         description: z.string().optional(),
@@ -46,11 +46,11 @@ export const postRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      const { id, ...data } = input;
+      const { post_id, ...data } = input;
 
       const updatedPost = await prisma.research_post.update({
         where: {
-          id,
+          post_id,
         },
         data,
       });
@@ -65,7 +65,7 @@ export const postRouter = router({
 
       await prisma.research_post.delete({
         where: {
-          id,
+          post_id: id,
         },
       });
 
