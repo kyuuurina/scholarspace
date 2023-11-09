@@ -114,14 +114,14 @@ const ProjectMember: NextPageWithLayout = () => {
             </div>
 
             {/* member table  */}
-            <MemberTable
+            {/* <MemberTable
               filteredMembers={filteredMembers}
               handleRoleChange={handleRoleChange}
               handleDeleteMember={handleDeleteMember}
               userWorkspaceRole={workspaceRole.data}
               isPersonal={is_personal}
               ownerId={ownerid}
-            />
+            /> */}
           </div>
         </div>
       </main>
