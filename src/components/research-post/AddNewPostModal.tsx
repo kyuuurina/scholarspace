@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { v4 as uuidv4 } from "uuid";
 import { api } from "~/utils/api";
+import toast from "react-hot-toast";
 
 // types
 import type { ResearchPostFormData } from "~/types/researchpost";
@@ -15,13 +16,15 @@ import type { ResearchPostFormData } from "~/types/researchpost";
 import FormErrorMessage from "../FormErrorMessage";
 import Modal from "../modal/Modal";
 import PrimaryButton from "../button/PrimaryButton";
+import SuccessToast from "../toast/SuccessToast";
+import ErrorToast from "../toast/ErrorToast";
 
 type ModalProps = {
   openModal: boolean;
   onClick: () => void;
 };
 
-const TestPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
+const AddNewPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
 
   // document variables
   const [documentPlaceholder, setdocumentPlaceholder] = useState<string | null>(null);
@@ -33,21 +36,31 @@ const TestPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
   const user = useUser();
   const supabase = useSupabaseClient();
 
-  const createResearchPost = api.researchpost.create.useMutation();
+
+  // hot toast for success and error message
+  const createResearchPost = api.researchpost.create.useMutation({
+    onSuccess: () => {
+      toast.custom(() => <SuccessToast message="Post successfully created" />);
+      router.reload();
+    },
+    onError: (error) => {
+      toast.custom(() => <ErrorToast message={error.toString()} />);
+      onClick();
+      reset();
+    },
+  });
+  
 
   // schema for form validation, must follow "./types/researchpost.ts"
   const schema: ZodType<ResearchPostFormData> = z.object({
     category: z
-      .string()
-      .min(2, "Category must be at least 2 characters long.")
-      .max(100, "Category must be at most 100 characters long."),
+      .string(),
     title: z
       .string()
       .min(2, "Title must be at least 2 characters long.")
       .max(200, "Title must be at most 200 characters long."),
     description: z
-      .string()
-      .min(2, "Description must be at least 2 characters long."),
+      .string(),
     author: z
     .string()
     .min(2, "Author must be at least 2 characters long.")
@@ -91,8 +104,9 @@ const TestPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
       reset();
       setdocumentPlaceholder(null);
 
-      // Navigate to the newly created project dashboard
-      await router.push(`/home-rwp/${response.id}`);
+      // Navigate to the newly created post
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      await router.push(`/home-rwp/${response.post_id}`);
       setIsSubmitting(false);
     } catch (error) {
       // Handle any errors
@@ -100,14 +114,14 @@ const TestPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
     }
   };
 
-  // handler for onChange input for image upload
+  // handler for onChange input for document upload
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     try {
       if (!e.target.files) return;
       const file = e.target.files[0];
       const reader = new FileReader();
 
-      // Read the image as a data URL
+      // Read the document as a data URL
       if (file) {
         reader.readAsDataURL(file);
         reader.onloadend = () => {
@@ -140,6 +154,21 @@ const TestPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
         >
           <div>
             <label
+              htmlFor="category"
+              className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+            >
+              Category
+            </label>
+            <input
+              id="name"
+              className="block w-full"
+              {...register("category", { required: true })}
+            />
+            {errors.category && <FormErrorMessage text={errors.category.message} />}
+          </div>
+
+          <div>
+            <label
               htmlFor="research title"
               className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
             >
@@ -161,7 +190,7 @@ const TestPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
               Author
             </label>
             <input
-              id="name"
+              id="author_name"
               className="block w-full"
               {...register("author", { required: true })}
             />
@@ -197,7 +226,7 @@ const TestPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
                 {documentPlaceholder ? (
                   <Image
                     src={documentPlaceholder}
-                    alt="cover image"
+                    alt="post documents"
                     style={{ objectFit: "contain" }}
                     fill
                   />
@@ -230,7 +259,7 @@ const TestPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
                 <input
                   type="file"
                   className="hidden"
-                  accept="image/png, image/jpeg, image/jpg"
+                  accept="image/pdf, image/doc, image/docx"   //define file types accepted
                   onChange={(e) => {
                     void handleOnChange(e);
                   }}
@@ -246,4 +275,4 @@ const TestPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
   );
 };
 
-export default TestPostModal;
+export default AddNewPostModal;

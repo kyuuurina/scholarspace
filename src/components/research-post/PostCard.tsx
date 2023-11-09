@@ -1,10 +1,14 @@
 import Link from "next/link";
+import Image from "next/image";
 import React, { useState } from "react";
 import { FiHeart, FiMessageSquare, FiRepeat, FiMoreHorizontal, FiEdit, FiTrash } from "react-icons/fi";
 import Comment from "~/components/research-post/Comment";
 
+import AvatarPlaceholder from "../AvatarPlaceholder";
+
 interface PostCardProps {
   title: string;
+  category: string;
   author: string;
   description: string;
   timestamp: string;
@@ -12,6 +16,7 @@ interface PostCardProps {
 
 const PostCard: React.FC<PostCardProps> = ({
   title,
+  category,
   author,
   description,
   timestamp,
@@ -79,12 +84,25 @@ const PostCard: React.FC<PostCardProps> = ({
       </div>
 
       {/* content in the post card */}
-      <h3 className="text-lg font-bold">{title}</h3>
-      <p className="text-gray-500">Created on: {timestamp}</p>
-      <p className="mt-2">{description}</p>
-      <div className="flex items-center mb-4">
-        <p className="text-gray-500">Author: {author}</p>
+      <div className="flex items-center space-x-2 mb-4">
+        <span className="px-2 py-1 bg-blue-200 text-blue-800 rounded-full text-sm">
+          {category}
+        </span>
       </div>
+      <div className = "mt-2-flex items-center mt-4">
+        <h3 className="text-lg font-bold">{title}</h3>
+      </div>     
+      <div className= "mt-2-flex items-center mb-4">
+        <p className="text-sm">Created on: {timestamp}</p>
+      </div>
+
+      <p className="mt-2 text-black">{description}</p>
+
+      <div className="mt-2-flex items-center mb-4">
+        <p className="mt-2 text-gray-500">Author: {author}</p>
+      </div>
+
+      {/* div of comment, likes and reshare */}
       <div className="flex items-center mt-4">
         <button className="mr-2 flex items-center text-gray-500 hover:text-gray-700 focus:outline-none">
           <FiMessageSquare size={20} className="inline-block mr-2" />
@@ -99,6 +117,7 @@ const PostCard: React.FC<PostCardProps> = ({
           Reshare
         </button>
       </div>
+      
       <div className="mt-4">
         <Comment onAddComment={addComment} />
         <ul>

@@ -2,11 +2,12 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 
 //This page should be displayed when user click Home Page
-//atm, it appears on localhost:3000/home-rwp/index
+//atm, it appears on localhost:3000/home-rwp
 
 //utils
-import { useRouterId } from "~/utils/routerId";
-import React from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
+import toast from "react-hot-toast";
 
 // types
 import type { ReactElement } from "react";
@@ -19,7 +20,6 @@ import ErrorPage from "~/pages/error-page";
 import Layout from "~/components/layout/Layout";
 import Head from "~/components/layout/Head";
 import Link from "next/link";
-
 import Card from "~/components/Card";
 import AvatarPlaceholder from "~/components/AvatarPlaceholder";
 import Modal from "~/components/modal/Modal";
@@ -38,25 +38,34 @@ import TestModal from "~/components/research-post/AddNewPostModal";
 
 const FollowingPostPage: NextPageWithLayout = () => {
   const users = [
-    { id: 1, name: "John Doe" },
-    { id: 2, name: "Jane Doe" },
+    { id: 1, name: "Ahmad Osama" },
+    { id: 2, name: "Hasbullah " },
   ];
 
   const posts = [
     {
-      title: "Post 1",
-      author: "John Doe",
-      description: "This is the first post. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      timestamp: "October 26, 2023",
+      title: "Effects of parental involvement on student behaviour",
+      category: "Conference Paper",
+      author: "National Institutes of Health",
+      description: "This riveting study delves into the intriguing realm of parental involvement and its curious influence on the behavior of young scholars. Join us on an adventure through the labyrinthine corridors of academia as we unravel the enigmatic connection.",
+      timestamp: "November 9, 2023",
     },
     {
-      title: "Post 2",
-      author: "Jane Doe",
+      title: "Design Patterns in Software Engineering",
+      category: "Journal Article",
+      author: "Nur Athirah",
+      description: "Due to the increasing research information, knowledge production, development of information technology, and its impact on access to knowledge, the taxonomy of knowledge and information is necessary to manage and use them in the development of science",
+      timestamp: "October 27, 2023",
+    },
+    {
+      title: "Impact of school funding on student achievement",
+      category: "Conference Paper",
+      author: "Dr. Isma Zaini",
       description: "This is the second post. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
       timestamp: "October 27, 2023",
     },
-  ];
 
+  ];
 
   return (
     <div className="mx-auto max-w-screen-xl p-8">
@@ -71,6 +80,7 @@ const FollowingPostPage: NextPageWithLayout = () => {
               <PostCard
                 key={index}
                 title={post.title}
+                category={post.category}
                 author={post.author}
                 description={post.description}
                 timestamp={post.timestamp}
