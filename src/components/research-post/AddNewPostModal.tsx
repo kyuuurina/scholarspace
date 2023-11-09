@@ -145,7 +145,7 @@ const AddNewPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
           reset();
           setdocumentPlaceholder(null);
         }}
-        title="Edit Post"
+        title="Add New Post"
       >
         <form
           autoComplete="off"
