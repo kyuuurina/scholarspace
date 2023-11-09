@@ -27,7 +27,7 @@ const TestPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
   const [documentPlaceholder, setdocumentPlaceholder] = useState<string | null>(null);
   const [documentValue, setdocumentValue] = useState<File | null | undefined>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const imgId: string = uuidv4();
+  const docpostId: string = uuidv4();
 
   const router = useRouter();
   const user = useUser();
@@ -75,8 +75,8 @@ const TestPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
       setIsSubmitting(true);
       // Upload the document to the "post-files-upload" storage bucket
       if (documentValue && user) {
-        formData.document = imgId;
-        const fileUrl = `/${imgId}`;
+        formData.document = docpostId;
+        const fileUrl = `/${docpostId}`;
         const { data, error } = await supabase.storage
           .from("post-files-upload")
           .upload(fileUrl, documentValue);
@@ -111,8 +111,8 @@ const TestPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
       if (file) {
         reader.readAsDataURL(file);
         reader.onloadend = () => {
-          const displayImg = reader.result as string;
-          setdocumentPlaceholder(displayImg);
+          const displayDocument = reader.result as string;
+          setdocumentPlaceholder(displayDocument);
         };
 
         setdocumentValue(file);

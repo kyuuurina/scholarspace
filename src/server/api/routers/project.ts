@@ -4,24 +4,72 @@ import { TRPCError } from "@trpc/server";
 import { router, protectedProcedure, publicProcedure } from "~/server/api/trpc";
 
 export const projectRouter = router({
-  // get: publicProcedure
-  //   .input(z.object({ id: z.string() }))
-  //   .query(async ({ ctx, input }) => {
-  //     const project = await ctx.prisma.project.findUnique({
-  //       where: {
-  //         project_id: input.id,
-  //       },
-  //     });
+  get: protectedProcedure
+    .input(z.object({ project_id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const project = await ctx.prisma.project.findUnique({
+        where: {
+          project_id: input.project_id,
+        },
+      });
 
-  //     if (!project) {
-  //       throw new TRPCError({
-  //         code: "NOT_FOUND",
-  //         message: "Workspace not found",
-  //       });
-  //     }
+      if (!project) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Project not found",
+        });
+      }
 
-  //     return project;
-  //   }),
+      const projectUsers = await ctx.prisma.project_users.findMany({
+        where: {
+          project_id: input.project_id,
+        },
+      });
+
+      const users = await Promise.all(
+        projectUsers.map((projectUser) =>
+          ctx.prisma.user.findUnique({
+            where: {
+              id: projectUser.user_id,
+            },
+          })
+        )
+      );
+
+      return {
+        ...project,
+        users,
+      };
+    }),
+
+  // get projects under a workspace
+  getWorkspaceProjects: protectedProcedure
+    .input(z.object({ workspace_id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const workspaceUser = await ctx.prisma.workspace_user.findUnique({
+        where: {
+          workspaceid_userid: {
+            workspaceid: input.workspace_id,
+            userid: ctx.user.id,
+          },
+        },
+      });
+
+      if (!workspaceUser) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You are not authorized to view this workspace",
+        });
+      }
+
+      const projects = await ctx.prisma.project.findMany({
+        where: {
+          workspace_id: input.workspace_id,
+        },
+      });
+
+      return projects;
+    }),
 
   create: protectedProcedure
     .input(

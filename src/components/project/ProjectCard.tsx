@@ -1,25 +1,46 @@
 import Link from "next/link";
+import Image from "next/image";
 
-const ProjectCard: React.FC = () => {
+import AvatarPlaceholder from "~/components/AvatarPlaceholder";
+
+type ProjectCardProps = {
+  // an object of an array of projects
+  project: {
+    project_id: string;
+    name: string;
+    description: string;
+    cover_img: string | null;
+    c_score: number;
+    p_score: number; // Make it nullable to handle potential null values
+  };
+};
+
+const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
   return (
     <Link
-      href="/project"
-      className="flex w-full flex-col items-center rounded-lg border border-gray-200 bg-white p-4 shadow hover:bg-gray-100 md:max-w-xl"
+      href={`/project/${project.project_id}`}
+      className="flex w-full items-center space-x-5 rounded-lg border border-gray-200 bg-white p-4 shadow hover:bg-gray-100"
     >
-      <div className="w-full">
+      <div className="aspect:square">
+        {project.cover_img ? (
+          <Image
+            src={`https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/project-covers/${project.cover_img}`}
+            alt="Project cover image"
+            width={100}
+            height={100}
+          />
+        ) : (
+          <div className="aspect:square h-20 w-20">
+            <AvatarPlaceholder name={project.name} shape="square" />
+          </div>
+        )}
+      </div>
+      <div className="overflow-hidden">
         <h5 className="mb-2 line-clamp-2 text-2xl font-bold dark:text-white">
-          Assessing the Virtual Early Intervention for Children with Learning
-          Disabilities
+          {project.name}
         </h5>
-        <p className="line-clamp-3 text-gray-700 ">
-          Assessing the Virtual Early Intervention for Children with Learning
-          Disabilities is a research study aimed at evaluating the effectiveness
-          and impact of virtual early intervention programs on children with
-          learning disabilities. Through rigorous assessment and analysis, this
-          study aims to provide valuable insights into the benefits and
-          limitations of virtual interventions, informing the development of
-          more inclusive and accessible educational approaches for children with
-          learning disabilities.
+        <p className="line-clamp-3 overflow-hidden text-ellipsis text-gray-700">
+          {project.description || "No description"}
         </p>
       </div>
     </Link>
