@@ -196,7 +196,7 @@ const ProfilePage: NextPageWithLayout = () => {
             {!isEditing && (
               <button
                 onClick={handleEdit}
-                className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mr-2"
+                className="rounded-lg bg-purple-accent-1 px-3 py-2 text-center text-sm font-medium text-white hover:bg-purple-accent-2 focus:outline-none"
               >
                 Edit
               </button>
@@ -205,13 +205,13 @@ const ProfilePage: NextPageWithLayout = () => {
               <>
                 <button
                   onClick={handleSaveChanges}
-                  className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mr-2"
+                  className="rounded-lg bg-purple-accent-1 px-3 py-2 text-center text-sm font-medium text-white hover:bg-purple-accent-2 focus:outline-none"
                 >
                   Save
                 </button>
                 <button
                   onClick={handleCancelChanges}
-                  className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                  className= "rounded-lg bg-red-600 px-3 py-2 text-center text-sm font-medium text-white hover:bg-red-700 focus:outline-none"
                 >
                   Cancel
                 </button>
