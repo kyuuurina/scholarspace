@@ -2,22 +2,21 @@ import AvatarPlaceholder from "../AvatarPlaceholder";
 import HeaderButton from "./HeaderButton";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouterId } from "~/utils/routerId";
 import { useRouter } from "next/router";
 
 type HeaderProps = {
   name: string;
   imgUrl: string;
+  purpose: "workspace" | "project";
 };
 
-const Header: React.FC<HeaderProps> = ({ name, imgUrl }) => {
+const Header: React.FC<HeaderProps> = ({ name, imgUrl, purpose }) => {
   const router = useRouter();
-  const workspaceId =
-    router.query && router.query.id ? router.query.id.toString() : "";
+  const id = router.query && router.query.id ? router.query.id.toString() : "";
   return (
     <div className="flex w-full flex-wrap justify-between border-b bg-white px-5 py-2 sm:py-5">
       <Link
-        href={`/workspace/${workspaceId}`}
+        href={`/${purpose}/${id}`}
         className="flex max-w-[70%] items-center gap-x-3"
       >
         {imgUrl !== "" ? (
@@ -34,8 +33,8 @@ const Header: React.FC<HeaderProps> = ({ name, imgUrl }) => {
         </h1>
       </Link>
       <div className="flex items-center gap-x-2">
-        <HeaderButton type={"members"} />
-        <HeaderButton type={"settings"} />
+        <HeaderButton purpose={purpose} type={"members"} />
+        <HeaderButton purpose={purpose} type={"settings"} />
       </div>
     </div>
   );

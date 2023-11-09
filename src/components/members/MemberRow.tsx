@@ -47,44 +47,49 @@ const MemberRow: React.FC<MemberRowProps> = ({
         </div>
       </td>
       <td className="px-6 py-4">
-        {userWorkspaceRole === "Researcher Admin" && !isPersonalOwner ? (
+        {userWorkspaceRole === "Researcher Admin" &&
+        !isPersonalOwner &&
+        member.memberRole ? (
           <Select
-            initialValue={member.memberRole || "Researcher"}
+            initialValue={member.memberRole}
             onValueChange={(newRole) =>
               handleRoleChange(member.memberId, newRole)
             }
+            options={["Researcher", "Researcher Admin", "Student"]}
           />
         ) : (
           <Select
-            initialValue={member.memberRole || "Researcher"}
+            initialValue={member.memberRole!} // added non-null assertion operator
             onValueChange={(newRole) =>
               handleRoleChange(member.memberId, newRole)
             }
             disabled={true}
+            options={["Researcher", "Researcher Admin", "Student"]}
           />
         )}
       </td>
       <td className="px-6 py-4">
-        {member.memberId != userId && (
-          <button
-            type="button"
-            className={`font-medium 
-            ${
-              userWorkspaceRole === "Researcher Admin"
-                ? "cursor-pointer text-purple-600 hover:underline"
-                : "cursor-default text-gray-400"
-            }
-            `}
-            onClick={() => {
-              if (userWorkspaceRole === "Researcher Admin") {
-                handleDeleteMember(member.memberId);
-              }
-            }}
-            disabled={userWorkspaceRole === "Researcher Admin"}
-          >
-            Remove user
-          </button>
-        )}
+        {member.memberId != userId &&
+          !isPersonalOwner && ( // Added the && operator here
+            <button
+              type="button"
+              className={`font-medium 
+          ${
+            userWorkspaceRole === "Researcher Admin"
+              ? "cursor-pointer text-purple-600 hover:underline"
+              : "cursor-default text-gray-400"
+          }
+        `}
+              onClick={() => {
+                if (userWorkspaceRole === "Researcher Admin") {
+                  handleDeleteMember(member.memberId);
+                }
+              }}
+              disabled={userWorkspaceRole !== "Researcher Admin"}
+            >
+              Remove user
+            </button>
+          )}
       </td>
     </tr>
   );
