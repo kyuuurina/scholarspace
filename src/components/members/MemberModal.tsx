@@ -77,16 +77,22 @@ const MemberModal: React.FC<MemberModalProps> = ({
         <div>
           <div className="flex">
             <div className="flex">
-              <input
-                id="email"
-                className="block w-full rounded-sm"
-                {...register("email", { required: true })}
-              />
-              <Select
-                initialValue={"Researcher"}
-                options={["Researcher", "Researcher Admin", "Student"]}
-                onValueChange={handleRoleChange}
-              />
+              <div>
+                <label htmlFor="email">Email</label>
+                <input
+                  id="email"
+                  className="block w-full rounded-sm"
+                  {...register("email", { required: true })}
+                />
+              </div>
+              <div className="flex flex-col">
+                <label htmlFor="role">Role</label>
+                <Select
+                  initialValue={"Researcher"}
+                  options={["Researcher", "Researcher Admin", "Student"]}
+                  onValueChange={handleRoleChange}
+                />
+              </div>
             </div>
             {errorMessage === "User with this email does not exist." ? (
               <>
