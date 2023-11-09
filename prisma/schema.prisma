@@ -310,15 +310,12 @@ model user {
   name                                        String?
   avatar_url                                  String?
   email                                       String?
-
-  //non-auth fields
   chat_message_chat_message_receiver_idTouser chat_message[]   @relation("chat_message_receiver_idTouser")
   chat_message_chat_message_sender_idTouser   chat_message[]   @relation("chat_message_sender_idTouser")
+  likes                                       post_likes[]
   profile                                     profile[]
   research_post                               research_post[]
-  likes                                       post_likes[]
   workspace_user                              workspace_user[]
-
 
   @@schema("public")
 }
@@ -381,33 +378,32 @@ model project_users {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model research_post {
-  id          String   @id(map: "ResearchPosts_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  user_id     String   @db.Uuid
+  post_id     String       @id(map: "ResearchPosts_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id     String       @db.Uuid
   title       String
   author      String
-  document    String
-  description String
-  created_at  DateTime @default(now())
-  updated_at  DateTime @default(now())
+  document    String?
+  description String?
+  created_at  DateTime     @default(now())
+  updated_at  DateTime     @default(now())
   category    String?
-  user        user     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   likes       post_likes[]
+  user        user         @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@schema("public")
 }
 
 model post_likes {
-  user_id       String  @db.Uuid
-  post_id       String  @db.Uuid
-  like_status   Boolean @default(false)
-  user          user    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  research_post research_post @relation(fields: [post_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  like_status   Boolean       @default(false)
+  user_id       String        @db.Uuid
+  post_id       String        @db.Uuid
+  research_post research_post @relation(fields: [post_id], references: [post_id], onDelete: Cascade, onUpdate: NoAction)
+  user          user          @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@id([user_id, post_id])
-  @@index ([user_id])
-  @@index ([post_id])
+  @@index([user_id])
+  @@index([post_id])
   @@schema("public")
-
 }
 
 enum aal_level {
