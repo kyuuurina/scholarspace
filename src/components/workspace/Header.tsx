@@ -7,10 +7,14 @@ import { useRouter } from "next/router";
 type HeaderProps = {
   name: string;
   imgUrl: string;
-  purpose: "workspace" | "project";
+  purpose?: "workspace" | "project";
 };
 
-const Header: React.FC<HeaderProps> = ({ name, imgUrl, purpose }) => {
+const Header: React.FC<HeaderProps> = ({
+  name,
+  imgUrl,
+  purpose = "workspace",
+}) => {
   const router = useRouter();
   const id = router.query && router.query.id ? router.query.id.toString() : "";
   return (
