@@ -13,7 +13,7 @@ const profileRouter = router({
     // check if this user has a profile
     const profile = await ctx.prisma.profile.findFirst({
       where: {
-        userId,
+        user_id: userId,
       },
     });
 
@@ -56,7 +56,7 @@ const profileRouter = router({
       try {
         const profile = await prisma.profile.findUnique({
           where: {
-            id: profileId,
+            profile_id: profileId,
           },
         });
 
@@ -66,18 +66,18 @@ const profileRouter = router({
 
         const updatedProfile = await prisma.profile.update({
           where: {
-            id: profileId,
+            profile_id: profileId,
           },
           data: {
             name,
             avatar,
-            aboutMe,
+            about_me: aboutMe,
             skills,
             achievements,
             education,
-            researchExperience,
-            researchInterest,
-            collabStatus,
+            research_experience: researchExperience,
+            research_interest: researchInterest,
+            collab_status: collabStatus,
           },
         });
 
