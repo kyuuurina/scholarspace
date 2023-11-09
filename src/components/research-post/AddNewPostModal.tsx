@@ -54,9 +54,7 @@ const AddNewPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
   // schema for form validation, must follow "./types/researchpost.ts"
   const schema: ZodType<ResearchPostFormData> = z.object({
     category: z
-      .string()
-      .min(2, "Category must be at least 2 characters long.")
-      .max(100, "Category must be at most 100 characters long."),
+      .string(),
     title: z
       .string()
       .min(2, "Title must be at least 2 characters long.")
@@ -107,7 +105,8 @@ const AddNewPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
       setdocumentPlaceholder(null);
 
       // Navigate to the newly created post
-      await router.push(`/home-rwp/${response.id}`);
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      await router.push(`/home-rwp/${response.post_id}`);
       setIsSubmitting(false);
     } catch (error) {
       // Handle any errors
@@ -146,13 +145,28 @@ const AddNewPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
           reset();
           setdocumentPlaceholder(null);
         }}
-        title="Add New Post"
+        title="Edit Post"
       >
         <form
           autoComplete="off"
           className="flex flex-col gap-4"
           onSubmit={handleSubmit(onSubmit)}
         >
+          <div>
+            <label
+              htmlFor="category"
+              className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+            >
+              Category
+            </label>
+            <input
+              id="name"
+              className="block w-full"
+              {...register("category", { required: true })}
+            />
+            {errors.category && <FormErrorMessage text={errors.category.message} />}
+          </div>
+
           <div>
             <label
               htmlFor="research title"
@@ -176,7 +190,7 @@ const AddNewPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
               Author
             </label>
             <input
-              id="name"
+              id="author_name"
               className="block w-full"
               {...register("author", { required: true })}
             />
@@ -212,7 +226,7 @@ const AddNewPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
                 {documentPlaceholder ? (
                   <Image
                     src={documentPlaceholder}
-                    alt="cover image"
+                    alt="post documents"
                     style={{ objectFit: "contain" }}
                     fill
                   />

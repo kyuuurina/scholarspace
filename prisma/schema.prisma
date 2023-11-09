@@ -378,12 +378,12 @@ model project_users {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model research_post {
-  post_id          String   @id(map: "ResearchPosts_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  post_id     String   @id(map: "ResearchPosts_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   user_id     String   @db.Uuid
   title       String
   author      String
-  document    String
-  description String
+  document    String?
+  description String?
   created_at  DateTime @default(now())
   updated_at  DateTime @default(now())
   category    String?

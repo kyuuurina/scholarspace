@@ -2,19 +2,27 @@ import { api } from "./api";
 import { useRouterId } from "./routerId";
 import { postRouter } from "~/server/api/routers/researchpost";
 
+type ResearchPost = {
+  category: string;
+  title: string;
+  author: string;
+  description: string | null;
+  document: string | null;
+};
+
 export const useCreateResearchPost = () => {
   const id: string = useRouterId();
 
   const researchpost = api.researchpost.get.useQuery(
     {
-      id: id,
+      post_id: id,
     },
     {
       enabled: !!id,
     }
   );
 
-  const {  category, title, description, author,  document } =
+  const {  category, title, author, description, document } =
     researchpost.data || {};
 
   const { isLoading, error } = researchpost;
@@ -34,11 +42,16 @@ export const useCreateResearchPost = () => {
     error,
     imgUrl,
   };
-};
-
 
   return {
     error,
     isLoading,
   };
 };
+  
+};
+
+
+
+
+
