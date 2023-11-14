@@ -336,18 +336,18 @@ model chat_message {
 }
 
 model profile {
-  profile_id          String   @id(map: "Profile_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  user_id             String   @db.Uuid
+  profile_id          String          @id(map: "Profile_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id             String          @db.Uuid
   name                String
-  avatar              String
-  about_me            String
+  avatar              String?
+  about_me            String?
   skills              String[]
   achievements        String[]
   education           String[]
   research_experience String[]
   research_interest   String[]
-  collab_status       String[]
-  user                user     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  collab_status       collab_status[]
+  user                user            @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@schema("public")
 }
@@ -433,4 +433,11 @@ enum factor_type {
   webauthn
 
   @@schema("auth")
+}
+
+enum collab_status {
+  Open_For_Collaboration     @map("Open For Collaboration")
+  Not_Open_for_Collaboration @map("Not Open for Collaboration")
+
+  @@schema("public")
 }
