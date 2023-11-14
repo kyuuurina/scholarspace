@@ -336,18 +336,18 @@ model chat_message {
 }
 
 model profile {
-  profile_id          String   @id(map: "Profile_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  user_id             String   @db.Uuid
+  profile_id          String          @id(map: "Profile_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id             String          @db.Uuid
   name                String
-  avatar              String
-  about_me            String
+  avatar              String?
+  about_me            String?
   skills              String[]
   achievements        String[]
   education           String[]
   research_experience String[]
   research_interest   String[]
-  collab_status       String[]
-  user                user     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  collab_status       collab_status[]
+  user                user            @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@schema("public")
 }
@@ -386,7 +386,7 @@ model research_post {
   description String?
   created_at  DateTime     @default(now())
   updated_at  DateTime     @default(now())
-  category    String?
+  category    category?
   likes       post_likes[]
   user        user         @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
@@ -433,4 +433,24 @@ enum factor_type {
   webauthn
 
   @@schema("auth")
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum category {
+  Article
+  Conference_Paper  @map("Conference Paper")
+  Presentation
+  Preprint
+  Research_Proposal @map("Research Proposal")
+  Thesis
+  Others
+
+  @@schema("public")
+}
+
+enum collab_status {
+  Open_For_Collaboration     @map("Open For Collaboration")
+  Not_Open_for_Collaboration @map("Not Open for Collaboration")
+
+  @@schema("public")
 }
