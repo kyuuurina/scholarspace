@@ -386,7 +386,7 @@ model research_post {
   description String?
   created_at  DateTime     @default(now())
   updated_at  DateTime     @default(now())
-  category    String?
+  category    category?
   likes       post_likes[]
   user        user         @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
@@ -438,6 +438,19 @@ enum factor_type {
 enum collab_status {
   Open_For_Collaboration     @map("Open For Collaboration")
   Not_Open_for_Collaboration @map("Not Open for Collaboration")
+
+  @@schema("public")
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum category {
+  Article
+  Conference_Paper  @map("Conference Paper")
+  Presentation
+  Preprint
+  Research_Proposal @map("Research Proposal")
+  Thesis
+  Others
 
   @@schema("public")
 }
