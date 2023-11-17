@@ -52,7 +52,7 @@ const Project: NextPageWithLayout = () => {
         <div className="grid p-5 md:grid-cols-12 md:gap-x-5">
           {/* Left section of workspace dashboard */}
           <div className="w-full md:col-span-8">
-            <section className="bg-white dark:bg-gray-900">
+            <section className="bg-white">
               <div className="mx-auto max-w-screen-xl px-4 py-8 text-center lg:px-6 lg:py-16">
                 <dl className="mx-auto grid max-w-screen-md gap-8 text-gray-900 sm:grid-cols-3">
                   <div className="flex flex-col items-center justify-center">

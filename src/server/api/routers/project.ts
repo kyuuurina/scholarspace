@@ -71,6 +71,29 @@ export const projectRouter = router({
       return projects;
     }),
 
+  // get user role of a project
+  getProjectUserRole: protectedProcedure
+    .input(z.object({ project_id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const projectUser = await ctx.prisma.project_users.findUnique({
+        where: {
+          user_id_project_id: {
+            user_id: ctx.user.id,
+            project_id: input.project_id,
+          },
+        },
+      });
+
+      if (!projectUser) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You are not authorized to view this project",
+        });
+      }
+
+      return projectUser.project_role;
+    }),
+
   create: protectedProcedure
     .input(
       z.object({
@@ -167,5 +190,90 @@ export const projectRouter = router({
       });
 
       return project;
+    }),
+
+  leave: protectedProcedure
+    .input(z.object({ project_id: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      const projectUser = await ctx.prisma.project_users.findUnique({
+        where: {
+          user_id_project_id: {
+            user_id: ctx.user.id,
+            project_id: input.project_id,
+          },
+        },
+      });
+
+      // if user does not exists, throw an error
+      if (!projectUser) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "User does not exist in this project",
+        });
+      }
+
+      // if there's only one user left in the project, throw an error
+      const projectUsers = await ctx.prisma.project_users.findMany({
+        where: {
+          project_id: input.project_id,
+        },
+      });
+
+      if (projectUsers.length === 1) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You are the only user in this project",
+        });
+      }
+
+      await ctx.prisma.project_users.delete({
+        where: {
+          user_id_project_id: {
+            user_id: ctx.user.id,
+            project_id: input.project_id,
+          },
+        },
+      });
+
+      return true;
+    }),
+
+  delete: protectedProcedure
+    .input(z.object({ project_id: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      const projectUser = await ctx.prisma.project_users.findUnique({
+        where: {
+          user_id_project_id: {
+            user_id: ctx.user.id,
+            project_id: input.project_id,
+          },
+        },
+      });
+
+      console.log(projectUser);
+
+      // if user is not researcher admin, throw error
+      if (projectUser?.project_role !== "Researcher Admin") {
+        console.log(projectUser?.project_role);
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: `You are not authorized to delete this project ${projectUser?.project_role}`,
+        });
+      }
+
+      // delete all project_users record first
+      await ctx.prisma.project_users.deleteMany({
+        where: {
+          project_id: input.project_id,
+        },
+      });
+
+      await ctx.prisma.project.delete({
+        where: {
+          project_id: input.project_id,
+        },
+      });
+
+      return true;
     }),
 });

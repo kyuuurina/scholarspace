@@ -16,22 +16,20 @@ import type { ProjectFormData } from "~/types/project";
 import Layout from "~/components/layout/Layout";
 import Head from "~/components/layout/Head";
 import FormErrorMessage from "~/components/FormErrorMessage";
-import { DeleteWorkspaceModal } from "~/components/workspace/DeleteWorkspaceModal";
+import DeleteProjectModal from "~/components/project/DeleteProjectModal";
 import SuccessToast from "~/components/toast/SuccessToast";
 import ErrorToast from "~/components/toast/ErrorToast";
 import Header from "~/components/workspace/Header";
-import { useFetchWorkspace } from "~/utils/workspace";
-import LeaveModal from "~/components/modal/LeaveModal";
+import LeaveProjectModal from "~/components/project/LeaveProjectModal";
 import LoadingSpinner from "~/components/LoadingSpinner";
 import ErrorPage from "~/pages/error-page";
 
 // utils
-import { useGetWorkspaceRole } from "~/utils/userWorkspaces";
-import { useFetchProject } from "~/utils/project";
+import { useFetchProject, useFecthProjectRole } from "~/utils/project";
 
 const ProjectSettings: NextPageWithLayout = () => {
   // constants
-  const userWorkspaceRole = useGetWorkspaceRole();
+  const { data: projectRole } = useFecthProjectRole();
   const router = useRouter();
   const { id } = router.query;
   const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -107,29 +105,26 @@ const ProjectSettings: NextPageWithLayout = () => {
     });
   };
 
-  //   const renderLeaveWorkspace = () => {
-  //     if (canLeavePersonalWorkspace || canLeaveTeamWorkspace) {
-  //       return (
-  //         <div className="flex justify-between px-2 text-sm">
-  //           <div>
-  //             <p className="mb-1 font-medium">Leave Workspace</p>
-  //             <p className="font-normal">You will lose access to this project.</p>
-  //           </div>
-  //           <button
-  //             type="button"
-  //             className="w-auto rounded-sm border border-gray-700 p-2 text-center text-sm font-medium text-gray-700 hover:bg-gray-800 hover:text-white focus:outline-none"
-  //             onClick={() => setLeaveModalIsOpen(true)}
-  //           >
-  //             Leave Workspace
-  //           </button>
-  //         </div>
-  //       );
-  //     }
-  //     return null;
-  //   };
+  const renderLeaveWorkspace = () => {
+    return (
+      <div className="flex justify-between px-2 text-sm">
+        <div>
+          <p className="mb-1 font-medium">Leave Workspace</p>
+          <p className="font-normal">You will lose access to this project.</p>
+        </div>
+        <button
+          type="button"
+          className="w-auto rounded-sm border border-gray-700 p-2 text-center text-sm font-medium text-gray-700 hover:bg-gray-800 hover:text-white focus:outline-none"
+          onClick={() => setLeaveModalIsOpen(true)}
+        >
+          Leave Workspace
+        </button>
+      </div>
+    );
+  };
 
   const renderDeleteProject = () => {
-    if (userWorkspaceRole === "Researcher Admin") {
+    if (projectRole === "Researcher Admin") {
       return (
         <div className="flex flex-col rounded-sm bg-red-50 p-6 text-sm text-red-800">
           <div className="flex">
@@ -158,7 +153,7 @@ const ProjectSettings: NextPageWithLayout = () => {
                 className="w-auto rounded-sm border border-red-700 p-2 text-center text-sm font-medium text-red-700 hover:bg-red-800 hover:text-white focus:outline-none"
                 onClick={() => setModalIsOpen(true)}
               >
-                Delete Workspace
+                Delete Project
               </button>
             </div>
           </div>
@@ -179,13 +174,13 @@ const ProjectSettings: NextPageWithLayout = () => {
   return (
     <>
       <Head title={name ? `${name} Settings` : "Settings"} />
-      <LeaveModal
+      <LeaveProjectModal
         openModal={leaveModalIsOpen}
         onClick={() => setLeaveModalIsOpen(false)}
         name={name}
         id={id as string}
       />
-      <DeleteWorkspaceModal
+      <DeleteProjectModal
         openModal={modalIsOpen}
         onClick={() => setModalIsOpen(false)}
         name={name}
@@ -262,6 +257,7 @@ const ProjectSettings: NextPageWithLayout = () => {
                 <h5 className="text-xl font-medium text-gray-900">
                   Danger Zone
                 </h5>
+                {renderLeaveWorkspace()}
                 {renderDeleteProject()}
               </form>
             </section>

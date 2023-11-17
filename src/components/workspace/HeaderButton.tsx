@@ -6,13 +6,10 @@ import { useRouterId } from "~/utils/routerId";
 
 type HeaderButtonProps = {
   type: "members" | "settings";
-  purpose?: "workspace" | "project";
+  purpose: "workspace" | "project";
 };
 
-const HeaderButton: React.FC<HeaderButtonProps> = ({
-  type,
-  purpose = "workspace",
-}) => {
+const HeaderButton: React.FC<HeaderButtonProps> = ({ type, purpose }) => {
   const id = useRouterId();
 
   let icon = null;

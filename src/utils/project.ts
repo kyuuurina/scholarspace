@@ -22,8 +22,15 @@ export const useFetchProject = () => {
     }
   );
 
-  const { name, description, cover_img, c_score, p_score, users } =
-    project.data || {};
+  const {
+    name,
+    description,
+    cover_img,
+    c_score,
+    p_score,
+    users,
+    workspace_id,
+  } = project.data || {};
 
   let imgUrl = "";
   if (cover_img) {
@@ -42,6 +49,7 @@ export const useFetchProject = () => {
     isLoading,
     error,
     cover_img,
+    workspace_id,
   };
 };
 
@@ -79,4 +87,25 @@ export const useFetchWorkspaceProjects = () => {
     });
   }
   return workspaceProjects;
+};
+
+export const useFecthProjectRole = () => {
+  const id: string = useRouterId();
+
+  const projectRole = api.project.getProjectUserRole.useQuery(
+    {
+      project_id: id,
+    },
+    {
+      enabled: !!id,
+    }
+  );
+
+  const { isLoading, error, data } = projectRole;
+
+  return {
+    data,
+    isLoading,
+    error,
+  };
 };
