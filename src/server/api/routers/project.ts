@@ -91,7 +91,11 @@ export const projectRouter = router({
         });
       }
 
-      return projectUser.project_role;
+      // return project role and is_external_collaborator
+      return {
+        project_role: projectUser.project_role,
+        is_external_collaborator: projectUser.is_external_collaborator,
+      };
     }),
 
   create: protectedProcedure
@@ -257,7 +261,7 @@ export const projectRouter = router({
         console.log(projectUser?.project_role);
         throw new TRPCError({
           code: "UNAUTHORIZED",
-          message: `You are not authorized to delete this project ${projectUser?.project_role}`,
+          message: "You are not authorized to delete this project",
         });
       }
 

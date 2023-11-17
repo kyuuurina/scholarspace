@@ -44,12 +44,7 @@ const DeleteProjectModal: React.FC<ModalProps> = ({
     } finally {
       setIsDeleting(false);
       // go to workspace dashboard
-      if (workspace_id !== undefined) {
-        void router.push(`/workspace/${workspace_id}`);
-      } else {
-        // Handle the case where workspace_id is undefined, e.g., provide a default value or throw an error.
-        void router.push(`/`);
-      }
+      void router.push(`/workspace/${workspace_id ?? "/"}`);
       toast.custom(() => <SuccessToast message="Project deleted" />);
     }
   };

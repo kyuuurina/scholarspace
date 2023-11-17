@@ -29,7 +29,7 @@ import { useFetchProject, useFecthProjectRole } from "~/utils/project";
 
 const ProjectSettings: NextPageWithLayout = () => {
   // constants
-  const { data: projectRole } = useFecthProjectRole();
+  const { project_role, is_external_collaborator } = useFecthProjectRole();
   const router = useRouter();
   const { id } = router.query;
   const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -106,25 +106,27 @@ const ProjectSettings: NextPageWithLayout = () => {
   };
 
   const renderLeaveWorkspace = () => {
-    return (
-      <div className="flex justify-between px-2 text-sm">
-        <div>
-          <p className="mb-1 font-medium">Leave Workspace</p>
-          <p className="font-normal">You will lose access to this project.</p>
+    if (!is_external_collaborator) {
+      return (
+        <div className="flex justify-between px-2 text-sm">
+          <div>
+            <p className="mb-1 font-medium">Leave Workspace</p>
+            <p className="font-normal">You will lose access to this project.</p>
+          </div>
+          <button
+            type="button"
+            className="w-auto rounded-sm border border-gray-700 p-2 text-center text-sm font-medium text-gray-700 hover:bg-gray-800 hover:text-white focus:outline-none"
+            onClick={() => setLeaveModalIsOpen(true)}
+          >
+            Leave Workspace
+          </button>
         </div>
-        <button
-          type="button"
-          className="w-auto rounded-sm border border-gray-700 p-2 text-center text-sm font-medium text-gray-700 hover:bg-gray-800 hover:text-white focus:outline-none"
-          onClick={() => setLeaveModalIsOpen(true)}
-        >
-          Leave Workspace
-        </button>
-      </div>
-    );
+      );
+    }
   };
 
   const renderDeleteProject = () => {
-    if (projectRole === "Researcher Admin") {
+    if (project_role === "Researcher Admin") {
       return (
         <div className="flex flex-col rounded-sm bg-red-50 p-6 text-sm text-red-800">
           <div className="flex">

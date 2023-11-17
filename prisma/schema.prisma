@@ -306,16 +306,15 @@ model workspace_user {
 }
 
 model user {
-  id                                          String           @id @db.Uuid
-  name                                        String?
-  avatar_url                                  String?
-  email                                       String?
-  chat_message_chat_message_receiver_idTouser chat_message[]   @relation("chat_message_receiver_idTouser")
-  chat_message_chat_message_sender_idTouser   chat_message[]   @relation("chat_message_sender_idTouser")
-  post_likes                                  post_likes[]
-  profile                                     profile[]
-  research_post                               research_post[]
-  workspace_user                              workspace_user[]
+  id             String           @id @db.Uuid
+  name           String?
+  avatar_url     String?
+  email          String?
+  chat_message   chat_message[]
+  post_likes     post_likes[]
+  profile        profile[]
+  research_post  research_post[]
+  workspace_user workspace_user[]
 
   @@schema("public")
 }
@@ -323,31 +322,29 @@ model user {
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model chat_message {
-  id                                  String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  sender_id                           String   @db.Uuid
-  receiver_id                         String   @db.Uuid
-  message                             String?
-  created_at                          DateTime @default(now()) @db.Timestamptz(6)
-  is_read                             Boolean? @default(false)
-  user_chat_message_receiver_idTouser user     @relation("chat_message_receiver_idTouser", fields: [receiver_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  user_chat_message_sender_idTouser   user     @relation("chat_message_sender_idTouser", fields: [sender_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id    String   @db.Uuid
+  content    String?
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  is_read    Boolean? @default(false)
+  user       user     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@schema("public")
 }
 
 model profile {
-  profile_id          String   @id(map: "Profile_pkey") @db.Uuid
-  user_id             String   @db.Uuid
+  profile_id          String          @id(map: "Profile_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id             String          @db.Uuid
   name                String
-  avatar              String
-  about_me            String
+  avatar              String?
+  about_me            String?
   skills              String[]
   achievements        String[]
   education           String[]
   research_experience String[]
   research_interest   String[]
-  collab_status       String[]
-  user                user     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  collab_status       collab_status[]
+  user                user            @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@schema("public")
 }
@@ -368,9 +365,10 @@ model project {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model project_users {
-  user_id      String @db.Uuid
-  project_id   String @db.Uuid
-  project_role String
+  user_id                  String  @db.Uuid
+  project_id               String  @db.Uuid
+  project_role             String
+  is_external_collaborator Boolean @default(false)
 
   @@id([user_id, project_id])
   @@schema("public")
@@ -378,15 +376,15 @@ model project_users {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model research_post {
-  id          String       @id(map: "ResearchPosts_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  post_id     String       @id(map: "ResearchPosts_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   user_id     String       @db.Uuid
   title       String
   author      String
-  document    String
-  description String
+  document    String?
+  description String?
   created_at  DateTime     @default(now())
   updated_at  DateTime     @default(now())
-  category    String?
+  category    category?
   likes       post_likes[]
   user        user         @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
@@ -397,7 +395,7 @@ model post_likes {
   like_status   Boolean       @default(false)
   user_id       String        @db.Uuid
   post_id       String        @db.Uuid
-  research_post research_post @relation(fields: [post_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  research_post research_post @relation(fields: [post_id], references: [post_id], onDelete: Cascade, onUpdate: NoAction)
   user          user          @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@id([user_id, post_id])
@@ -433,4 +431,24 @@ enum factor_type {
   webauthn
 
   @@schema("auth")
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum category {
+  Article
+  Conference_Paper  @map("Conference Paper")
+  Presentation
+  Preprint
+  Research_Proposal @map("Research Proposal")
+  Thesis
+  Others
+
+  @@schema("public")
+}
+
+enum collab_status {
+  Open_For_Collaboration     @map("Open For Collaboration")
+  Not_Open_for_Collaboration @map("Not Open for Collaboration")
+
+  @@schema("public")
 }

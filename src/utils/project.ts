@@ -104,7 +104,8 @@ export const useFecthProjectRole = () => {
   const { isLoading, error, data } = projectRole;
 
   return {
-    data,
+    project_role: data?.project_role,
+    is_external_collaborator: data?.is_external_collaborator,
     isLoading,
     error,
   };
