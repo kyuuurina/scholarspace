@@ -198,6 +198,50 @@ export const workspaceRouter = router({
           },
         });
 
+        const projects = await ctx.prisma.project.findMany({
+          where: {
+            workspace_id: workspaceId,
+          },
+        });
+        
+        if (projects?.length > 0) {
+          for (const project of projects) {
+            // Check if the user is already a member of the project
+            const existingProjectUser = await ctx.prisma.project_users.findFirst({
+              where: {
+                project_id: project.project_id,
+                user_id: user.id,
+              },
+            });
+        
+            if (!existingProjectUser) {
+              // Proceed with creating the project_users record
+              await ctx.prisma.project_users.create({
+                data: {
+                  project_id: project.project_id,
+                  user_id: user.id,
+                  project_role: role,
+                  is_external_collaborator: true,
+                },
+              });
+            } else {
+              // Update the existing project_users record
+              await ctx.prisma.project_users.update({
+                where: {
+                  user_id_project_id: {
+                    project_id: project.project_id,
+                    user_id: user.id,
+                  },
+                },
+                data: {
+                  project_role: role,
+                  is_external_collaborator: false, // Update is_external_collaborator to false
+                },
+              });
+            }
+          }
+        }        
+        
         return workspaceUser;
       } catch (error) {
         if (error instanceof Error) {
@@ -306,6 +350,26 @@ export const workspaceRouter = router({
           code: "UNAUTHORIZED",
           message: "You are not authorized to perform this action.",
         });
+      }
+
+      // remove workspace member from other projects as well
+      const projects = await ctx.prisma.project.findMany({
+        where: {
+          workspace_id: workspaceId,
+        },
+      });
+
+      if (projects?.length > 0) {
+        for (const project of projects) {
+          await ctx.prisma.project_users.delete({
+            where: {
+              user_id_project_id: {
+                project_id: project.project_id,
+                user_id: userId,
+              },
+            },
+          });
+        }
       }
 
       const workspaceUser = await ctx.prisma.workspace_user.delete({

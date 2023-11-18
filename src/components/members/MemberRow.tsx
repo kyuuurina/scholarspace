@@ -10,7 +10,7 @@ type MemberRowProps = {
   handleDeleteMember: (memberId: string) => void;
   userWorkspaceRole: string | null | undefined;
   isPersonal: boolean | undefined;
-  ownerId: string | undefined | null;
+  ownerId?: string | undefined | null;
 };
 
 const MemberRow: React.FC<MemberRowProps> = ({

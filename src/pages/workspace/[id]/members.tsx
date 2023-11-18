@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import { FiUserPlus } from "react-icons/fi";
 
 // local components
+import Head from "~/components/layout/Head";
 import Layout from "~/components/layout/Layout";
 import Header from "~/components/workspace/Header";
 import MemberModal from "~/components/members/MemberModal";
@@ -58,7 +59,7 @@ const Members: NextPageWithLayout = () => {
     },
   });
 
-  const onSubmit = async (data: { email: string, role: string }) => {
+  const onSubmit = async (data: { email: string; role: string }) => {
     try {
       await addMember.mutateAsync({
         workspaceId: workspaceId,
@@ -129,6 +130,7 @@ const Members: NextPageWithLayout = () => {
   return (
     <>
       {/* add member modal */}
+      <Head title={name} />
       <MemberModal
         openModal={modalIsOpen}
         onClose={() => setModalIsOpen(false)}
@@ -137,7 +139,7 @@ const Members: NextPageWithLayout = () => {
       />
 
       <main className="min-h-screen w-full">
-        <Header name={name || ""} imgUrl={imgUrl} purpose="workspace"/>
+        <Header name={name || ""} imgUrl={imgUrl} purpose="workspace" />
         <div className="p-5">
           <div className="relative overflow-x-auto rounded-lg shadow-md">
             {/* search and add member section  */}
