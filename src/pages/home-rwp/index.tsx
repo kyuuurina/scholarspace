@@ -21,7 +21,7 @@ import Head from "~/components/layout/Head";
 import Link from "next/link";
 
 import Card from "~/components/Card";
-import AvatarPlaceholder from "~/components/AvatarPlaceholder";
+import AvatarPlaceholder from "~/components/avatar/AvatarPlaceholder";
 import Modal from "~/components/modal/Modal";
 
 //research post components
@@ -34,8 +34,6 @@ import TestModal from "~/components/research-post/AddNewPostModal";
 //import { NewPostModal } from "~/components/draft/NewPostModal";
 //import NewPostForm from "~/components/draft/NewPostForm";
 
-
-
 const ResearchPostsPage: NextPageWithLayout = () => {
   const users = [
     { id: 1, name: "John Doe" },
@@ -46,13 +44,15 @@ const ResearchPostsPage: NextPageWithLayout = () => {
     {
       title: "Post 1",
       author: "John Doe",
-      description: "This is the first post. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+      description:
+        "This is the first post. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
       timestamp: "October 26, 2023",
     },
     {
       title: "Post 2",
       author: "Jane Doe",
-      description: "This is the second post. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+      description:
+        "This is the second post. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
       timestamp: "October 27, 2023",
     },
   ];

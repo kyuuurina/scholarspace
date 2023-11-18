@@ -20,7 +20,26 @@ export const workspaceRouter = router({
         });
       }
 
-      return workspace;
+      const workspaceUsers = await ctx.prisma.workspace_user.findMany({
+        where: {
+          workspaceid: workspace.id,
+        },
+        include: {
+          user: true,
+        },
+      });
+
+      const users = await Promise.all(
+        workspaceUsers.map((workspaceUser) =>
+          ctx.prisma.user.findUnique({
+            where: {
+              id: workspaceUser.userid,
+            },
+          })
+        )
+      );
+
+      return { ...workspace, users };
     }),
 
   listUserWorkspaces: protectedProcedure.query(async ({ ctx }) => {
@@ -203,17 +222,18 @@ export const workspaceRouter = router({
             workspace_id: workspaceId,
           },
         });
-        
+
         if (projects?.length > 0) {
           for (const project of projects) {
             // Check if the user is already a member of the project
-            const existingProjectUser = await ctx.prisma.project_users.findFirst({
-              where: {
-                project_id: project.project_id,
-                user_id: user.id,
-              },
-            });
-        
+            const existingProjectUser =
+              await ctx.prisma.project_users.findFirst({
+                where: {
+                  project_id: project.project_id,
+                  user_id: user.id,
+                },
+              });
+
             if (!existingProjectUser) {
               // Proceed with creating the project_users record
               await ctx.prisma.project_users.create({
@@ -240,8 +260,8 @@ export const workspaceRouter = router({
               });
             }
           }
-        }        
-        
+        }
+
         return workspaceUser;
       } catch (error) {
         if (error instanceof Error) {
