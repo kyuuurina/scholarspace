@@ -77,7 +77,7 @@ const profileRouter = router({
             education,
             research_experience: researchExperience,
             research_interest: researchInterest,
-            collab_status: collabStatus,
+            // collab_status: collabStatus,
           },
         });
 

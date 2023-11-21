@@ -93,17 +93,21 @@ const AddNewPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
         const { data, error } = await supabase.storage
           .from("post-files-upload")
           .upload(fileUrl, documentValue);
-
+  
         console.log(error);
         console.log(data);
       }
       const response = await createResearchPost.mutateAsync({
-        ...formData,
+        category: formData.category as "Article" | "Conference_Paper" | "Presentation" | "Preprint" | "Research_Proposal" | "Thesis" | "Others",
+        title: formData.title,
+        description: formData.description,
+        author: formData.author,
+        document: formData.document,
       });
-      onClick();3
+      onClick();
       reset();
       setdocumentPlaceholder(null);
-
+  
       // Navigate to the newly created post
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       await router.push(`/home-rwp/${response.post_id}`);
@@ -112,7 +116,7 @@ const AddNewPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
       // Handle any errors
       console.error(error);
     }
-  };
+  };  
 
   // handler for onChange input for document upload
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
