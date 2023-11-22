@@ -1,8 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
+
+// to do: avatar and collab_status enum
+
 import { z } from "zod";
 import { router, protectedProcedure } from "~/server/api/trpc";
 import { PrismaClient } from "@prisma/client";
+
 
 const prisma = new PrismaClient();
 
@@ -27,36 +31,36 @@ const profileRouter = router({
   updateProfile: protectedProcedure
     .input(
       z.object({
-        profileId: z.string(),
+        profile_id: z.string(),
         name: z.string(),
-        avatar: z.string(),
-        aboutMe: z.string(),
-        skills: z.array(z.string()),
+        // avatar: z.string(),
+        about_me: z.string().nullable(),
+        skills: z.array(z.string()).nullable(),
         achievements: z.array(z.string()),
         education: z.array(z.string()),
-        researchExperience: z.array(z.string()),
-        researchInterest: z.array(z.string()),
-        collabStatus: z.array(z.string()),
+        research_experience: z.array(z.string()).nullable(),
+        research_interest: z.array(z.string()).nullable(),
+        collab_status: z.enum(['Open_For_Collaboration', 'Not_Open_For_Collaboration']),
       })
     )
     .mutation(async ({ input }) => {
       const {
-        profileId,
+        profile_id,
         name,
-        avatar,
-        aboutMe,
+        // avatar,
+        about_me,
         skills,
         achievements,
         education,
-        researchExperience,
-        researchInterest,
-        collabStatus,
+        research_experience,
+        research_interest,
+        collab_status,
       } = input;
 
       try {
         const profile = await prisma.profile.findUnique({
           where: {
-            profile_id: profileId,
+            profile_id: profile_id,
           },
         });
 
@@ -66,18 +70,19 @@ const profileRouter = router({
 
         const updatedProfile = await prisma.profile.update({
           where: {
-            profile_id: profileId,
+            profile_id: profile_id,
           },
           data: {
             name,
-            avatar,
-            about_me: aboutMe,
-            skills,
-            achievements,
-            education,
-            research_experience: researchExperience,
-            research_interest: researchInterest,
-            // collab_status: collabStatus,
+            // avatar,
+            about_me,
+            skills: skills ? { set: skills }: undefined, // Use Prisma set operation for arrays & accept nullable
+            achievements: achievements ? { set: achievements }: undefined ,
+            education: { set: education },
+            research_experience: research_experience ? { set: research_experience } : undefined,
+            research_interest: research_interest ? { set: research_interest } : undefined,
+            //collab_status: collab_status ? { set: [collab_status] } : undefined as collab_status[],
+            //collab_status: collab_status ? { set: [collab_status] as any } : undefined,
           },
         });
 

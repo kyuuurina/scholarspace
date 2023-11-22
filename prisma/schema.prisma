@@ -437,6 +437,13 @@ enum factor_type {
   @@schema("auth")
 }
 
+enum collab_status {
+  Open_For_Collaboration     @map("Open For Collaboration")
+  Not_Open_for_Collaboration @map("Not Open for Collaboration")
+
+  @@schema("public")
+}
+
 /// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 enum category {
   Article
@@ -446,13 +453,6 @@ enum category {
   Research_Proposal @map("Research Proposal")
   Thesis
   Others
-
-  @@schema("public")
-}
-
-enum collab_status {
-  Open_For_Collaboration     @map("Open For Collaboration")
-  Not_Open_for_Collaboration @map("Not Open for Collaboration")
 
   @@schema("public")
 }
