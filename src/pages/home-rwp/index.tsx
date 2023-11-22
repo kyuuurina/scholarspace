@@ -28,7 +28,7 @@ import Modal from "~/components/modal/Modal";
 import AllFollowingTabs from "~/components/research-post/AllFollowingTabs";
 import PostCard from "~/components/research-post/PostCard";
 import { ResearchPostCard } from "~/components/draft/ResearchPostCard";
-import UserProfileCard from "~/components/research-post/UserRecCards";
+import UserRecCard from "~/components/research-post/UserRecCards";
 import AddNewPostButton from "~/components/research-post/AddNewPostButton";
 import TestModal from "~/components/research-post/AddNewPostModal";
 //import { NewPostModal } from "~/components/draft/NewPostModal";
@@ -90,14 +90,15 @@ const ResearchPostsPage: NextPageWithLayout = () => {
                 category={post.category}
                 author={post.author}
                 description={post.description}
-                timestamp={post.timestamp}
+                created_at=""
+                // timestamp={post.timestamp}
               />
             ))}
           </div>
         </div>
-        <div className="col-span-1">
-          <UserProfileCard users={users} />
-        </div>
+        {/* <div className="col-span-1">
+          <UserRecCard users={users} />
+        </div> */}
       </div>
     </div>
   );
