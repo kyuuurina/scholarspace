@@ -9,6 +9,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { v4 as uuidv4 } from "uuid";
 import { api } from "~/utils/api";
+import Link from "next/link";
+import Image from "next/image";
 import AvatarPlaceholder from "../AvatarPlaceholder";
 
 //types
@@ -34,7 +36,16 @@ const UserProfileCard: React.FC<UserProfileCardProps> = ({ profile }) => {
                         {profile.name}
                     </div>
                     <div className="text-sm font-medium text-center text-gray-500">
-                        {profile.about_me}
+                        {profile.about_me || "No description"}
+                    </div>
+                    <div className="text-sm font-medium text-center text-gray-500">
+                        {profile.skills}
+                    </div>
+                    <div className="text-sm font-medium text-center text-gray-500">
+                        {profile.education}
+                    </div>
+                    <div className="text-sm font-medium text-center text-gray-500">
+                        {profile.collab_status || null}
                     </div>
                 </div>
             </div>

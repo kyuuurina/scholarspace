@@ -15,7 +15,6 @@ type MiniUserCardProps = {
 const MiniUserCard: React.FC<MiniUserCardProps> = ({ otherUser }) => {
     return (
         <Link
-            //href={`/project/${project.project_id}`}
             href={`/profile/${otherUser.profile_id}`}
             className="flex w-full items-center space-x-5 rounded-lg border border-gray-200 bg-white p-4 shadow hover:bg-gray-100"
         >
