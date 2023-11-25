@@ -8,7 +8,7 @@ type Profile = {
         user_id: string;
         name: string | null;
         about_me: string | null;
-        //collab_status: 
+        collab_status: 'Open For Collaboration' | 'Not Open For Collaboration' | null;   //enum values
     }
 }
 
