@@ -1,3 +1,18 @@
+import { type } from 'os';
+import {api} from './api';
+import {useRouterId} from './routerId';
+
+type Profile = {
+    profile: {
+        profile_id: string;
+        user_id: string;
+        name: string | null;
+        about_me: string | null;
+        //collab_status: 
+    }
+}
+
+
 // import { api } from "./api";
 // import { useRouterId } from "./routerId";
 

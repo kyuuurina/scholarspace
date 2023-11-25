@@ -1,4 +1,4 @@
-//user input in ProfileForm.tsx
+//user input in UserProfileForm.tsx
 
 type ProfileFormData = {
     name: string;

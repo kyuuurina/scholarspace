@@ -7,7 +7,6 @@ import { z } from "zod";
 import { router, protectedProcedure } from "~/server/api/trpc";
 import { PrismaClient } from "@prisma/client";
 
-
 const prisma = new PrismaClient();
 
 const profileRouter = router({
@@ -33,7 +32,7 @@ const profileRouter = router({
       z.object({
         profile_id: z.string(),
         name: z.string(),
-        // avatar: z.string(),
+        avatar: z.string(),
         about_me: z.string().nullable(),
         skills: z.array(z.string()).nullable(),
         achievements: z.array(z.string()),
@@ -47,7 +46,7 @@ const profileRouter = router({
       const {
         profile_id,
         name,
-        // avatar,
+        avatar,
         about_me,
         skills,
         achievements,
@@ -74,11 +73,11 @@ const profileRouter = router({
           },
           data: {
             name,
-            // avatar,
+            avatar,
             about_me,
             skills: skills ? { set: skills }: undefined, // Use Prisma set operation for arrays & accept nullable
             achievements: achievements ? { set: achievements }: undefined ,
-            education: { set: education },
+            education: education ? { set: education }: undefined,
             research_experience: research_experience ? { set: research_experience } : undefined,
             research_interest: research_interest ? { set: research_interest } : undefined,
             //collab_status: collab_status ? { set: [collab_status] } : undefined as collab_status[],
