@@ -306,17 +306,16 @@ model workspace_user {
 }
 
 model user {
-  id                String              @id @db.Uuid
-  name              String?
-  avatar_url        String?
-  email             String?
-  chat_message      chat_message[]
-  likes             post_likes[]
-  profile           profile[]
-  profile_education profile_education[]
-  project_users     project_users[]
-  research_post     research_post[]
-  workspace_user    workspace_user[]
+  id             String           @id @db.Uuid
+  name           String?
+  avatar_url     String?
+  email          String?
+  chat_message   chat_message[]
+  likes          post_likes[]
+  profile        profile[]
+  project_users  project_users[]
+  research_post  research_post[]
+  workspace_user workspace_user[]
 
   @@schema("public")
 }
@@ -335,8 +334,8 @@ model chat_message {
 }
 
 model profile {
-  profile_id          String          @id(map: "Profile_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  user_id             String          @db.Uuid
+  profile_id          String              @id(map: "Profile_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id             String              @db.Uuid
   name                String
   avatar              String?
   about_me            String?
@@ -346,7 +345,8 @@ model profile {
   research_experience String[]
   research_interest   String[]
   collab_status       collab_status[]
-  user                user            @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user                user                @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  profile_education   profile_education[]
 
   @@schema("public")
 }
@@ -416,7 +416,7 @@ model profile_education {
   school_name  String?
   start_date   DateTime? @db.Date
   end_date     DateTime? @db.Date
-  user         user      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user         profile   @relation(fields: [user_id], references: [profile_id], onDelete: NoAction, onUpdate: NoAction)
 
   @@schema("public")
 }
