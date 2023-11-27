@@ -1,16 +1,17 @@
-import { type } from 'os';
-import {api} from './api';
-import {useRouterId} from './routerId';
+import { api } from './api';
+import { useRouterId } from './routerId';
 
 type Profile = {
     profile: {
-        profile_id: string;
-        user_id: string;
+        profileId: string;
+        userId: string;
         name: string | null;
-        about_me: string | null;
-        collab_status: 'Open For Collaboration' | 'Not Open For Collaboration' | null;   //enum values
+        aboutMe: string | null;
+        collabStatus: 'Open For Collaboration' | 'Not Open For Collaboration' | null;   //enum values
     }
 }
+
+
 
 // export const useFetchProfile = (profileId: string) => {
 //     const profile = api.profile.getProfile.useQuery(
@@ -34,7 +35,7 @@ type Profile = {
 // }
 
 
-
+//new
 
 // import { api } from "./api";
 // import { useRouterId } from "./routerId";
