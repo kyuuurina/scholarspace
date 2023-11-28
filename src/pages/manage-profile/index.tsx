@@ -14,6 +14,9 @@ import Layout from "~/components/layout/Layout";
 import UserProfileForm from "~/components/profile/UserProfileForm";
 import { FaEdit } from 'react-icons/fa';
 
+//components for advanced details
+import EducationCard from "~/components/profile/EducationCard";
+
 
 const ProfilePage: NextPageWithLayout = () => {
   const id = useRouterId();
@@ -23,6 +26,21 @@ const ProfilePage: NextPageWithLayout = () => {
   const handleEditClick = () => {
     setIsEditModalOpen(true);
   };
+
+  const educations = [
+    {
+      education_id: '1',
+      school_name: 'University of California, Irvine',
+      start_date: new Date('2016-09-01'),
+      end_date: new Date('2020-06-01'),
+    },
+    {
+      education_id: '2',
+      school_name: 'University of California, Irvine',
+      start_date: new Date('2016-09-01'),
+      end_date: new Date('2020-06-01'),
+    },
+  ];
 
   return (
     <>
@@ -37,6 +55,10 @@ const ProfilePage: NextPageWithLayout = () => {
               className="cursor-pointer"
               style={{ fontSize: '24px' }} // Adjust the icon size as needed
             />
+          </div>
+
+          <div>
+            <EducationCard educations = {educations} />
           </div>
         </div>
 
@@ -54,5 +76,6 @@ const ProfilePage: NextPageWithLayout = () => {
     </>
   );
 };
+
 
 export default ProfilePage;
