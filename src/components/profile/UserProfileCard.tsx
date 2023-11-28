@@ -41,9 +41,9 @@ const UserProfileCard: React.FC<UserProfileCardProps> = ({ profile }) => {
                     <div className="text-sm font-medium text-center text-gray-500">
                         {profile.skills}
                     </div>
-                    <div className="text-sm font-medium text-center text-gray-500">
+                    {/* <div className="text-sm font-medium text-center text-gray-500">
                         {profile.education}
-                    </div>
+                    </div> */}
                     <div className="text-sm font-medium text-center text-gray-500">
                         {profile.collab_status || null}
                     </div>
