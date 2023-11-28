@@ -1,11 +1,14 @@
-import { workspaceRouter } from "~/server/api/routers/workspace";
-import { memberRouter } from "~/server/api/routers/member";
-import { accountRouter } from "./routers/account";
 import { router } from "~/server/api/trpc";
-import { postRouter } from "~/server/api/routers/researchpost";
-import  profileRouter  from "./routers/profile";
+import { accountRouter } from "./routers/account";
 import { userRouter } from "./routers/user";
+import { workspaceRouter } from "~/server/api/routers/workspace";
 import { projectRouter } from "./routers/project";
+import { memberRouter } from "~/server/api/routers/member";
+import { postRouter } from "~/server/api/routers/researchpost";
+import  { profileRouter }  from "./routers/profile";
+import { educationRouter } from "./routers/education";
+
+
 
 /**
  * This is the primary router for your server.
@@ -17,6 +20,9 @@ export const appRouter = router({
   member: memberRouter,
   account: accountRouter,
   profile: profileRouter,
+  education: educationRouter,
+  //achievement: achievementRouter,
+  //experience: experienceRouter,
   researchpost: postRouter,
   user: userRouter,
   project: projectRouter,

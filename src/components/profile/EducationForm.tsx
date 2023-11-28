@@ -15,7 +15,6 @@ import type { ProfileEducationFormData } from "~/types/profile";
 
 // local components
 import FormErrorMessage from "../FormErrorMessage";
-import ProfileModal from "../draft/ProfileModal";
 import PrimaryButton from "../button/PrimaryButton";
 import SuccessToast from "../toast/SuccessToast";
 import ErrorToast from "../toast/ErrorToast";
