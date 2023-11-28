@@ -15,28 +15,6 @@ type Profile = {
 
 
 
-// export const useFetchProfile = (profileId: string) => {
-//     const profile = api.profile.getProfile.useQuery(
-//         {
-//             profile_id: profileId,
-//         },
-//         {
-//             enabled: !!profileId,
-//         }
-//     );
-
-//     const {profile_id, user_id, name, about_me, collab_status} = profile.data || {};
-
-//     const {isLoading, error} = profile;
-
-//     return {
-//         profile: {profile_id, user_id, name, about_me, collab_status},
-//         isLoading,
-//         error,
-//     };
-// }
-
-
 //new
 
 // import { api } from "./api";

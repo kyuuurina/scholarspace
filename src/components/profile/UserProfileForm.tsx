@@ -17,7 +17,7 @@ import type { ProfileFormData } from "~/types/profile";
 
 // local components
 import FormErrorMessage from "../FormErrorMessage";
-import ProfileModal from "./ProfileModal";
+import ProfileModal from "../draft/ProfileModal";
 import PrimaryButton from "../button/PrimaryButton";
 import SuccessToast from "../toast/SuccessToast";
 import ErrorToast from "../toast/ErrorToast";
@@ -27,6 +27,8 @@ type ProfileModalProps = {
   openModal: boolean;
   onClick: () => void;
 };
+
+
 
 // const CreateProfileForm: React.FC<ProfileModalProps> = ({ openModal, onClick }) => {
 //   const profile_id = useRouterId();
