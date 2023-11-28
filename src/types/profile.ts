@@ -21,12 +21,12 @@ type ProfileEducation = {
 
 type ProfileFormData = {
   name: string;
-  avatar?: string;
-  about_me?: string;
-  research_interest?: string[];
+  about_me?: string | null;
+  skills?: string[] | null;
+  research_interest?: string[] | null;
   collab_status?: "Open_For_Collaboration" | "Not_Open_for_Collaboration";
-  skills?: string[];
-  education?: ProfileEducationFormData[];
+  
+  //education?: ProfileEducationFormData[];
 };
 
 type ProfileEducationFormData = {

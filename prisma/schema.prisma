@@ -341,7 +341,7 @@ model profile {
   avatar            String?
   about_me          String?
   research_interest String[]
-  collab_status     collab_status[]
+  collab_status     collab_status?      @default(Not_Open_for_Collaboration)
   skills            String[]
   user              user                @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   profile_education profile_education[]
@@ -411,11 +411,11 @@ model post_likes {
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model profile_education {
   education_id String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  user_id      String    @db.Uuid
+  profile_id   String    @db.Uuid
   school_name  String?
   start_date   DateTime? @db.Date
   end_date     DateTime? @db.Date
-  user         profile   @relation(fields: [user_id], references: [profile_id], onDelete: NoAction, onUpdate: NoAction)
+  profile      profile   @relation(fields: [profile_id], references: [profile_id], onDelete: NoAction, onUpdate: NoAction)
 
   @@schema("public")
 }

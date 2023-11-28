@@ -1,17 +1,124 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+
 import { api } from './api';
 import { useRouterId } from './routerId';
 
-type Profile = {
-    profile: {
-        profileId: string;
-        userId: string;
+type User = {
+    user: {
+        id: string;
         name: string | null;
-        aboutMe: string | null;
-        skills: string[] | null;
-        researchInterest: string[] | null;
-        collabStatus: 'Open For Collaboration' | 'Not Open For Collaboration' | null;   //enum values
-    }
-}
+    };
+};
+
+type Profile = {
+    profile_id: string;
+    user_id: string;
+    name: string;
+    about_me?: string | null;
+    skills?: string[] | null;
+    research_interest?: string[] | null;
+    collab_status?: 'Open_For_Collaboration' | 'Not_Open_For_Collaboration'; // enum values
+};
+
+export const useFetchProfile = () => {
+    const id: string = useRouterId();
+
+    const profile = api.profile.get.useQuery(
+        {
+            profile_id: id,
+        },
+        {
+            enabled: !!id,
+        }
+    );
+
+    const {
+        profile_id,
+        user_id,
+        name,
+        about_me,
+        skills,
+        research_interest,
+        collab_status,
+    } = profile.data || {};
+
+    const { isLoading, error } = profile;
+
+    return {
+        name,
+        about_me,
+        skills,
+        research_interest,
+        collab_status,
+        isLoading,
+        error,
+        profile_id,
+        user_id,
+    };
+};
+
+
+// import { api } from './api';
+// import { useRouterId } from './routerId';
+
+// type User = {
+//     user: {
+//         id: string;
+//         name: string | null;
+//     }
+// }
+
+// type Profile = {
+//     profile_id: string;
+//     user_id: string;
+//     name: string;
+//     about_me?: string | null;
+//     skills?: string[] | null;
+//     research_interest?: string[] | null;
+//     collab_status?: 'Open_For_Collaboration' | 'Not_Open_For_Collaboration' | null;   //enum values
+
+// }
+
+// export const useFetchProfile = () => {
+//     const id: string = useRouterId();
+
+//     const profile = api.profile.get.useQuery(
+//         {
+//             profile_id: id,
+//         },
+//         {
+//             enabled: !!id,
+//         }
+//     );
+
+//     const {
+//         profile_id,
+//         user_id,
+//         name,
+//         about_me,
+//         skills,
+//         research_interest,
+//         collab_status,
+//     } = profile.data || {};
+
+//     const { isLoading, error } = profile;
+
+//     return {
+//         name,
+//         about_me,
+//         skills,
+//         research_interest,
+//         collab_status,
+//         isLoading,
+//         error,
+//         profile_id,
+//         user_id,
+//     };
+//     };
+//     )
+// };
 
 
 

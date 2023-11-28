@@ -27,14 +27,14 @@ type ModalProps = {
   };
 
   type EducationFormProps = {
-    onSubmit: (formData: EducationFormData[]) => void;
+    onSubmit: (formData: ProfileEducationFormData[]) => void;
   };
 
   const EducationForm: React.FC<EducationFormProps> = ({ onSubmit }) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showModal, setShowModal] = useState(false);
   
-    const schema: ZodType<ProfileProfileEducationFormData[]> = z.array(
+    const schema: ZodType<ProfileEducationFormData[]> = z.array(
       z.object({
         school_name: z.string().optional(),
         start_date: z.string().optional(),
