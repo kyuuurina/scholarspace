@@ -7,6 +7,8 @@ type Profile = {
         userId: string;
         name: string | null;
         aboutMe: string | null;
+        skills: string[] | null;
+        researchInterest: string[] | null;
         collabStatus: 'Open For Collaboration' | 'Not Open For Collaboration' | null;   //enum values
     }
 }
