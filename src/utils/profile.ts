@@ -1,14 +1,14 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+//add import in api.ts
 
 import { api } from './api';
 import { useRouterId } from './routerId';
 
 type User = {
+    userid: string;
     user: {
-        id: string;
         name: string | null;
+        email: string | null;
+        avatar_url: string | null;
     };
 };
 
@@ -20,6 +20,29 @@ type Profile = {
     skills?: string[] | null;
     research_interest?: string[] | null;
     collab_status?: 'Open_For_Collaboration' | 'Not_Open_For_Collaboration'; // enum values
+};
+
+type Education = {
+    education_id: string;
+    profile_id: string;
+    school_name: string;
+    start_date: Date;
+    end_date: Date;
+};
+
+type Experience = {
+    experience_id: string;
+    profile_id: string;
+    title: string;
+    start_date: Date;
+    end_date: Date;
+};
+
+type Achievement = {
+    achievement_id: string;
+    profile_id: string;
+    title: string;
+    received_date: Date;
 };
 
 export const useFetchProfile = () => {
@@ -58,6 +81,45 @@ export const useFetchProfile = () => {
         user_id,
     };
 };
+
+
+//fetch education
+export const useFetchProfileEducation = () => {
+    const id: string = useRouterId();
+
+    const education = api.education.getProfileEducation.useQuery(
+        {
+            profile_id: id,
+        },
+        {
+            enabled: !!id,
+        }
+    );
+
+    const { isLoading, error, data } = education;
+
+    //store education in an array
+    const profileEducation: {
+        education_id: string;
+        profile_id: string;
+        school_name: string;
+        start_date: Date;
+        end_date: Date;
+    }[] = data || [];
+
+    return {
+        isLoading,
+        error,
+        profileEducation,
+    };
+
+    // return {
+    //     isLoading,
+    //     error,
+    //     data,
+    // };
+};
+
 
 
 // import { api } from './api';

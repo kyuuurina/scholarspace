@@ -1,21 +1,36 @@
 //to-do: add loader
 
 //utils
-import { useRouterId } from "~/utils/routerId";
 import { useFetchProfile } from "~/utils/profile";
-import React, { useState } from 'react';
+import { useRouterId } from "~/utils/routerId";
+import React from 'react';
+
 
 // types
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "~/pages/_app";
+import {api} from "~/utils/api";
+
+//pages
+import ErrorPage from "~/pages/error-page";
 
 //local components
 import Layout from "~/components/layout/Layout";
-import UserProfileForm from "~/components/profile/UserProfileForm";
+import LoadingSpinner from "~/components/LoadingSpinner";
+import PrimaryButton from "~/components/button/PrimaryButton";
+import AvatarPlaceholder from "~/components/AvatarPlaceholder";
 import { FaEdit } from 'react-icons/fa';
 
-//components for advanced details
+import Image from 'next/image';
+import Link from 'next/link';
+import {useState} from 'react';
+
+//profile components
+import UserProfileCard from "~/components/research-post/UserRecCards";
+import UserProfileForm from "~/components/profile/UserProfileForm";
+import EducationForm from "~/components/profile/EducationForm";
 import EducationCard from "~/components/profile/EducationCard";
+
 
 
 const ProfilePage: NextPageWithLayout = () => {
@@ -60,6 +75,9 @@ const ProfilePage: NextPageWithLayout = () => {
           <div>
             <EducationCard educations = {educations} />
           </div>
+          <div>
+
+          </div>
         </div>
 
         {/* UserProfileForm modal */}
@@ -71,7 +89,7 @@ const ProfilePage: NextPageWithLayout = () => {
         )}
 
         {/* Additional content within the Scholarspace layout */}
-        <div>Profile Page</div>
+
       </Layout>
     </>
   );

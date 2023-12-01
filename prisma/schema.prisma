@@ -440,6 +440,7 @@ model profile_achievement {
   achievement_id String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   profile_id     String?  @db.Uuid
   received_date  DateTime @db.Date
+  title          String
   profile        profile? @relation(fields: [profile_id], references: [profile_id], onDelete: NoAction, onUpdate: NoAction)
 
   @@schema("public")
@@ -448,12 +449,12 @@ model profile_achievement {
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model profile_experience {
-  interest_id String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  profile_id  String?   @db.Uuid
-  title       String
-  start_date  DateTime? @db.Date
-  end_date    DateTime? @db.Date
-  profile     profile?  @relation(fields: [profile_id], references: [profile_id], onDelete: NoAction, onUpdate: NoAction)
+  experience_id String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  profile_id    String?   @db.Uuid
+  title         String
+  start_date    DateTime? @db.Date
+  end_date      DateTime? @db.Date
+  profile       profile?  @relation(fields: [profile_id], references: [profile_id], onDelete: NoAction, onUpdate: NoAction)
 
   @@schema("public")
 }
