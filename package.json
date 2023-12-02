@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.2",
+    "@huggingface/inference": "^2.6.4",
     "@prisma/client": "^5.3.1",
     "@supabase/auth-helpers-nextjs": "^0.7.4",
     "@supabase/auth-helpers-react": "^0.4.0",

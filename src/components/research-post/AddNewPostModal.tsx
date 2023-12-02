@@ -1,13 +1,18 @@
+/* eslint-disable @typescript-eslint/await-thenable */
+// AddNewPostModal.tsx
+
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import Image from "next/image";
-import { useRouter } from "next/router";
-import { type ZodType, z, set } from "zod";
+import { type ZodType, z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { v4 as uuidv4 } from "uuid";
 import { api } from "~/utils/api";
 import toast from "react-hot-toast";
+// import { HFAI } from "@huggingface/inference"; // Import Hugging Face Inference
+// import { summarizeText } from "~/utils/summarization";
+
 
 // types
 import type { ResearchPostFormData } from "~/types/researchpost";
@@ -18,6 +23,7 @@ import Modal from "../modal/Modal";
 import PrimaryButton from "../button/PrimaryButton";
 import SuccessToast from "../toast/SuccessToast";
 import ErrorToast from "../toast/ErrorToast";
+import router from "next/router";
 
 type ModalProps = {
   openModal: boolean;
@@ -25,23 +31,20 @@ type ModalProps = {
 };
 
 const AddNewPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
-
   // document variables
   const [documentPlaceholder, setdocumentPlaceholder] = useState<string | null>(null);
   const [documentValue, setdocumentValue] = useState<File | null | undefined>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const docpostId: string = uuidv4();
 
-  const router = useRouter();
-  const user = useUser();
   const supabase = useSupabaseClient();
-
+  //onst huggingface = new HFAI({ token: process.env.HUGGING_FACE_API_TOKEN }); // Initialize Hugging Face Inference
 
   // hot toast for success and error message
   const createResearchPost = api.researchpost.create.useMutation({
     onSuccess: () => {
       toast.custom(() => <SuccessToast message="Post successfully created" />);
-      router.reload();
+      // Reload the page or perform any necessary actions after successful submission
     },
     onError: (error) => {
       toast.custom(() => <ErrorToast message={error.toString()} />);
@@ -49,22 +52,13 @@ const AddNewPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
       reset();
     },
   });
-  
 
-  // schema for form validation, must follow "./types/researchpost.ts"
+  // schema for form validation
   const schema: ZodType<ResearchPostFormData> = z.object({
-    category: z
-      .string(),
-    title: z
-      .string()
-      .min(2, "Title must be at least 2 characters long.")
-      .max(200, "Title must be at most 200 characters long."),
-    description: z
-      .string(),
-    author: z
-    .string()
-    .min(2, "Author must be at least 2 characters long.")
-    .max(200, "Author must be at most 200 characters long."),
+    category: z.string(),
+    title: z.string().min(2, "Title must be at least 2 characters long.").max(200, "Title must be at most 200 characters long."),
+    description: z.string(),
+    author: z.string().min(2, "Author must be at least 2 characters long.").max(200, "Author must be at most 200 characters long."),
     document: z.string().nullable(),
   });
 
@@ -84,39 +78,48 @@ const AddNewPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
   // handler for onSubmit form
   const onSubmit = async (formData: ResearchPostFormData) => {
     if (isSubmitting) return;
+
     try {
       setIsSubmitting(true);
+
       // Upload the document to the "post-files-upload" storage bucket
-      if (documentValue && user) {
+      if (documentValue) {
         formData.document = docpostId;
         const fileUrl = `/${docpostId}`;
-        const { data, error } = await supabase.storage
-          .from("post-files-upload")
-          .upload(fileUrl, documentValue);
-  
+        const { data, error } = await supabase.storage.from("post-files-upload").upload(fileUrl, documentValue);
+
+        // Handle errors or log data if needed
         console.log(error);
         console.log(data);
       }
+
+      // Read the document content
+      const documentContent = await readFileContent(documentValue);
+
+      // Summarize the document content using Hugging Face Inference
+      const summary = await summarizeText(documentContent);
+
+      // Create the research post with the summary
       const response = await createResearchPost.mutateAsync({
         category: formData.category as "Article" | "Conference_Paper" | "Presentation" | "Preprint" | "Research_Proposal" | "Thesis" | "Others",
         title: formData.title,
-        description: formData.description,
+        description: summary, // Set the description to the generated summary
         author: formData.author,
         document: formData.document,
       });
+
+      // Reset form and state
       onClick();
       reset();
       setdocumentPlaceholder(null);
-  
+
       // Navigate to the newly created post
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       await router.push(`/home-rwp/${response.post_id}`);
       setIsSubmitting(false);
     } catch (error) {
-      // Handle any errors
       console.error(error);
     }
-  };  
+  };
 
   // handler for onChange input for document upload
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -140,6 +143,26 @@ const AddNewPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
     }
   };
 
+  // utility function to read the content of the uploaded document
+  const readFileContent = async (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+
+      reader.onload = (event) => {
+        if (event.target) {
+          const content = event.target.result as string;
+          resolve(content);
+        }
+      };
+
+      reader.onerror = (error) => {
+        reject(error);
+      };
+
+      reader.readAsText(file);
+    });
+  };
+
   return (
     <div>
       <Modal
@@ -151,89 +174,47 @@ const AddNewPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
         }}
         title="Add New Post"
       >
-        <form
-          autoComplete="off"
-          className="flex flex-col gap-4"
-          onSubmit={handleSubmit(onSubmit)}
-        >
+        <form autoComplete="off" className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
           <div>
-            <label
-              htmlFor="category"
-              className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-            >
+            <label htmlFor="category" className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
               Category
             </label>
-            <input
-              id="name"
-              className="block w-full"
-              {...register("category", { required: true })}
-            />
+            <input id="name" className="block w-full" {...register("category", { required: true })} />
             {errors.category && <FormErrorMessage text={errors.category.message} />}
           </div>
 
           <div>
-            <label
-              htmlFor="research title"
-              className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-            >
+            <label htmlFor="research title" className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
               Title
             </label>
-            <input
-              id="name"
-              className="block w-full"
-              {...register("title", { required: true })}
-            />
+            <input id="name" className="block w-full" {...register("title", { required: true })} />
             {errors.title && <FormErrorMessage text={errors.title.message} />}
           </div>
 
           <div>
-            <label
-              htmlFor="author"
-              className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-            >
+            <label htmlFor="author" className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
               Author
             </label>
-            <input
-              id="author_name"
-              className="block w-full"
-              {...register("author", { required: true })}
-            />
+            <input id="author_name" className="block w-full" {...register("author", { required: true })} />
             {errors.author && <FormErrorMessage text={errors.author.message} />}
-          </div>
-          
-          <div>
-            <label
-              htmlFor="description"
-              className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-            >
-              Description
-            </label>
-            <textarea
-              id="description"
-              className="block w-full"
-              {...register("description", { required: true })}
-            />
-            {errors.description && (
-              <FormErrorMessage text={errors.description.message} />
-            )}
           </div>
 
           <div>
-            <label
-              htmlFor="cImage"
-              className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-            >
+            <label htmlFor="description" className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+              Description
+            </label>
+            <textarea id="description" className="block w-full" {...register("description", { required: true })} />
+            {errors.description && <FormErrorMessage text={errors.description.message} />}
+          </div>
+
+          <div>
+            <label htmlFor="cImage" className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
               Upload a Research Document
             </label>
             <div className="flex w-full items-center justify-center">
               <label className="relative flex h-64 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 ">
                 {documentPlaceholder ? (
-                  <Image
-                    src={documentPlaceholder}
-                    alt="post documents"
-                    style={{ objectFit: "contain" }}
-                    fill
-                  />
+                  <Image src={documentPlaceholder} alt="post documents" style={{ objectFit: "contain" }} fill />
                 ) : (
                   <div className="flex flex-col items-center justify-center pb-6 pt-5">
                     <svg
@@ -252,18 +233,15 @@ const AddNewPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
                       />
                     </svg>
                     <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                      <span className="font-semibold">Click to upload</span> or
-                      drag and drop
+                      <span className="font-semibold">Click to upload</span> or drag and drop
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      .pdf, .rtf, .doc or .docx
-                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">.pdf, .rtf, .doc, or .docx</p>
                   </div>
                 )}
                 <input
                   type="file"
                   className="hidden"
-                  accept="image/pdf, image/doc, image/docx"   //define file types accepted
+                  accept="image/pdf, image/doc, image/docx" // Define file types accepted
                   onChange={(e) => {
                     void handleOnChange(e);
                   }}
@@ -280,3 +258,7 @@ const AddNewPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
 };
 
 export default AddNewPostModal;
+function summarizeText(documentContent: string) {
+  throw new Error("Function not implemented.");
+}
+
