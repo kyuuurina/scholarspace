@@ -315,9 +315,9 @@ model profile {
   name                String
   avatar              String?
   about_me            String?
-  research_interest   String[]
+  research_interest   String?
   collab_status       collab_status?        @default(Not_Open_for_Collaboration)
-  skills              String[]
+  skills              String?
   post_comments       post_comments[]
   post_likes          post_likes[]
   user                user                  @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -374,6 +374,7 @@ model project {
   c_score       Int             @default(0) @db.SmallInt
   p_score       Int             @default(0) @db.SmallInt
   cover_img     String?
+  phase         phase[]
   workspace     workspace       @relation(fields: [workspace_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   project_users project_users[]
 
@@ -394,7 +395,7 @@ model project_users {
 }
 
 model research_interests {
-  id   String @id(map: "researchInterests_pkey")
+  id   String @id(map: "researchInterests_pkey") @default("gen_random")
   name String
 
   @@schema("public")
@@ -430,6 +431,7 @@ model user {
   profile        profile[]
   project_users  project_users[]
   research_post  research_post[]
+  task           task[]
   workspace_user workspace_user[]
 
   @@schema("public")
@@ -458,6 +460,63 @@ model workspace_user {
   workspace       workspace @relation(fields: [workspaceid], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@id([workspaceid, userid])
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model phase {
+  id                  String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                String?
+  start_at            DateTime              @db.Date
+  end_at              DateTime?             @db.Date
+  project_id          String                @db.Uuid
+  project             project               @relation(fields: [project_id], references: [project_id], onDelete: Cascade, onUpdate: NoAction)
+  phase_property      phase_property[]
+  phase_property_task phase_property_task[]
+  task                task[]
+
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model phase_property {
+  id                  String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                String                @default("name")
+  type                String                @default("text")
+  phase_id            String                @db.Uuid
+  phase               phase                 @relation(fields: [phase_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  phase_property_task phase_property_task[]
+
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model phase_property_task {
+  id             BigInt         @id @default(autoincrement())
+  value          String
+  phase_id       String         @db.Uuid
+  task_id        String         @db.Uuid
+  property_id    String         @db.Uuid
+  phase          phase          @relation(fields: [phase_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  phase_property phase_property @relation(fields: [property_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  task           task           @relation(fields: [task_id], references: [id], onDelete: NoAction)
+
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model task {
+  id                  String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at          DateTime              @db.Date
+  name                String                @default("task")
+  description         String?
+  status              String                @default("pending")
+  assignees           String?               @db.Uuid
+  phase_id            String                @db.Uuid
+  phase_property_task phase_property_task[]
+  user                user?                 @relation(fields: [assignees], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  phase               phase                 @relation(fields: [phase_id], references: [id], onDelete: NoAction)
+
   @@schema("public")
 }
 

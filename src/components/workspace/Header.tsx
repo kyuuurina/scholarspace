@@ -37,6 +37,10 @@ const Header: React.FC<HeaderProps> = ({
         </h1>
       </Link>
       <div className="flex items-center gap-x-2">
+        {/* if purpose is project */}
+        {purpose === "project" && (
+          <HeaderButton purpose={purpose} type={"phases"} />
+        )}
         <HeaderButton purpose={purpose} type={"members"} />
         <HeaderButton purpose={purpose} type={"settings"} />
       </div>

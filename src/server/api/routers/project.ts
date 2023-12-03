@@ -154,6 +154,24 @@ export const projectRouter = router({
         )
       );
 
+      // add a phase to project
+      const phase = await ctx.prisma.phase.create({
+        data: {
+          name: "Default phase",
+          start_at: new Date(),
+          project_id: project.project_id,
+        },
+      });
+
+      // create a task for the phase
+      await ctx.prisma.task.create({
+        data: {
+          name: "Default task",
+          phase_id: phase.id,
+          created_at: new Date(),
+        },
+      });
+
       return project;
     }),
 
@@ -251,7 +269,7 @@ export const projectRouter = router({
 
       return members;
     }),
-  
+
   // add member to project
   addMember: protectedProcedure
     .input(
@@ -518,4 +536,4 @@ export const projectRouter = router({
 
       return true;
     }),
-  });
+});
