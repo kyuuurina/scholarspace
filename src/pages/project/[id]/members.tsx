@@ -203,7 +203,7 @@ const ProjectMember: NextPageWithLayout = () => {
             </div>
 
             {/* member table  */}
-            {/* <MemberTable
+            <MemberTable
               filteredMembers={filteredMembers}
               handleRoleChange={handleRoleChange}
               handleDeleteMember={handleDeleteMember}
