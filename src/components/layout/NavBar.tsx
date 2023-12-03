@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useUser } from "@supabase/auth-helpers-react";
 
 // local components
-import AvatarPlaceholder from "../AvatarPlaceholder";
+import AvatarPlaceholder from "../avatar/AvatarPlaceholder";
 import SignoutButton from "../auth/SignoutButton";
 
 type NavbarProps = {

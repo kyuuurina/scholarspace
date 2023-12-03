@@ -200,7 +200,7 @@ const Settings: NextPageWithLayout = () => {
       />
       <main className="min-h-screen w-full">
         {/* Workspace header */}
-        <Header name={name || ""} imgUrl={imgUrl} />
+        <Header name={name || ""} imgUrl={imgUrl} purpose="workspace" />
         <div className="p-5">
           {/* Update Workspace Section  */}
           <div className="grid gap-y-5">

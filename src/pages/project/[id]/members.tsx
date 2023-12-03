@@ -1,7 +1,16 @@
 // utils
 import { useRouterId } from "~/utils/routerId";
-import { useFetchProject } from "~/utils/project";
-import { useState } from "react";
+import {
+  useFetchProject,
+  useFetchProjectMembers,
+  useFecthProjectRole,
+} from "~/utils/project";
+import { useState, useEffect } from "react";
+import { api } from "~/utils/api";
+import toast from "react-hot-toast";
+import { FiUserPlus } from "react-icons/fi";
+
+import { useRouter } from "next/router";
 
 // types
 import type { ReactElement } from "react";
@@ -13,29 +22,123 @@ import ErrorPage from "~/pages/error-page";
 // components
 import Layout from "~/components/layout/Layout";
 import Image from "next/image";
-import Link from "next/link";
 import Head from "~/components/layout/Head";
 import Header from "~/components/workspace/Header";
-import Card from "~/components/Card";
-import AvatarPlaceholder from "~/components/AvatarPlaceholder";
-import ScoreChart from "~/components/chart/ScoreChart";
+import MemberModal from "~/components/members/MemberModal";
 import LoadingSpinner from "~/components/LoadingSpinner";
 import MemberTable from "~/components/members/MemberTable";
+import SuccessToast from "~/components/toast/SuccessToast";
+import ErrorToast from "~/components/toast/ErrorToast";
 
 const ProjectMember: NextPageWithLayout = () => {
-  const {
-    name,
-    description,
-    isLoading,
-    error,
-    imgUrl,
-    c_score,
-    p_score,
-    users,
-  } = useFetchProject();
+  const { name, description, isLoading, error, imgUrl, c_score, p_score } =
+    useFetchProject();
+
+  const { project_role } = useFecthProjectRole();
+
+  const { projectMembers } = useFetchProjectMembers();
+  const router = useRouter();
 
   const id = useRouterId();
   const [searchQuery, setSearchQuery] = useState("");
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+
+  // add member
+  const addMember = api.project.addMember.useMutation({
+    onSuccess: () => {
+      toast.custom(() => <SuccessToast message="Member added" />);
+      router.reload();
+    },
+  });
+
+  const onSubmit = async (data: { email: string; role: string }) => {
+    try {
+      await addMember.mutateAsync({
+        project_id: id,
+        email: data.email,
+        project_role: data.role,
+      });
+    } catch (error) {
+      console.error("Failed to add member:", error);
+    }
+  };
+
+  // add member error message from server
+  let addMemberErrorMsg = addMember.error?.message;
+  useEffect(() => {
+    addMemberErrorMsg = addMember.error?.message;
+  }, [addMember.error]);
+
+  // search bar functions
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(event.target.value);
+  };
+
+  const filteredMembers = projectMembers?.filter((member) => {
+    if (!member?.memberEmail) {
+      return; // Skip this member if it's null or undefined
+    }
+
+    let memberName = "";
+    if (member.memberName) {
+      memberName = member.memberName.toLowerCase();
+    }
+
+    const memberEmail = member.memberEmail.toLowerCase();
+    const query = searchQuery.toLowerCase();
+    return memberName.includes(query) || memberEmail.includes(query);
+  });
+
+  // update member role
+  const updateRole = api.project.updateMemberRole.useMutation({
+    onSuccess: () => {
+      toast.custom(() => <SuccessToast message="Member role updated" />);
+      router.reload();
+    },
+    onError: (error) => {
+      toast.custom(() => <ErrorToast message={error.message} />);
+    },
+  });
+
+  const handleRoleChange = (memberId: string, newRole: string) => {
+    updateRole
+      .mutateAsync({
+        project_id: id,
+        user_id: memberId,
+        project_role: newRole,
+      })
+      .then(() => {
+        router.reload();
+      })
+      .catch((error) => {
+        console.error("Failed to update member role:", error);
+      });
+  };
+
+  // delete member
+  const deleteMember = api.project.deleteMember.useMutation({
+    onSuccess: () => {
+      toast.custom(() => <SuccessToast message="Member removed" />);
+      router.reload();
+    },
+    onError: (error) => {
+      toast.custom(() => <ErrorToast message={error.message} />);
+    },
+  });
+
+  const handleDeleteMember = (memberId: string) => {
+    deleteMember
+      .mutateAsync({
+        project_id: id,
+        user_id: memberId,
+      })
+      .then(() => {
+        router.reload();
+      })
+      .catch((error) => {
+        console.error("Failed to delete member:", error);
+      });
+  };
 
   if (isLoading) {
     return <LoadingSpinner />;
@@ -45,29 +148,15 @@ const ProjectMember: NextPageWithLayout = () => {
     return <ErrorPage error={error.message} />;
   }
 
-  // search bar functions
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(event.target.value);
-  };
-
-  const filteredMembers = users?.filter((user) => {
-    if (!user?.email) {
-      return; // Skip this member if it's null or undefined
-    }
-
-    let memberName = "";
-    if (user.name) {
-      memberName = user.name.toLowerCase();
-    }
-
-    const memberEmail = user.email.toLowerCase();
-    const query = searchQuery.toLowerCase();
-    return memberName.includes(query) || memberEmail.includes(query);
-  });
-
   return (
     <>
       <Head title={name} />
+      <MemberModal
+        openModal={modalIsOpen}
+        onClose={() => setModalIsOpen(false)}
+        onSubmit={onSubmit}
+        addMemberError={addMemberErrorMsg}
+      />
       <main className="flex flex-col">
         {/* Project header */}
         <Header name={name || ""} imgUrl={imgUrl} purpose="project" />
@@ -100,7 +189,7 @@ const ProjectMember: NextPageWithLayout = () => {
                   onChange={handleSearch}
                 />
               </div>
-              {/* {workspaceRole.data === "Researcher Admin" && (
+              {project_role === "Researcher Admin" && (
                 <button
                   onClick={() => {
                     setModalIsOpen(true);
@@ -110,7 +199,7 @@ const ProjectMember: NextPageWithLayout = () => {
                   <FiUserPlus className="mr-2" />
                   Add Member
                 </button>
-              )} */}
+              )}
             </div>
 
             {/* member table  */}
@@ -118,10 +207,10 @@ const ProjectMember: NextPageWithLayout = () => {
               filteredMembers={filteredMembers}
               handleRoleChange={handleRoleChange}
               handleDeleteMember={handleDeleteMember}
-              userWorkspaceRole={workspaceRole.data}
-              isPersonal={is_personal}
-              ownerId={ownerid}
-            /> */}
+              userWorkspaceRole={project_role}
+              isPersonal={false}
+              ownerId={null}
+            />
           </div>
         </div>
       </main>

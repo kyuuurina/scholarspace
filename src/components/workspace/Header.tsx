@@ -1,4 +1,4 @@
-import AvatarPlaceholder from "../AvatarPlaceholder";
+import AvatarPlaceholder from "../avatar/AvatarPlaceholder";
 import HeaderButton from "./HeaderButton";
 import Image from "next/image";
 import Link from "next/link";

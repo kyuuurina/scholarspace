@@ -6,7 +6,7 @@ type MemberTableProps = {
   handleDeleteMember: (memberId: string) => void;
   userWorkspaceRole: string | null | undefined;
   isPersonal: boolean | undefined;
-  ownerId: string | undefined | null;
+  ownerId?: string | undefined | null;
 };
 
 const MemberTable: React.FC<MemberTableProps> = ({

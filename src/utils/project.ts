@@ -1,6 +1,16 @@
 import { api } from "./api";
 import { useRouterId } from "./routerId";
 
+type Member = {
+  user: {
+    id: string;
+    name: string | null;
+    email: string | null;
+    avatar_url: string | null;
+  };
+  project_role: string | null;
+};
+
 type Project = {
   project_id: string;
   name: string;
@@ -22,8 +32,15 @@ export const useFetchProject = () => {
     }
   );
 
-  const { name, description, cover_img, c_score, p_score, users } =
-    project.data || {};
+  const {
+    name,
+    description,
+    cover_img,
+    c_score,
+    p_score,
+    users,
+    workspace_id,
+  } = project.data || {};
 
   let imgUrl = "";
   if (cover_img) {
@@ -42,6 +59,7 @@ export const useFetchProject = () => {
     isLoading,
     error,
     cover_img,
+    workspace_id,
   };
 };
 
@@ -79,4 +97,68 @@ export const useFetchWorkspaceProjects = () => {
     });
   }
   return workspaceProjects;
+};
+
+export const useFecthProjectRole = () => {
+  const id: string = useRouterId();
+
+  const projectRole = api.project.getProjectUserRole.useQuery(
+    {
+      project_id: id,
+    },
+    {
+      enabled: !!id,
+    }
+  );
+
+  const { isLoading, error, data } = projectRole;
+
+  return {
+    project_role: data?.project_role,
+    is_external_collaborator: data?.is_external_collaborator,
+    isLoading,
+    error,
+  };
+};
+
+export const useFetchProjectMembers = () => {
+  const id: string = useRouterId();
+
+  const members = api.project.getProjectMembers.useQuery(
+    {
+      id,
+    },
+    {
+      enabled: !!id,
+    }
+  );
+
+  const { isLoading, error } = members;
+
+  // push member data into array
+  const projectMembers: {
+    memberId: string;
+    memberName: string | null;
+    memberEmail: string | null;
+    memberRole: string | null;
+    memberAvatarUrl: string | null; // Make it nullable to handle potential null values
+  }[] = [];
+
+  if (members.data) {
+    members.data.forEach((member: Member) => {
+      projectMembers.push({
+        memberId: member.user?.id,
+        memberName: member.user?.name,
+        memberEmail: member.user.email,
+        memberRole: member.project_role,
+        memberAvatarUrl: member.user.avatar_url,
+      });
+    });
+  }
+
+  return {
+    projectMembers,
+    error,
+    isLoading,
+  };
 };

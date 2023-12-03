@@ -1,6 +1,6 @@
 import type { Member } from "~/types/member";
 import Image from "next/image";
-import AvatarPlaceholder from "~/components/AvatarPlaceholder";
+import AvatarPlaceholder from "~/components/avatar/AvatarPlaceholder";
 import Select from "~/components/Select";
 import { getCookie } from "cookies-next";
 
@@ -10,7 +10,7 @@ type MemberRowProps = {
   handleDeleteMember: (memberId: string) => void;
   userWorkspaceRole: string | null | undefined;
   isPersonal: boolean | undefined;
-  ownerId: string | undefined | null;
+  ownerId?: string | undefined | null;
 };
 
 const MemberRow: React.FC<MemberRowProps> = ({
@@ -25,6 +25,7 @@ const MemberRow: React.FC<MemberRowProps> = ({
   const isPersonalOwner = member.memberId === ownerId && isPersonal;
   console.log(ownerId);
   console.log(member.memberId);
+
   return (
     <tr className="bg-white hover:bg-gray-50">
       <td className="flex items-center whitespace-nowrap px-6 py-4 font-medium text-gray-900">

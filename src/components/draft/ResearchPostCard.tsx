@@ -1,5 +1,5 @@
 import Link from "next/link";
-import AvatarPlaceholder from "../AvatarPlaceholder";
+import AvatarPlaceholder from "../avatar/AvatarPlaceholder";
 
 //Research Post Card wraps Avatar, Title, Details, Likes, Comments and Reposts
 export function ResearchPostCard() {
