@@ -19,6 +19,7 @@ const Avatar = (user: user): React.ReactNode => {
     return (
       <div key={user?.avatar_url} className="w-10 rounded-full">
         <AvatarPlaceholder name={user?.email || "SS"} />
+
       </div>
     );
   }

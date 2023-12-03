@@ -25,6 +25,7 @@ const MemberRow: React.FC<MemberRowProps> = ({
   const isPersonalOwner = member.memberId === ownerId && isPersonal;
   console.log(ownerId);
   console.log(member.memberId);
+
   return (
     <tr className="bg-white hover:bg-gray-50">
       <td className="flex items-center whitespace-nowrap px-6 py-4 font-medium text-gray-900">
