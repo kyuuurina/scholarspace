@@ -1,21 +1,25 @@
 // utils
 import { useRouterId } from "~/utils/routerId";
-import { FiLayout } from "react-icons/fi";
 import { useRouter } from "next/router";
 import { useFetchProject } from "~/utils/project";
+// import phases type from prisma client
 
 // types
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "~/pages/_app";
 import { api } from "~/utils/api";
+import type { phase } from "@prisma/client";
 
 // local components
 import Layout from "~/components/layout/Layout";
 import Head from "~/components/layout/Head";
 import PageLoader from "~/components/layout/PageLoader";
+import Header from "~/components/phase/Header";
+import Table from "~/components/phase/Table";
 
 import { useState, useEffect } from "react";
 import { set } from "zod";
+import PrimaryButton from "~/components/button/PrimaryButton";
 
 const Phase: NextPageWithLayout = () => {
   // get project id from router
@@ -33,9 +37,6 @@ const Phase: NextPageWithLayout = () => {
   // state to store the selected phase
   const [selectedPhase, setSelectedPhase] = useState("");
 
-  // states for isAdding button
-  const [isAdding, setIsAdding] = useState(false);
-
   // get phase from api
   const {
     data: phase,
@@ -49,40 +50,17 @@ const Phase: NextPageWithLayout = () => {
   const isLoading = phasesIsLoading || phaseIsLoading;
   const error = phasesError || phaseError;
 
-  const renderPhase = (phaseId: string) => {
+  const handleSelectPhase = (phaseId: string) => {
     // update the selected phase state
     setSelectedPhase(phaseId);
   };
-
-  // create phase
-  const createPhase = api.phase.create.useMutation();
-
-  // function to create phase with default name phase1
-  const handleCreatePhase = () => {
-    // if isAdding is true, then exit the function
-    if (isAdding) return;
-    else {
-      setIsAdding(true);
-      // await for createPhase to finish executing, then set isAdding to false
-      createPhase.mutate(
-        {
-          project_id: id,
-          name: "phase1",
-        },
-        {
-          onSuccess: () => {
-            setIsAdding(false);
-            router.reload();
-          },
-        }
-      );
-    }
-  };
+  const [safePhases, setSafePhases] = useState<phase[]>([]); // Replace 'phase' with the actual type of your phases
 
   useEffect(() => {
     // Set the default selected phase when the component mounts
     if (phases && phases.length > 0 && !selectedPhase) {
       // Ensure phase.data[0] is not undefined before accessing its properties
+      setSafePhases(phases);
       const firstPhase = phases[0];
       if (firstPhase) {
         setSelectedPhase(firstPhase.id);
@@ -95,40 +73,44 @@ const Phase: NextPageWithLayout = () => {
       <Head title={name} />
       <PageLoader isLoading={isLoading} errorMsg={error?.message}>
         <main className="flex flex-col">
-          {/* add phase button */}
-          <div className="flex justify-end">
-            <button
-              className="rounded-md border border-gray-300 bg-gray-200 p-2 hover:bg-gray-400"
-              onClick={() => handleCreatePhase()}
-            >
-              <div className="flex items-center">
-                <FiLayout />
-                <span className="ml-2 text-xs">Add Phase</span>
-              </div>
-            </button>
-          </div>
-          {/* render phases in a clickable button that renders a phase within the page */}
-          <div className="flex flex-wrap gap-2">
-            {phases?.map((phase) => (
-              <button
-                key={phase.id}
-                className="rounded-md border border-gray-300 bg-gray-200 p-2 hover:bg-gray-400"
-                onClick={() => renderPhase(phase.id)}
-              >
-                <div className="flex items-center">
-                  <FiLayout />
-                  <span className="ml-2 text-xs">{phase.name}</span>
-                </div>
-              </button>
-            ))}
-          </div>
+          {/* render header */}
+          <Header
+            phases={safePhases}
+            onSelectPhase={handleSelectPhase}
+            selectedPhase={selectedPhase}
+          />
 
-          {/* render selected phase */}
-          {selectedPhase && (
-            <div className="flex flex-col gap-2">
-              <h1 className="text-2xl font-bold">{phase?.name}</h1>
-            </div>
-          )}
+          {/* selected phase section */}
+          <section className="p-2">
+            {selectedPhase && (
+              <div className="relative space-y-4 overflow-hidden rounded-md bg-white px-6 py-2 shadow-sm">
+                <div className="flex flex-col items-center justify-between md:flex-row">
+                  <input
+                    type="text"
+                    className="block w-80 rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900"
+                    placeholder="Search for tasks"
+                  />
+                  <div className="flex justify-between space-x-2">
+                    <PrimaryButton
+                      name="Add Task"
+                      onClick={() => router.push(`/project/${id}/tasks/new`)}
+                    />
+                    <PrimaryButton
+                      name="Filter"
+                      onClick={() => router.push(`/project/${id}/tasks/new`)}
+                    />
+                    <PrimaryButton
+                      name="Sort"
+                      onClick={() => router.push(`/project/${id}/tasks/new`)}
+                    />
+                  </div>
+                </div>
+                <div className="overflow-x-auto">
+                  <Table />
+                </div>
+              </div>
+            )}
+          </section>
         </main>
       </PageLoader>
     </>
