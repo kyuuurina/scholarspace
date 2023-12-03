@@ -1,17 +1,21 @@
+// please do not use authorID as it will confuses me with the actual author column in the research_post table. cant we just use user_id instead of authorID?
+
 import Link from "next/link";
 import Image from "next/image";
 import React, { useState } from "react";
+import CategoryPills from "./CategoryPills";
 import { FiHeart, FiMessageSquare, FiRepeat, FiMoreHorizontal, FiEdit, FiTrash } from "react-icons/fi";
 import Comment from "~/components/research-post/Comment";
 
 import AvatarPlaceholder from "../AvatarPlaceholder";
 
 interface PostCardProps {
+
   title: string;
   category: string;
   author: string;
   description: string;
-  timestamp: string;
+  created_at: string;
 }
 
 const PostCard: React.FC<PostCardProps> = ({
@@ -19,7 +23,7 @@ const PostCard: React.FC<PostCardProps> = ({
   category,
   author,
   description,
-  timestamp,
+  created_at,
 }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -93,7 +97,7 @@ const PostCard: React.FC<PostCardProps> = ({
         <h3 className="text-lg font-bold">{title}</h3>
       </div>     
       <div className= "mt-2-flex items-center mb-4">
-        <p className="text-sm">Created on: {timestamp}</p>
+        <p className="text-sm">Created on: {created_at}</p>
       </div>
 
       <p className="mt-2 text-black">{description}</p>

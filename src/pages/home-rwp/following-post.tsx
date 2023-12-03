@@ -81,14 +81,15 @@ const FollowingPostPage: NextPageWithLayout = () => {
                 category={post.category}
                 author={post.author}
                 description={post.description}
-                timestamp={post.timestamp}
+                created_at=""
+                // timestamp={post.timestamp}
               />
             ))}
           </div>
         </div>
-        <div className="col-span-1">
+        {/* <div className="col-span-1">
           <UserProfileCard users={users} />
-        </div>
+        </div> */}
       </div>
     </div>
   );
