@@ -509,16 +509,3 @@ enum collab_status {
 
   @@schema("public")
 }
-
-/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-enum category {
-  Article
-  Conference_Paper  @map("Conference Paper")
-  Presentation
-  Preprint
-  Research_Proposal @map("Research Proposal")
-  Thesis
-  Others
-
-  @@schema("public")
-}
