@@ -4,6 +4,50 @@ import { TRPCError } from "@trpc/server";
 import { router, protectedProcedure, publicProcedure } from "~/server/api/trpc";
 
 export const phaseRouter = router({
+  get: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const { id } = input;
+
+      const phase = await ctx.prisma.phase.findUnique({
+        where: {
+          id,
+        },
+      });
+
+      if (!phase) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Phase not found" });
+      }
+
+      return phase;
+    }),
+
+  list: protectedProcedure
+    .input(
+      z.object({
+        project_id: z.string(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const { project_id } = input;
+
+      const phases = await ctx.prisma.phase.findMany({
+        where: {
+          project_id,
+        },
+      });
+
+      if (!phases) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Phase not found" });
+      }
+
+      return phases;
+    }),
+
   create: protectedProcedure
     .input(
       z.object({
