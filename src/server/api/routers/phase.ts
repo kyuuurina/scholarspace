@@ -52,8 +52,6 @@ export const phaseRouter = router({
     .input(
       z.object({
         name: z.string(),
-        start_at: z.date(),
-        end_at: z.date(),
         project_id: z.string(),
       })
     )
@@ -61,6 +59,7 @@ export const phaseRouter = router({
       const phase = await ctx.prisma.phase.create({
         data: {
           ...input,
+          start_at: new Date(),
         },
       });
 
