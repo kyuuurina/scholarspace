@@ -12,38 +12,38 @@ type User = {
     };
 };
 
-type Profile = {
-    profile_id: string;
-    user_id: string;
-    name: string;
-    about_me?: string | null;
-    skills?: string[] | null;
-    research_interest?: string[] | null;
-    collab_status?: 'Open_For_Collaboration' | 'Not_Open_For_Collaboration'; // enum values
-};
+// type Profile = {
+//     profile_id: string;
+//     user_id: string;
+//     name: string;
+//     about_me?: string | null;
+//     skills?: string[] | null;
+//     research_interest?: string[] | null;
+//     collab_status?: 'Open_For_Collaboration' | 'Not_Open_For_Collaboration'; // enum values
+// };
 
-type Education = {
-    education_id: string;
-    profile_id: string;
-    school_name: string;
-    start_date: Date;
-    end_date: Date;
-};
+// type Education = {
+//     education_id: string;
+//     profile_id: string;
+//     school_name: string;
+//     start_date: Date;
+//     end_date: Date;
+// };
 
-type Experience = {
-    experience_id: string;
-    profile_id: string;
-    title: string;
-    start_date: Date;
-    end_date: Date;
-};
+// type Experience = {
+//     experience_id: string;
+//     profile_id: string;
+//     title: string;
+//     start_date: Date;
+//     end_date: Date;
+// };
 
-type Achievement = {
-    achievement_id: string;
-    profile_id: string;
-    title: string;
-    received_date: Date;
-};
+// type Achievement = {
+//     achievement_id: string;
+//     profile_id: string;
+//     title: string;
+//     received_date: Date;
+// };
 
 export const useFetchProfile = () => {
     const id: string = useRouterId();

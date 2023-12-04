@@ -1,4 +1,4 @@
-//to-do: add PageLoader
+//Query all post created by user, if null, display "You have not created any post yet"
 
 import React from 'react';
 import {useState} from 'react';
@@ -32,7 +32,7 @@ import EducationCard from "~/components/profile/EducationCard";
 import Head from 'next/head';
 
 
-const ProfilePage: NextPageWithLayout = () => {
+const MyPost: NextPageWithLayout = () => {
   const id = useRouterId();
   const {
     name,
@@ -53,7 +53,7 @@ const ProfilePage: NextPageWithLayout = () => {
   );
 };
 
-ProfilePage.getLayout = function getLayout(page: ReactElement) {
+MyPost.getLayout = function getLayout(page: ReactElement) {
   return (
     <>
       <Layout>{page}</Layout>
@@ -61,52 +61,4 @@ ProfilePage.getLayout = function getLayout(page: ReactElement) {
   );
 };
 
-export default ProfilePage;
-
-//</>const ProfilePage: NextPageWithLayout = () => {
-//   const id = useRouterId();
-//   useFetchProfile();
-//   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-
-//   const handleEditClick = () => {
-//     setIsEditModalOpen(true);
-//   };
-
-
-//   return (
-//     <>
-//       {/* Scholarspace layout */}
-//       <Layout>
-//         <div>
-//           {/* Content to display profile information */}
-//           <div>
-//             {/* ... Display profile information here */}
-//             <FaEdit
-//               onClick={handleEditClick}
-//               className="cursor-pointer"
-//               style={{ fontSize: '24px' }} // Adjust the icon size as needed
-//             />
-//           </div>
-
-//           <div>
-
-//           </div>
-//         </div>
-
-//         {/* UserProfileForm modal */}
-//         {isEditModalOpen && (
-//           <UserProfileForm
-//             openModal={isEditModalOpen}
-//             onClick={() => setIsEditModalOpen(false)}
-//           />
-//         )}
-
-//         {/* Additional content within the Scholarspace layout */}
-
-//       </Layout>
-//     </>
-//   );
-// };
-
-
-// export default ProfilePage;
+export default MyPost;

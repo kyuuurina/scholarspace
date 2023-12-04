@@ -7,6 +7,8 @@ import { memberRouter } from "~/server/api/routers/member";
 import { postRouter } from "~/server/api/routers/researchpost";
 import  { profileRouter }  from "./routers/profile";
 import { educationRouter } from "./routers/education";
+import { experienceRouter } from "./routers/experience";
+import { achievementRouter } from "./routers/achievement";
 
 
 
@@ -21,8 +23,8 @@ export const appRouter = router({
   account: accountRouter,
   profile: profileRouter,
   education: educationRouter,
-  //achievement: achievementRouter,
-  //experience: experienceRouter,
+  achievement: achievementRouter,
+  experience: experienceRouter,
   researchpost: postRouter,
   user: userRouter,
   project: projectRouter,

@@ -82,7 +82,7 @@ export const SideBar: React.FC<SideBarProps> = ({ toggleSidebar, open }) => {
 
               <li className=" rounded-sm">
                 <Link
-                  href="/manage-profile"
+                  href="/"
                   className={`flex items-center space-x-3 rounded-md hover:bg-purple-800 ${
                     open ? "text-purple-accent-2" : "text-purple-accent-2"
                   }`}

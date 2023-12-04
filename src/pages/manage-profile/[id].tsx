@@ -24,7 +24,6 @@ import AvatarPlaceholder from "~/components/AvatarPlaceholder";
 import { FaEdit } from 'react-icons/fa';
 
 //profile components
-import ProfileTabs from '~/components/profile/ProfileTabs';
 import UserProfileCard from "~/components/research-post/UserRecCards";
 import UserProfileForm from "~/components/profile/UserProfileForm";
 import EducationForm from "~/components/profile/EducationForm";
@@ -46,9 +45,14 @@ const ProfilePage: NextPageWithLayout = () => {
   return (
     <>
       {/* <Head title={name} /> */}
-      {/* <PageLoader isLoading={isLoading} errorMsg={error?.message}> */}
-      <ProfileTabs />
-      {/* </PageLoader> */}
+      <PageLoader isLoading={isLoading} errorMsg={error?.message}>
+        
+      
+
+
+
+      {/* Tab */}
+      </PageLoader>
     </>
   );
 };
