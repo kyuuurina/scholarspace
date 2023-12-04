@@ -273,7 +273,7 @@ model users {
 }
 
 model research_interests {
-  id   String @id(map: "researchInterests_pkey")
+  id   String @id(map: "researchInterests_pkey") @default("gen_random")
   name String
 
   @@schema("public")
@@ -306,17 +306,20 @@ model workspace_user {
 }
 
 model user {
-  id             String           @id @db.Uuid
-  name           String?
-  avatar_url     String?
-  email          String?
-  chat_message   chat_message[]
-  post_comments  post_comments[]
-  likes          post_likes[]
-  profile        profile[]
-  project_users  project_users[]
-  research_post  research_post[]
-  workspace_user workspace_user[]
+  id                  String                @id @db.Uuid
+  name                String?
+  avatar_url          String?
+  email               String?
+  chat_message        chat_message[]
+  comment             comment[]
+  profile             profile[]
+  profile_achievement profile_achievement[]
+  profile_education   profile_education[]
+  profile_experience  profile_experience[]
+  project_users       project_users[]
+  research_post       research_post[]
+  task                task[]
+  workspace_user      workspace_user[]
 
   @@schema("public")
 }
@@ -335,18 +338,17 @@ model chat_message {
 }
 
 model profile {
-  profile_id          String                @id(map: "Profile_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  user_id             String                @db.Uuid
-  name                String
-  avatar              String?
-  about_me            String?
-  research_interest   String[]
-  collab_status       collab_status?        @default(Not_Open_for_Collaboration)
-  skills              String[]
-  user                user                  @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  profile_achievement profile_achievement[]
-  profile_education   profile_education[]
-  profile_experience  profile_experience[]
+  profile_id        String          @id(map: "Profile_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id           String          @db.Uuid
+  name              String
+  avatar_url        String?
+  about_me          String?
+  research_interest String?
+  collab_status     collab_status?  @default(Not_Open_for_Collaboration)
+  skills            String?
+  post_likes        post_likes[]
+  user              user            @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  research_post     research_post[]
 
   @@schema("public")
 }
@@ -360,6 +362,7 @@ model project {
   c_score       Int             @default(0) @db.SmallInt
   p_score       Int             @default(0) @db.SmallInt
   cover_img     String?
+  phase         phase[]
   workspace     workspace       @relation(fields: [workspace_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   project_users project_users[]
 
@@ -382,42 +385,44 @@ model project_users {
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model research_post {
   post_id       String          @id(map: "ResearchPosts_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  user_id       String          @db.Uuid
+  profile_id    String?         @db.Uuid
   title         String
-  author        String
+  author        String?
   document      String?
   description   String?
   created_at    DateTime        @default(now())
   updated_at    DateTime        @default(now())
-  category      category?
+  category      String?
+  user_id       String?         @db.Uuid
+  summary       String?
   post_comments post_comments[]
   likes         post_likes[]
-  user          user            @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  profile       profile?        @relation(fields: [profile_id], references: [profile_id], onDelete: NoAction, onUpdate: NoAction)
+  user          user?           @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@schema("public")
 }
 
 model post_likes {
-  user_id       String        @db.Uuid
   post_id       String        @db.Uuid
-  likes_id      String        @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  likes_id      String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  profile_id    String        @db.Uuid
   research_post research_post @relation(fields: [post_id], references: [post_id], onDelete: Cascade, onUpdate: NoAction)
-  user          user          @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  profile       profile       @relation(fields: [profile_id], references: [profile_id], onDelete: NoAction, onUpdate: NoAction)
 
-  @@id([user_id, post_id, likes_id])
-  @@index([user_id])
   @@index([post_id])
   @@schema("public")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model profile_education {
-  education_id String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  profile_id   String    @db.Uuid
-  school_name  String?
-  start_date   DateTime? @db.Date
-  end_date     DateTime? @db.Date
-  profile      profile   @relation(fields: [profile_id], references: [profile_id], onDelete: NoAction, onUpdate: NoAction)
+  education_id String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id      String  @db.Uuid
+  school       String
+  start_year   String?
+  end_year     String?
+  description  String?
+  user         user    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@schema("public")
 }
@@ -426,22 +431,22 @@ model profile_education {
 model post_comments {
   id            String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   text          String         @default("")
-  user_id       String?        @db.Uuid
+  profile_id    String?        @db.Uuid
   post_id       String?        @db.Uuid
   created_at    DateTime?      @db.Timestamptz(6)
   research_post research_post? @relation(fields: [post_id], references: [post_id], onDelete: NoAction, onUpdate: NoAction)
-  user          user?          @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@schema("public")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model profile_achievement {
-  achievement_id String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  profile_id     String?  @db.Uuid
-  received_date  DateTime @db.Date
+  achievement_id String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id        String? @db.Uuid
+  received_year  String
   title          String
-  profile        profile? @relation(fields: [profile_id], references: [profile_id], onDelete: NoAction, onUpdate: NoAction)
+  description    String?
+  user           user?   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@schema("public")
 }
@@ -449,12 +454,85 @@ model profile_achievement {
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model profile_experience {
-  experience_id String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  profile_id    String?   @db.Uuid
+  experience_id String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id       String? @db.Uuid
   title         String
-  start_date    DateTime? @db.Date
-  end_date      DateTime? @db.Date
-  profile       profile?  @relation(fields: [profile_id], references: [profile_id], onDelete: NoAction, onUpdate: NoAction)
+  start_year    String?
+  end_year      String?
+  description   String?
+  user          user?   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model comment {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  value      String
+  task_id    String   @db.Uuid
+  user_id    String   @db.Uuid
+  task       task     @relation(fields: [task_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user       user     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model phase {
+  id                  String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                String?
+  start_at            DateTime              @db.Date
+  end_at              DateTime?             @db.Date
+  project_id          String                @db.Uuid
+  project             project               @relation(fields: [project_id], references: [project_id], onDelete: Cascade, onUpdate: NoAction)
+  phase_property      phase_property[]
+  phase_property_task phase_property_task[]
+  task                task[]
+
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model phase_property {
+  id                  String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                String                @default("name")
+  type                String                @default("text")
+  phase_id            String                @db.Uuid
+  phase               phase                 @relation(fields: [phase_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  phase_property_task phase_property_task[]
+
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model phase_property_task {
+  id             BigInt         @id @default(autoincrement())
+  value          String
+  phase_id       String         @db.Uuid
+  task_id        String         @db.Uuid
+  property_id    String         @db.Uuid
+  phase          phase          @relation(fields: [phase_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  phase_property phase_property @relation(fields: [property_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  task           task           @relation(fields: [task_id], references: [id], onDelete: NoAction)
+
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model task {
+  id                  String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at          DateTime              @db.Timestamptz(6)
+  name                String                @default("task")
+  description         String?
+  status              String                @default("pending")
+  assignees           String?               @db.Uuid
+  phase_id            String                @db.Uuid
+  end_at              DateTime?             @db.Timestamptz(6)
+  comment             comment[]
+  phase_property_task phase_property_task[]
+  user                user?                 @relation(fields: [assignees], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  phase               phase                 @relation(fields: [phase_id], references: [id], onDelete: NoAction)
 
   @@schema("public")
 }
