@@ -1,6 +1,7 @@
 // utils
 import { useRouterId } from "~/utils/routerId";
 import { useFetchProject } from "~/utils/project";
+import { api } from "~/utils/api";
 
 // types
 import type { ReactElement } from "react";
@@ -14,6 +15,8 @@ import Card from "~/components/Card";
 import MembersCard from "~/components/members/MembersCard";
 import ScoreChart from "~/components/chart/ScoreChart";
 import PageLoader from "~/components/layout/PageLoader";
+import { Gantt, Task, EventOption, StylingOption, ViewMode, DisplayOption } from 'gantt-task-react';
+import "gantt-task-react/dist/index.css";
 
 const Project: NextPageWithLayout = () => {
   const id = useRouterId();
@@ -28,6 +31,54 @@ const Project: NextPageWithLayout = () => {
     users,
   } = useFetchProject();
 
+  // get c score and p score of project
+  const cScore = api.score.getCScore.useQuery(
+    { project_id: id },
+    {
+      enabled: !!id,
+    }
+  );
+
+  const pScore = api.score.getPScore.useQuery(
+    { project_id: id },
+    {
+      enabled: !!id,
+    }
+  );
+
+  const tasks: Task[] = [
+    {
+      start: new Date(2023, 1, 10),
+      end: new Date(2023, 7, 10),
+      name: 'Literature Review',
+      id: 'Task 0',
+      type:'task',
+      progress: 34,
+      isDisabled: true,
+      styles: { progressColor: '#ffbb54', progressSelectedColor: '#ff9e0d' },
+    },
+    {
+      start: new Date(2023, 3, 10),
+      end: new Date(2023, 5, 11),
+      name: 'Formulate Hypothesis',
+      id: 'Task 0',
+      type:'task',
+      progress: 79,
+      isDisabled: true,
+      styles: { progressColor: '#ffbb54', progressSelectedColor: '#ff9e0d' },
+    },
+    {
+      start: new Date(2023, 6, 10),
+      end: new Date(2023, 9, 10),
+      name: 'Collect Data for H1',
+      id: 'Task 0',
+      type:'task',
+      progress: 45,
+      isDisabled: true,
+      styles: { progressColor: '#ffbb54', progressSelectedColor: '#ff9e0d' },
+    },
+];
+
   return (
     <>
       <Head title={name} />
@@ -39,7 +90,7 @@ const Project: NextPageWithLayout = () => {
             {/* Left section of workspace dashboard */}
             <div className="w-full md:col-span-8">
               <section className="bg-white">
-                <div className="mx-auto max-w-screen-xl px-4 py-8 text-center lg:px-6 lg:py-16">
+                <div className="mx-auto max-w-screen-xl px-4 py-4 text-center lg:px-6 lg:py-10">
                   <dl className="mx-auto grid max-w-screen-md gap-8 text-gray-900 sm:grid-cols-3">
                     <div className="flex flex-col items-center justify-center">
                       <dt className="mb-2 text-3xl font-extrabold text-green-500 md:text-4xl">
@@ -68,8 +119,9 @@ const Project: NextPageWithLayout = () => {
                   </dl>
                 </div>
               </section>
-              <div className="my-2 overflow-x-auto bg-white">
-                <table className="w-full text-left text-sm text-gray-500">
+              <div className="my-2 overflow-x-auto">
+              <Gantt tasks={tasks} />
+                <table className="w-full text-left text-sm text-gray-500 bg-white">
                   <thead className="border-grey-50 border text-xs uppercase text-gray-700 ">
                     <tr>
                       <th scope="col" className="p-4">
@@ -220,10 +272,10 @@ const Project: NextPageWithLayout = () => {
               </Card>
               <MembersCard id={id} name={"project"} users={users} />
               <Card title={"Collaborativity Score"} center>
-                <ScoreChart score={90} />
+                <ScoreChart name={"Collaborativity"} score={cScore.data} />
               </Card>
               <Card title={"Productivity Score"} center>
-                <ScoreChart score={70} />
+                <ScoreChart name={"Productivity"} score={pScore.data} />
               </Card>
             </div>
           </div>

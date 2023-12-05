@@ -55,7 +55,20 @@ const Header: React.FC<HeaderProps> = ({
     <div className="flex w-full flex-col flex-wrap border-b bg-white p-4 pb-0">
       {/* Project Header */}
       <div className="flex flex-row justify-between pb-1">
-        <h2 className="max-w-[80%] truncate text-2xl font-semibold">{name}</h2>
+        {/* breadcrumb workspace and project */}
+        <div className="flex items-center justify-center rounded-lg border border-gray-200 bg-gray-50 px-3 py-1 text-gray-700">
+          <Link href="/workspace">
+            <span className="ml-1 flex items-center text-xs hover:underline">
+              MYSIGSQRA
+            </span>
+          </Link>
+          <span className="mx-1">/</span>
+          <Link href={`/project/${id}`}>
+            <span className="ml-1 flex items-center text-xs font-semibold text-purple-800 hover:underline">
+              {name}
+            </span>
+          </Link>
+        </div>
         {/* add phase button */}
         <div className="flex justify-end">
           <button

@@ -175,6 +175,26 @@ export const projectRouter = router({
       return project;
     }),
 
+  updateCScore: protectedProcedure
+    .input(
+      z.object({
+        project_id: z.string(),
+        c_score: z.number(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const project = await ctx.prisma.project.update({
+        where: {
+          project_id: input.project_id,
+        },
+        data: {
+          c_score: input.c_score,
+        },
+      });
+
+      return project;
+    }),
+
   update: protectedProcedure
     .input(
       z.object({

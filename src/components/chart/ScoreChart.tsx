@@ -3,14 +3,15 @@ import { Doughnut } from "react-chartjs-2";
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 interface ScoreChartProps {
+  name: string;
   score: number;
 }
-const ScoreChart: React.FC<ScoreChartProps> = ({ score }) => {
+const ScoreChart: React.FC<ScoreChartProps> = ({ name, score }) => {
   const data = {
-    labels: ["Collaborativity Score", "Remaining Score"],
+    labels: [`${name} Score`, `Non-${name} Score`],
     datasets: [
       {
-        label: "Collaborativity Score",
+        label: [`${name} Score`],
         data: [score, 100 - score],
         backgroundColor: ["#935FEF", "#D1D5DB"],
         borderColor: ["#935FEF", "#D1D5DB"],

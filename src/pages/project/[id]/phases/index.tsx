@@ -37,18 +37,9 @@ const Phase: NextPageWithLayout = () => {
   // state to store the selected phase
   const [selectedPhase, setSelectedPhase] = useState("");
 
-  // get phase from api
-  const {
-    data: phase,
-    isLoading: phaseIsLoading,
-    error: phaseError,
-  } = api.phase.get.useQuery({
-    id: selectedPhase,
-  });
-
   // boolean conditions for loading and error
-  const isLoading = phasesIsLoading || phaseIsLoading;
-  const error = phasesError || phaseError;
+  const isLoading = phasesIsLoading;
+  const error = phasesError;
 
   const handleSelectPhase = (phaseId: string) => {
     // update the selected phase state
@@ -106,7 +97,7 @@ const Phase: NextPageWithLayout = () => {
                   </div>
                 </div>
                 <div className="overflow-x-auto">
-                  <Table />
+                  <Table phase_id={selectedPhase} />
                 </div>
               </div>
             )}

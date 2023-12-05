@@ -32,7 +32,7 @@ const Header: React.FC<HeaderProps> = ({
             <AvatarPlaceholder name={name || "SS"} shape="square" />
           </div>
         )}
-        <h1 className="max-w-[80%] truncate text-2xl font-bold sm:text-4xl">
+        <h1 className="truncate text-2xl font-bold sm:text-4xl">
           {name}
         </h1>
       </Link>

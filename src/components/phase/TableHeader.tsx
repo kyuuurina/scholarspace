@@ -1,15 +1,12 @@
-const TableHeader: React.FC = () => {
+const TableHeader: React.FC= () => {
   return (
     <thead className="bg-gray-50 text-xs uppercase text-gray-700">
       <tr>
         <th scope="col" className="px-6 py-3">
-          Name
+          Task Name
         </th>
         <th scope="col" className="px-6 py-3">
           Start At
-        </th>
-        <th scope="col" className="px-6 py-3">
-          End At
         </th>
         <th scope="col" className="px-6 py-3">
           Status

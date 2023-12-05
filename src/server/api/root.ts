@@ -7,6 +7,9 @@ import profileRouter from "./routers/profile";
 import { userRouter } from "./routers/user";
 import { projectRouter } from "./routers/project";
 import { phaseRouter } from "./routers/phase";
+import { taskRouter } from "./routers/task";
+import { commentRouter } from "./routers/comment";
+import { scoreRouter } from "./routers/score";
 
 /**
  * This is the primary router for your server.
@@ -22,6 +25,9 @@ export const appRouter = router({
   user: userRouter,
   project: projectRouter,
   phase: phaseRouter,
+  task: taskRouter,
+  comment: commentRouter,
+  score: scoreRouter,
 });
 
 // export type definition of API
