@@ -1,40 +1,64 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-
 //note: import educationrouter in root.ts
-
 import { api } from "./api";
 import { useRouterId } from "./routerId";
 
-export const useFetchEducation = () => {
-  //get education id
-  const education_id: string = useRouterId();
+// Define the shape of the user object
+type User = {
+  userid: string;
+  user: {
+    name: string | null;
+    email: string | null;
+    avatar_url: string | null;
+  };
+};
 
+// Utility function to fetch education details for a specific ID
+export const useFetchEducation = () => {
+  // Get education ID from the router
+  const id: string = useRouterId();
+
+  // Use TRPC query to fetch education details
   const education = api.education.get.useQuery(
     {
-      id: education_id,
+      education_id: id,
     },
     {
-      enabled: !!education_id,
+      enabled: !!id, // Only enable the query if ID is available
     }
   );
 
-    const { school, start_year, end_year, description } =
-    education.data || {};
+  // Destructure data, isLoading, and error from the education query result
+  const {
+    education_id,
+    user_id,
+    school,
+    start_year,
+    end_year,
+    description,
+  } = education.data || {};
 
-    const { isLoading, error } = education;
+  // Destructure isLoading and error from the education query
+  const { isLoading, error } = education;
 
-    return {
-        school,
-        start_year,
-        end_year,
-        description,
-        isLoading,
-        error,
-    };
+  // Return the relevant information
+  return {
+    school,
+    start_year,
+    end_year,
+    description,
+    isLoading,
+    error,
+    education_id,
+    user_id,
+  };
 };
 
+// Additional utility functions for creating, updating, and deleting education records
+// ... (You can uncomment and modify these functions as needed)
+
+// Note: Ensure that each utility function focuses on a specific task to maintain clarity and readability.
+
+// Exported utility functions can be used in your components or other parts of the application.
 
 
 // export const useFetchUserEducations = () => {

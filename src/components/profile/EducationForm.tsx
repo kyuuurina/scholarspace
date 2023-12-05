@@ -4,7 +4,6 @@ import { useRouter } from "next/router";
 import { type ZodType, z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { v4 as uuidv4 } from "uuid";
 import { api } from "~/utils/api";
 import { useRouterId } from "~/utils/routerId";
 import toast from "react-hot-toast";
@@ -27,21 +26,12 @@ type ModalProps = {
 const EducationModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
   const education_id = useRouterId();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
   const router = useRouter();
   const user = useUser();
   const supabase = useSupabaseClient();
 
-  const createEducation = api.education.create.useMutation({
-    onSuccess: () => {
-      toast.custom(() => <SuccessToast message="Education successfully added" />);
-      router.reload();
-    },
-    onError: (error) => {
-      toast.custom(() => <ErrorToast message={error.toString()} />);
-      onClick();
-      reset();
-    },
-  });
+  const educationMutation = api.education.create.useMutation();
 
   // schema for form validation
   const schema: ZodType<EducationFormData> = z.object({
@@ -70,19 +60,26 @@ const EducationModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
     try {
       setIsSubmitting(true);
 
-      const response = await createEducation.mutateAsync({
+      const response = await educationMutation.mutateAsync({
         ...formData,
         education_id,
       });
 
+      if (educationMutation.error) {
+        // Handle error case
+        toast.custom(() => <ErrorToast message={educationMutation.error.toString()} />);
+      } else {
+        // Handle success case
+        toast.custom(() => <SuccessToast message="Education successfully added" />);
+        router.reload();
+      }
+
       onClick();
       reset();
 
-      // Additional actions after successful submission if needed
-
       setIsSubmitting(false);
     } catch (error) {
-      // Handle any errors
+      // Handle any other errors
       setIsSubmitting(false);
     }
   };
@@ -95,7 +92,7 @@ const EducationModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
           onClick();
           reset();
         }}
-        title="Add Education"
+        title="Education"
       >
         <form
           autoComplete="off"
@@ -117,38 +114,40 @@ const EducationModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
             {errors.school && <FormErrorMessage text={errors.school.message} />}
           </div>
 
-          <div>
-            <label
-              htmlFor="start_year"
-              className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-            >
-              Start Year
-            </label>
-            <input
-              id="start_year"
-              className="block w-full"
-              {...register("start_year", { required: true })}
-            />
-            {errors.start_year && (
-              <FormErrorMessage text={errors.start_year.message} />
-            )}
-          </div>
+          <div className="flex gap-4">
+            <div className="flex flex-col flex-grow">
+              <label
+                htmlFor="start_year"
+                className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Start Year
+              </label>
+              <input
+                id="start_year"
+                className="block w-full"
+                {...register("start_year", { required: true })}
+              />
+              {errors.start_year && (
+                <FormErrorMessage text={errors.start_year.message} />
+              )}
+            </div>
 
-          <div>
-            <label
-              htmlFor="end_year"
-              className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-            >
-              End Year
-            </label>
-            <input
-              id="end_year"
-              className="block w-full"
-              {...register("end_year", { required: true })}
-            />
-            {errors.end_year && (
-              <FormErrorMessage text={errors.end_year.message} />
-            )}
+            <div className="flex flex-col flex-grow">
+              <label
+                htmlFor="end_year"
+                className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+              >
+                End Year
+              </label>
+              <input
+                id="end_year"
+                className="block w-full"
+                {...register("end_year", { required: true })}
+              />
+              {errors.end_year && (
+                <FormErrorMessage text={errors.end_year.message} />
+              )}
+            </div>
           </div>
 
           <div>
@@ -176,6 +175,7 @@ const EducationModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
 };
 
 export default EducationModal;
+
 
 
   // type EducationFormProps = {

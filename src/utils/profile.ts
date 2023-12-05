@@ -83,42 +83,42 @@ export const useFetchProfile = () => {
 };
 
 
-//fetch education
-export const useFetchProfileEducation = () => {
-    const id: string = useRouterId();
+// //fetch education
+// export const useFetchProfileEducation = () => {
+//     const id: string = useRouterId();
 
-    const education = api.education.getProfileEducation.useQuery(
-        {
-            profile_id: id,
-        },
-        {
-            enabled: !!id,
-        }
-    );
+//     const education = api.education.getProfileEducation.useQuery(
+//         {
+//             profile_id: id,
+//         },
+//         {
+//             enabled: !!id,
+//         }
+//     );
 
-    const { isLoading, error, data } = education;
+//     const { isLoading, error, data } = education;
 
-    //store education in an array
-    const profileEducation: {
-        education_id: string;
-        profile_id: string;
-        school_name: string;
-        start_date: Date;
-        end_date: Date;
-    }[] = data || [];
+//     //store education in an array
+//     const profileEducation: {
+//         education_id: string;
+//         profile_id: string;
+//         school_name: string;
+//         start_date: Date;
+//         end_date: Date;
+//     }[] = data || [];
 
-    return {
-        isLoading,
-        error,
-        profileEducation,
-    };
+//     return {
+//         isLoading,
+//         error,
+//         profileEducation,
+//     };
 
-    // return {
-    //     isLoading,
-    //     error,
-    //     data,
-    // };
-};
+//     // return {
+//     //     isLoading,
+//     //     error,
+//     //     data,
+//     // };
+// };
 
 
 

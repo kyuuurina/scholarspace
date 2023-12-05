@@ -1,6 +1,8 @@
 // EducationCard.tsx
 
-import React from "react";
+import React, { useState } from "react";
+import { FaPlus } from "react-icons/fa"; 
+import EducationForm from "./EducationForm"; 
 
 type EducationCardProps = {
   //an object of an array of education
@@ -14,20 +16,45 @@ type EducationCardProps = {
 };
 
 const EducationCard: React.FC<EducationCardProps> = ({ education }) => {
+  const [isEducationFormOpen, setIsEducationFormOpen] = useState(false);
+
+  const handleAddEducationClick = () => {
+    setIsEducationFormOpen(true);
+  };
+
   return (
     <div className="max-w-md mx-auto bg-white rounded-xl overflow-hidden shadow-md">
       <div className="px-6 py-4">
-        <div className="font-bold text-xl mb-2">{education.school}</div>
-        <div className="text-gray-600">
-          {`${education.start_year} - ${education.end_year}`}
+        <div className="flex justify-between items-center mb-4">
+          <div className="font-bold text-xl">{education.school}</div>
+          <div className="text-gray-600">
+            {`${education.start_year} - ${education.end_year}`}
+          </div>
         </div>
-        <div className="text-gray-600">{education.description}</div>
+        <div className="text-gray-600 mb-2">{education.description}</div>
+        
+        {/* Add Education Form Modal */}
+        {isEducationFormOpen && (
+          <EducationForm
+            openModal={isEducationFormOpen}
+            onClick={() => setIsEducationFormOpen(false)}
+          />
+        )}
+      </div>
+      <div className="flex justify-end px-6 py-4">
+        {/* Add Education Icon */}
+        <FaPlus
+          onClick={handleAddEducationClick}
+          className="cursor-pointer text-blue-500"
+          style={{ fontSize: "24px" }}
+        />
       </div>
     </div>
   );
 };
 
 export default EducationCard;
+
 
 // import React from 'react';
 

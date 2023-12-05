@@ -344,7 +344,7 @@ model profile {
   avatar_url        String?
   about_me          String?
   research_interest String?
-  collab_status     collab_status?  @default(Not_Open_for_Collaboration)
+  collab_status     String?         @default("'Not Open For Collaboration'::text")
   skills            String?
   post_likes        post_likes[]
   user              user            @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)

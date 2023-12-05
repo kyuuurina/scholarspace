@@ -1,20 +1,32 @@
 import { z } from "zod";
+import { TRPCError } from "@trpc/server";
 import { router, protectedProcedure } from "~/server/api/trpc";
 
+// Define educationRouter with CRUD procedures
 export const educationRouter = router({
+  // Procedure to list education records for a specific user
   listUserEducations: protectedProcedure
     .input(z.object({ user_id: z.string() }))
     .query(async ({ ctx, input }) => {
-      // Fetch education records for a specific user
-      const educations = await ctx.prisma.profile_education.findMany({
-        where: {
-          user_id: input.user_id,
-        },
-      });
+      try {
+        // Fetch education records for a specific user
+        const educations = await ctx.prisma.profile_education.findMany({
+          where: {
+            user_id: input.user_id,
+          },
+        });
 
-      return educations;
+        return educations;
+      } catch (error) {
+        // Handle errors by throwing a TRPCError
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to fetch user educations",
+        });
+      }
     }),
 
+  // Procedure to create a new education record for a user
   createEducation: protectedProcedure
     .input(
       z.object({
@@ -26,20 +38,29 @@ export const educationRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      // Create a new education record for a user
-      const newEducation = await ctx.prisma.profile_education.create({
-        data: {
-          user_id: input.user_id,
-          school: input.school,
-          start_year: input.start_year,
-          end_year: input.end_year,
-          description: input.description,
-        },
-      });
+      try {
+        // Create a new education record for a user
+        const newEducation = await ctx.prisma.profile_education.create({
+          data: {
+            user_id: input.user_id,
+            school: input.school,
+            start_year: input.start_year,
+            end_year: input.end_year,
+            description: input.description,
+          },
+        });
 
-      return newEducation;
+        return newEducation;
+      } catch (error) {
+        // Handle errors by throwing a TRPCError
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to create education",
+        });
+      }
     }),
 
+  // Procedure to update an existing education record
   updateEducation: protectedProcedure
     .input(
       z.object({
@@ -51,36 +72,56 @@ export const educationRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      // Update an existing education record
-      const updatedEducation = await ctx.prisma.profile_education.update({
-        where: {
-          education_id: input.education_id,
-        },
-        data: {
-          school: input.school,
-          start_year: input.start_year,
-          end_year: input.end_year,
-          description: input.description,
-        },
-      });
+      try {
+        // Update an existing education record
+        const updatedEducation = await ctx.prisma.profile_education.update({
+          where: {
+            education_id: input.education_id,
+          },
+          data: {
+            school: input.school,
+            start_year: input.start_year,
+            end_year: input.end_year,
+            description: input.description,
+          },
+        });
 
-      return updatedEducation;
+        return updatedEducation;
+      } catch (error) {
+        // Handle errors by throwing a TRPCError
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to update education",
+        });
+      }
     }),
 
+  // Procedure to delete an education record
   deleteEducation: protectedProcedure
     .input(z.object({ education_id: z.string() }))
     .mutation(async ({ input, ctx }) => {
-      // Delete an education record
-      await ctx.prisma.profile_education.delete({
-        where: {
-          education_id: input.education_id,
-        },
-      });
+      try {
+        // Delete an education record
+        await ctx.prisma.profile_education.delete({
+          where: {
+            education_id: input.education_id,
+          },
+        });
 
-      return { success: true };
+        return { success: true };
+      } catch (error) {
+        // Handle errors by throwing a TRPCError
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to delete education",
+        });
+      }
     }),
 });
 
+
+
+//new line
 
 // export const educationRouter = router({
 //   // Create education entry for a profile
