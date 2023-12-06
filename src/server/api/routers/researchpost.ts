@@ -1,17 +1,30 @@
-//Step 1 - create new server router
+// Step 1 - create new server router
 
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { router, protectedProcedure } from "~/server/api/trpc";
+import { router, protectedProcedure, publicProcedure } from "~/server/api/trpc";
 
-export const postRouter = router({
+export const researchpostRouter = router({
+  get: publicProcedure
+    .input(z.object({ post_id: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const post = await ctx.prisma.research_post.findUnique({
+        where: {
+          post_id: input.post_id,
+        },
+      });
+
+      return post;
+    }),
+
+  // create procedure
   create: protectedProcedure
     .input(
       z.object({
-        category: z.enum(["Article", "Conference_Paper", "Presentation", "Preprint", "Research_Proposal", "Thesis", "Others"]),
+        category: z.string(),
         title: z.string(),
         description: z.string().nullable(),
-        author: z.string(),
+        author: z.string().nullable(),
         document: z.string().nullable(),
       })
     )
@@ -26,42 +39,141 @@ export const postRouter = router({
       return post;
     }),
 
+  // update procedure
   update: protectedProcedure
-    .input(
-      z.object({
-        post_id: z.string(),
-        category: z.enum(["Article", "Conference_Paper", "Presentation", "Preprint", "Research_Proposal", "Thesis", "Others"]),
-        title: z.string(),
-        description: z.string().nullable(),
-        author: z.string(),
-        document: z.string().nullable(),
-      })
-    )
-    .mutation(async ({ input, ctx }) => {
-      const post = await ctx.prisma.research_post.update({
-        where: {
-          post_id: input.post_id,
-        },
-        data: {
-          ...input,
-        },
+  .input(
+    z.object({
+      post_id: z.string(),
+      category: z.string(),
+      title: z.string(),
+      description: z.string().nullable(),
+      document: z.string().nullable(),
+    })
+  )
+  .mutation(async ({ input, ctx }) => {
+    const { post_id, category, title, description, document } = input;
+
+    // Check if the authenticated user is the owner of the post
+    const post = await ctx.prisma.research_post.findUnique({
+      where: {
+        post_id,
+      },
+    });
+
+    if (!post || post.user_id !== ctx.user.id) {
+      // User is not authorized to update this post
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "You are not authorized to update this post.",
       });
+    }
 
-      return post;
-    }),
+    const updatedResearchPost = await ctx.prisma.research_post.update({
+      where: {
+        post_id,
+      },
+      data: {
+        category,
+        title,
+        description,
+        document,
+      },
+    });
+    console.log(updatedResearchPost);
 
-  delete: protectedProcedure
-    .input(z.object({ post_id: z.string() }))
-    .mutation(async ({ input, ctx }) => {
-      await ctx.prisma.research_post.delete({
-        where: {
-          post_id: input.post_id,
-        },
+    return updatedResearchPost;
+  }),
+
+delete: protectedProcedure
+  .input(z.object({ post_id: z.string() }))
+  .mutation(async ({ input, ctx }) => {
+    const { post_id } = input;
+
+    // Check if the authenticated user is the owner of the post
+    const post = await ctx.prisma.research_post.findUnique({
+      where: {
+        post_id,
+      },
+    });
+
+    if (!post || post.user_id !== ctx.user.id) {
+      // User is not authorized to delete this post
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "You are not authorized to delete this post.",
       });
+    }
 
-      return true;
-    }),
+    await ctx.prisma.research_post.delete({
+      where: {
+        post_id,
+      },
+    });
+
+    return { success: true };
+  }),
 });
+
+
+
+// export const researchpostRouter = router({
+//   create: protectedProcedure
+//     .input(
+//       z.object({
+//         category: z.string(),
+//         title: z.string(),
+//         description: z.string().nullable(),
+//         author: z.string(),
+//         document: z.string().nullable(),
+//       })
+//     )
+//     .mutation(async ({ input, ctx }) => {
+//       const post = await ctx.prisma.research_post.create({
+//         data: {
+//           user_id: ctx.user.id,
+//           ...input,
+//         },
+//       });
+
+//       return post;
+//     }),
+
+//   update: protectedProcedure
+//     .input(
+//       z.object({
+//         post_id: z.string(),
+//         category: z.string(),
+//         title: z.string(),
+//         description: z.string().nullable(),
+//         author: z.string().nullable(),
+//         document: z.string().nullable(),
+//       })
+//     )
+//     .mutation(async ({ input, ctx }) => {
+//       const post = await ctx.prisma.research_post.update({
+//         where: {
+//           post_id: input.post_id,
+//         },
+//         data: {
+//           ...input,
+//         },
+//       });
+
+//       return post;
+//     }),
+
+//   delete: protectedProcedure
+//     .input(z.object({ post_id: z.string() }))
+//     .mutation(async ({ input, ctx }) => {
+//       await ctx.prisma.research_post.delete({
+//         where: {
+//           post_id: input.post_id,
+//         },
+//       });
+
+//       return true;
+//     }),
+// });
 
 
 
