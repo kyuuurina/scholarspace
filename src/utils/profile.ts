@@ -12,38 +12,15 @@ type User = {
     };
 };
 
-// type Profile = {
-//     profile_id: string;
-//     user_id: string;
-//     name: string;
-//     about_me?: string | null;
-//     skills?: string[] | null;
-//     research_interest?: string[] | null;
-//     collab_status?: 'Open_For_Collaboration' | 'Not_Open_For_Collaboration'; // enum values
-// };
-
-// type Education = {
-//     education_id: string;
-//     profile_id: string;
-//     school_name: string;
-//     start_date: Date;
-//     end_date: Date;
-// };
-
-// type Experience = {
-//     experience_id: string;
-//     profile_id: string;
-//     title: string;
-//     start_date: Date;
-//     end_date: Date;
-// };
-
-// type Achievement = {
-//     achievement_id: string;
-//     profile_id: string;
-//     title: string;
-//     received_date: Date;
-// };
+type Profile = {
+    profile_id: string;
+    user_id: string;
+    name: string;
+    about_me?: string | null;
+    skills?: string | null;
+    research_interest?: string | null;
+    collab_status?: string;
+};
 
 export const useFetchProfile = () => {
     const id: string = useRouterId();
@@ -82,6 +59,44 @@ export const useFetchProfile = () => {
     };
 };
 
+
+//Step 2
+
+// import { api } from "./api";
+// import { useRouterId } from "./routerId";
+
+// export const useFetchResearchPost = () => {
+//     const id: string = useRouterId();
+
+//     const researchpost = api.researchpost.get.useQuery(
+//         {
+//             post_id: id,
+//         },
+//         {
+//             enabled: !!id,
+//         }
+//     );
+
+//     const { category, title, author, description, document } = researchpost.data || {};
+
+//     const { isLoading, error } = researchpost;
+
+//     let imgUrl = "";
+//     if (document) {
+//         imgUrl = `https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/post-files-upload/${document}`;
+//     }
+
+//     return {
+//         category,
+//         title,
+//         author,
+//         description,
+//         document,
+//         isLoading,
+//         error,
+//         imgUrl,
+//     };
+// };
 
 // //fetch education
 // export const useFetchProfileEducation = () => {

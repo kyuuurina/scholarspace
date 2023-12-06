@@ -1,90 +1,83 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-
 import { z } from "zod";
 import { router, protectedProcedure, publicProcedure } from "~/server/api/trpc";
 import { TRPCError } from "@trpc/server";
 
 export const profileRouter = router({
-  get: protectedProcedure
-  .input(z.object({profile_id: z.string()}))
-  .query(async ({ input, ctx }) => {
-    const profile = await ctx.prisma.profile.findUnique({
-      where: {
-        profile_id: input.profile_id,
-      },
-    });
-
-    if (!profile) {
-      throw new TRPCError({
-        code: "NOT_FOUND",
-        message: "Profile not found",
+  get: publicProcedure
+    .input(z.object({ profile_id: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const profile = await ctx.prisma.profile.findUnique({
+        where: {
+          profile_id: input.profile_id,
+        },
       });
-    }
 
-    return {
-      ...profile,
-    };
-  }),
+      if (!profile) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Profile not found",
+        });
+      }
 
-  //create
+      return {
+        ...profile,
+      };
+    }),
+
   create: protectedProcedure
-  .input(
-    z.object({
-      profile_id: z.string(),
-      user_id: z.string(),
-      name: z.string(),
-      about_me: z.string().nullable(),
-      skills: z.array(z.string()).nullable(),
-      research_interest: z.array(z.string()).nullable(),
-      collab_status: z.enum(["Open_For_Collaboration", "Not_Open_for_Collaboration"]),
-    })
-  )
-  .mutation(async ({ input, ctx }) => {
-    const profile = await ctx.prisma.profile.create({
-      data: {
-        profile_id: input.profile_id,
-        user_id: input.user_id,
-        name: input.name,
-        about_me: input.about_me,
-        skills: input.skills ? { set: input.skills } : undefined,
-        research_interest: input.research_interest ? { set: input.research_interest } : undefined,
-        collab_status: input.collab_status , // Use Prisma set operation for enums
-      },
-    });
+    .input(
+      z.object({
+        user_id: z.string(),
+        name: z.string(),
+        about_me: z.string().nullable(),
+        skills: z.string().nullable(),
+        research_interest: z.string().nullable(),
+        collab_status: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const profile = await ctx.prisma.profile.create({
+        data: {
+          user_id: input.user_id,
+          name: input.name,
+          about_me: input.about_me,
+          skills: input.skills,
+          research_interest: input.research_interest,
+          collab_status: input.collab_status,
+        },
+      });
 
-    return profile;
-  }),
+      return profile;
+    }),
 
-update: protectedProcedure
-  .input(
-    z.object({
-      profile_id: z.string(),
-      name: z.string(),
-      about_me: z.string().nullable(),
-      skills: z.array(z.string()).nullable(),
-      research_interest: z.array(z.string()).nullable(),
-      collab_status: z.enum(['Open_For_Collaboration', 'Not_Open_for_Collaboration']),
-    })
-  )
-  .mutation(async ({ input, ctx }) => {
-    const profile = await ctx.prisma.profile.update({
-      where: {
-        profile_id: input.profile_id,
-      },
-      data: {
-        name: input.name,
-        about_me: input.about_me,
-        skills: input.skills ? { set: input.skills } : undefined,
-        research_interest: input.research_interest ? { set: input.research_interest } : undefined,
-        collab_status: input.collab_status, // Use Prisma set operation for enums
-      },
-    });
+  update: protectedProcedure
+    .input(
+      z.object({
+        profile_id: z.string(),
+        user_id: z.string(),
+        name: z.string(),
+        about_me: z.string().nullable(),
+        skills: z.string().nullable(),
+        research_interest: z.string().nullable(),
+        collab_status: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const profile = await ctx.prisma.profile.update({
+        where: {
+          profile_id: input.profile_id,
+        },
+        data: {
+          name: input.name,
+          about_me: input.about_me,
+          skills: input.skills,
+          research_interest: input.research_interest,
+          collab_status: input.collab_status,
+        },
+      });
 
-    return profile;
-  }),
-
-
+      return profile;
+    }),
 });
 
 

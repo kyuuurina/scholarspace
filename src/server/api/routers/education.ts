@@ -5,7 +5,7 @@ import { router, protectedProcedure } from "~/server/api/trpc";
 // Define educationRouter with CRUD procedures
 export const educationRouter = router({
   // Procedure to list education records for a specific user
-  listUserEducations: protectedProcedure
+  getUserEducations: protectedProcedure
     .input(z.object({ user_id: z.string() }))
     .query(async ({ ctx, input }) => {
       try {

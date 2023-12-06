@@ -1,10 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 
 //backup on 14-11-2023 UserProfileForm.tsx
 
 //Form for NAME, ABOUT ME, SKILLS, RESEARCH INTEREST & COLLAB STATUS
+
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
@@ -44,12 +42,12 @@ const UserProfileForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
   const router = useRouter();
   const user = useUser();
   const supabase = useSupabaseClient();
+
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const createProfile = api.profile.create.useMutation({
+  const updateProfile = api.profile.update.useMutation({
     onSuccess: () => {
-      toast.custom(() => <SuccessToast message="Profile created" />);
+      toast.custom(() => <SuccessToast message="Profile successfully updated" />);
       router.reload();
     },
     onError: (error: { toString: () => string }) => {
@@ -59,19 +57,14 @@ const UserProfileForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
     },
   });
 
-  //schema for form validation
   const schema: ZodType<ProfileFormData> = z.object({
     name: z.string(),
     about_me: z.string().nullable(),
-    skills: z.array(z.string()).nullable(),
-    research_interest: z.array(z.string()).nullable(),
-    collab_status: z.enum([
-      "Open_For_Collaboration",
-      "Not_Open_for_Collaboration",
-    ]),
+    skills: z.string().nullable(),
+    research_interest: z.string().nullable(),
+    collab_status: z.string().nullable(),
   });
 
-  //react-hook-form
   const {
     register,
     handleSubmit,
@@ -81,21 +74,26 @@ const UserProfileForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
     resolver: zodResolver(schema),
   });
 
-  //handler onSubmit form
   const onSubmit = async (formData: ProfileFormData) => {
     if (isSubmitting) return;
 
     try {
       setIsSubmitting(true);
 
-      console.log(errors);
-      console.log(formData);
-    } catch {
-      const response = await createProfile.mutateAsync({
+      const response = await updateProfile.mutateAsync({
         ...formData,
         user_id: user?.id,
         profile_id: profile_id,
       });
+
+      // Handle success, reload the page, or perform any other necessary actions
+      toast.custom(() => <SuccessToast message="Profile successfully updated" />);
+      router.reload();
+    } catch (error) {
+      // Handle errors, show toast, etc.
+      toast.custom(() => <ErrorToast message="Unsuccessful updated. Please try again." />);
+    } finally {
+      setIsSubmitting(false);
       onClick();
       reset();
     }
@@ -165,23 +163,6 @@ const UserProfileForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
             )}
           </div>
 
-          {/* <div>
-            <label
-              htmlFor="skills"
-              className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-            >
-              Research Interest
-            </label>
-            <input
-              id="research_interest"
-              className="block w-full"
-              {...register("research_interest", { required: false })}
-            />
-            {errors.skills && (
-              <FormErrorMessage text={errors.research_interest.message} />
-            )}
-          </div> */}
-
           <div>
             <label
               htmlFor="collab_status"
@@ -194,14 +175,13 @@ const UserProfileForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
               className="block w-full"
               {...register("collab_status", { required: true })}
             >
-              <option value="Open_For_Collaboration">Open for Collaboration</option>
-              <option value="Not_Open_for_Collaboration">Not Open for Collaboration</option>
+              <option value="Open For Collaboration">Open for Collaboration</option>
+              <option value="Not Open For Collaboration">Not Open for Collaboration</option>
             </select>
             {errors.collab_status && (
               <FormErrorMessage text={errors.collab_status.message} />
             )}
           </div>
-
 
           <PrimaryButton name="Update My Profile" type="submit" />
         </form>
@@ -211,3 +191,16 @@ const UserProfileForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
 };
 
 export default UserProfileForm;
+
+
+
+//  // const schema: ZodType<ProfileFormData> = z.object({
+  //   name: z.string(),
+  //   about_me: z.string().nullable(),
+  //   skills: z.array(z.string()).nullable(),
+  //   research_interest: z.array(z.string()).nullable(),
+  //   collab_status: z.enum([
+  //     "Open_For_Collaboration",
+  //     "Not_Open_for_Collaboration",
+  //   ]),
+  // });

@@ -10,6 +10,8 @@ import Link from 'next/link';
 import { useRouterId } from "~/utils/routerId";
 import { useFetchProfile } from "~/utils/profile";
 import { useFetchEducation } from '~/utils/education';
+// import { useFetchExperience } from '~/utils/experience';
+// import { useFetchAchievement } from '~/utils/achievement';
 
 // types
 import type { ReactElement } from "react";
@@ -42,13 +44,11 @@ import AchievementForm from "~/components/profile/AchievementForm";
 const ProfilePage: NextPageWithLayout = () => {
   const id = useRouterId();
   const {name, about_me, skills,research_interest,isLoading,error} = useFetchProfile();
-
-  useFetchEducation();
-
+  // const { school, start_year, end_year, description} = useFetchEducation();
 
 
   //modal states
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(true);
   const [isEducationModalOpen, setIsEducationModalOpen] = useState(false);
   const [isExperienceModalOpen, setIsExperienceModalOpen] = useState(false);
   const [isAchievementModalOpen, setIsAchievementModalOpen] = useState(false);
