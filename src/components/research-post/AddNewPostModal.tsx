@@ -64,7 +64,9 @@ const AddNewPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
   // schema for form validation
   const schema: ZodType<ResearchPostFormData> = z.object({
     category: z.string(),
-    title: z.string(),
+    title: z.string().refine((data) => !!data, {
+      message: "Title is required", // Custom error message if validation fails
+    }),
     // .min(2, "Title must be at least 2 characters long.")
     // .max(200, "Title must be at most 200 characters long."),
     description: z.string().nullable(),
@@ -211,12 +213,13 @@ const AddNewPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
               className="block w-full"
               {...register("category", { required: true })}
             >
-              <option value="Open_For_Collaboration">Article</option>
-              <option value="Not_Open_for_Collaboration">Conference Paper</option>
-              <option value="Not_Open_for_Collaboration">Presentation</option>
-              <option value="Not_Open_for_Collaboration">Preprint</option>
-              <option value="Not_Open_for_Collaboration">Research Proposal</option>
-              <option value="Not_Open_for_Collaboration">Thesis</option>
+              <option value="Article">Article</option>
+              <option value="Conference Paper">Conference Paper</option>
+              <option value="Presentation">Presentation</option>
+              <option value="Preprint">Preprint</option>
+              <option value="Research Proposal">Research Proposal</option>
+              <option value="Thesis">Thesis</option>
+              <option value="Idea">Idea</option>
             </select>
             {errors.category && (
               <FormErrorMessage text={errors.category.message} />
