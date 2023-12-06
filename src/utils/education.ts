@@ -3,14 +3,14 @@ import { api } from "./api";
 import { useRouterId } from "./routerId";
 
 // Define the shape of the user object
-type User = {
-  userid: string;
-  user: {
-    name: string | null;
-    email: string | null;
-    avatar_url: string | null;
-  };
-};
+// type User = {
+//   userid: string;
+//   user: {
+//     name: string | null;
+//     email: string | null;
+//     avatar_url: string | null;
+//   };
+// };
 
 // Utility function to fetch education details for a specific ID
 export const useFetchEducation = () => {
@@ -20,7 +20,7 @@ export const useFetchEducation = () => {
   // Use TRPC query to fetch education details
   const education = api.education.getUserEducations.useQuery(
     {
-      education_id: id,
+      user_id: id,
     },
     {
       enabled: !!id, // Only enable the query if ID is available
@@ -35,7 +35,22 @@ export const useFetchEducation = () => {
     start_year,
     end_year,
     description,
-  } = education.data || {};
+  } = (education.data || {}) as {
+        education_id: string;
+        user_id: string;
+        school: string;
+        start_year: string | null;
+        end_year: string | null;
+        description: string | null;
+  };
+  // const {
+  //   education_id,
+  //   user_id,
+  //   school,
+  //   start_year,
+  //   end_year,
+  //   description,
+  // } = education.data || {};
 
   // Destructure isLoading and error from the education query
   const { isLoading, error } = education;

@@ -61,8 +61,8 @@ const ProfilePage: NextPageWithLayout = () => {
   const userId = getCookie("UserID");
 
   //const modal states
-  const [isEditModalOpen, setIsEditModalOpen] = useState(true);
-  const [isEducationModalOpen, setIsEducationModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isEducationModalOpen, setIsEducationModalOpen] = useState(true);
   const [isExperienceModalOpen, setIsExperienceModalOpen] = useState(false);
   const [isAchievementModalOpen, setIsAchievementModalOpen] = useState(false);
 
@@ -171,7 +171,13 @@ const ProfilePage: NextPageWithLayout = () => {
           {/* Update Workspace Section  */}
           <div className="grid gap-y-5">
             <section className="mt-2 w-full rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
-
+            EducationForm modal
+              {isEducationModalOpen && (
+                <EducationForm
+                  openModal={isEducationModalOpen}
+                  onClick={() => setIsEducationModalOpen(false)}
+                />
+              )}
             </section>
           </div>
         </div>

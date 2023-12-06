@@ -31,7 +31,7 @@ const EducationModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
   const user = useUser();
   const supabase = useSupabaseClient();
 
-  const educationMutation = api.education.create.useMutation();
+  const educationMutation = api.education.createEducation.useMutation();
 
   // schema for form validation
   const schema: ZodType<EducationFormData> = z.object({
@@ -67,7 +67,7 @@ const EducationModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
 
       if (educationMutation.error) {
         // Handle error case
-        toast.custom(() => <ErrorToast message={educationMutation.error.toString()} />);
+        toast.custom(() => <ErrorToast message={"Failed to add Education"} />);
       } else {
         // Handle success case
         toast.custom(() => <SuccessToast message="Education successfully added" />);

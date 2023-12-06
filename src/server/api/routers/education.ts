@@ -1,7 +1,49 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { router, protectedProcedure } from "~/server/api/trpc";
+import { router, protectedProcedure, publicProcedure } from "~/server/api/trpc";
 
+// export const educationRouter = router({
+//   get: publicProcedure
+//   .input(z.object({ education_id: z.string() }))
+//   .query(async ({ input, ctx }) => {
+//     try {
+//       // Fetch education record by id
+//       const education = await ctx.prisma.profile_education.findUnique({
+//         where: {
+//           education_id: input.education_id,
+//         },
+//       });
+
+//       return education;
+//     } catch (error) {
+//       // Handle errors by throwing a TRPCError
+//       throw new TRPCError({
+//         code: "INTERNAL_SERVER_ERROR",
+//         message: "Failed to fetch education",
+//       });
+//     }
+//   }),
+
+//   createEducation: protectedProcedure
+//   .input(
+//     z.object({
+//       school: z.string(),
+//       start_year: z.string(),
+//       end_year: z.string(),
+//       description: z.string().nullable(),
+//     })
+//   )
+//   .mutation(async ({ input, ctx }) => {
+//     const user = ctx.user.id;
+
+//     const education = await ctx.prisma.profile_education.create({
+//       data: {
+//         ...input,
+//       },
+// });
+
+
+//nice
 // Define educationRouter with CRUD procedures
 export const educationRouter = router({
   // Procedure to list education records for a specific user
