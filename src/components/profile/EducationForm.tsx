@@ -35,7 +35,9 @@ const EducationModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
 
   // schema for form validation
   const schema: ZodType<EducationFormData> = z.object({
-    school: z.string(),
+    school: z.string().refine((data) => data.trim() !== '', {
+      message: "Institution name is required",
+    }),
     start_year: z.string(),
     end_year: z.string(),
     description: z.string().nullable(),
@@ -104,7 +106,7 @@ const EducationModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
               htmlFor="school"
               className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
             >
-              School
+              Instituition
             </label>
             <input
               id="school"

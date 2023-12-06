@@ -18,9 +18,9 @@ export const useFetchEducation = () => {
   const id: string = useRouterId();
 
   // Use TRPC query to fetch education details
-  const education = api.education.getUserEducations.useQuery(
+  const education = api.education.getEducations.useQuery(
     {
-      user_id: id,
+      education_id: id,
     },
     {
       enabled: !!id, // Only enable the query if ID is available

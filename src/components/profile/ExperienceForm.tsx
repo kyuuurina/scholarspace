@@ -33,11 +33,13 @@ const ExperienceForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
   const user = useUser();
   const supabase = useSupabaseClient();
 
-  const createExperience = api.experience.create.useMutation();
+  const experienceMutation = api.experience.createExperience.useMutation();
 
   // schema for form validation
   const schema: ZodType<ExperienceFormData> = z.object({
-    title: z.string(),
+    title: z.string().refine((data) => data.trim() !== '', {
+      message: "Title is required",
+    }),
     start_year: z.string(),
     end_year: z.string(),
     description: z.string().nullable(),

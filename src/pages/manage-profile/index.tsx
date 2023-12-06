@@ -16,8 +16,8 @@ import Link from 'next/link';
 import { useRouterId } from "~/utils/routerId";
 import { useFetchProfile } from "~/utils/profile";
 import { useFetchEducation } from '~/utils/education';
-// import { useFetchExperience } from '~/utils/experience';
-// import { useFetchAchievement } from '~/utils/achievement';
+import { useFetchExperience } from '~/utils/experience';
+import { useFetchAchievement } from '~/utils/achievement';
 
 // types
 import type { ReactElement } from "react";
@@ -62,9 +62,9 @@ const ProfilePage: NextPageWithLayout = () => {
 
   //const modal states
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isEducationModalOpen, setIsEducationModalOpen] = useState(true);
+  const [isEducationModalOpen, setIsEducationModalOpen] = useState(false);
   const [isExperienceModalOpen, setIsExperienceModalOpen] = useState(false);
-  const [isAchievementModalOpen, setIsAchievementModalOpen] = useState(false);
+  const [isAchievementModalOpen, setIsAchievementModalOpen] = useState(true);
 
   //custom hooks
   const {name, about_me, skills,research_interest,isLoading,error} = useFetchProfile();
@@ -171,25 +171,25 @@ const ProfilePage: NextPageWithLayout = () => {
           {/* Update Workspace Section  */}
           <div className="grid gap-y-5">
             <section className="mt-2 w-full rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
-            EducationForm modal
-              {isEducationModalOpen && (
-                <EducationForm
-                  openModal={isEducationModalOpen}
-                  onClick={() => setIsEducationModalOpen(false)}
-                />
-              )}
+            Achievement modal
+            {isAchievementModalOpen && (
+              <AchievementForm
+                openModal={isAchievementModalOpen}
+                onClick={() => setIsAchievementModalOpen(false)}
+              />
+            )}      
             </section>
           </div>
         </div>
       </main>
 
       {/* UserProfileForm modal */}
-      {isEditModalOpen && (
+      {/* {isEditModalOpen && (
         <UserProfileForm
           openModal={isEditModalOpen}
           onClick={() => setIsEditModalOpen(false)}
         />
-      )}
+      )} */}
 
       {/* EducationForm modal
       {isEducationModalOpen && (

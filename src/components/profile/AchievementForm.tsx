@@ -33,11 +33,13 @@ const AchievementForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
   const user = useUser();
   const supabase = useSupabaseClient();
 
-  const createAchievement = api.achievement.create.useMutation();
+  const achievementMutation = api.achievement.createAchievement.useMutation();
 
   // schema for form validation
   const schema: ZodType<AchievementFormData> = z.object({
-    title: z.string(),
+    title: z.string().refine((data) => data.trim() !== '', {
+      message: "Title is required",
+    }),
     received_year: z.string(),
     description: z.string().nullable(),
   });
@@ -68,7 +70,7 @@ const AchievementForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
 
       if (achievementMutation.error) {
         // Handle error case
-        toast.custom(() => <ErrorToast message={achievementMutation.error.toString()} />);
+        toast.custom(() => <ErrorToast message="Failed to add Achievement" />);
       } else {
         // Handle success case
         toast.custom(() => <SuccessToast message="Achievement successfully added" />);
