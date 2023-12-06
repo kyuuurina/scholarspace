@@ -312,6 +312,7 @@ model user {
   email               String?
   chat_message        chat_message[]
   comment             comment[]
+  post_likes          post_likes[]
   profile             profile[]
   profile_achievement profile_achievement[]
   profile_education   profile_education[]
@@ -346,7 +347,6 @@ model profile {
   research_interest String?
   collab_status     String?         @default("'Not Open For Collaboration'::text")
   skills            String?
-  post_likes        post_likes[]
   user              user            @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   research_post     research_post[]
 
@@ -406,9 +406,9 @@ model research_post {
 model post_likes {
   post_id       String        @db.Uuid
   likes_id      String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  profile_id    String        @db.Uuid
+  user_id       String        @db.Uuid
   research_post research_post @relation(fields: [post_id], references: [post_id], onDelete: Cascade, onUpdate: NoAction)
-  profile       profile       @relation(fields: [profile_id], references: [profile_id], onDelete: NoAction, onUpdate: NoAction)
+  user          user          @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([post_id])
   @@schema("public")

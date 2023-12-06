@@ -10,11 +10,11 @@ import Comment from "~/components/research-post/Comment";
 import AvatarPlaceholder from "../AvatarPlaceholder";
 
 interface PostCardProps {
-
   title: string;
   category: string;
-  author: string;
-  description: string;
+  author: string | null;
+  description: string | null;
+  document: string | null;
   created_at: string;
 }
 
@@ -23,6 +23,7 @@ const PostCard: React.FC<PostCardProps> = ({
   category,
   author,
   description,
+  document,
   created_at,
 }) => {
   const [showDropdown, setShowDropdown] = useState(false);
