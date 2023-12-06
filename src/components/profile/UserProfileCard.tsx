@@ -24,6 +24,16 @@ type UserProfileCardProps = {
     profile: ProfileFormData;
 };
 
+// type UserProfileCardProps = {
+//     profile: {
+//         name: string;
+//         about_me?: string;
+//         skills?: string;
+//         collab_status?: string | null;
+//     };
+// };
+
+
 const UserProfileCard: React.FC<UserProfileCardProps> = ({ profile }) => {
     return (
         <div className="flex flex-col items-center justify-center w-full h-full p-4 space-y-4 bg-white rounded-md shadow-md">
@@ -52,6 +62,73 @@ const UserProfileCard: React.FC<UserProfileCardProps> = ({ profile }) => {
         </div>
     );
 };
+
+{/* <main className="min-h-screen w-full">
+<div className="p-5">
+  {/* Update Workspace Section  */}
+//   <div className="grid gap-y-5">
+//     <section className="mt-2 w-full rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
+//       <form
+//         className="space-y-6"
+//         autoComplete="off"
+//         onSubmit={handleSubmit(handleUpdateProfile)}
+//       >
+//         <h5 className="text-xl font-medium text-gray-900 dark:text-white">
+//           General Settings
+//         </h5>
+//         <div>
+//           <label
+//             htmlFor="workspace-name"
+//             className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+//           >
+//             Name
+//           </label>
+//           <input className="w-full" {...register("name")} />
+//           {errors.name && (
+//             <FormErrorMessage text={errors.name.message} />
+//           )}
+//         </div>
+//         <div>
+//           <label
+//             htmlFor="about_me"
+//             className="mb-2 mt-4 block text-sm font-medium text-gray-900 dark:text-white"
+//           >
+//             About Me
+//           </label>
+//           <textarea className="w-full" {...register("about_me")} />
+//           {errors.about_me && (
+//             <FormErrorMessage text={errors.about_me.message} />
+//           )}
+//         </div>
+//         <div className="flex justify-end space-x-3">
+//           {isDirty && (
+//             <button
+//               type="button"
+//               className="rounded-sm border border-gray-200 bg-white px-3 py-2 text-center text-sm font-medium hover:bg-grey-bg hover:text-purple-accent-1 focus:outline-none"
+//               // reverts the input values to the original values
+//               onClick={handleCancel}
+//             >
+//               Cancel
+//             </button>
+//           )}
+//           <button
+//             type="submit"
+//             className={`${
+//               isDirty
+//                 ? "bg-purple-accent-1 hover:bg-purple-accent-2"
+//                 : "bg-gray-200"
+//             } rounded-sm px-3 py-2 text-center text-sm font-medium text-white focus:outline-none`}
+//             disabled={!isDirty}
+//           >
+//             Save
+//           </button>
+//         </div>
+//       </form>
+//     </section>
+
+//   </div>
+// </div>
+// </main> */}
 
 
 
