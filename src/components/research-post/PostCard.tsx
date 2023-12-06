@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import React, { useState } from "react";
 import CategoryPills from "./CategoryPills";
-import { FiHeart, FiMessageSquare, FiRepeat, FiMoreHorizontal, FiEdit, FiTrash } from "react-icons/fi";
+import { FiHeart, FiHeart as FiHeartOutline, FiMessageSquare, FiRepeat, FiMoreHorizontal, FiEdit, FiTrash } from "react-icons/fi";
 import Comment from "~/components/research-post/Comment";
 
 import AvatarPlaceholder from "../AvatarPlaceholder";
