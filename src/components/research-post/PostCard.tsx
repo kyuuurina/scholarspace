@@ -116,10 +116,10 @@ const PostCard: React.FC<PostCardProps> = ({
           <FiHeart size={20} className="inline-block mr-2" />
           Like
         </button>
-        <button className="flex items-center text-gray-500 hover:text-gray-700 focus:outline-none">
+        {/* <button className="flex items-center text-gray-500 hover:text-gray-700 focus:outline-none">
           <FiRepeat size={20} className="inline-block mr-2" />
           Reshare
-        </button>
+        </button> */}
       </div>
       
       <div className="mt-4">
