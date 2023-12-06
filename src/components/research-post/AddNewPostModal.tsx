@@ -24,7 +24,7 @@ import ErrorToast from "../toast/ErrorToast";
 
 
 //huggingface-vercelai
-import { HfInference } from "@huggingface/inference";
+// import { HfInference } from "@huggingface/inference";
 //import { summarizeText } from "~/utils/summarization";
 
 type ModalProps = {
