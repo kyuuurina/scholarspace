@@ -226,7 +226,7 @@ const AddNewPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
               Upload a Research Document
             </label>
             <div className="flex w-full items-center justify-center">
-              <label className="relative flex h-64 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 ">
+              <label className="relative flex h-25 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 ">
                 {documentPlaceholder ? (
                   <Image
                     src={documentPlaceholder}
@@ -237,7 +237,7 @@ const AddNewPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
                 ) : (
                   <div className="flex flex-col items-center justify-center pb-6 pt-5">
                     <svg
-                      className="mb-4 h-8 w-8 text-gray-500"
+                      className="mb-4 h-5 w-8 text-gray-500"
                       aria-hidden="true"
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
