@@ -57,7 +57,7 @@ const ProfilePage: NextPageWithLayout = () => {
 
   //const
   const router = useRouter();
-  const id = useRouterId();
+  const { id } = router.query;
   const userId = getCookie("UserID");
 
   //const modal states
@@ -67,7 +67,8 @@ const ProfilePage: NextPageWithLayout = () => {
   const [isAchievementModalOpen, setIsAchievementModalOpen] = useState(true);
 
   //custom hooks
-  const {profile_id, name, about_me, skills,research_interest, collab_status, isLoading, error} = useFetchProfile();
+  //fetch profile data
+  const {name, about_me, skills,research_interest, collab_status, isLoading} = useFetchProfile();
   const profile = useFetchProfile();
   const education = useFetchEducation();
   const experience = useFetchExperience();
@@ -127,7 +128,8 @@ const ProfilePage: NextPageWithLayout = () => {
   const handleUpdateProfile = async (formData: ProfileFormData) => {
     try {
       await updateProfile.mutateAsync({
-        profile_id: id,
+        profile_id: id as string,        
+        // profile_id: id,
         ...formData,
       });
       console.log(formData);
@@ -148,7 +150,7 @@ const ProfilePage: NextPageWithLayout = () => {
     });
   };
 
-  // loader
+  //loader
   // if (isLoading) {
   //   return <div>Loading...</div>;
   // }
@@ -166,9 +168,15 @@ const ProfilePage: NextPageWithLayout = () => {
         <div className="p-5">
           {/* Profile section  */}
           <div className="grid gap-y-5">
-            <section className="mt-2 w-full rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
+
+          {/* User Profile Card */}
+          <section className="mt-2 w-3/4 mx-auto rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
               <div className="flex justify-between items-center">
+                <h3 className="font-semibold text-2xl">
+                  Profile
+                </h3>
                 {/* UserProfileCard component */}
+                    <UserProfileCard profile={{ profile_id, name, about_me, skills, research_interest, collab_status }} />
                 {/* <UserProfileCard profile={{updateProfile}} /> */}
                 {/* Edit button */}
                 <button onClick={handleEditClick} className="flex items-center">
@@ -188,66 +196,32 @@ const ProfilePage: NextPageWithLayout = () => {
 
           {/* Education section  */}
           <div className="grid gap-y-5">
-            <section className="mt-2 w-full rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
-              <div>
-                Education
-              </div>
-            </section>
+          <section className="mt-2 w-3/4 mx-auto rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
+            <h3 className="font-semibold text-2xl">
+              Education
+            </h3>
+          </section>
           </div>
 
           {/* Experience section  */}
           <div className="grid gap-y-5">
-            <section className="mt-2 w-full rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
-              <div>
+            <section className="mt-2 w-3/4 mx-auto rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
+              <h3 className="font-semibold text-2xl">
                 Research Experience
-              </div>
+              </h3>
             </section>
           </div>
 
           {/* Achievement section  */}
           <div className="grid gap-y-5">
-            <section className="mt-2 w-full rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
-              <div>
+            <section className="mt-2 w-3/4 mx-auto rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
+              <h3 className="font-semibold text-2xl">
                 Achievement
-              </div>
+              </h3>
             </section>
           </div>
         </div>
       </main>
-
-      {/* UserProfileForm modal */}
-      {/* {isEditModalOpen && (
-        <UserProfileForm
-          openModal={isEditModalOpen}
-          onClick={() => setIsEditModalOpen(false)}
-        />
-      )} */}
-
-      {/* EducationForm modal
-      {isEducationModalOpen && (
-        <EducationForm
-          openModal={isEducationModalOpen}
-          onClick={() => setIsEducationModalOpen(false)}
-        />
-      )} */}
-
-      {/* Experience modal
-      {isExperienceModalOpen && (
-        <ExperienceForm
-          openModal={isExperienceModalOpen}
-          onClick={() => setIsExperienceModalOpen(false)}
-        />
-      )} */}
-
-      {/* Achievement modal
-      {isAchievementModalOpen && (
-        <AchievementForm
-          openModal={isAchievementModalOpen}
-          onClick={() => setIsAchievementModalOpen(false)}
-        />
-      )}       */}
-      
-      {/* </PageLoader> */}
     </>
   );
 };
@@ -306,5 +280,65 @@ export default ProfilePage;
 //   </>
 // );
 // };
+
+
+          {/* <section className="mt-2 w-full rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
+              <form
+                className="space-y-6"
+                autoComplete="off"
+                onSubmit={handleSubmit(handleUpdateProfile)}
+              >
+                <h5 className="text-xl font-medium text-gray-900 dark:text-white">
+                  General Settings
+                </h5>
+                <div>
+                  <label
+                    htmlFor="workspace-name"
+                    className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    Name
+                  </label>
+                  <input className="w-full" {...register("name")} />
+                  {errors.name && (
+                    <FormErrorMessage text={errors.name.message} />
+                  )}
+                </div>
+                <div>
+                  <label
+                    htmlFor="workspace-description"
+                    className="mb-2 mt-4 block text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    About Me
+                  </label>
+                  <textarea className="w-full" {...register("about_me")} />
+                  {errors.about_me && (
+                    <FormErrorMessage text={errors.about_me.message} />
+                  )}
+                </div>
+                <div className="flex justify-end space-x-3">
+                  {isDirty && (
+                    <button
+                      type="button"
+                      className="rounded-sm border border-gray-200 bg-white px-3 py-2 text-center text-sm font-medium hover:bg-grey-bg hover:text-purple-accent-1 focus:outline-none"
+                      // reverts the input values to the original values
+                      onClick={handleCancel}
+                    >
+                      Cancel
+                    </button>
+                  )}
+                  <button
+                    type="submit"
+                    className={`${
+                      isDirty
+                        ? "bg-purple-accent-1 hover:bg-purple-accent-2"
+                        : "bg-gray-200"
+                    } rounded-sm px-3 py-2 text-center text-sm font-medium text-white focus:outline-none`}
+                    disabled={!isDirty}
+                  >
+                    Save
+                  </button>
+                </div>
+              </form>
+            </section> */}
 
 

@@ -36,18 +36,27 @@ export const useFetchResearchPost = () => {
 
 
 //hook for fetching user's research posts
-export const useFetchUserResearchPosts = (userId: string) => {
-    const userResearchPosts = api.researchpost.getMyPosts.useQuery(
-        {
-            user_id: userId,
-        },
-        {
-            enabled: !!userId,
-        }
-    );
+// export const useFetchUserResearchPosts = (userId: string) => {
+//     const userResearchPosts = api.researchpost.getMyPosts.useQuery(
+//         {
+//             user_id: userId,
+//         },
+//         {
+//             enabled: !!userId,
+//         }
+//     );
 
-    return useFetchUserResearchPosts;
-};
+//     return {
+//         category,
+//         title,
+//         author,
+//         description,
+//         document,
+//         isLoading,
+//         error,
+//         imgUrl,
+//     };
+// };
 
 
 

@@ -4,7 +4,7 @@ import { userRouter } from "./routers/user";
 import { workspaceRouter } from "~/server/api/routers/workspace";
 import { projectRouter } from "./routers/project";
 import { memberRouter } from "~/server/api/routers/member";
-import { postRouter } from "~/server/api/routers/researchpost";
+import { researchpostRouter } from "~/server/api/routers/researchpost";
 import  { profileRouter }  from "./routers/profile";
 import { educationRouter } from "./routers/education";
 import { experienceRouter } from "./routers/experience";
@@ -25,7 +25,7 @@ export const appRouter = router({
   education: educationRouter,
   achievement: achievementRouter,
   experience: experienceRouter,
-  researchpost: postRouter,
+  researchpost: researchpostRouter,
   user: userRouter,
   project: projectRouter,
 });

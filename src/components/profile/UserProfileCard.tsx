@@ -13,7 +13,7 @@ type UserProfileCardProps = {
     profile: {
         profile_id: string;
         name: string;
-        about_me: string | null;
+        about_me: string |null;
         skills: string | null;
         research_interest: string | null;
         collab_status: string | null;

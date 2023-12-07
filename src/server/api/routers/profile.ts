@@ -58,20 +58,20 @@ export const profileRouter = router({
     )
     .mutation(async ({ input, ctx }) => {
       const { profile_id, name, about_me, skills, research_interest, collab_status} = input;
-  
+
       const profile = await ctx.prisma.profile.findUnique({
         where: {
           profile_id,
         },
       });
-  
+
       if (!profile || profile.user_id !== ctx.user.id) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to update this profile.",
         });
       }
-  
+
       const updatedProfile = await ctx.prisma.profile.update({
         where: {
           profile_id,
@@ -84,10 +84,10 @@ export const profileRouter = router({
           collab_status,
         },
       });
-  
+
       return updatedProfile;
     }),
-  
+
   //delete experience procedure
   deleteProfile: protectedProcedure
     .input(z.object({ profile_id: z.string() }))
@@ -103,7 +103,7 @@ export const profileRouter = router({
       if (!profile || profile.user_id !== ctx.user.id) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to delete this experience.",
+          message: "Failed to delete this profile.",
         });
       }
 
