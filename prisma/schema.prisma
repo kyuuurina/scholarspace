@@ -43,7 +43,7 @@ model flow_state {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model identities {
-  id              String
+  provider_id     String
   user_id         String    @db.Uuid
   identity_data   Json
   provider        String
@@ -51,9 +51,10 @@ model identities {
   created_at      DateTime? @db.Timestamptz(6)
   updated_at      DateTime? @db.Timestamptz(6)
   email           String?   @default(dbgenerated("lower((identity_data ->> 'email'::text))"))
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   users           users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
-  @@id([provider, id])
+  @@unique([provider_id, provider], map: "identities_provider_id_provider_unique")
   @@index([email])
   @@index([user_id])
   @@schema("auth")
@@ -186,6 +187,10 @@ model sessions {
   factor_id      String?          @db.Uuid
   aal            aal_level?
   not_after      DateTime?        @db.Timestamptz(6)
+  refreshed_at   DateTime?        @db.Timestamp(6)
+  user_agent     String?
+  ip             String?          @db.Inet
+  tag            String?
   mfa_amr_claims mfa_amr_claims[]
   refresh_tokens refresh_tokens[]
   users          users            @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
@@ -320,7 +325,7 @@ model user {
   profile_experience  profile_experience[]
   project_users       project_users[]
   research_post       research_post[]
-  task                task[]
+  task_assignees      task_assignees[]
   workspace_user      workspace_user[]
 
   @@schema("public")
@@ -487,6 +492,7 @@ model phase {
   phase_property      phase_property[]
   property_phase_task property_phase_task[]
   task                task[]
+  task_assignees      task_assignees[]
 
   @@schema("public")
 }
@@ -510,13 +516,12 @@ model task {
   name                String                @default("task")
   description         String?
   status              String                @default("pending")
-  assignees           String?               @db.Uuid
   phase_id            String                @db.Uuid
   end_at              DateTime?             @db.Timestamptz(6)
   comment             comment[]
   property_phase_task property_phase_task[]
-  user                user?                 @relation(fields: [assignees], references: [id], onDelete: NoAction, onUpdate: NoAction)
   phase               phase                 @relation(fields: [phase_id], references: [id], onDelete: NoAction)
+  task_assignees      task_assignees[]
 
   @@schema("public")
 }
@@ -533,6 +538,19 @@ model property_phase_task {
   task           task           @relation(fields: [task_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@id([task_id, property_id])
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model task_assignees {
+  task_id     String @db.Uuid
+  assignee_id String @db.Uuid
+  phase_id    String @db.Uuid
+  user        user   @relation(fields: [assignee_id], references: [id], onDelete: NoAction)
+  phase       phase  @relation(fields: [phase_id], references: [id], onDelete: NoAction)
+  task        task   @relation(fields: [task_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([task_id, assignee_id])
   @@schema("public")
 }
 

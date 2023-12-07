@@ -67,7 +67,7 @@ const ProfilePage: NextPageWithLayout = () => {
   const [isAchievementModalOpen, setIsAchievementModalOpen] = useState(true);
 
   //custom hooks
-  const {name, about_me, skills,research_interest,isLoading, error} = useFetchProfile();
+  const {profile_id, name, about_me, skills,research_interest, collab_status, isLoading, error} = useFetchProfile();
   const profile = useFetchProfile();
   const education = useFetchEducation();
   const experience = useFetchExperience();
@@ -84,7 +84,7 @@ const ProfilePage: NextPageWithLayout = () => {
     collab_status: z.string(),
   });
 
-  const updateProfile = api.profile.update.useMutation({
+  const updateProfile = api.profile.updateProfile.useMutation({
     onSuccess: () => {
       toast.custom(() => <SuccessToast message="Profile successfully updated" />);
       router.reload();
@@ -108,7 +108,7 @@ const ProfilePage: NextPageWithLayout = () => {
       about_me: about_me,
       skills: skills,
       research_interest: research_interest,
-      // collab_status: collab_status,
+      collab_status: collab_status,
     }
   });
 
@@ -119,7 +119,7 @@ const ProfilePage: NextPageWithLayout = () => {
       setValue("about_me", about_me || "");
       setValue("skills", skills || "");
       setValue("research_interest", research_interest || "");
-      // setValue("collab_status", collab_status || "");
+      setValue("collab_status", collab_status || "");
     }
   }, [isLoading, setValue]);
 
@@ -144,7 +144,7 @@ const ProfilePage: NextPageWithLayout = () => {
       about_me: about_me || "",
       skills: skills || "",
       research_interest: research_interest || "",
-      // collab_status: collab_status || "",
+      collab_status: collab_status || "",
     });
   };
 
@@ -178,10 +178,10 @@ const ProfilePage: NextPageWithLayout = () => {
               </div>
               <div>
                 {/* map profile array and pass project object to profile card  */}
-                {profile && (
+                {/* {profile && (
                     <UserProfileCard 
                       key={profile.profile_id} profile={profile} />  
-                )}
+                )} */}
               </div>
             </section>
           </div>

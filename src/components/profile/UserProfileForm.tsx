@@ -57,7 +57,7 @@ const UserProfileForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   //mutation to update profile
-  const updateProfile = api.profile.update.useMutation({
+  const updateProfile = api.profile.updateProfile.useMutation({
     onSuccess: () => {
       toast.custom(() => <SuccessToast message="Profile successfully updated" />);
       router.reload();
