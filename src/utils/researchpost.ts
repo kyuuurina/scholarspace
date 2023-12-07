@@ -1,6 +1,5 @@
 import { api } from "./api";
 import { useRouterId } from "./routerId";
-import { postRouter } from "~/server/api/routers/researchpost";
 
 type ResearchPost = {
   category: string;
