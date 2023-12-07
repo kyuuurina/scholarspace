@@ -32,7 +32,7 @@ export const profileRouter = router({
         about_me: z.string().nullable(),
         skills: z.string().nullable(),
         research_interest: z.string().nullable(),
-        collab_status: z.string(),
+        collab_status: z.string().nullable(),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -54,12 +54,12 @@ export const profileRouter = router({
     .input(
       z.object({
         profile_id: z.string(),
-        user_id: z.string(),
+        // user_id: z.string(),
         name: z.string(),
         about_me: z.string().nullable(),
         skills: z.string().nullable(),
         research_interest: z.string().nullable(),
-        collab_status: z.string(),
+        collab_status: z.string().nullable(),
       })
     )
     .mutation(async ({ input, ctx }) => {

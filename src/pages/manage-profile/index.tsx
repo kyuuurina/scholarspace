@@ -67,7 +67,8 @@ const ProfilePage: NextPageWithLayout = () => {
   const [isAchievementModalOpen, setIsAchievementModalOpen] = useState(true);
 
   //custom hooks
-  const {name, about_me, skills,research_interest,isLoading,error} = useFetchProfile();
+  const {name, about_me, skills,research_interest,isLoading, error} = useFetchProfile();
+  const profile = useFetchProfile();
   const education = useFetchEducation();
   const experience = useFetchExperience();
   const achievement = useFetchAchievement();
@@ -126,7 +127,7 @@ const ProfilePage: NextPageWithLayout = () => {
   const handleUpdateProfile = async (formData: ProfileFormData) => {
     try {
       await updateProfile.mutateAsync({
-        id: id as string,
+        profile_id: id,
         ...formData,
       });
       console.log(formData);
@@ -166,8 +167,21 @@ const ProfilePage: NextPageWithLayout = () => {
           {/* Profile section  */}
           <div className="grid gap-y-5">
             <section className="mt-2 w-full rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
+              <div className="flex justify-between items-center">
+                {/* UserProfileCard component */}
+                {/* <UserProfileCard profile={{updateProfile}} /> */}
+                {/* Edit button */}
+                <button onClick={handleEditClick} className="flex items-center">
+                  Edit <FaEdit className="ml-2" />
+                </button>
+
+              </div>
               <div>
-                Profile
+                {/* map profile array and pass project object to profile card  */}
+                {profile && (
+                    <UserProfileCard 
+                      key={profile.profile_id} profile={profile} />  
+                )}
               </div>
             </section>
           </div>
@@ -175,7 +189,7 @@ const ProfilePage: NextPageWithLayout = () => {
           {/* Education section  */}
           <div className="grid gap-y-5">
             <section className="mt-2 w-full rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
-            <div>
+              <div>
                 Education
               </div>
             </section>
@@ -184,7 +198,7 @@ const ProfilePage: NextPageWithLayout = () => {
           {/* Experience section  */}
           <div className="grid gap-y-5">
             <section className="mt-2 w-full rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
-            <div>
+              <div>
                 Research Experience
               </div>
             </section>
@@ -193,12 +207,11 @@ const ProfilePage: NextPageWithLayout = () => {
           {/* Achievement section  */}
           <div className="grid gap-y-5">
             <section className="mt-2 w-full rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
-            <div>
+              <div>
                 Achievement
               </div>
             </section>
           </div>
-  
         </div>
       </main>
 

@@ -34,10 +34,21 @@ type ProfileModalProps = {
 type ModalProps = {
   openModal: boolean;
   onClick: () => void;
+  profile: {
+    profile_id: string;
+    name: string;
+    about_me: string | null;
+    skills: string | null;
+    research_interest: string | null;
+    collab_status?: string | null;
+  };
 };
 
 const UserProfileForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
+
   const profile_id = useRouterId();
+  const userId = useUser()?.id;
+  // const userId = profile.user_id; 
 
   const router = useRouter();
   const user = useUser();
@@ -45,6 +56,7 @@ const UserProfileForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  //mutation to update profile
   const updateProfile = api.profile.update.useMutation({
     onSuccess: () => {
       toast.custom(() => <SuccessToast message="Profile successfully updated" />);
@@ -82,7 +94,6 @@ const UserProfileForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
 
       const response = await updateProfile.mutateAsync({
         ...formData,
-        user_id: user?.id,
         profile_id: profile_id,
       });
 

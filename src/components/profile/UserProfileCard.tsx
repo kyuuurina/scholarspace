@@ -3,38 +3,70 @@
 import Link from "next/link";
 import Image from "next/image";
 import AvatarPlaceholder from "../AvatarPlaceholder";
+import React, { useState } from "react";
+import { FiEdit } from "react-icons/fi";
+import UserProfileForm from "./UserProfileForm";
+
 
 type UserProfileCardProps = {
+    //a profile object containing the profile information
     profile: {
         profile_id: string;
         name: string;
-        about_me: string;
+        about_me: string | null;
         skills: string | null;
         research_interest: string | null;
-        collab_status?: string | null;
+        collab_status: string | null;
     };
 };
 
 const UserProfileCard: React.FC<UserProfileCardProps> = ({ profile }) => {
-    return (
-        <Link
-            href = {`/profile/${profile.profile_id}`}
-            className="flex w-full items-center space-x-5 rounded-lg border border-gray-200 bg-white p-4 shadow hover:bg-gray-100"
-            >
-            <div className= "aspect:circle h-20 w-20">
-                <AvatarPlaceholder name={profile.name} shape = "circle" />
-            </div>
-            <div className="flex flex-col items-start justify-center w-full h-full space-y-2">
-                {profile.about_me}
-            </div>
-            <div className="flex flex-col items-start justify-center w-full h-full space-y-2">
-                {profile.skills}
-            </div>
-            <div className="flex flex-col items-start justify-center w-full h-full space-y-2">
-                {profile.collab_status}
-            </div>
-        </Link>
-    );
+
+    const [isEditModalOpen, setEditModalOpen] = useState(false);
+
+    const openEditModal = () => {
+      setEditModalOpen(true);
+    };
+  
+    const closeEditModal = () => {
+      setEditModalOpen(false);
+    };
+
+  return (
+    <>
+      <Link
+        href={`/profile/${profile.profile_id}`}
+        className="flex w-full items-center space-x-5 rounded-lg border border-gray-200 bg-white p-4 shadow hover:bg-gray-100"
+      >
+        <div className="aspect:circle h-20 w-20">
+          <AvatarPlaceholder name={profile.name} shape="circle" />
+        </div>
+        <div className="flex flex-col items-start justify-center w-full h-full space-y-2">
+          {profile.about_me || 'No description'}
+        </div>
+        <div className="flex flex-col items-start justify-center w-full h-full space-y-2">
+          {profile.skills || 'No skills provided'}
+        </div>
+        <div className="flex flex-col items-start justify-center w-full h-full space-y-2">
+          {profile.research_interest || 'No research interest provided'}
+        </div>
+        <div className="flex flex-col items-start justify-center w-full h-full space-y-2">
+          {profile.collab_status || 'No collaboration status provided'}
+        </div>
+      </Link>
+      <div className="mt-2">
+        <FiEdit
+          className="cursor-pointer text-gray-500 hover:text-gray-700"
+          onClick={openEditModal}
+        />
+      </div>
+      {/* <UserProfileForm
+        openModal={isEditModalOpen}
+        onClick={closeEditModal}
+        profile={profile}
+      /> */}
+    </>
+  );
 };
 
 export default UserProfileCard;

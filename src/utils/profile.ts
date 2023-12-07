@@ -3,14 +3,14 @@
 import { api } from './api';
 import { useRouterId } from './routerId';
 
-type User = {
-    userid: string;
-    user: {
-        name: string | null;
-        email: string | null;
-        avatar_url: string | null;
-    };
-};
+// type User = {
+//     userid: string;
+//     user: {
+//         name: string | null;
+//         email: string | null;
+//         avatar_url: string | null;
+//     };
+// };
 
 type Profile = {
     profile_id: string;
@@ -55,6 +55,7 @@ export const useFetchProfile = () => {
         isLoading,
         error,
         profile_id,
+        // profile_id: id,
         user_id,
     };
 };
