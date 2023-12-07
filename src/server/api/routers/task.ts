@@ -44,10 +44,6 @@ export const taskRouter = router({
         },
       });
 
-      if (!tasks) {
-        throw new TRPCError({ code: "NOT_FOUND", message: "Tasks not found" });
-      }
-
       return tasks;
     }),
 
@@ -189,5 +185,29 @@ export const taskRouter = router({
       }
 
       return tasks;
+    }),
+
+  updateProperty: protectedProcedure
+    .input(
+      z.object({
+        task_id: z.string(),
+        property_id: z.string(),
+        value: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { task_id, property_id, value } = input;
+
+      const task = await ctx.prisma.property_phase_task.update({
+        where: {
+          task_id_property_id: {
+            property_id,
+            task_id,
+          },
+        },
+        data: { value },
+      });
+
+      return task;
     }),
 });

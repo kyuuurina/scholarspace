@@ -25,8 +25,6 @@ const Row: React.FC<RowProps> = ({ task, phase_id }) => {
   const [drawerIsOpen, setDrawerIsOpen] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState(task.status);
 
-  const router = useRouter();
-
   const updateStatusTask = api.task.updateStatus.useMutation({
     onSuccess: () => {
       toast.custom(() => <SuccessToast message="Status updated" />);
@@ -131,29 +129,25 @@ const Row: React.FC<RowProps> = ({ task, phase_id }) => {
       </td>
 
       <td className="border-b px-6 py-1">
-        {user.data && (
-          <div className="h-8">
-            {/* Your Avatar component */}
-          </div>
-        )}
+        {user.data && <div className="h-8">{/* Your Avatar component */}</div>}
       </td>
 
       {/* Use AnimatePresence to handle the animation of TaskDrawer */}
       <AnimatePresence>
-  {drawerIsOpen && (
-    <motion.div
-      key="drawer"
-      initial="closed"
-      animate="open"
-      exit="closed"
-      variants={variants}
-      className="fixed inset-0 overflow-hidden"
-      style={{ zIndex: 50, transition: "transform 0.5s ease-in-out" }}
-    >
-      <TaskDrawer task={task} onClose={() => setDrawerIsOpen(false)} />
-    </motion.div>
-  )}
-</AnimatePresence>
+        {drawerIsOpen && (
+          <motion.div
+            key="drawer"
+            initial="closed"
+            animate="open"
+            exit="closed"
+            variants={variants}
+            className="fixed inset-0 overflow-hidden"
+            style={{ zIndex: 50, transition: "transform 0.5s ease-in-out" }}
+          >
+            <TaskDrawer task={task} onClose={() => setDrawerIsOpen(false)} />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </tr>
   );
 };
