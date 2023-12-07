@@ -8,13 +8,13 @@ export const researchpostRouter = router({
   get: publicProcedure
     .input(z.object({ post_id: z.string() }))
     .query(async ({ input, ctx }) => {
-      const post = await ctx.prisma.research_post.findUnique({
+      const researchpost = await ctx.prisma.research_post.findUnique({
         where: {
           post_id: input.post_id,
         },
       });
 
-      return post;
+      return researchpost;
     }),
 
   create: protectedProcedure
@@ -28,14 +28,14 @@ export const researchpostRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const post = await ctx.prisma.research_post.create({
+      const researchpost = await ctx.prisma.research_post.create({
         data: {
           user_id: ctx.user.id,
           ...input,
         },
       });
 
-      return post;
+      return researchpost;
     }),
 
   update: protectedProcedure
@@ -51,13 +51,13 @@ export const researchpostRouter = router({
     .mutation(async ({ input, ctx }) => {
       const { post_id, category, title, description, document } = input;
 
-      const post = await ctx.prisma.research_post.findUnique({
+      const researchpost = await ctx.prisma.research_post.findUnique({
         where: {
           post_id,
         },
       });
 
-      if (!post || post.user_id !== ctx.user.id) {
+      if (!researchpost || researchpost.user_id !== ctx.user.id) {
         throw new TRPCError({
           code: "UNAUTHORIZED",
           message: "You are not authorized to update this post.",
@@ -84,13 +84,13 @@ export const researchpostRouter = router({
     .mutation(async ({ input, ctx }) => {
       const { post_id } = input;
 
-      const post = await ctx.prisma.research_post.findUnique({
+      const researchpost = await ctx.prisma.research_post.findUnique({
         where: {
           post_id,
         },
       });
 
-      if (!post || post.user_id !== ctx.user.id) {
+      if (!researchpost || researchpost.user_id !== ctx.user.id) {
         throw new TRPCError({
           code: "UNAUTHORIZED",
           message: "You are not authorized to delete this post.",

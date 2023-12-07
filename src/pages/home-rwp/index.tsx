@@ -1,17 +1,19 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
-/* eslint-disable @typescript-eslint/no-misused-promises */
-
 //This page should be displayed when user click Home Page
 //atm, it appears on localhost:3000/home-rwp
 
 //utils
-import { useState, useEffect } from "react";
+import { useFetchResearchPost } from "~/utils/researchpost";
+import { useRouterId } from "~/utils/routerId";
 import { useRouter } from "next/router";
-import toast from "react-hot-toast";
 
 // types
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "~/pages/_app";
+import { api } from "~/utils/api";
+
+//react
+import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 
 // pages
 import ErrorPage from "~/pages/error-page";
@@ -19,62 +21,36 @@ import ErrorPage from "~/pages/error-page";
 // local components
 import Layout from "~/components/layout/Layout";
 import Head from "~/components/layout/Head";
+import PrimaryButton from "~/components/button/PrimaryButton";
+import PageLoader from "~/components/layout/PageLoader";
 import Link from "next/link";
 import Card from "~/components/Card";
 import AvatarPlaceholder from "~/components/AvatarPlaceholder";
 import Modal from "~/components/modal/Modal";
 
 //research post components
+import AddNewPostButton from "~/components/research-post/AddNewPostButton";
+import AddNewPostModal from "~/components/research-post/AddNewPostModal";
 import AllFollowingTabs from "~/components/research-post/AllFollowingTabs";
 import PostCard from "~/components/research-post/PostCard";
 import { ResearchPostCard } from "~/components/draft/ResearchPostCard";
 import UserRecCard from "~/components/research-post/UserRecCards";
-import AddNewPostButton from "~/components/research-post/AddNewPostButton";
 import TestModal from "~/components/research-post/AddNewPostModal";
 //import { NewPostModal } from "~/components/draft/NewPostModal";
 //import NewPostForm from "~/components/draft/NewPostForm";
 
 
 
-const ResearchPostsPage: NextPageWithLayout = () => {
-  const users = [
-    { id: 1, name: "Ahmad Osama" },
-    { id: 2, name: "Hasbullah " },
-  ];
+const Home: NextPageWithLayout = () => {
 
-  const posts = [
-    {
-      title: "Taxonomy in Design Patterns",
-      category: "Conference Paper",
-      author: "Dr. Ismail",
-      description: "This is the first post. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      timestamp: "November 1, 2023",
-    },
-    {
-      title: "Design Patterns in Software Engineering",
-      category: "Journal Article",
-      author: "Nur Athirah",
-      description: "This is the second post. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      timestamp: "October 27, 2023",
-    },
-    {
-      title: "Impact of school funding on student achievement",
-      category: "Conference Paper",
-      author: "Dr. Isma Zaini",
-      description: "This is the second post. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      timestamp: "October 27, 2023",
-    },
-    {
-      title: "The effects of social and emotional learning on student well-being",
-      category: "Journal Article",
-      author: "Dr. Ismail",
-      description: "This is the first post. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      timestamp: "October 20, 2023",
-    },
+  const { category,title, author, description, isLoading, isError } = useFetchResearchPost();
+  const post_id = useRouterId();
+  const [modalIsOpen, setModalIsOpen] = useState(false);
 
-  ];
 
   return (
+    <>
+    <Head title="Home Page" />
     <div className="mx-auto max-w-screen-xl p-8">
       <AddNewPostButton />
       {/* <h1 className="mb-4 text-3xl font-bold">Research Posts</h1> */}
@@ -83,17 +59,7 @@ const ResearchPostsPage: NextPageWithLayout = () => {
           <AllFollowingTabs />
           <div className="mt-6">
             {/* Render post cards here */}
-            {posts.map((post, index) => (
-              <PostCard
-                key={index}
-                title={post.title}
-                category={post.category}
-                author={post.author}
-                description={post.description}
-                created_at=""
-                // timestamp={post.timestamp}
-              />
-            ))}
+
           </div>
         </div>
         {/* <div className="col-span-1">
@@ -101,16 +67,17 @@ const ResearchPostsPage: NextPageWithLayout = () => {
         </div> */}
       </div>
     </div>
+    </>
+
   );
 };
 
-ResearchPostsPage.getLayout = function getLayout(page: ReactElement) {
+Home.getLayout = function getLayout(page: ReactElement) {
   return (
-    <Layout>
-      <Head title="Home Page" />
-      {page}
-    </Layout>
+    <>
+      <Layout>{page}</Layout>
+    </>
   );
 };
 
-export default ResearchPostsPage;
+export default Home;

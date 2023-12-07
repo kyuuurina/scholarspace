@@ -37,10 +37,6 @@ import TestModal from "~/components/research-post/AddNewPostModal";
 
 
 const FollowingPostPage: NextPageWithLayout = () => {
-  const users = [
-    { id: 1, name: "Ahmad Osama" },
-    { id: 2, name: "Hasbullah " },
-  ];
 
   const posts = [
     {
@@ -68,6 +64,8 @@ const FollowingPostPage: NextPageWithLayout = () => {
   ];
 
   return (
+    <>
+    <Head title="Following Page" />
     <div className="mx-auto max-w-screen-xl p-8">
       <AddNewPostButton />
       {/* <h1 className="mb-4 text-3xl font-bold">Research Posts</h1> */}
@@ -76,33 +74,23 @@ const FollowingPostPage: NextPageWithLayout = () => {
           <AllFollowingTabs />
           <div className="mt-6">
             {/* Render post cards here */}
-            {posts.map((post, index) => (
-              <PostCard
-                key={index}
-                title={post.title}
-                category={post.category}
-                author={post.author}
-                description={post.description}
-                created_at=""
-                // timestamp={post.timestamp}
-              />
-            ))}
+
           </div>
         </div>
         {/* <div className="col-span-1">
-          <UserProfileCard users={users} />
+          <UserRecCard users={users} />
         </div> */}
       </div>
     </div>
+    </>
   );
 };
 
 FollowingPostPage.getLayout = function getLayout(page: ReactElement) {
   return (
-    <Layout>
-      <Head title="Home Page" />
-      {page}
-    </Layout>
+    <>
+      <Layout>{page}</Layout>
+    </>
   );
 };
 
