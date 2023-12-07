@@ -73,7 +73,7 @@ const ProfileTabs: React.FC = () => {
                   router.asPath === `/manage-profile/${profile_id}/likedpost`
                 }
               >
-                My Post
+                Liked Post
               </span>
             </Link>
           </li>
