@@ -118,54 +118,54 @@ export const researchpostRouter = router({
       return { success: true };
     }),
 
-  like: protectedProcedure
-    .input(z.object({ post_id: z.string() }))
-    .mutation(async ({ input, ctx }) => {
-      const { post_id } = input;
+  // like: protectedProcedure
+  //   .input(z.object({ post_id: z.string() }))
+  //   .mutation(async ({ input, ctx }) => {
+  //     const { post_id } = input;
 
-      const existingLike = await ctx.prisma.post_likes.findUnique({
-        where: {
-          post_id_user_id: {
-            post_id,
-            user_id: ctx.user.id,
-          },
-        },
-      });
+  //     const existingLike = await ctx.prisma.post_likes.findUnique({
+  //       where: {
+  //         post_id_user_id: {
+  //           post_id,
+  //           user_id: ctx.user.id,
+  //         },
+  //       },
+  //     });
 
-      if (existingLike) {
-        throw new TRPCError({
-          code: "CONFLICT",
-          message: "You have already liked this post.",
-        });
-      }
+  //     if (existingLike) {
+  //       throw new TRPCError({
+  //         code: "CONFLICT",
+  //         message: "You have already liked this post.",
+  //       });
+  //     }
 
-      const like = await ctx.prisma.post_likes.create({
-        data: {
-          post_id,
-          user_id: ctx.user.id,
-        },
-      });
+  //     const like = await ctx.prisma.post_likes.create({
+  //       data: {
+  //         post_id,
+  //         user_id: ctx.user.id,
+  //       },
+  //     });
 
-      return like;
-    }),
+  //     return like;
+  //   }),
 
-    unlike: protectedProcedure
-    .input(z.object({ post_id: z.string() }))
-    .mutation(async ({ input, ctx }) => {
-      const { post_id } = input;
+  //   unlike: protectedProcedure
+  //   .input(z.object({ post_id: z.string() }))
+  //   .mutation(async ({ input, ctx }) => {
+  //     const { post_id } = input;
   
-      // Delete the like entry made by the user for the specified post
-      await ctx.prisma.post_likes.delete({
-        where: {
-          post_id_user_id: {
-            post_id,
-            user_id: ctx.user.id,
-          },
-        },
-      });
+  //     // Delete the like entry made by the user for the specified post
+  //     await ctx.prisma.post_likes.delete({
+  //       where: {
+  //         post_id_user_id: {
+  //           post_id,
+  //           user_id: ctx.user.id,
+  //         },
+  //       },
+  //     });
   
-      return { success: true };
-    }),
+  //     return { success: true };
+  //   }),
 });
 
 

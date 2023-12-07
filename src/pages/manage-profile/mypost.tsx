@@ -8,7 +8,7 @@ import Link from 'next/link';
 
 //utils
 import { useRouterId } from "~/utils/routerId";
-import { useFetchProfile } from "~/utils/profile";
+import { useFetchResearchPost, useFetchUserResearchPosts } from '~/utils/researchpost';
 
 // types
 import type { ReactElement } from "react";
@@ -34,14 +34,18 @@ import Head from 'next/head';
 
 const MyPost: NextPageWithLayout = () => {
   const id = useRouterId();
-  const {
-    name,
-    about_me,
-    skills,
-    research_interest,
-    isLoading,
-    error
-  } = useFetchProfile();
+  const researchPosts = useFetchResearchPost();
+  // const userResearchPosts = useFetchUserResearchPost();
+
+
+  // const {
+  //   name,
+  //   about_me,
+  //   skills,
+  //   research_interest,
+  //   isLoading,
+  //   error
+  // } = useFetchProfile();
 
   return (
     <>
