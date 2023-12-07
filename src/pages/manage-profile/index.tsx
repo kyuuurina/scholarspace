@@ -43,7 +43,7 @@ import Header from "~/components/workspace/Header";
 
 //profile components
 import ProfileTabs from '~/components/profile/ProfileTabs';
-import UserProfileCard from "~/components/research-post/UserRecCards";
+import UserProfileCard from "~/components/profile/UserProfileCard";
 import UserProfileForm from "~/components/profile/UserProfileForm";
 import EducationForm from "~/components/profile/EducationForm";
 import EducationCard from "~/components/profile/EducationCard";
@@ -68,7 +68,9 @@ const ProfilePage: NextPageWithLayout = () => {
 
   //custom hooks
   const {name, about_me, skills,research_interest,isLoading,error} = useFetchProfile();
-  // const { school, start_year, end_year, description, isLoading} = useFetchEducation();
+  const education = useFetchEducation();
+  const experience = useFetchExperience();
+  const achievement = useFetchAchievement();
   // const { title, start_year, end_date, description, isLoading} = useFetchExperience();
   // const { title, received_year, description, isLoading} = useFetchAchievement();
 
@@ -162,7 +164,7 @@ const ProfilePage: NextPageWithLayout = () => {
 
   return (
     <>
-      {/* <Head title={name} /> */}
+      <Head title="Profile" />
       {/* <PageLoader isLoading={isLoading} errorMsg={error?.message}> */}
         <ProfileTabs />
 
@@ -171,13 +173,6 @@ const ProfilePage: NextPageWithLayout = () => {
           {/* Update Workspace Section  */}
           <div className="grid gap-y-5">
             <section className="mt-2 w-full rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
-            Achievement modal
-            {isAchievementModalOpen && (
-              <AchievementForm
-                openModal={isAchievementModalOpen}
-                onClick={() => setIsAchievementModalOpen(false)}
-              />
-            )}      
             </section>
           </div>
         </div>
