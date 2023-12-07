@@ -17,6 +17,18 @@ export const researchpostRouter = router({
       return post;
     }),
 
+  getMyPosts: protectedProcedure
+  .input(z.object({post_id: z.string()}))
+  .query(async ({input, ctx}) => {
+    const myPosts = await ctx.prisma.research_post.findMany({
+      where: {
+        user_id: ctx.user.id,
+      },
+    });
+
+    return myPosts;
+  }),
+
   create: protectedProcedure
     .input(
       z.object({

@@ -152,29 +152,53 @@ const ProfilePage: NextPageWithLayout = () => {
   //   return <div>Loading...</div>;
   // }
 
-  const handleEditClick = () => {
-    setIsEditModalOpen(true);
-  };
-
-  const handleEducationClick = () => {
-    setIsEducationModalOpen(true);
-  }
-
-
+  const handleEditClick = () => {setIsEditModalOpen(true);};
+  const handleEducationClick = () => {setIsEducationModalOpen(true);}
 
   return (
     <>
-      <Head title="Profile" />
+      {/* <Head title="Profile" /> */}
       {/* <PageLoader isLoading={isLoading} errorMsg={error?.message}> */}
         <ProfileTabs />
 
         <main className="min-h-screen w-full">
         <div className="p-5">
-          {/* Update Workspace Section  */}
+          {/* Profile section  */}
           <div className="grid gap-y-5">
             <section className="mt-2 w-full rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
+              <div>
+                Profile
+              </div>
             </section>
           </div>
+
+          {/* Education section  */}
+          <div className="grid gap-y-5">
+            <section className="mt-2 w-full rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
+            <div>
+                Education
+              </div>
+            </section>
+          </div>
+
+          {/* Experience section  */}
+          <div className="grid gap-y-5">
+            <section className="mt-2 w-full rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
+            <div>
+                Research Experience
+              </div>
+            </section>
+          </div>
+
+          {/* Achievement section  */}
+          <div className="grid gap-y-5">
+            <section className="mt-2 w-full rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
+            <div>
+                Achievement
+              </div>
+            </section>
+          </div>
+  
         </div>
       </main>
 
