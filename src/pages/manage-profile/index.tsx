@@ -128,7 +128,7 @@ const ProfilePage: NextPageWithLayout = () => {
   const handleUpdateProfile = async (formData: ProfileFormData) => {
     try {
       await updateProfile.mutateAsync({
-        profile_id: id as string,        
+        profile_id: id as string,
         // profile_id: id,
         ...formData,
       });
@@ -176,7 +176,7 @@ const ProfilePage: NextPageWithLayout = () => {
                   Profile
                 </h3>
                 {/* UserProfileCard component */}
-                    <UserProfileCard profile={{ profile_id, name, about_me, skills, research_interest, collab_status }} />
+                    {/* <UserProfileCard profile={{ profile_id, name, about_me, skills, research_interest, collab_status }} /> */}
                 {/* <UserProfileCard profile={{updateProfile}} /> */}
                 {/* Edit button */}
                 <button onClick={handleEditClick} className="flex items-center">
