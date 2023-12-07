@@ -340,16 +340,15 @@ model chat_message {
 }
 
 model profile {
-  profile_id        String          @id(map: "Profile_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  user_id           String          @db.Uuid
+  profile_id        String  @id(map: "Profile_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id           String  @db.Uuid
   name              String
   avatar_url        String?
   about_me          String?
   research_interest String?
-  collab_status     String?         @default("'Not Open For Collaboration'::text")
+  collab_status     String? @default("'Not Open For Collaboration'::text")
   skills            String?
-  user              user            @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  research_post     research_post[]
+  user              user    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@schema("public")
 }
@@ -386,7 +385,6 @@ model project_users {
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model research_post {
   post_id       String          @id(map: "ResearchPosts_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  profile_id    String?         @db.Uuid
   title         String
   author        String?
   document      String?
@@ -398,21 +396,18 @@ model research_post {
   summary       String?
   post_comments post_comments[]
   likes         post_likes[]
-  profile       profile?        @relation(fields: [profile_id], references: [profile_id], onDelete: NoAction, onUpdate: NoAction)
   user          user?           @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@schema("public")
 }
 
 model post_likes {
+  like_id       String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   post_id       String        @db.Uuid
-  likes_id      String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   user_id       String        @db.Uuid
-  research_post research_post @relation(fields: [post_id], references: [post_id], onDelete: Cascade, onUpdate: NoAction)
-  user          user          @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  research_post research_post @relation(fields: [post_id], references: [post_id], onDelete: Cascade)
+  user          user          @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
-  @@unique([post_id, user_id], map: "unique_user_post_likes")
-  @@index([post_id])
   @@schema("public")
 }
 
