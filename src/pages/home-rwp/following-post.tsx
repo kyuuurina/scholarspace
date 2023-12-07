@@ -35,7 +35,6 @@ import TestModal from "~/components/research-post/AddNewPostModal";
 //import NewPostForm from "~/components/draft/NewPostForm";
 
 
-
 const FollowingPostPage: NextPageWithLayout = () => {
 
   const posts = [

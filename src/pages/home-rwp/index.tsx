@@ -1,6 +1,8 @@
 //This page should be displayed when user click Home Page
 //atm, it appears on localhost:3000/home-rwp
 
+//TO DO: Add Page Loader
+
 //utils
 import { useFetchResearchPost } from "~/utils/researchpost";
 import { useRouterId } from "~/utils/routerId";
@@ -43,13 +45,13 @@ import TestModal from "~/components/research-post/AddNewPostModal";
 
 const Home: NextPageWithLayout = () => {
 
-  const { category,title, author, description, isLoading, isError } = useFetchResearchPost();
+  const { category,title, author, description, isLoading, error } = useFetchResearchPost();
   const post_id = useRouterId();
   const [modalIsOpen, setModalIsOpen] = useState(false);
 
 
-  return (
-    <>
+return (
+  <>
     <Head title="Home Page" />
     <div className="mx-auto max-w-screen-xl p-8">
       <AddNewPostButton />
@@ -59,7 +61,6 @@ const Home: NextPageWithLayout = () => {
           <AllFollowingTabs />
           <div className="mt-6">
             {/* Render post cards here */}
-
           </div>
         </div>
         {/* <div className="col-span-1">
@@ -67,9 +68,9 @@ const Home: NextPageWithLayout = () => {
         </div> */}
       </div>
     </div>
-    </>
+  </>
+);
 
-  );
 };
 
 Home.getLayout = function getLayout(page: ReactElement) {
