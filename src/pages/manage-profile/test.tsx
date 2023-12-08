@@ -166,32 +166,33 @@ const ProfilePage: NextPageWithLayout = () => {
           {/* User Profile Card */}
           <section className="mt-2 w-3/4 mx-auto rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
               <div className="flex justify-between items-center">
-                <h3 className="font-semibold text-2xl">
-                  Profile
-                </h3>
-                {/* UserProfileCard component */}
+                <h3 className="font-semibold text-2xl">Profile</h3>
                 <div>
-                    {/* Map through profiles and render UserProfileCard for each profile */}
-                    {profile.map((profile) => (
-                        <UserProfileCard key={profile.profile_id} profile={profile} />
-                    ))}
+                  <button onClick={handleEditClick} className="flex items-center">
+                    Edit <FaEdit className="ml-2" />
+                  </button>
                 </div>
-                {/* <UserProfileCard profile={{updateProfile}} /> */}
-                <button onClick={handleEditClick} className="flex items-center">
-                  Edit <FaEdit className="ml-2" />
-                </button>
-
               </div>
               <div>
-                {/* map profile array and pass profile object to profile card  */}
-                 {/* {profile && (
-                    <UserProfileCard 
-                      key={profile.profile_id} profile={profile} />  
+                {/* Render UserProfileForm if isEditModalOpen is true */}
+                {isEditModalOpen && (
+                  <UserProfileForm
+                    openModal={isEditModalOpen}
+                    onClick={() => setIsEditModalOpen(false)}
+                  />
+                )}
+                {/* Render UserProfileCard passing profile object */}
+                {/* {profile && (
+                  <UserProfileCard
+                    key={profile.profile_id}
+                    profile={profile}
+                  />
                 )} */}
               </div>
+              <div>
+                </div>
             </section>
           </div>
-
           {/* Education section  */}
           <div className="grid gap-y-5">
           <section className="mt-2 w-3/4 mx-auto rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">

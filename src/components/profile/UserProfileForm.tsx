@@ -34,7 +34,7 @@ type ProfileModalProps = {
 type ModalProps = {
   openModal: boolean;
   onClick: () => void;
-  profile: {
+  profile?: {
     profile_id: string;
     name: string;
     about_me: string | null;
@@ -102,7 +102,7 @@ const UserProfileForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
       router.reload();
     } catch (error) {
       // Handle errors, show toast, etc.
-      toast.custom(() => <ErrorToast message="Unsuccessful updated. Please try again." />);
+      toast.custom(() => <ErrorToast message="Unsuccessful update. Please try again." />);
     } finally {
       setIsSubmitting(false);
       onClick();
@@ -171,6 +171,23 @@ const UserProfileForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
             />
             {errors.skills && (
               <FormErrorMessage text={errors.skills.message} />
+            )}
+          </div>
+
+          <div>
+            <label
+              htmlFor="research_interest"
+              className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+            >
+              Research Interest
+            </label>
+            <input
+              id="research_interest"
+              className="block w-full"
+              {...register("research_interest", { required: false })}
+            />
+            {errors.research_interest && (
+              <FormErrorMessage text={errors.research_interest.message} />
             )}
           </div>
 
