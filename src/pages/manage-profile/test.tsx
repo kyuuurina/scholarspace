@@ -160,11 +160,10 @@ const ProfilePage: NextPageWithLayout = () => {
 
         <main className="min-h-screen w-full">
         <div className="p-5">
-          {/* Profile section  */}
           <div className="grid gap-y-5">
 
-          {/* User Profile Card */}
-          <section className="mt-2 w-3/4 mx-auto rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
+            {/* User Profile Card */}
+            <section className="mt-2 w-3/4 mx-auto rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
               <div className="flex justify-between items-center">
                 <h3 className="font-semibold text-2xl">Profile</h3>
                 <div>
@@ -189,35 +188,71 @@ const ProfilePage: NextPageWithLayout = () => {
                   />
                 )} */}
               </div>
-              <div>
-                </div>
             </section>
-          </div>
-          {/* Education section  */}
-          <div className="grid gap-y-5">
-          <section className="mt-2 w-3/4 mx-auto rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
-            <h3 className="font-semibold text-2xl">
-              Education
-            </h3>
-          </section>
+
+            {/* Education section  */}
+            <section className="mt-2 w-3/4 mx-auto rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8 flex justify-between">
+              <h3 className="font-semibold text-2xl">
+                Education
+              </h3>
+
+              {/* Add Education Button on the right side */}
+                <button
+                  onClick={() => setIsEducationModalOpen(true)}
+                  className="bg-purple-700 text-white px-4 py-2 rounded-md mt-4"
+                >
+                  Add New
+                </button>
+            </section>
+            {/* Render EducationForm passing modal state and onClose handler */}
+              <EducationForm
+                openModal={isEducationModalOpen}
+                onClick={() => setIsEducationModalOpen(false)}
+              />
           </div>
 
           {/* Experience section  */}
           <div className="grid gap-y-5">
-            <section className="mt-2 w-3/4 mx-auto rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
+            <section className="mt-2 w-3/4 mx-auto rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8 flex justify-between">
               <h3 className="font-semibold text-2xl">
                 Research Experience
               </h3>
+
+              {/* Add Education Button on the right side */}
+                <button
+                  onClick={() => setIsEducationModalOpen(true)}
+                  className="bg-purple-700 text-white px-4 py-2 rounded-md mt-4"
+                >
+                  Add New
+                </button>
             </section>
+            {/* Render ExperienceForm passing modal state and onClose handler */}
+                <ExperienceForm
+                openModal={isEducationModalOpen}
+                onClick={() => setIsEducationModalOpen(false)}
+              />
           </div>
 
-          {/* Achievement section  */}
+          {/* Experience section  */}
           <div className="grid gap-y-5">
-            <section className="mt-2 w-3/4 mx-auto rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
+            <section className="mt-2 w-3/4 mx-auto rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8 flex justify-between">
               <h3 className="font-semibold text-2xl">
                 Achievement
               </h3>
+
+              {/* Add Education Button on the right side */}
+                <button
+                  onClick={() => setIsEducationModalOpen(true)}
+                  className="bg-purple-700 text-white px-4 py-2 rounded-md mt-4"
+                >
+                  Add New
+                </button>
             </section>
+            {/* Render ExperienceForm passing modal state and onClose handler */}
+                <AchievementForm
+                openModal={isEducationModalOpen}
+                onClick={() => setIsEducationModalOpen(false)}
+              />
           </div>
         </div>
       </main>
