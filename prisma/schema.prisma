@@ -311,22 +311,24 @@ model workspace_user {
 }
 
 model user {
-  id                  String                @id @db.Uuid
-  name                String?
-  avatar_url          String?
-  email               String?
-  chat_message        chat_message[]
-  comment             comment[]
-  post_comments       post_comments[]
-  post_likes          post_likes[]
-  profile             profile[]
-  profile_achievement profile_achievement[]
-  profile_education   profile_education[]
-  profile_experience  profile_experience[]
-  project_users       project_users[]
-  research_post       research_post[]
-  task_assignees      task_assignees[]
-  workspace_user      workspace_user[]
+  id                               String                @id @db.Uuid
+  name                             String?
+  avatar_url                       String?
+  email                            String?
+  chat_message                     chat_message[]
+  comment                          comment[]
+  follow_follow_follower_idTouser  follow[]              @relation("follow_follower_idTouser")
+  follow_follow_following_idTouser follow[]              @relation("follow_following_idTouser")
+  post_comments                    post_comments[]
+  post_likes                       post_likes[]
+  profile                          profile[]
+  profile_achievement              profile_achievement[]
+  profile_education                profile_education[]
+  profile_experience               profile_experience[]
+  project_users                    project_users[]
+  research_post                    research_post[]
+  task_assignees                   task_assignees[]
+  workspace_user                   workspace_user[]
 
   @@schema("public")
 }
@@ -551,6 +553,17 @@ model task_assignees {
   task        task   @relation(fields: [task_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@id([task_id, assignee_id])
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model follow {
+  id                             String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  follower_id                    String  @db.Uuid
+  following_id                   String? @db.Uuid
+  user_follow_follower_idTouser  user    @relation("follow_follower_idTouser", fields: [follower_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user_follow_following_idTouser user?   @relation("follow_following_idTouser", fields: [following_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
   @@schema("public")
 }
 
