@@ -22,6 +22,9 @@ const MiniUserCard: React.FC<MiniUserCardProps> = ({ otherUser }) => {
                 <div className="aspect:square h-20 w-20">
                     <AvatarPlaceholder name={otherUser.name} shape="circle" />
                 </div>
+                <div>
+                    {otherUser.collab_status}
+                </div>
             </div>
         </Link>
     );

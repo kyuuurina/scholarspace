@@ -9,6 +9,7 @@ import  { profileRouter }  from "./routers/profile";
 import { educationRouter } from "./routers/education";
 import { experienceRouter } from "./routers/experience";
 import { achievementRouter } from "./routers/achievement";
+import { followRouter } from "./routers/follow";
 
 
 
@@ -28,6 +29,7 @@ export const appRouter = router({
   researchpost: researchpostRouter,
   user: userRouter,
   project: projectRouter,
+  follow: followRouter,
 });
 
 // export type definition of API

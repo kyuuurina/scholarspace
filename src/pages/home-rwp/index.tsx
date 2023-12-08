@@ -22,6 +22,7 @@ import AvatarPlaceholder from "~/components/AvatarPlaceholder";
 import Modal from "~/components/modal/Modal";
 
 //search 
+import { search } from "~/utils/searchService";
 import SearchBar from "~/components/profile/SearchBar";
 
 //research post components
@@ -83,10 +84,16 @@ const ResearchPostsPage: NextPageWithLayout = () => {
     };
   
     // Handler for search form submission
-    const handleSearchSubmit = () => {
+    const handleSearchSubmit = async () => {
       // Perform the search with the current searchQuery value
-      // You may want to navigate to the search results page or update the content based on the searchQuery
-      console.log("Search submitted:", searchQuery);
+      console.log("Searching...:", searchQuery);
+
+      // Use try-catch to handle any errors during navigation
+      try {
+        await router.push(`/search-results?q=${searchQuery}`);
+      } catch (error) {
+        console.error("Error :", error);
+      }
     };
 
     return (

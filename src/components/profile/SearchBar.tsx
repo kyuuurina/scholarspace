@@ -1,5 +1,6 @@
 // components/SearchBar.tsx
 import React, { ChangeEvent, KeyboardEvent } from "react";
+import {usePathname, useRouter, useSearchParams} from 'next/navigation';
 
 interface SearchBarProps {
   searchQuery: string;
@@ -28,7 +29,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ searchQuery, onSearchChange, onSe
       <input
         type="text"
         className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 pl-10 text-sm text-gray-900"
-        placeholder="Search for a research post title or profile..."
+        placeholder="Search for a profile..."
         value={searchQuery}
         onChange={onSearchChange}
         onKeyPress={(event: KeyboardEvent<HTMLInputElement>) => {

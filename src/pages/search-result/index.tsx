@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { NextPageWithLayout } from "~/pages/_app";
 import Layout from "~/components/layout/Layout";
 import { search } from "~/utils/searchService";
+import MiniUserCard  from "~/components/profile/MiniUserCard";
 
 const SearchResultsPage: NextPageWithLayout = () => {
   const router = useRouter();
@@ -11,14 +12,21 @@ const SearchResultsPage: NextPageWithLayout = () => {
   const [searchResults, setSearchResults] = useState<any[]>([]);
 
   useEffect(() => {
-    const query = router.query.q as string;
-    if (query) {
-      setSearchQuery(query);
-      // Ensure performSearch is awaited
-      performSearch(query).then((results) => {
-        setSearchResults(results);
-      });
-    }
+    const fetchData = async () => {
+      const query = router.query.q as string;
+      if (query) {
+        setSearchQuery(query);
+        try {
+          const results = await performSearch(query);
+          setSearchResults(results);
+        } catch (error) {
+          console.error("Error during search:", error);
+          // Handle the error accordingly
+        }
+      }
+    };
+  
+    fetchData();
   }, [router.query.q]);
 
   const performSearch = async (query: string): Promise<any[]> => {
@@ -37,11 +45,7 @@ const SearchResultsPage: NextPageWithLayout = () => {
       <h1 className="mb-4 text-3xl font-bold">Search Results for {searchQuery}</h1>
       {/* Display search results */}
       {searchResults.map((result) => (
-        <div key={result.id}>
-          {/* Customize based on your search result structure */}
-          <p>{result.title}</p>
-          <p>{result.name}</p>
-        </div>
+        <MiniUserCard key={result.profile_id} otherUser={result} />
       ))}
     </div>
   );
