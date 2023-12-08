@@ -62,7 +62,7 @@ const ProfilePage: NextPageWithLayout = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isEducationModalOpen, setIsEducationModalOpen] = useState(false);
   const [isExperienceModalOpen, setIsExperienceModalOpen] = useState(false);
-  const [isAchievementModalOpen, setIsAchievementModalOpen] = useState(true);
+  const [isAchievementModalOpen, setIsAchievementModalOpen] = useState(false);
 
   //custom hooks
   //fetch profile data
@@ -220,7 +220,7 @@ const ProfilePage: NextPageWithLayout = () => {
 
               {/* Add Education Button on the right side */}
                 <button
-                  onClick={() => setIsEducationModalOpen(true)}
+                  onClick={() => setIsExperienceModalOpen(true)}
                   className="bg-purple-700 text-white px-4 py-2 rounded-md mt-4"
                 >
                   Add New
@@ -228,8 +228,8 @@ const ProfilePage: NextPageWithLayout = () => {
             </section>
             {/* Render ExperienceForm passing modal state and onClose handler */}
                 <ExperienceForm
-                openModal={isEducationModalOpen}
-                onClick={() => setIsEducationModalOpen(false)}
+                openModal={isExperienceModalOpen}
+                onClick={() => setIsExperienceModalOpen(false)}
               />
           </div>
 
@@ -242,7 +242,7 @@ const ProfilePage: NextPageWithLayout = () => {
 
               {/* Add Education Button on the right side */}
                 <button
-                  onClick={() => setIsEducationModalOpen(true)}
+                  onClick={() => setIsAchievementModalOpen(true)}
                   className="bg-purple-700 text-white px-4 py-2 rounded-md mt-4"
                 >
                   Add New
@@ -250,8 +250,8 @@ const ProfilePage: NextPageWithLayout = () => {
             </section>
             {/* Render ExperienceForm passing modal state and onClose handler */}
                 <AchievementForm
-                openModal={isEducationModalOpen}
-                onClick={() => setIsEducationModalOpen(false)}
+                openModal={isAchievementModalOpen}
+                onClick={() => setIsAchievementModalOpen(false)}
               />
           </div>
         </div>
