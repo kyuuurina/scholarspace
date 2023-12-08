@@ -27,7 +27,7 @@ const UserProfileCard: React.FC<UserProfileCardProps> = ({ profile }) => {
     const openEditModal = () => {
       setEditModalOpen(true);
     };
-  
+
     const closeEditModal = () => {
       setEditModalOpen(false);
     };
@@ -60,11 +60,11 @@ const UserProfileCard: React.FC<UserProfileCardProps> = ({ profile }) => {
           onClick={openEditModal}
         />
       </div>
-      {/* <UserProfileForm
+      <UserProfileForm
         openModal={isEditModalOpen}
         onClick={closeEditModal}
         profile={profile}
-      /> */}
+      />
     </>
   );
 };

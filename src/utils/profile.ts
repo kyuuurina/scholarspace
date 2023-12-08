@@ -3,16 +3,6 @@
 import { api } from './api';
 import { useRouterId } from './routerId';
 
-type Profile = {
-    profile_id: string;
-    user_id: string;
-    name: string;
-    about_me: string | null;
-    skills: string | null;
-    research_interest: string | null;
-    collab_status: string;
-};
-
 //fetch a user profile based on profile_id from router
 export const useFetchProfile = () => {
     const id: string = useRouterId();

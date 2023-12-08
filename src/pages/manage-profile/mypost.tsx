@@ -1,6 +1,6 @@
-//Query all post created by user, if null, display "You have not created any post yet"
-
 import React from 'react';
+import { useFetchMyResearchPosts } from '~/utils/mypost';
+
 import {useState} from 'react';
 import {api} from "~/utils/api";
 import Image from 'next/image';
@@ -19,32 +19,58 @@ import ErrorPage from "~/pages/error-page";
 import Layout from "~/components/layout/Layout";
 import PageLoader from "~/components/layout/PageLoader";
 import LoadingSpinner from "~/components/LoadingSpinner";
-import PrimaryButton from "~/components/button/PrimaryButton";
-import AvatarPlaceholder from "~/components/AvatarPlaceholder";
 import { FaEdit } from 'react-icons/fa';
 
 //profile components
 import ProfileTabs from '~/components/profile/ProfileTabs';
-import UserProfileCard from "~/components/research-post/UserRecCards";
-import UserProfileForm from "~/components/profile/UserProfileForm";
-import EducationForm from "~/components/profile/EducationForm";
-import EducationCard from "~/components/profile/EducationCard";
 import Head from 'next/head';
 
+// ... (other imports)
 
 const MyPost: NextPageWithLayout = () => {
-  const id = useRouterId();
-  const researchposts = useFetchResearchPost();
- 
-  // const userResearchPosts = useFetchUserResearchPost();
-
+  const userResearchPosts = useFetchMyResearchPosts();
+  const router = useRouterId();
 
   return (
     <>
-      {/* <Head title={name} /> */}
-      {/* <PageLoader isLoading={isLoading} errorMsg={error?.message}> */}
+      <Head>
+        <title>Your Posts</title>
+      </Head>
       <ProfileTabs />
-      {/* </PageLoader> */}
+
+      <div>
+        {/* {userResearchPosts.isLoading && <LoadingSpinner />}
+        {userResearchPosts.error && <ErrorPage error={userResearchPosts.error.message} />} */}
+        {/* {!userResearchPosts.isLoading && !userResearchPosts.error && ( */}
+          <div>
+            {userResearchPosts.myResearchPosts.length === 0 ? (
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  height: '50vh',
+                }}
+              >
+                <p style={{ fontWeight: '600', fontSize: '18px' }}>
+                  You have not created any posts yet.
+                </p>
+              </div>
+            ) : (
+              <ul>
+                {userResearchPosts.myResearchPosts.map((post) => (
+                  <li key={post.post_id}>
+                    <h2 style={{ fontWeight: '600', fontSize: '24px' }}>{post.title}</h2>
+                    <p style={{ fontWeight: '500', fontSize: '16px' }}>{post.description}</p>
+                    {/* Add more fields as needed */}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        {/* // )} */}
+      </div>
     </>
   );
 };

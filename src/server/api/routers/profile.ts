@@ -2,16 +2,20 @@ import { z } from "zod";
 import { router, protectedProcedure, publicProcedure } from "~/server/api/trpc";
 import { TRPCError } from "@trpc/server";
 
+// Define the profile router
 export const profileRouter = router({
-  get: publicProcedure
+  // Procedure to get a user's profile
+  get: protectedProcedure
     .input(z.object({ profile_id: z.string() }))
     .query(async ({ input, ctx }) => {
+      // Find the profile in the database based on the provided profile_id
       const profile = await ctx.prisma.profile.findUnique({
         where: {
           profile_id: input.profile_id,
         },
       });
 
+      // If the profile is not found, throw a NOT_FOUND error
       if (!profile) {
         throw new TRPCError({
           code: "NOT_FOUND",
@@ -19,34 +23,16 @@ export const profileRouter = router({
         });
       }
 
+      // Return the profile if found
       return {
         ...profile,
       };
     }),
 
-  createProfile: protectedProcedure
+  // Procedure to update a user's profile
+  updateProfile: protectedProcedure
     .input(
-      z.object({
-        name: z.string(),
-        about_me: z.string().nullable(),
-        skills: z.string().nullable(),
-        research_interest: z.string().nullable(),
-        collab_status: z.string().nullable(),
-      })
-    )
-    .mutation(async ({ input, ctx }) => {
-      const newProfile = await ctx.prisma.profile.create({
-        data: {
-          user_id: ctx.user.id,
-          ...input,
-        },
-      });
-
-      return newProfile;
-    }),
-
-    updateProfile: protectedProcedure
-    .input(
+      // Define the input schema for the updateProfile mutation
       z.object({
         profile_id: z.string(),
         name: z.string(),
@@ -57,14 +43,17 @@ export const profileRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const { profile_id, name, about_me, skills, research_interest, collab_status} = input;
+      // Destructure input to get relevant properties
+      const { profile_id, name, about_me, skills, research_interest, collab_status } = input;
 
+      // Find the profile in the database based on the provided profile_id
       const profile = await ctx.prisma.profile.findUnique({
         where: {
           profile_id,
         },
       });
 
+      // If the profile doesn't exist or the user is not the owner, throw an error
       if (!profile || profile.user_id !== ctx.user.id) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
@@ -72,6 +61,7 @@ export const profileRouter = router({
         });
       }
 
+      // Update the profile in the database with the provided data
       const updatedProfile = await ctx.prisma.profile.update({
         where: {
           profile_id,
@@ -85,37 +75,127 @@ export const profileRouter = router({
         },
       });
 
+      // Return the updated profile
       return updatedProfile;
     }),
-
-  //delete experience procedure
-  deleteProfile: protectedProcedure
-    .input(z.object({ profile_id: z.string() }))
-    .mutation(async ({ input, ctx }) => {
-      const { profile_id } = input;
-
-      const profile = await ctx.prisma.profile.findUnique({
-        where: {
-          profile_id,
-        },
-      });
-
-      if (!profile || profile.user_id !== ctx.user.id) {
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to delete this profile.",
-        });
-      }
-
-      await ctx.prisma.profile.delete({
-        where: {
-          profile_id,
-        },
-      });
-
-      return { success: true };
-    }),
 });
+
+// export const profileRouter = router({
+//   get: publicProcedure
+//     .input(z.object({ profile_id: z.string() }))
+//     .query(async ({ input, ctx }) => {
+//       const profile = await ctx.prisma.profile.findUnique({
+//         where: {
+//           profile_id: input.profile_id,
+//         },
+//       });
+
+//       if (!profile) {
+//         throw new TRPCError({
+//           code: "NOT_FOUND",
+//           message: "Profile not found",
+//         });
+//       }
+
+//       return {
+//         ...profile,
+//       };
+//     }),
+
+//   createProfile: protectedProcedure
+//     .input(
+//       z.object({
+//         name: z.string(),
+//         about_me: z.string().nullable(),
+//         skills: z.string().nullable(),
+//         research_interest: z.string().nullable(),
+//         collab_status: z.string().nullable(),
+//       })
+//     )
+//     .mutation(async ({ input, ctx }) => {
+//       const newProfile = await ctx.prisma.profile.create({
+//         data: {
+//           user_id: ctx.user.id,
+//           ...input,
+//         },
+//       });
+
+//       return newProfile;
+//     }),
+
+//     updateProfile: protectedProcedure
+//     .input(
+//       z.object({
+//         profile_id: z.string(),
+//         name: z.string(),
+//         about_me: z.string().nullable(),
+//         skills: z.string().nullable(),
+//         research_interest: z.string().nullable(),
+//         collab_status: z.string().nullable(),
+//       })
+//     )
+//     .mutation(async ({ input, ctx }) => {
+//       const { profile_id, name, about_me, skills, research_interest, collab_status} = input;
+
+//       const profile = await ctx.prisma.profile.findUnique({
+//         where: {
+//           profile_id,
+//         },
+//       });
+
+//       if (!profile || profile.user_id !== ctx.user.id) {
+//         throw new TRPCError({
+//           code: "INTERNAL_SERVER_ERROR",
+//           message: "Failed to update this profile.",
+//         });
+//       }
+
+//       const updatedProfile = await ctx.prisma.profile.update({
+//         where: {
+//           profile_id,
+//         },
+//         data: {
+//           name,
+//           about_me,
+//           skills,
+//           research_interest,
+//           collab_status,
+//         },
+//       });
+
+//       return updatedProfile;
+//     }),
+
+//   //delete experience procedure
+//   deleteProfile: protectedProcedure
+//     .input(z.object({ profile_id: z.string() }))
+//     .mutation(async ({ input, ctx }) => {
+//       const { profile_id } = input;
+
+//       const profile = await ctx.prisma.profile.findUnique({
+//         where: {
+//           profile_id,
+//         },
+//       });
+
+//       if (!profile || profile.user_id !== ctx.user.id) {
+//         throw new TRPCError({
+//           code: "INTERNAL_SERVER_ERROR",
+//           message: "Failed to delete this profile.",
+//         });
+//       }
+
+//       await ctx.prisma.profile.delete({
+//         where: {
+//           profile_id,
+//         },
+//       });
+
+//       return { success: true };
+//     }),
+// });
+
+//new
 
 // export const profileRouter = router({
 //   get: publicProcedure
