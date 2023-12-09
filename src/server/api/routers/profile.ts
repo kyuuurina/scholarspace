@@ -75,6 +75,7 @@ export const profileRouter = router({
         },
       });
 
+      console.log("profileRouter updatedProfile:", updatedProfile);
       // Return the updated profile
       return updatedProfile;
     }),

@@ -88,6 +88,7 @@ export const researchpostRouter = router({
         },
       });
 
+      console.log("researchPostRouter:", updatedResearchPost);
       return updatedResearchPost;
     }),
 

@@ -91,7 +91,7 @@ const PostCard: React.FC<PostCardProps> = ({
       </div>
       <div className = "mt-2-flex items-center mt-4">
         <h3 className="text-lg font-bold">{title}</h3>
-      </div>     
+      </div> 
       <div className= "mt-2-flex items-center mb-4">
         <p className="text-sm">Created on: {timestamp}</p>
       </div>
