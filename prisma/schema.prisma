@@ -520,6 +520,7 @@ model task {
   status              String                @default("pending")
   phase_id            String                @db.Uuid
   end_at              DateTime?             @db.Timestamptz(6)
+  attachments         String[]
   comment             comment[]
   property_phase_task property_phase_task[]
   phase               phase                 @relation(fields: [phase_id], references: [id], onDelete: NoAction)

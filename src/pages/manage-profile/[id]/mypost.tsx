@@ -1,5 +1,5 @@
 import React from 'react';
-import { useFetchMyResearchPosts } from '~/utils/mypost';
+import { useFetchMyResearchPosts } from '~/utils/researchpost';
 
 import { useState } from 'react';
 import { api } from '~/utils/api';
@@ -8,7 +8,6 @@ import Link from 'next/link';
 
 //utils
 import { useRouterId } from '~/utils/routerId';
-import { useFetchResearchPost } from '~/utils/researchpost';
 
 // types
 import type { ReactElement } from 'react';
@@ -30,7 +29,7 @@ const MyPost: NextPageWithLayout = () => {
   const myPostLists = useFetchMyResearchPosts();
   const router = useRouterId();
 
-  console.log("MyPost page router:", router)
+  console.log("MyPost.tsx page router:", router)
 
   return (
     <>

@@ -36,6 +36,29 @@ export const useFetchResearchPost = () => {
 
 
 
+export const useFetchMyResearchPosts = () => {
+    const id: string = useRouterId();
+
+    const myResearchPosts = api.researchpost.getMyPosts.useQuery(
+        {
+            post_id: id,
+        },
+        {
+            enabled: !!id,
+        }
+    );
+
+    const { data, isLoading, error } = myResearchPosts;
+
+    return {
+        myResearchPosts: data || [],
+        isLoading,
+        error,
+    };
+};
+
+
+
 
 //hook for fetching user's research posts
 // export const useFetchUserResearchPosts = (userId: string) => {

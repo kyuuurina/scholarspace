@@ -31,25 +31,47 @@ import EducationForm from "~/components/profile/EducationForm";
 import EducationCard from "~/components/profile/EducationCard";
 import Head from 'next/head';
 
+import { useRouter } from 'next/router';
+import { useFetchResearchPost } from '~/utils/researchpost';
+import { useFetchLikedPost } from '~/utils/like';
+import { FaExclamationCircle } from 'react-icons/fa';
 
-const LikedPost: NextPageWithLayout = () => {
-  const id = useRouterId();
-  const {
-    name,
-    about_me,
-    skills,
-    research_interest,
-    isLoading,
-    error
-  } = useFetchProfile();
+
+const LikedPost = () => {
+  const likedPostLists = useFetchLikedPost();
 
   return (
-    <>
-      {/* <Head title={name} /> */}
-      {/* <PageLoader isLoading={isLoading} errorMsg={error?.message}> */}
-      <ProfileTabs />
-      {/* </PageLoader> */}
-    </>
+      <div className="container mx-auto mt-8">
+          {likedPostLists.isLoading && <LoadingSpinner />}
+          {likedPostLists.error && (
+              <div className="flex flex-col items-center justify-center h-50vh">
+                  <FaExclamationCircle className="text-gray-500 text-4xl mb-4" />
+                  <p className="font-semibold text-lg text-gray-500 leading-1.5 text-center max-w-md">
+                      Oops! Something went wrong.
+                  </p>
+              </div>
+          )}
+
+          {likedPostLists.likedPosts.length > 0 ? (
+              <ul className="grid grid-cols-1 gap-8">
+                  {likedPostLists.likedPosts.map((post) => (
+                      <li key={post.post_id} className="mb-8">
+                          {/* Render your liked post component here */}
+                      </li>
+                  ))}
+              </ul>
+          ) : (
+              <div className="flex flex-col items-center justify-center h-50vh">
+                  <FaExclamationCircle className="text-gray-500 text-4xl mb-4" />
+                  <p className="font-semibold text-lg text-gray-500 leading-1.5 text-center max-w-md">
+                      Uh-oh, you havet liked any posts yet.
+                  </p>
+                  <p className="font-medium text-base text-gray-500 leading-1.5 text-center max-w-md">
+                      Explore posts and click the like button to add posts to your liked list.
+                  </p>
+              </div>
+          )}
+      </div>
   );
 };
 
