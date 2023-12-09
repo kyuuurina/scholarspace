@@ -23,11 +23,14 @@ import { FaEdit, FaExclamationCircle } from 'react-icons/fa';
 
 //profile components
 import ProfileTabs from '~/components/profile/ProfileTabs';
+import Post from '~/components/research-post/Post';
 import Head from 'next/head';
 
 const MyPost: NextPageWithLayout = () => {
-  const userResearchPosts = useFetchMyResearchPosts();
+  const myPostLists = useFetchMyResearchPosts();
   const router = useRouterId();
+
+  console.log("MyPost page router:", router)
 
   return (
     <>
@@ -36,40 +39,37 @@ const MyPost: NextPageWithLayout = () => {
       </Head>
       <ProfileTabs />
 
-      <div>
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            height: '50vh',
-          }}
-        >
-          <FaExclamationCircle style={{ fontSize: '48px', color: 'gray' }} />
-          <p style={{ fontWeight: '600', fontSize: '20px', marginTop: '16px', color: 'gray', lineHeight: '1.5' }}>
-            Uh-oh, you haven&apos;t created any posts yet.
-          </p>
-          <p style={{ fontWeight: '500', fontSize: '18px', textAlign: 'center', maxWidth: '400px', color: 'gray', lineHeight: '1.5' }}>
-            Navigate to the Home Page to add a new post and share your research!
-          </p>
-        </div>
+      <div className="container mx-auto mt-8">
+        {myPostLists.isLoading && <LoadingSpinner />}
+        {myPostLists.error && (
+          <div className="flex flex-col items-center justify-center h-50vh">
+            <FaExclamationCircle className="text-gray-500 text-4xl mb-4" />
+            <p className="font-semibold text-lg text-gray-500 leading-1.5 text-center max-w-md">
+              Oops! Something went wrong.
+            </p>
+          </div>
+        )}
 
-        <div>
-          {userResearchPosts.myResearchPosts.length > 0 && (
-            <ul>
-              {userResearchPosts.myResearchPosts.map((post) => (
-                <li key={post.post_id}>
-                  <h2 style={{ fontWeight: '600', fontSize: '28px', marginBottom: '8px' }}>{post.title}</h2>
-                  <p style={{ fontWeight: '500', fontSize: '18px', lineHeight: '1.5', marginBottom: '16px' }}>
-                    {post.description}
-                  </p>
-                  {/* Add more fields as needed */}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+        {/* if post exist */}
+        {myPostLists.myResearchPosts.length > 0 ? (
+          <ul className="grid grid-cols-1 gap-8">
+            {myPostLists.myResearchPosts.map((post) => (
+              <li key={post.post_id} className="mb-8">
+                <Post post={post} />
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className="flex flex-col items-center justify-center h-50vh">
+            <FaExclamationCircle className="text-gray-500 text-4xl mb-4" />
+            <p className="font-semibold text-lg text-gray-500 leading-1.5 text-center max-w-md">
+              Uh-oh, you havent created any posts yet.
+            </p>
+            <p className="font-medium text-base text-gray-500 leading-1.5 text-center max-w-md">
+              Navigate to the Home Page to add a new post and share your research!
+            </p>
+          </div>
+        )}
       </div>
     </>
   );
@@ -85,3 +85,20 @@ MyPost.getLayout = function getLayout(page: ReactElement) {
 };
 
 export default MyPost;
+
+
+{/* <div>
+{myPostLists.myResearchPosts.length > 0 && (
+  <ul>
+    {myPostLists.myResearchPosts.map((post) => (
+      <li key={post.post_id}>
+        <h2 style={{ fontWeight: '600', fontSize: '28px', marginBottom: '8px' }}>{post.title}</h2>
+        <p style={{ fontWeight: '500', fontSize: '18px', lineHeight: '1.5', marginBottom: '16px' }}>
+          {post.description}
+        </p>
+        {/* Add more fields as needed */}
+//       </li>
+//     ))}
+//   </ul>
+// )}
+// </div> */}

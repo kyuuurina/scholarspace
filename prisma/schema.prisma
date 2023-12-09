@@ -398,7 +398,7 @@ model research_post {
   description   String?
   created_at    DateTime        @default(now())
   updated_at    DateTime        @default(now())
-  category      String?
+  category      String
   user_id       String          @db.Uuid
   summary       String?
   post_comments post_comments[]
