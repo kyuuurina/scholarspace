@@ -1,6 +1,7 @@
 import { api } from "~/utils/api";
 import { useState } from "react";
 import { useFetchTasksWithProperties } from "~/utils/task";
+import { useClickAway } from "@uidotdev/usehooks";
 
 type CellProps = {
   task_id: string;
@@ -14,6 +15,9 @@ const EditableCell: React.FC<CellProps> = ({
   setIsEditing,
 }) => {
   const [newValue, setNewValue] = useState("");
+  const ref = useClickAway(() => {
+    setIsEditing(false);
+  });
   const updateProperty = api.task.updateProperty.useMutation();
 
   // get phase id of property
@@ -44,12 +48,9 @@ const EditableCell: React.FC<CellProps> = ({
     }
   };
 
-  const handleBlur = () => {
-    setIsEditing(false);
-  };
-
   return (
     <input
+      ref={ref as React.MutableRefObject<HTMLInputElement>}
       type="text"
       value={newValue}
       autoFocus

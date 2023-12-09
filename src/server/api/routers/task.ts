@@ -39,9 +39,6 @@ export const taskRouter = router({
         where: {
           phase_id,
         },
-        include: {
-          user: true,
-        },
       });
 
       return tasks;
@@ -175,9 +172,6 @@ export const taskRouter = router({
           phase_id,
           status,
         },
-        include: {
-          user: true,
-        },
       });
 
       if (!tasks) {
@@ -206,6 +200,170 @@ export const taskRouter = router({
           },
         },
         data: { value },
+      });
+
+      return task;
+    }),
+
+  getAssignees: protectedProcedure
+    .input(
+      z.object({
+        phase_id: z.string(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const { phase_id } = input;
+
+      const assignees = await ctx.prisma.task_assignees.findMany({
+        where: {
+          phase_id,
+        },
+        include: {
+          user: true,
+        },
+      });
+
+      if (assignees.length === 0) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Task not found" });
+      }
+
+      return assignees;
+    }),
+
+  getTaskAssignees: protectedProcedure
+    .input(
+      z.object({
+        task_id: z.string(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const { task_id } = input;
+
+      const assignees = await ctx.prisma.task_assignees.findMany({
+        where: {
+          task_id,
+        },
+        include: {
+          user: true,
+        },
+      });
+
+      if (assignees.length === 0) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Task not found" });
+      }
+
+      return assignees;
+    }),
+
+  addTaskRow: protectedProcedure
+    .input(
+      z.object({
+        phase_id: z.string(),
+        name: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { phase_id } = input;
+
+      const task = await ctx.prisma.task.create({
+        data: {
+          ...input,
+          created_at: new Date(),
+        },
+      });
+
+      // get properties of phase
+      const properties = await ctx.prisma.phase_property.findMany({
+        where: {
+          phase_id,
+        },
+      });
+
+      const nextIndex = properties.length - 1;
+
+      // create phase_property_task row for each phase property
+      await Promise.all(
+        properties.map((property) =>
+          ctx.prisma.property_phase_task.create({
+            data: {
+              task_id: task.id,
+              property_id: property.id,
+              phase_id,
+              index: nextIndex,
+            },
+          })
+        )
+      );
+      return task;
+    }),
+
+  updateTaskName: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        name: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { id, name } = input;
+
+      const task = await ctx.prisma.task.update({
+        where: { id },
+        data: { name },
+      });
+
+      return task;
+    }),
+
+  getPropertyValues: protectedProcedure
+    .input(
+      z.object({
+        task_id: z.string(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const { task_id } = input;
+
+      const propertyValues = await ctx.prisma.property_phase_task.findMany({
+        where: {
+          task_id,
+        },
+      });
+
+      return propertyValues;
+    }),
+
+  updateDescription: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        description: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { id, description } = input;
+
+      const task = await ctx.prisma.task.update({
+        where: { id },
+        data: { description },
+      });
+
+      return task;
+    }),
+
+  uploadAttachment: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        attachments: z.array(z.string()),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { id, attachments } = input;
+
+      const task = await ctx.prisma.task.update({
+        where: { id },
+        data: { attachments },
       });
 
       return task;

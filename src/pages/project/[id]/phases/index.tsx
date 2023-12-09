@@ -2,6 +2,7 @@
 import { useRouterId } from "~/utils/routerId";
 import { useRouter } from "next/router";
 import { useFetchProject } from "~/utils/project";
+
 // import phases type from prisma client
 
 // types
@@ -18,7 +19,6 @@ import Header from "~/components/phase/Header";
 import Table from "~/components/phase/Table";
 
 import { useState, useEffect } from "react";
-import { set } from "zod";
 import PrimaryButton from "~/components/button/PrimaryButton";
 
 const Phase: NextPageWithLayout = () => {
@@ -70,7 +70,6 @@ const Phase: NextPageWithLayout = () => {
             onSelectPhase={handleSelectPhase}
             selectedPhase={selectedPhase}
           />
-
           {/* selected phase section */}
           <section className="p-2">
             {selectedPhase && (
@@ -83,12 +82,8 @@ const Phase: NextPageWithLayout = () => {
                   />
                   <div className="flex justify-between space-x-2">
                     <PrimaryButton
-                      name="Add Task"
-                      onClick={() => router.push(`/project/${id}/tasks/new`)}
-                    />
-                    <PrimaryButton
                       name="Filter"
-                      onClick={() => router.push(`/project/${id}/tasks/new`)}
+                      onClick={() => console.log("filtered")}
                     />
                     <PrimaryButton
                       name="Sort"

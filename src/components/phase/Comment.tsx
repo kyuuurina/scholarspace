@@ -20,14 +20,7 @@ const Comment: React.FC<CommentProps> = ({ comment }) => {
       <footer className="mb-1 flex items-center justify-between">
         <div className="flex items-center">
           <p className="mr-3 inline-flex items-center text-sm font-semibold text-gray-900 dark:text-white">
-            {user && (
-              <Avatar
-                id={user.id}
-                name={user.name}
-                avatar_url={user.avatar_url}
-                email={user.email}
-              />
-            )}
+            {user && <Avatar avatar_url={user.avatar_url} email={user.email} />}
             <span className="ml-2">{user?.name}</span>
           </p>
           <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -45,7 +38,11 @@ const Comment: React.FC<CommentProps> = ({ comment }) => {
         </div>
         {/* Add dropdown and other actions here */}
       </footer>
-      <p className="text-gray-500 dark:text-gray-400">{value}</p>
+      <div
+        dangerouslySetInnerHTML={{
+          __html: value || "Add a detailed description here....",
+        }}
+      ></div>
       <div className="mt-4 flex items-center space-x-4">
         <button
           type="button"

@@ -43,7 +43,7 @@ model flow_state {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model identities {
-  id              String
+  provider_id     String
   user_id         String    @db.Uuid
   identity_data   Json
   provider        String
@@ -51,9 +51,10 @@ model identities {
   created_at      DateTime? @db.Timestamptz(6)
   updated_at      DateTime? @db.Timestamptz(6)
   email           String?   @default(dbgenerated("lower((identity_data ->> 'email'::text))"))
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   users           users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
-  @@id([provider, id])
+  @@unique([provider_id, provider], map: "identities_provider_id_provider_unique")
   @@index([email])
   @@index([user_id])
   @@schema("auth")
@@ -186,6 +187,10 @@ model sessions {
   factor_id      String?          @db.Uuid
   aal            aal_level?
   not_after      DateTime?        @db.Timestamptz(6)
+  refreshed_at   DateTime?        @db.Timestamp(6)
+  user_agent     String?
+  ip             String?          @db.Inet
+  tag            String?
   mfa_amr_claims mfa_amr_claims[]
   refresh_tokens refresh_tokens[]
   users          users            @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
@@ -299,28 +304,25 @@ model post_comments {
 }
 
 model post_likes {
+  like_id       String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   post_id       String        @db.Uuid
-  likes_id      String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   user_id       String        @db.Uuid
-  research_post research_post @relation(fields: [post_id], references: [post_id], onDelete: Cascade, onUpdate: NoAction)
-  user          user          @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  research_post research_post @relation(fields: [post_id], references: [post_id], onDelete: Cascade)
+  user          user          @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
-  @@unique([post_id, user_id], map: "unique_user_post_likes")
-  @@index([post_id])
   @@schema("public")
 }
 
 model profile {
-  profile_id        String          @id(map: "Profile_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  user_id           String          @db.Uuid
+  profile_id        String  @id(map: "Profile_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id           String  @db.Uuid
   name              String
   avatar_url        String?
   about_me          String?
   research_interest String?
-  collab_status     String?         @default("'Not Open For Collaboration'::text")
+  collab_status     String? @default("'Not Open For Collaboration'::text")
   skills            String?
-  user              user            @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  research_post     research_post[]
+  user              user    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@schema("public")
 }
@@ -403,42 +405,42 @@ model research_interests {
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model research_post {
   post_id       String          @id(map: "ResearchPosts_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  profile_id    String?         @db.Uuid
   title         String
   author        String?
   document      String?
   description   String?
   created_at    DateTime        @default(now())
   updated_at    DateTime        @default(now())
-  category      String?
-  user_id       String?         @db.Uuid
+  category      String
+  user_id       String          @db.Uuid
   summary       String?
   post_comments post_comments[]
   post_likes    post_likes[]
-  profile       profile?        @relation(fields: [profile_id], references: [profile_id], onDelete: NoAction, onUpdate: NoAction)
-  user          user?           @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user          user            @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@schema("public")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model user {
-  id                  String                @id @db.Uuid
-  name                String?
-  avatar_url          String?
-  email               String?
-  chat_message        chat_message[]
-  comment             comment[]
-  post_comments       post_comments[]
-  post_likes          post_likes[]
-  profile             profile[]
-  profile_achievement profile_achievement[]
-  profile_education   profile_education[]
-  profile_experience  profile_experience[]
-  project_users       project_users[]
-  research_post       research_post[]
-  task                task[]
-  workspace_user      workspace_user[]
+  id                               String                @id @db.Uuid
+  name                             String?
+  avatar_url                       String?
+  email                            String?
+  chat_message                     chat_message[]
+  comment                          comment[]
+  follow_follow_follower_idTouser  follow[]              @relation("follow_follower_idTouser")
+  follow_follow_following_idTouser follow[]              @relation("follow_following_idTouser")
+  post_comments                    post_comments[]
+  post_likes                       post_likes[]
+  profile                          profile[]
+  profile_achievement              profile_achievement[]
+  profile_education                profile_education[]
+  profile_experience               profile_experience[]
+  project_users                    project_users[]
+  research_post                    research_post[]
+  task_assignees                   task_assignees[]
+  workspace_user                   workspace_user[]
 
   @@schema("public")
 }
@@ -480,6 +482,7 @@ model phase {
   phase_property      phase_property[]
   property_phase_task property_phase_task[]
   task                task[]
+  task_assignees      task_assignees[]
 
   @@schema("public")
 }
@@ -503,13 +506,13 @@ model task {
   name                String                @default("task")
   description         String?
   status              String                @default("pending")
-  assignees           String?               @db.Uuid
   phase_id            String                @db.Uuid
   end_at              DateTime?             @db.Timestamptz(6)
+  attachments         String[]
   comment             comment[]
   property_phase_task property_phase_task[]
-  user                user?                 @relation(fields: [assignees], references: [id], onDelete: NoAction, onUpdate: NoAction)
   phase               phase                 @relation(fields: [phase_id], references: [id], onDelete: NoAction)
+  task_assignees      task_assignees[]
 
   @@schema("public")
 }
@@ -539,6 +542,30 @@ model property_phase_task {
   task           task           @relation(fields: [task_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@id([task_id, property_id])
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model task_assignees {
+  task_id     String @db.Uuid
+  assignee_id String @db.Uuid
+  phase_id    String @db.Uuid
+  user        user   @relation(fields: [assignee_id], references: [id], onDelete: NoAction)
+  phase       phase  @relation(fields: [phase_id], references: [id], onDelete: NoAction)
+  task        task   @relation(fields: [task_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([task_id, assignee_id])
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model follow {
+  id                             String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  follower_id                    String  @db.Uuid
+  following_id                   String? @db.Uuid
+  user_follow_follower_idTouser  user    @relation("follow_follower_idTouser", fields: [follower_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user_follow_following_idTouser user?   @relation("follow_following_idTouser", fields: [following_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
   @@schema("public")
 }
 
