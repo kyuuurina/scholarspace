@@ -20,7 +20,7 @@ const ProfileTabs: React.FC = () => {
         >
           <li className="mr-2" role="presentation">
             {/* <Link href={`/manage-profile/${profile_id}`}> */}
-            <Link href={`/manage-profile`}>
+            <Link href={`/manage-profile/${profile_id}`}>
               <span
                 className={`inline-block rounded-t-lg border-b-2 p-4 ${
                   router.asPath === `/manage-profile`
