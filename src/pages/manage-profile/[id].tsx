@@ -55,27 +55,18 @@ const ProfilePage: NextPageWithLayout = () => {
 
   //const
   const router = useRouter();
-  const { profile_id } = router.query;
+  const {profile_id}  = router.query;
+  // const profile_id = useRouterId();
   const userId = getCookie("UserID");
 
+  const {name, about_me, skills,research_interest, collab_status, isLoading} = useFetchProfile();
   //const modal states
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isEducationModalOpen, setIsEducationModalOpen] = useState(false);
   const [isExperienceModalOpen, setIsExperienceModalOpen] = useState(false);
   const [isAchievementModalOpen, setIsAchievementModalOpen] = useState(false);
 
-  //custom hooks
-  //fetch profile data
-  const {name, about_me, skills,research_interest, collab_status, isLoading} = useFetchProfile();
-//   const profile = useFetchProfile();
-
-  const education = useFetchEducation();
-  const experience = useFetchExperience();
-  const achievement = useFetchAchievement();
-  // const { title, start_year, end_date, description, isLoading} = useFetchExperience();
-  // const { title, received_year, description, isLoading} = useFetchAchievement();
-
-
+  //schema for form validation
   const schema: ZodType<ProfileFormData> = z.object({
     name: z.string(),
     about_me: z.string().nullable(),
@@ -84,73 +75,80 @@ const ProfilePage: NextPageWithLayout = () => {
     collab_status: z.string(),
   });
 
-  const updateProfile = api.profile.updateProfile.useMutation({
-    onSuccess: () => {
-      toast.custom(() => <SuccessToast message="Profile successfully updated" />);
-      router.reload();
-    },
-    onError: () => {
-      toast.custom(() => <ErrorToast message="Error updating profile" />);
-    },
-  });
-
-  //react-hook-form
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    reset,
-    formState: { errors, isDirty },
-  } = useForm<ProfileFormData>({
-    resolver: zodResolver(schema),
-    defaultValues :{
-      name: name,
-      about_me: about_me,
-      skills: skills,
-      research_interest: research_interest,
-      collab_status: collab_status,
-    }
-  });
-
-  //set form value to profile data
-  useEffect(() => {
-    if (!isLoading) {
-      setValue("name", name || "");
-      setValue("about_me", about_me || "");
-      setValue("skills", skills || "");
-      setValue("research_interest", research_interest || "");
-      setValue("collab_status", collab_status || "");
-    }
-  }, [isLoading, setValue]);
-
-  //handlers
-  const handleUpdateProfile = async (formData: ProfileFormData) => {
-    try {
-      await updateProfile.mutateAsync({
-        profile_id: profile_id as string,
-        // profile_id: id,
-        ...formData,
-      });
-      console.log(formData);
-    } catch (error) {
-      // Handle any errors
-      console.error(error);
-    }
-  };
-
-  // handle cancel
-  const handleCancel = () => {
-    reset({
-      name: name || "",
-      about_me: about_me || "",
-      skills: skills || "",
-      research_interest: research_interest || "",
-      collab_status: collab_status || "",
+    //react-hook-form
+    const {
+      register,
+      handleSubmit,
+      setValue,
+      reset,
+      formState: { errors, isDirty },
+    } = useForm<ProfileFormData>({
+      resolver: zodResolver(schema),
+      defaultValues :{
+        name: name,
+        about_me: about_me,
+        skills: skills,
+        research_interest: research_interest,
+        collab_status: collab_status,
+      }
     });
-  };
+
+        //set form value to profile data
+        useEffect(() => {
+          if (!isLoading) {
+            setValue("name", name || "");
+            setValue("about_me", about_me || "");
+            setValue("skills", skills || "");
+            setValue("research_interest", research_interest || "");
+            setValue("collab_status", collab_status || "");
+    
+          }
+        }, [isLoading, setValue]);
+    
+      //toast
+      const updateProfile = api.profile.updateProfile.useMutation({
+        onSuccess: () => {
+          toast.custom(() => <SuccessToast message="Profile successfully updated" />);
+          router.reload();
+        },
+        onError: () => {
+          toast.custom(() => <ErrorToast message="Error updating profile" />);
+        },
+      });
+    
+      //handlers
+      const handleUpdateProfile = async (formData: ProfileFormData) => {
+        try {
+          await updateProfile.mutateAsync({
+            // profile_id,
+            profile_id: profile_id as string,
+            // profile_id: id,
+            ...formData,
+          });
+          console.log(formData);
+        } catch (error) {
+          // Handle any errors
+          console.error(error);
+        }
+      };
+    
+      // handle cancel
+      const handleCancel = () => {
+        reset({
+          name: name || "",
+          about_me: about_me || "",
+          skills: skills || "",
+          research_interest: research_interest || "",
+          collab_status: collab_status || "",
+        });
+      };
+    
+
+  // Add this console.log to check the profile data
+  console.log('Profile Data:', useFetchProfile());
+  console.log('Router Query:', router.query);
 
   const handleEditClick = () => {setIsEditModalOpen(true);};
-
 
   return (
     <>

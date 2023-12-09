@@ -57,7 +57,7 @@ const ProfilePage: NextPageWithLayout = () => {
 
   //const
   const router = useRouter();
-  const { id } = router.query;
+  const { profile_id } = router.query;
   const userId = getCookie("UserID");
 
   //const modal states
@@ -128,7 +128,7 @@ const ProfilePage: NextPageWithLayout = () => {
   const handleUpdateProfile = async (formData: ProfileFormData) => {
     try {
       await updateProfile.mutateAsync({
-        profile_id: id as string,
+        profile_id: profile_id as string,
         // profile_id: id,
         ...formData,
       });

@@ -1,9 +1,9 @@
 
 //backup on 14-11-2023 UserProfileForm.tsx
 
-//Form for NAME, ABOUT ME, SKILLS, RESEARCH INTEREST & COLLAB STATUS
+//Form to edit NAME, ABOUT ME, SKILLS, RESEARCH INTEREST & COLLAB STATUS
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import { type ZodType, z } from "zod";
@@ -14,9 +14,13 @@ import { api } from "~/utils/api";
 import { useRouterId } from "~/utils/routerId";
 import toast from "react-hot-toast";
 import React from "react";
+import { getCookie } from "cookies-next";
 
 // types
 import type { ProfileFormData } from "~/types/profile";
+
+//utils
+import { useFetchProfile } from "~/utils/profile";
 
 // local components
 import FormErrorMessage from "../FormErrorMessage";
@@ -46,71 +50,99 @@ type ModalProps = {
 
 const UserProfileForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
 
-  const profile_id = useRouterId();
-  const userId = useUser()?.id;
-  // const userId = profile.user_id; 
-
+  //const
   const router = useRouter();
+  // const  profile_id  = router.query;
   const user = useUser();
-  const supabase = useSupabaseClient();
+  const profile_id = useRouterId();
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const userId = getCookie("UserID");
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  //custom hooks
+  //populate form fields with Profile details
+  const {name, about_me, skills,research_interest, collab_status, isLoading} = useFetchProfile();
 
-  //mutation to update profile
-  const updateProfile = api.profile.updateProfile.useMutation({
-    onSuccess: () => {
-      toast.custom(() => <SuccessToast message="Profile successfully updated" />);
-      router.reload();
-    },
-    onError: (error: { toString: () => string }) => {
-      toast.custom(() => <ErrorToast message={error.toString()} />);
-      onClick();
-      reset();
-    },
-  });
 
+//schema for form validation
   const schema: ZodType<ProfileFormData> = z.object({
     name: z.string(),
     about_me: z.string().nullable(),
     skills: z.string().nullable(),
     research_interest: z.string().nullable(),
-    collab_status: z.string().nullable(),
+    collab_status: z.string(),
   });
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<ProfileFormData>({
-    resolver: zodResolver(schema),
-  });
+    //react-hook-form
+    const {
+      register,
+      handleSubmit,
+      setValue,
+      reset,
+      formState: { errors, isDirty },
+    } = useForm<ProfileFormData>({
+      resolver: zodResolver(schema),
+      defaultValues :{
+        name: name,
+        about_me: about_me,
+        skills: skills,
+        research_interest: research_interest,
+        collab_status: collab_status,
+      }
+    });
 
-  const onSubmit = async (formData: ProfileFormData) => {
-    if (isSubmitting) return;
+    //set form value to profile data
+    useEffect(() => {
+      if (!isLoading) {
+        setValue("name", name || "");
+        setValue("about_me", about_me || "");
+        setValue("skills", skills || "");
+        setValue("research_interest", research_interest || "");
+        setValue("collab_status", collab_status || "");
 
-    try {
-      setIsSubmitting(true);
+      }
+    }, [isLoading, setValue]);
 
-      const response = await updateProfile.mutateAsync({
-        ...formData,
-        profile_id: profile_id,
-      });
-
-      // Handle success, reload the page, or perform any other necessary actions
+  //toast
+  const updateProfile = api.profile.updateProfile.useMutation({
+    onSuccess: () => {
       toast.custom(() => <SuccessToast message="Profile successfully updated" />);
       router.reload();
+    },
+    onError: () => {
+      toast.custom(() => <ErrorToast message="Error updating profile" />);
+    },
+  });
+
+  //handlers
+  const handleUpdateProfile = async (formData: ProfileFormData) => {
+    try {
+      await updateProfile.mutateAsync({
+        profile_id,
+        // profile_id: id,
+        ...formData,
+      });
+      console.log(formData);
     } catch (error) {
-      // Handle errors, show toast, etc.
-      toast.custom(() => <ErrorToast message="Unsuccessful update. Please try again." />);
-    } finally {
-      setIsSubmitting(false);
-      onClick();
-      reset();
+      // Handle any errors
+      console.error(error);
     }
   };
 
+  // handle cancel
+  const handleCancel = () => {
+    reset({
+      name: name || "",
+      about_me: about_me || "",
+      skills: skills || "",
+      research_interest: research_interest || "",
+      collab_status: collab_status || "",
+    });
+  };
+
+  const handleEditClick = () => {setIsEditModalOpen(true);};
+
   return (
+
     <div>
       <Modal
         show={openModal}
@@ -123,7 +155,7 @@ const UserProfileForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
         <form
           autoComplete="off"
           className="flex flex-col gap-4"
-          onSubmit={handleSubmit(onSubmit)}
+          onSubmit={handleSubmit(handleUpdateProfile)}
         >
           <div>
             <label
@@ -132,14 +164,11 @@ const UserProfileForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
             >
               Your Name
             </label>
-            <input
-              id="name"
-              className="block w-full"
-              {...register("name", { required: true })}
+            <input className = "w-full" {...register("name")}
             />
             {errors.name && <FormErrorMessage text={errors.name.message} />}
           </div>
-
+  
           <div>
             <label
               htmlFor="description"
@@ -220,7 +249,56 @@ const UserProfileForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
 
 export default UserProfileForm;
 
-
+    // <>
+    //     {/* Update Workspace Section */}
+    //     <div className="grid gap-y-5">
+    //   <section className="mt-2 w-full rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
+    //     <form
+    //       className="space-y-6"
+    //       autoComplete="off"
+    //       onSubmit={handleSubmit(handleUpdateProfile)}
+    //     >
+    //       <h5 className="text-xl font-medium text-gray-900 dark:text-white">
+    //         General Settings
+    //       </h5>
+    //       <div>
+    //         <label
+    //           htmlFor="name"
+    //           className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+    //         >
+    //           Name
+    //         </label>
+    //         <input className="w-full" {...register("name")} />
+    //         {errors.name && <FormErrorMessage text={errors.name.message} />}
+    //       </div>
+    //       {/* Continue with the rest of the form fields... */}
+    //       <div className="flex justify-end space-x-3">
+    //         {isDirty && (
+    //           <button
+    //             type="button"
+    //             className="rounded-sm border border-gray-200 bg-white px-3 py-2 text-center text-sm font-medium hover:bg-grey-bg hover:text-purple-accent-1 focus:outline-none"
+    //             // reverts the input values to the original values
+    //             onClick={handleCancel}
+    //           >
+    //             Cancel
+    //           </button>
+    //         )}
+    //         <button
+    //           type="submit"
+    //           className={`${
+    //             isDirty
+    //               ? "bg-purple-accent-1 hover:bg-purple-accent-2"
+    //               : "bg-gray-200"
+    //           } rounded-sm px-3 py-2 text-center text-sm font-medium text-white focus:outline-none`}
+    //           disabled={!isDirty}
+    //         >
+    //           Save
+    //         </button>
+    //       </div>
+    //     </form>
+    //   </section>
+    // </div>
+    // </>
 
 //  // const schema: ZodType<ProfileFormData> = z.object({
   //   name: z.string(),

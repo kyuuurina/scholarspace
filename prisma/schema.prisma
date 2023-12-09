@@ -399,11 +399,11 @@ model research_post {
   created_at    DateTime        @default(now())
   updated_at    DateTime        @default(now())
   category      String?
-  user_id       String?         @db.Uuid
+  user_id       String          @db.Uuid
   summary       String?
   post_comments post_comments[]
   likes         post_likes[]
-  user          user?           @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user          user            @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@schema("public")
 }
