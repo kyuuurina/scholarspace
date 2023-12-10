@@ -404,4 +404,38 @@ export const taskRouter = router({
 
       return task;
     }),
+
+  updateAssignees: protectedProcedure
+    .input(
+      z.object({
+        task_id: z.string(),
+        assignees: z.array(z.string()),
+        phase_id: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { task_id, assignees, phase_id } = input;
+
+      // delete all assignees of the task
+      await ctx.prisma.task_assignees.deleteMany({
+        where: {
+          task_id,
+        },
+      });
+
+      // create new assignees
+      await Promise.all(
+        assignees.map((assignee) =>
+          ctx.prisma.task_assignees.create({
+            data: {
+              task_id,
+              assignee_id: assignee,
+              phase_id,
+            },
+          })
+        )
+      );      
+
+      return true;
+    }),
 });

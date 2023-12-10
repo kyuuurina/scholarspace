@@ -1,12 +1,12 @@
 import { api } from "~/utils/api";
-import type task from "~/types/task";
+import type { taskRow } from "~/types/task";
 import { useState, useEffect } from "react";
 import { useClickAway } from "@uidotdev/usehooks";
 import { useFetchTasksWithProperties } from "~/utils/task";
 import { set } from "zod";
 
 type StatusBadgeProps = {
-  task?: task;
+  task?: taskRow;
   status?: string;
   setStatus?: (status: string) => void;
 };

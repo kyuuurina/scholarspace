@@ -24,6 +24,7 @@ import TaskDescription from "./TaskDescription";
 import AttachmentUpload from "./AttachmentUpload";
 import NonNullableDatePicker from "./NonNullableDatePicker";
 import NullableDatePicker from "./NullableDatePicker";
+import TaskAssignees from "./TaskAssignees";
 
 type TaskDrawerProps = {
   task: taskRow;
@@ -156,41 +157,12 @@ const TaskDrawer: React.FC<TaskDrawerProps> = ({
               }}
               label="Deadline"
             />
-            <div>
-              <label className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
-                Assignees
-              </label>
-              {/* {task?.assignees && task?.assignees?.length > 0
-                ? // render assignees
-                  task.assignees.map((assignee) => (
-                    <Avatar
-                      key={assignee.id}
-                      avatar_url={assignee.avatar_url}
-                      email={assignee.email}
-                    />
-                  )) // render add assignees button
-                : !addAssignees && (
-                    <button onClick={() => setAddAssignees(!addAssignees)}>
-                      Add assignees
-                    </button>
-                  )} */}
-
-              {/* {addAssignees && (
-                // <div ref={ref as React.MutableRefObject<HTMLDivElement>}>
-                <Select
-                  defaultValue={[]}
-                  isMulti
-                  name="colors"
-                  options={userDropdown}
-                  className="basic-multi-select"
-                  classNamePrefix="select"
-                  onChange={(selectedOptions) =>
-                    handleAssigneesChange(selectedOptions)
-                  }
-                />
-                // </div>
-              )} */}
-            </div>
+            <TaskAssignees
+              task_id={task?.id}
+              assignees={task?.assignees}
+              phase_id={task?.phase_id}
+              refetch={refetch}
+            />
             {/* render properties input fields */}
             {properties?.map((property) => (
               <div key={property.id}>
