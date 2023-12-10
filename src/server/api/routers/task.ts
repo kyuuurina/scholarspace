@@ -368,4 +368,40 @@ export const taskRouter = router({
 
       return task;
     }),
+
+  updateStartDate: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        created_at: z.date(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { id, created_at } = input;
+
+      const task = await ctx.prisma.task.update({
+        where: { id },
+        data: { created_at },
+      });
+
+      return task;
+    }),
+
+  updateDeadline: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        deadline: z.date(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { id, deadline } = input;
+
+      const task = await ctx.prisma.task.update({
+        where: { id },
+        data: { deadline },
+      });
+
+      return task;
+    }),
 });

@@ -22,7 +22,8 @@ import FormErrorMessage from "~/components/FormErrorMessage";
 import TaskHeader from "./TaskHeader";
 import TaskDescription from "./TaskDescription";
 import AttachmentUpload from "./AttachmentUpload";
-import StartDatePicker from "./StartDatePicker";
+import NonNullableDatePicker from "./NonNullableDatePicker";
+import NullableDatePicker from "./NullableDatePicker";
 
 type TaskDrawerProps = {
   task: taskRow;
@@ -58,6 +59,45 @@ const TaskDrawer: React.FC<TaskDrawerProps> = ({
   };
 
   const [tdescription, setTDescription] = useState("");
+
+  // date
+  const [startDate, setStartDate] = useState<Date | undefined>(
+    task?.created_at
+  );
+  const updateStartDate = api.task.updateStartDate.useMutation();
+
+  const onStartDateChange = async (date: Date | undefined) => {
+    if (task?.id && date) {
+      console.log(date);
+      try {
+        await updateStartDate.mutateAsync({
+          id: task.id,
+          created_at: date,
+        });
+      } finally {
+        refetch();
+      }
+    }
+  };
+  // date
+  const [deadline, setDeadline] = useState<Date | undefined | null>(
+    task?.deadline
+  );
+  const updateDeadline = api.task.updateDeadline.useMutation();
+
+  const onDeadlineChange = async (date: Date | undefined | null) => {
+    if (task?.id && date) {
+      console.log(date);
+      try {
+        await updateDeadline.mutateAsync({
+          id: task.id,
+          deadline: date,
+        });
+      } finally {
+        refetch();
+      }
+    }
+  };
   return (
     <div
       className="w-300 fixed right-0 top-0 z-10 flex h-screen cursor-default overflow-y-auto border-l border-gray-300 bg-white p-10"
@@ -100,9 +140,22 @@ const TaskDrawer: React.FC<TaskDrawerProps> = ({
                 setStatus={setTaskStatus}
               />
             </div>
-            <div>
-              <StartDatePicker selectedDate={task?.created_at} />
-            </div>
+            <NonNullableDatePicker
+              selectedDate={startDate}
+              onChange={async (date, event) => {
+                setStartDate(date);
+                await onStartDateChange(date);
+              }}
+              label="Start Date"
+            />
+            <NullableDatePicker
+              selectedDate={deadline}
+              onChange={async (date, event) => {
+                setDeadline(date);
+                await onDeadlineChange(date);
+              }}
+              label="Deadline"
+            />
             <div>
               <label className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
                 Assignees

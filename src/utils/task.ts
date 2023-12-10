@@ -11,6 +11,7 @@ export const useFetchTasksWithProperties = (phase_id: string) => {
     assignees: user[] | undefined;
     phase_id: string;
     end_at: Date | null;
+    deadline: Date | null;
     properties: {
       id: bigint;
       property_id: string;
@@ -102,6 +103,7 @@ export const useFetchTasksWithProperties = (phase_id: string) => {
         assignees: taskAssignees?.map((assignee) => assignee.user),
         phase_id: task.phase_id,
         end_at: task.end_at,
+        deadline: task.deadline,
         properties: taskProperties,
         attachments: task.attachments,
       });

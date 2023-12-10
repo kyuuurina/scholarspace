@@ -17,6 +17,7 @@ type taskRow =
         | undefined;
       phase_id: string;
       end_at: Date | null;
+      deadline: Date | null;
       properties: {
         id: bigint;
         property_id: string;
@@ -36,6 +37,7 @@ type TaskFormData = {
   description: string | null | undefined;
   created_at: Date | undefined;
   end_at: Date | null | undefined;
+  deadline: Date | null | undefined;
   status: string | undefined;
   assignees:
     | {

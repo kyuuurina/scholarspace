@@ -25,8 +25,6 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({
   task_id,
   refetch,
 }) => {
-  const [newComment, setNewComment] = useState("");
-
   // form schema
   const schema: ZodType<{ commentN: string }> = z.object({
     commentN: z.string().min(3, { message: "Task description is too short" }),

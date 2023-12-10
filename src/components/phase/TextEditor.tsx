@@ -153,7 +153,6 @@ const TextEditor = ({
   documentValue: string;
   setDocumentValue: (value: string) => void;
 }) => {
-  console.log(documentValue);
   const html = `<p>${documentValue}</p>`;
   const sanitizedHtml = sanitizeHtml(html);
   const editor = useEditor({
