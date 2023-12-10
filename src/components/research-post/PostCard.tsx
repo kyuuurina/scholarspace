@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { FiHeart, FiMessageSquare, FiRepeat, FiMoreHorizontal, FiEdit, FiTrash } from "react-icons/fi";
 import Comment from "~/components/research-post/Comment";
 
-import AvatarPlaceholder from "../AvatarPlaceholder";
+import AvatarPlaceholder from "../avatar/AvatarPlaceholder";
 
 interface PostCardProps {
   title: string;

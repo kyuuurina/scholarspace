@@ -1,6 +1,6 @@
 import type { Member } from "~/types/member";
 import Image from "next/image";
-import AvatarPlaceholder from "~/components/AvatarPlaceholder";
+import AvatarPlaceholder from "~/components/avatar/AvatarPlaceholder";
 import Select from "~/components/Select";
 import { getCookie } from "cookies-next";
 

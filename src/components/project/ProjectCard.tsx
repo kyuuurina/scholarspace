@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 
-import AvatarPlaceholder from "~/components/AvatarPlaceholder";
+import AvatarPlaceholder from "~/components/avatar/AvatarPlaceholder";
 
 type ProjectCardProps = {
   // an object of an array of projects

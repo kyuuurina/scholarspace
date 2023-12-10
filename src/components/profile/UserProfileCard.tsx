@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import AvatarPlaceholder from "../AvatarPlaceholder";
+import AvatarPlaceholder from "../avatar/AvatarPlaceholder";
 import React, { useState } from "react";
 import { FiEdit } from "react-icons/fi";
 import UserProfileForm from "./UserProfileForm";

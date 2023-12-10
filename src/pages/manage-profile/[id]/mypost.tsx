@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { api } from '~/utils/api';
 import Image from 'next/image';
 import Link from 'next/link';
+import AddNewPostButton from '~/components/research-post/AddNewPostButton';
 
 //utils
 import { useRouterId } from '~/utils/routerId';
@@ -39,6 +40,8 @@ const MyPost: NextPageWithLayout = () => {
       <ProfileTabs />
 
       <div className="container mx-auto mt-8">
+      <AddNewPostButton className="mb-4" />
+        {/* if loading */}
         {myPostLists.isLoading && <LoadingSpinner />}
         {myPostLists.error && (
           <div className="flex flex-col items-center justify-center h-50vh">

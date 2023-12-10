@@ -32,7 +32,7 @@ import PageLoader from "~/components/layout/PageLoader";
 import ErrorPage from "~/pages/error-page";
 import LoadingSpinner from "~/components/LoadingSpinner";
 import PrimaryButton from "~/components/button/PrimaryButton";
-import AvatarPlaceholder from "~/components/AvatarPlaceholder";
+import AvatarPlaceholder from "~/components/avatar/AvatarPlaceholder";
 import { FaEdit } from 'react-icons/fa';
 //import { DeleteProfileDetails } from "~/components/workspace/DeleteProfileDetails";
 import SuccessToast from "~/components/toast/SuccessToast";

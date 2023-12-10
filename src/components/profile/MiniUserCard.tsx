@@ -1,7 +1,7 @@
 //Mini cards that shows results of profile search --> profile picture, name, collaboration status
 
 import Link from "next/link";
-import AvatarPlaceholder from "~/components/AvatarPlaceholder";
+import AvatarPlaceholder from "~/components/avatar/AvatarPlaceholder";
 
 type MiniUserCardProps = {
     // an object of an array of users

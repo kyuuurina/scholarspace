@@ -16,7 +16,7 @@ import Link from "next/link";
 import Head from "~/components/layout/Head";
 import Header from "~/components/workspace/Header";
 import Card from "~/components/Card";
-import AvatarPlaceholder from "~/components/AvatarPlaceholder";
+import AvatarPlaceholder from "~/components/avatar/AvatarPlaceholder";
 import ScoreChart from "~/components/chart/ScoreChart";
 import LoadingSpinner from "~/components/LoadingSpinner";
 

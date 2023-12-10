@@ -32,7 +32,7 @@ import PageLoader from "~/components/layout/PageLoader";
 import ErrorPage from "~/pages/error-page";
 import LoadingSpinner from "~/components/LoadingSpinner";
 import PrimaryButton from "~/components/button/PrimaryButton";
-import AvatarPlaceholder from "~/components/AvatarPlaceholder";
+import AvatarPlaceholder from "~/components/avatar/AvatarPlaceholder";
 import { FaEdit } from 'react-icons/fa';
 //import { DeleteProfileDetails } from "~/components/workspace/DeleteProfileDetails";
 import SuccessToast from "~/components/toast/SuccessToast";
@@ -178,13 +178,11 @@ const ProfilePage: NextPageWithLayout = () => {
                     onClick={() => setIsEditModalOpen(false)}
                   />
                 )}
-                {/* Render UserProfileCard passing profile object */}
-                {/* {profile && (
-                  <UserProfileCard
-                    key={profile.profile_id}
-                    profile={profile}
-                  />
-                )} */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              </div>
+
+              </div>
+              <div> 
               </div>
             </section>
 
@@ -270,3 +268,10 @@ export default ProfilePage;
 
 
 
+                {/* Render UserProfileCard passing profile object */}
+                {/* {profile && (
+                  <UserProfileCard
+                    key={profile.profile_id}
+                    profile={profile}
+                  />
+                )} */}

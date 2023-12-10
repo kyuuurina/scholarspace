@@ -3,7 +3,7 @@ import Link from "next/link";
 import { fetchUserWorkspaces } from "~/utils/userWorkspaces";
 import { FiPlusCircle } from "react-icons/fi";
 import Image from "next/image";
-import AvatarPlaceholder from "../AvatarPlaceholder";
+import AvatarPlaceholder from "../avatar/AvatarPlaceholder";
 import { MoonLoader } from "react-spinners";
 
 const WorkspaceDropdown: React.FC<{ onClick: () => void }> = ({ onClick }) => {

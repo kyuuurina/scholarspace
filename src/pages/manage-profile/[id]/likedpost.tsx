@@ -20,7 +20,7 @@ import Layout from "~/components/layout/Layout";
 import PageLoader from "~/components/layout/PageLoader";
 import LoadingSpinner from "~/components/LoadingSpinner";
 import PrimaryButton from "~/components/button/PrimaryButton";
-import AvatarPlaceholder from "~/components/AvatarPlaceholder";
+import AvatarPlaceholder from "~/components/avatar/AvatarPlaceholder";
 import { FaEdit } from 'react-icons/fa';
 
 //profile components
@@ -39,6 +39,10 @@ import { FaExclamationCircle } from 'react-icons/fa';
 
 const LikedPost = () => {
   const likedPostLists = useFetchLikedPost();
+  const router = useRouterId();
+
+  console.log("MyPost.tsx page router:", router)
+  console.log("MyPost.tsx page likedPostLists:", likedPostLists)
 
   return (
       <div className="container mx-auto mt-8">
@@ -52,9 +56,9 @@ const LikedPost = () => {
               </div>
           )}
 
-          {likedPostLists.likedPosts.length > 0 ? (
+          {likedPostLists.likedpost.length > 0 ? (
               <ul className="grid grid-cols-1 gap-8">
-                  {likedPostLists.likedPosts.map((post) => (
+                  {likedPostLists.likedpost.map((post) => (
                       <li key={post.post_id} className="mb-8">
                           {/* Render your liked post component here */}
                       </li>
