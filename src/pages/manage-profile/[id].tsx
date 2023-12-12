@@ -1,4 +1,5 @@
 //to-do: add PageLoader
+//this file contains dummy data for Education, Research Experience and Achievement
 
 import React from 'react';
 import {useState, useEffect} from 'react';
@@ -55,7 +56,7 @@ const ProfilePage: NextPageWithLayout = () => {
 
   //const
   const router = useRouter();
-  const {profile_id}  = router.query;
+  const {id}  = router.query;
   // const profile_id = useRouterId();
   const userId = getCookie("UserID");
 
@@ -121,7 +122,7 @@ const ProfilePage: NextPageWithLayout = () => {
         try {
           await updateProfile.mutateAsync({
             // profile_id,
-            profile_id: profile_id as string,
+            profile_id: id as string,
             // profile_id: id,
             ...formData,
           });
@@ -186,19 +187,36 @@ const ProfilePage: NextPageWithLayout = () => {
               </div>
             </section>
 
-            {/* Education section  */}
-            <section className="mt-2 w-3/4 mx-auto rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8 flex justify-between">
-              <h3 className="font-semibold text-2xl">
+            {/* Education section */}
+            <section className="mt-2 w-3/4 mx-auto rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
+              <h3 className="font-semibold text-2xl mb-4">
                 Education
               </h3>
+              
+              <div className="mb-4">
+                {/* Year */}
+                <p className="text-sm text-gray-600">
+                  <span className="font-semibold">Year:</span> 2020 - 2023
+                </p>
+
+                {/* Institution Name */}
+                <p className="text-sm text-gray-600">
+                  <span className="font-semibold">Institution:</span> Universiti Malaya
+                </p>
+
+                {/* Description */}
+                <p className="text-sm text-gray-600">
+                  <span className="font-semibold">Description:</span> Software Engineering.
+                </p>
+              </div>
 
               {/* Add Education Button on the right side */}
-                <button
-                  onClick={() => setIsEducationModalOpen(true)}
-                  className="bg-purple-700 text-white px-4 py-2 rounded-md mt-4"
-                >
-                  Add New
-                </button>
+              <button
+                onClick={() => setIsEducationModalOpen(true)}
+                className="bg-purple-700 text-white px-4 py-2 rounded-md"
+              >
+                Add New
+              </button>
             </section>
             {/* Render EducationForm passing modal state and onClose handler */}
               <EducationForm
@@ -209,11 +227,27 @@ const ProfilePage: NextPageWithLayout = () => {
 
           {/* Experience section  */}
           <div className="grid gap-y-5">
-            <section className="mt-2 w-3/4 mx-auto rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8 flex justify-between">
-              <h3 className="font-semibold text-2xl">
+          <section className="mt-2 w-3/4 mx-auto rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
+              <h3 className="font-semibold text-2xl mb-4">
                 Research Experience
               </h3>
+              
+              <div className="mb-4">
+                {/* Year */}
+                <p className="text-sm text-gray-600">
+                  <span className="font-semibold">Year:</span> 2015 - 2016
+                </p>
 
+                {/* Institution Name */}
+                <p className="text-sm text-gray-600">
+                  <span className="font-semibold">Title:</span> Nursing at Hospital Kuala Lumpur
+                </p>
+
+                {/* Description */}
+                <p className="text-sm text-gray-600">
+                  <span className="font-semibold">Description:</span> Research Assistant
+                </p>
+              </div>
               {/* Add Education Button on the right side */}
                 <button
                   onClick={() => setIsExperienceModalOpen(true)}
@@ -231,11 +265,27 @@ const ProfilePage: NextPageWithLayout = () => {
 
           {/* Experience section  */}
           <div className="grid gap-y-5">
-            <section className="mt-2 w-3/4 mx-auto rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8 flex justify-between">
-              <h3 className="font-semibold text-2xl">
+          <section className="mt-2 w-3/4 mx-auto rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
+              <h3 className="font-semibold text-2xl mb-4">
                 Achievement
               </h3>
+              
+              <div className="mb-4">
+                {/* Year */}
+                <p className="text-sm text-gray-600">
+                  <span className="font-semibold">Year:</span> 2018
+                </p>
 
+                {/* Institution Name */}
+                <p className="text-sm text-gray-600">
+                  <span className="font-semibold">Title:</span> Dean List Award
+                </p>
+
+                {/* Description */}
+                <p className="text-sm text-gray-600">
+                  <span className="font-semibold">Description:</span> FCSIT Deans List
+                </p>
+              </div>
               {/* Add Education Button on the right side */}
                 <button
                   onClick={() => setIsAchievementModalOpen(true)}

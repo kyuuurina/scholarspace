@@ -5,7 +5,7 @@ type ResearchPostFormData = {
     category: string;
     title: string;
     description: string | null;
-    author: string;
+    author: string | null;
     document : string | null;
   };
   

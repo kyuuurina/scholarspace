@@ -45,8 +45,13 @@ const LikedPost = () => {
   console.log("MyPost.tsx page likedPostLists:", likedPostLists)
 
   return (
+    <>
+    <Head>
+        <title>Your Posts</title>
+    </Head>
+    <ProfileTabs />
       <div className="container mx-auto mt-8">
-          {likedPostLists.isLoading && <LoadingSpinner />}
+          {/* {likedPostLists.isLoading && <LoadingSpinner />} */}
           {likedPostLists.error && (
               <div className="flex flex-col items-center justify-center h-50vh">
                   <FaExclamationCircle className="text-gray-500 text-4xl mb-4" />
@@ -76,6 +81,7 @@ const LikedPost = () => {
               </div>
           )}
       </div>
+      </>
   );
 };
 
