@@ -33,13 +33,14 @@ import Head from 'next/head';
 
 import { useRouter } from 'next/router';
 import { useFetchResearchPost } from '~/utils/researchpost';
-import { useFetchLikedPost } from '~/utils/like';
+import { useFetchLikedPost } from '~/utils/postlike';
 import { FaExclamationCircle } from 'react-icons/fa';
+import Post from '~/components/research-post/Post';
 
 
-const LikedPost = () => {
+const LikedPost: NextPageWithLayout = () => {
   const likedPostLists = useFetchLikedPost();
-  const router = useRouterId();
+  const router = useRouter();
 
   console.log("MyPost.tsx page router:", router)
   console.log("MyPost.tsx page likedPostLists:", likedPostLists)
@@ -47,11 +48,11 @@ const LikedPost = () => {
   return (
     <>
     <Head>
-        <title>Your Posts</title>
+        <title>Liked Posts</title>
     </Head>
     <ProfileTabs />
       <div className="container mx-auto mt-8">
-          {/* {likedPostLists.isLoading && <LoadingSpinner />} */}
+          {likedPostLists.isLoading && <LoadingSpinner />}
           {likedPostLists.error && (
               <div className="flex flex-col items-center justify-center h-50vh">
                   <FaExclamationCircle className="text-gray-500 text-4xl mb-4" />
@@ -61,11 +62,13 @@ const LikedPost = () => {
               </div>
           )}
 
-          {likedPostLists.likedpost.length > 0 ? (
+        {/* if liked post exist */}
+          {likedPostLists.myLikedPosts.length > 0 ? (
               <ul className="grid grid-cols-1 gap-8">
-                  {likedPostLists.likedpost.map((post) => (
-                      <li key={post.post_id} className="mb-8">
+                  {likedPostLists.myLikedPosts.map((post_likes) => (
+                      <li key={post_likes.post_id} className="mb-8">
                           {/* Render your liked post component here */}
+                          <Post post_likes = {post_likes} />
                       </li>
                   ))}
               </ul>
