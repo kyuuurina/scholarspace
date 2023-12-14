@@ -3,6 +3,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Router, { useRouter } from "next/router";
 import { getCookie } from "cookies-next";
+import { useSession, useSessionContext } from "@supabase/auth-helpers-react";
 
 // icons
 import {
@@ -17,6 +18,7 @@ import { IconContext } from "react-icons";
 import WorkspaceDropdown from "../workspace/WorkspaceDropdown";
 import WorkspaceModal from "../workspace/WorkspaceModal";
 
+
 type SideBarProps = {
   toggleSidebar: () => void;
   open: boolean;
@@ -26,6 +28,9 @@ export const SideBar: React.FC<SideBarProps> = ({ toggleSidebar, open }) => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   
   const router = useRouter();
+  const session = useSession();
+  const { supabaseClient } = useSessionContext();
+  // const user = session.data?.user;
   const userId = getCookie("User ID");
 
   // Check if router.query and router.query.id are defined before accessing their values

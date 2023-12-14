@@ -11,6 +11,7 @@ interface PostProps {
     title: string;
     author: string | null;
     description: string | null;
+    created_at: Date;
   };
 }
 
@@ -58,10 +59,17 @@ const Post: React.FC<PostProps> = ({ post }) => {
       <p className="mt-2 text-black text-sm md:text-base">
         {post.description || 'No description'}
       </p>
+      
 
       <div className="mt-2 flex items-center mb-2 md:mb-4">
         <p className="mt-2 text-gray-500 text-xs md:text-sm">
           Author: {post.author || '-'}
+        </p>
+      </div>
+
+      <div className="mt-2 flex items-center mb-2 md:mb-4">
+        <p className="mt-2 text-gray-500 text-xs md:text-sm">
+          Created At: {post.created_at.toLocaleString()}    {/* Convert Date to string */}
         </p>
       </div>
 

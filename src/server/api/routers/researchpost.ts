@@ -24,6 +24,9 @@ export const researchpostRouter = router({
       where: {
         user_id: ctx.user.id,
       },
+      orderBy: {
+        created_at: 'desc', // Order by created_at in descending order
+      },
     });
 
     return myPosts;

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { router, protectedProcedure, publicProcedure } from "~/server/api/trpc";
 import { TRPCError } from "@trpc/server";
+import { inferAsyncReturnType } from "@trpc/server";
 
 // Define the profile router
 export const profileRouter = router({
@@ -80,6 +81,10 @@ export const profileRouter = router({
       return updatedProfile;
     }),
 });
+
+
+
+//ignore from here
 
 // export const profileRouter = router({
 //   get: publicProcedure

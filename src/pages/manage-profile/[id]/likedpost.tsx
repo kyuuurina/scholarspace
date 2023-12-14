@@ -1,7 +1,7 @@
 //Query all post created by user, if null, display "You have not created any post yet"
 
 import React from 'react';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {api} from "~/utils/api";
 import Image from 'next/image';
 import Link from 'next/link';
@@ -25,10 +25,6 @@ import { FaEdit } from 'react-icons/fa';
 
 //profile components
 import ProfileTabs from '~/components/profile/ProfileTabs';
-import UserProfileCard from "~/components/research-post/UserRecCards";
-import UserProfileForm from "~/components/profile/UserProfileForm";
-import EducationForm from "~/components/profile/EducationForm";
-import EducationCard from "~/components/profile/EducationCard";
 import Head from 'next/head';
 
 import { useRouter } from 'next/router';
@@ -41,6 +37,24 @@ import Post from '~/components/research-post/Post';
 const LikedPost: NextPageWithLayout = () => {
   const likedPostLists = useFetchLikedPost();
   const router = useRouter();
+  const [likedPostsDetails, setLikedPostDetails] = useState([]);
+
+  const fetchLikedPostsDetails = async () => {
+    if (likedPostLists.myLikedPosts.length > 0) {
+      const likedPostsDetailsArray = await Promise.all(
+        likedPostLists.myLikedPosts.map(async (likedPost) => {
+          // Fetch research post details for each liked post
+          const researchPostDetails = await useFetchResearchPost(likedPost.post_id);
+          return { ...likedPost, researchPostDetails };
+        })
+      );
+      setLikedPostsDetails(likedPostsDetailsArray);
+    }
+  };
+
+  useEffect(() => {
+    fetchLikedPostsDetails();
+  }, [likedPostLists.myLikedPosts]);  
 
   console.log("MyPost.tsx page router:", router)
   console.log("MyPost.tsx page likedPostLists:", likedPostLists)
@@ -68,7 +82,7 @@ const LikedPost: NextPageWithLayout = () => {
                   {likedPostLists.myLikedPosts.map((post_likes) => (
                       <li key={post_likes.post_id} className="mb-8">
                           {/* Render your liked post component here */}
-                          <Post post_likes = {post_likes} />
+                          {/* <Post post_likes = {post_likes} /> */}
                       </li>
                   ))}
               </ul>

@@ -33,6 +33,96 @@ export const likeRouter = router({
     console.log("likeRouter getMyLikedPosts", myLikedPosts);
   }),
 
+  toggleLike: protectedProcedure
+    .input(z.object({like_id: z.string()}))
+    .query (async ({input: {like_id}, ctx}) => {
+      const data = { post_id: post_id, user_id: ctx.user.id };
+
+      const existingLike = await ctx.prisma.post_likes.findUnique({
+        where: { user_id_post_id: data },
+      })
+
+      //check whether have liked the post or not
+      if (existingLike == null) {
+        await ctx.prisma.post_likes.create({data})
+        return { addedLike: true}
+      }
+      else  //if already liked
+      {
+        await ctx.prisma.post_likes.delete({where: {like_id}})
+        return { addedLike: false}
+      }),
+
+  // likePost: protectedProcedure
+  //   .input(z.object({ post_id: z.string() }))
+  //   .mutation(async ({ input, ctx }) => {
+  //     const existingLike = await ctx.prisma.post_likes.findUnique({
+  //       where: {
+  //         post_id_user_id: {
+  //           post_id: input.post_id,
+  //           user_id: ctx.user.id,
+  //         },
+  //       } as {
+  //         post_id_user_id: {
+  //           post_id: string;
+  //           user_id: string;
+  //         };
+  //       },
+  //     });
+
+  //     if (existingLike) {
+  //       // User has already liked the post, you may throw an error or handle it as needed
+  //       throw new TRPCError({
+  //         message: "You have already liked this post.",
+  //         code: "CONFLICT",
+  //       });
+  //     }
+
+  //     const newLike = await ctx.prisma.post_likes.create({
+  //       data: {
+  //         post_id: input.post_id,
+  //         user_id: ctx.user.id,
+  //       },
+  //     });
+
+  //     return newLike;
+
+  //     console.log("likeRouter likePost", newLike);
+  //   }),
+
+  // unlikePost: protectedProcedure
+  //   .input(z.object({ post_id: z.string() }))
+  //   .mutation(async ({ input, ctx }) => {
+  //     const existingLike = await ctx.prisma.post_likes.findUnique({
+  //       where: {
+  //         post_id_user_id: {
+  //           post_id: input.post_id,
+  //           user_id: ctx.user.id,
+  //         },
+  //       },
+  //     });
+
+  //     if (!existingLike) {
+  //       // User has not liked the post, you may throw an error or handle it as needed
+  //       throw new TRPCError({
+  //         message: "You have not liked this post.",
+  //         code: "CONFLICT",
+  //       });
+  //     }
+
+  //     await ctx.prisma.post_likes.delete({
+  //       where: {
+  //         like_id: existingLike.like_id,
+  //       },
+  //     });
+
+  //     // Return some indication of success, if needed
+  //     return { success: true };
+
+  //     console.log("likeRouter unlikePost", existingLike);
+  //   }),
+
+
 
   // like: protectedProcedure
   //   .input(z.object({ post_id: z.string() }))

@@ -56,7 +56,7 @@ const ProfilePage: NextPageWithLayout = () => {
 
   //const
   const router = useRouter();
-  const {id}  = router.query;
+  const {id}  = router.query;           //query id
   // const profile_id = useRouterId();
   const userId = getCookie("UserID");
 
@@ -122,7 +122,7 @@ const ProfilePage: NextPageWithLayout = () => {
         try {
           await updateProfile.mutateAsync({
             // profile_id,
-            profile_id: id as string,
+            profile_id: id as string,     //pass the id to router.query
             // profile_id: id,
             ...formData,
           });
@@ -169,6 +169,7 @@ const ProfilePage: NextPageWithLayout = () => {
                   <button onClick={handleEditClick} className="flex items-center">
                     Edit <FaEdit className="ml-2" />
                   </button>
+
                 </div>
               </div>
               <div>
