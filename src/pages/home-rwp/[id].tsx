@@ -77,16 +77,13 @@ const ResearchPostsPage: NextPageWithLayout = () => {
   ];
   
     const router = useRouter();
-    // Define state for searchQuery
-    const [searchQuery, setSearchQuery] = useState<string>("");
-
-    // Inside your Home component
     const userId = getCookie("User ID");
 
     // Now you can use the userId variable in your component as needed
     console.log("User ID:", userId);
 
-    // Handler for search query change
+    //State and handler for searchQuery
+    const [searchQuery, setSearchQuery] = useState<string>("");
     const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value);
     };

@@ -33,25 +33,25 @@ export const likeRouter = router({
     console.log("likeRouter getMyLikedPosts", myLikedPosts);
   }),
 
-  toggleLike: protectedProcedure
-    .input(z.object({like_id: z.string()}))
-    .query (async ({input: {like_id}, ctx}) => {
-      const data = { post_id: post_id, user_id: ctx.user.id };
+  // toggleLike: protectedProcedure
+  //   .input(z.object({like_id: z.string()}))
+  //   .query (async ({input: {like_id}, ctx}) => {
+  //     const data = { post_id: post_id, user_id: ctx.user.id };
 
-      const existingLike = await ctx.prisma.post_likes.findUnique({
-        where: { user_id_post_id: data },
-      })
+  //     const existingLike = await ctx.prisma.post_likes.findUnique({
+  //       where: { user_id_post_id: data },
+  //     })
 
-      //check whether have liked the post or not
-      if (existingLike == null) {
-        await ctx.prisma.post_likes.create({data})
-        return { addedLike: true}
-      }
-      else  //if already liked
-      {
-        await ctx.prisma.post_likes.delete({where: {like_id}})
-        return { addedLike: false}
-      }),
+  //     //check whether have liked the post or not
+  //     if (existingLike == null) {
+  //       await ctx.prisma.post_likes.create({data})
+  //       return { addedLike: true}
+  //     }
+  //     else  //if already liked
+  //     {
+  //       await ctx.prisma.post_likes.delete({where: {like_id}})
+  //       return { addedLike: false}
+  //     }),
 
   // likePost: protectedProcedure
   //   .input(z.object({ post_id: z.string() }))

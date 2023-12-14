@@ -11,6 +11,7 @@ import { experienceRouter } from "./routers/experience";
 import { achievementRouter } from "./routers/achievement";
 import { followRouter } from "./routers/follow";
 import { likeRouter } from "./routers/postlike";
+import { postCommentRouter } from "./routers/postcomment";
 
 
 
@@ -32,6 +33,7 @@ export const appRouter = router({
   project: projectRouter,
   follow: followRouter,
   postlike: likeRouter,
+  postcomment: postCommentRouter,
 });
 
 // export type definition of API

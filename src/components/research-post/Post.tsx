@@ -4,14 +4,18 @@ import Image from 'next/image';
 import { FiHeart, FiMessageSquare } from 'react-icons/fi';
 import Card from '../Card';
 import Comment from './Comment'; // Import the Comment component
+import PostComment from './PostComment';
+import CommentsList from './CommentList';
 
 interface PostProps {
   post: {
+    post_id: string;  //just added
     category: string;
     title: string;
     author: string | null;
     description: string | null;
     created_at: Date;
+
   };
 }
 
@@ -92,6 +96,9 @@ const Post: React.FC<PostProps> = ({ post }) => {
 
       {/* Add the Comment component here */}
       <Comment onAddComment={handleAddComment} />
+      {/* <CommentsList post_id={post.post_id} refetch={refetch} /> */}
+      {/* <PostComment post_id={post.post_id} refetch={refetch} /> */}
+      {/* <PostComment comment ={postComment} /> */}
 
       {/* Display existing comments */}
       <ul>
