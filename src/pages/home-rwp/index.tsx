@@ -3,6 +3,8 @@
 
 //auth
 import { getCookie } from "cookies-next";
+import { useUser } from "@supabase/auth-helpers-react";
+
 //utils
 import React, { ChangeEvent, SetStateAction, useState, useEffect } from "react";
 import { useRouter } from "next/router";
@@ -77,6 +79,9 @@ const ResearchPostsPage: NextPageWithLayout = () => {
   ];
   
     const router = useRouter();
+    const user = useUser();
+
+    console.log("User:", user);
     // Define state for searchQuery
     const [searchQuery, setSearchQuery] = useState<string>("");
 

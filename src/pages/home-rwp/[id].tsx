@@ -3,8 +3,9 @@
 
 //auth
 import { getCookie } from "cookies-next";
+import { useUser } from "@supabase/auth-helpers-react";
 //utils
-import React, { ChangeEvent, SetStateAction, useState, useEffect } from "react";
+import React, { ChangeEvent, SetStateAction, useState, useEffect, use } from "react";
 import { useRouter } from "next/router";
 import toast from "react-hot-toast";
 
@@ -78,6 +79,9 @@ const ResearchPostsPage: NextPageWithLayout = () => {
   
     const router = useRouter();
     const userId = getCookie("User ID");
+    const user = useUser();
+
+    console.log("User:", user);
 
     // Now you can use the userId variable in your component as needed
     console.log("User ID:", userId);
