@@ -81,9 +81,8 @@ const ResearchPostsPage: NextPageWithLayout = () => {
     const userId = getCookie("User ID");
     const user = useUser();
 
-    console.log("User:", user);
-
     // Now you can use the userId variable in your component as needed
+    console.log("User home-rwp:", user);
     console.log("User ID:", userId);
 
     //State and handler for searchQuery

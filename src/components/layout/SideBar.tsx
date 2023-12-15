@@ -4,6 +4,7 @@ import Link from "next/link";
 import Router, { useRouter } from "next/router";
 import { getCookie } from "cookies-next";
 import { useSession, useSessionContext } from "@supabase/auth-helpers-react";
+import { api } from "~/utils/api";
 
 // icons
 import {
@@ -26,11 +27,11 @@ type SideBarProps = {
 
 export const SideBar: React.FC<SideBarProps> = ({ toggleSidebar, open }) => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  
+
   const router = useRouter();
   const session = useSession();
+  // const { user } = session.data?.user;
   const { supabaseClient } = useSessionContext();
-  // const user = session.data?.user;
   const userId = getCookie("User ID");
 
   // Check if router.query and router.query.id are defined before accessing their values
@@ -38,6 +39,8 @@ export const SideBar: React.FC<SideBarProps> = ({ toggleSidebar, open }) => {
     router.query && router.query.id ? router.query.id.toString() : "";
 
   console.log("sidebar router",router.asPath);
+  console.log("supabaseClient", supabaseClient);
+  console.log("userId", userId);
 
   return (
     <>
@@ -80,7 +83,7 @@ export const SideBar: React.FC<SideBarProps> = ({ toggleSidebar, open }) => {
                   className={`flex items-center space-x-3 rounded-md hover:bg-purple-800 ${
                     open ? "text-purple-accent-2" : "text-purple-accent-2"
                   }`}
-                  href="/home-rwp"
+                  href={`/home-rwp/${id}`}
                   onClick={toggleSidebar}
                 >
                   <FiHome className="h-6 w-6" />

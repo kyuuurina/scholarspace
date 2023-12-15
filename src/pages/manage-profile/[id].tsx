@@ -60,7 +60,7 @@ const ProfilePage: NextPageWithLayout = () => {
   // const profile_id = useRouterId();
   const userId = getCookie("UserID");
 
-  const {name, about_me, skills,research_interest, collab_status, isLoading} = useFetchProfile();
+  const {name, about_me, skills,research_interest, collab_status, isLoading, user_id} = useFetchProfile();
   //const modal states
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isEducationModalOpen, setIsEducationModalOpen] = useState(false);

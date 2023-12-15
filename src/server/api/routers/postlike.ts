@@ -33,6 +33,44 @@ export const likeRouter = router({
     console.log("likeRouter getMyLikedPosts", myLikedPosts);
   }),
 
+  toggleLike: protectedProcedure
+  .input(z.object({post_id: z.string()}))
+  .mutation(async ({input, ctx}) => {
+    const {user} = ctx;
+
+    const existingLike = await ctx.prisma.post_likes.findUnique({
+      where: {
+        post_id_user_id: {
+          post_id: input.post_id,
+          user_id: user.id,
+        },
+      },
+    });
+
+    if (existingLike) {
+      await ctx.prisma.post_likes.delete({
+        where: {
+          like_id: existingLike.like_id,
+        },
+      });
+
+      return {addedLike: false};
+    } else {
+      await ctx.prisma.post_likes.create({
+        data: {
+          post_id: input.post_id,
+          user_id: user.id,
+        },
+      });
+
+      return {addedLike: true};
+    }
+  }),
+
+
+
+
+
   // toggleLike: protectedProcedure
   //   .input(z.object({like_id: z.string()}))
   //   .query (async ({input: {like_id}, ctx}) => {

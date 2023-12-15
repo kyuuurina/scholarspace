@@ -6,6 +6,7 @@ import Card from '../Card';
 import Comment from './Comment'; // Import the Comment component
 import PostComment from './PostComment';
 import CommentsList from './CommentList';
+import { api } from '~/utils/api';
 
 interface PostProps {
   post: {
@@ -41,11 +42,21 @@ const getCategoryStyles = (category: string) => {
 const Post: React.FC<PostProps> = ({ post }) => {
   const categoryStyles = getCategoryStyles(post.category);
 
-  // Like
-  const [liked, setLiked] = useState(false);
-  const handleLikeClick = () => {
-    setLiked((prevLiked) => !prevLiked);
-  };
+ // Like
+ const [liked, setLiked] = useState(false);
+ const toggleLike = api.postlike.toggleLike.useMutation();
+
+ const handleLikeClick = async () => {
+   try {
+     // eslint-disable-next-line @typescript-eslint/await-thenable
+     await toggleLike.mutate({ post_id: post.post_id });
+
+     // Update local state
+     setLiked((prevLiked) => !prevLiked);
+   } catch (error) {
+     console.error('Error toggling like:', error);
+   }
+ };
 
   // Comment
   const [comments, setComments] = useState<string[]>([]);

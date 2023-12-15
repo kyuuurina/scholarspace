@@ -415,6 +415,7 @@ model post_likes {
   research_post research_post @relation(fields: [post_id], references: [post_id], onDelete: Cascade)
   user          user          @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
+  @@unique([post_id, user_id], map: "unique_user_post_likes")
   @@schema("public")
 }
 
