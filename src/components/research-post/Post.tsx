@@ -42,6 +42,18 @@ const getCategoryStyles = (category: string) => {
 const Post: React.FC<PostProps> = ({ post }) => {
   const categoryStyles = getCategoryStyles(post.category);
 
+  // const [liked, setLiked] = useState(false);
+  // const [likeCount, setLikeCount] = useState(post.likeCount);
+
+  // const handleLikeClick = async () => {
+  //   const { addedLike, likeCount: updatedLikeCount } = await toggleLike.mutate({
+  //     post_id: post.post_id,
+  //   });
+
+  //   setLiked(addedLike);
+  //   setLikeCount(updatedLikeCount);
+  // };
+
  // Like
  const [liked, setLiked] = useState(false);
  const toggleLike = api.postlike.toggleLike.useMutation();

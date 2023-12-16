@@ -54,16 +54,30 @@ export const likeRouter = router({
         },
       });
 
-      return {addedLike: false};
+      //Fetch updated like count after deletion
+      const likeCount = await ctx.prisma.post_likes.count({
+        where: {
+          post_id: input.post_id,
+        },
+      });
+
+      return {addedLike: false, likeCount};
     } else {
       await ctx.prisma.post_likes.create({
         data: {
           post_id: input.post_id,
           user_id: user.id,
+          liked_at: new Date(),
         },
       });
 
-      return {addedLike: true};
+      //Fetch updated like count after creation
+      const likeCount = await ctx.prisma.post_likes.count({
+        where: {
+          post_id: input.post_id,
+        },
+      });
+      return {addedLike: true, likeCount};
     }
   }),
 
