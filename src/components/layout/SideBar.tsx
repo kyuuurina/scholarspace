@@ -29,7 +29,8 @@ export const SideBar: React.FC<SideBarProps> = ({ toggleSidebar, open }) => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
 
   const router = useRouter();
-  const session = useSession();
+  // const session = useSession();
+  useSessionContext();
   // const { user } = session.data?.user;
   const { supabaseClient } = useSessionContext();
   const userId = getCookie("User ID");
@@ -39,7 +40,6 @@ export const SideBar: React.FC<SideBarProps> = ({ toggleSidebar, open }) => {
     router.query && router.query.id ? router.query.id.toString() : "";
 
   console.log("sidebar router",router.asPath);
-  console.log("supabaseClient", supabaseClient);
   console.log("userId", userId);
 
   return (
