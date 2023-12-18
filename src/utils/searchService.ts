@@ -4,7 +4,9 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export const search = async (query: string) => {
+export const searchProfiles = async (query: string) => {
+
+  console.log("Executing search query:", query);
   const results = await prisma.profile.findMany({
     where: {
       name: {

@@ -25,7 +25,7 @@ import AvatarPlaceholder from "~/components/avatar/AvatarPlaceholder";
 import Modal from "~/components/modal/Modal";
 
 //search 
-import { search } from "~/utils/searchService";
+import { searchProfiles } from "~/utils/searchService";
 import SearchBar from "~/components/profile/SearchBar";
 
 //research post components
@@ -81,7 +81,6 @@ const ResearchPostsPage: NextPageWithLayout = () => {
     const userId = getCookie("User ID");
     const user = useUser();
 
-    // Now you can use the userId variable in your component as needed
     console.log("User home-rwp:", user);
     console.log("User ID:", userId);
 
@@ -91,16 +90,36 @@ const ResearchPostsPage: NextPageWithLayout = () => {
     setSearchQuery(event.target.value);
     };
   
+    // // Handler for search form submission
+    // const handleSearchSubmit = async () => {
+    //   // Perform the search with the current searchQuery value
+    //   console.log("Searching...:", searchQuery);
+
+    //   // Use try-catch to handle any errors during navigation
+    //   try {
+    //     await router.push(`/search-results?q=${searchQuery}`);
+    //   } catch (error) {
+    //     console.error("Error :", error);
+    //   }
+    // };
+
+  // Handler for search form submission
+  // const handleSearchSubmit = async () => {
+  //   try {
+  //     const searchResults = await searchProfiles(searchQuery);
+  //     // Handle the search results, e.g., update state or navigate to the search results page
+  //     console.log("Search Results:", searchResults);
+  //   } catch (error) {
+  //     console.error("Error during search:", error);
+  //   }
+  // };
+
     // Handler for search form submission
     const handleSearchSubmit = async () => {
-      // Perform the search with the current searchQuery value
-      console.log("Searching...:", searchQuery);
-
-      // Use try-catch to handle any errors during navigation
       try {
-        await router.push(`/search-results?q=${searchQuery}`);
+        await router.push(`/search-result?q=${searchQuery}`);
       } catch (error) {
-        console.error("Error :", error);
+        console.error("Error during navigation:", error);
       }
     };
 
