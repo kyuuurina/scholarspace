@@ -1,36 +1,39 @@
 import { api } from "./api";
+import {useRouterId} from "./routerId";
 
-export const followUser = async (targetUserId: string): Promise<boolean> => {
-  try {
-    // Call the follow procedure from your API
-    const result = await api.follow.follow.mutation({
-      input: { targetUserId },
-    });
 
-    // Return the result
-    return result;
-  } catch (error) {
-    // Handle errors, log, or throw as needed
-    console.error("Error following user:", error);
-    throw error;
-  }
-};
 
-export const unfollowUser = async (targetUserId: string): Promise<boolean> => {
-  try {
-    // Call the unfollow procedure from your API
-    const result = await api.follow.unfollow.mutation({
-      input: { targetUserId },
-    });
+// export const followUser = async (targetUserId: string): Promise<boolean> => {
+//   try {
+//     // Call the follow procedure from your API
+//     const result = await api.follow.follow.mutation({
+//       input: { targetUserId },
+//     });
 
-    // Return the result
-    return result;
-  } catch (error) {
-    // Handle errors, log, or throw as needed
-    console.error("Error unfollowing user:", error);
-    throw error;
-  }
-};
+//     // Return the result
+//     return result;
+//   } catch (error) {
+//     // Handle errors, log, or throw as needed
+//     console.error("Error following user:", error);
+//     throw error;
+//   }
+// };
+
+// export const unfollowUser = async (targetUserId: string): Promise<boolean> => {
+//   try {
+//     // Call the unfollow procedure from your API
+//     const result = await api.follow.unfollow.mutation({
+//       input: { targetUserId },
+//     });
+
+//     // Return the result
+//     return result;
+//   } catch (error) {
+//     // Handle errors, log, or throw as needed
+//     console.error("Error unfollowing user:", error);
+//     throw error;
+//   }
+// };
 
 
 
