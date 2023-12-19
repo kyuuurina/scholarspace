@@ -57,7 +57,26 @@ export const useFetchMyResearchPosts = () => {
     };
 };
 
+export const useFetchFollowingResearchPosts = (limit = 20, cursor?: string) => {
+    const followingResearchPosts = api.researchpost.getFollowingPosts.useQuery(
+        {
+            limit,
+            cursor,
+        },
+        {
+            //`enabled: true` if to fetch data immediately.
+            enabled: true,
+        }
+    );
 
+    const { data, isLoading, error } = followingResearchPosts;
+
+    return {
+        followingResearchPosts: data?.researchPosts || [], // Corrected: Access the correct property
+        isLoading,
+        error,
+    };
+};
 
 
 //hook for fetching user's research posts

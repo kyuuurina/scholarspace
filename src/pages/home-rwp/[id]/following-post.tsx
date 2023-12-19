@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-floating-promises */
 /* eslint-disable @typescript-eslint/no-misused-promises */
 
@@ -16,9 +18,14 @@ import type { NextPageWithLayout } from "~/pages/_app";
 // pages
 import ErrorPage from "~/pages/error-page";
 
+// utils
+import { useFetchFollowingResearchPosts } from "~/utils/researchpost";
+import { api } from "~/utils/api";
+
 // local components
 import Layout from "~/components/layout/Layout";
 import Head from "~/components/layout/Head";
+import LoadingSpinner from "~/components/LoadingSpinner";
 import Link from "next/link";
 import Card from "~/components/Card";
 import AvatarPlaceholder from "~/components/avatar/AvatarPlaceholder";
@@ -26,6 +33,7 @@ import Modal from "~/components/modal/Modal";
 
 //research post components
 import AllFollowingTabs from "~/components/research-post/AllFollowingTabs";
+import Post from "~/components/research-post/Post";
 import PostCard from "~/components/research-post/PostCard";
 import { ResearchPostCard } from "~/components/draft/ResearchPostCard";
 import UserProfileCard from "~/components/research-post/UserRecCards";
@@ -42,50 +50,47 @@ const FollowingPostPage: NextPageWithLayout = () => {
     { id: 2, name: "Hasbullah " },
   ];
 
-  const posts = [
-    {
-      title: "Effects of parental involvement on student behaviour",
-      category: "Conference Paper",
-      author: "National Institutes of Health",
-      description: "This riveting study delves into the intriguing realm of parental involvement and its curious influence on the behavior of young scholars. Join us on an adventure through the labyrinthine corridors of academia as we unravel the enigmatic connection.",
-      timestamp: "November 9, 2023",
-    },
-    {
-      title: "Design Patterns in Software Engineering",
-      category: "Journal Article",
-      author: "Nur Athirah",
-      description: "Due to the increasing research information, knowledge production, development of information technology, and its impact on access to knowledge, the taxonomy of knowledge and information is necessary to manage and use them in the development of science",
-      timestamp: "October 27, 2023",
-    },
-    {
-      title: "Impact of school funding on student achievement",
-      category: "Conference Paper",
-      author: "Dr. Isma Zaini",
-      description: "This is the second post. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      timestamp: "October 27, 2023",
-    },
+    // Customize the limit and cursor as needed
+    // const { followingResearchPosts, isLoading, error } = useFetchFollowingResearchPosts();
+    // if (isLoading) {
+    //     return <p>Loading...</p>;
+    // }
 
-  ];
+    // if (error) {
+    //     return <p>Error: {error.message}</p>;
+    // }
+
+
+    const FollowingPostLists = useFetchFollowingResearchPosts();
+    const router = useRouter();
+
+  // Check if followingResearchPosts is an array
+  if (!Array.isArray(FollowingPostLists.followingResearchPosts)) {
+    // Handle the case where it's not an array (you can log an error, show a message, etc.)
+    console.error("Following research posts data is not an array:", FollowingPostLists.followingResearchPosts);
+    return <p>Error: Unable to fetch research posts</p>;
+  }
+
 
   return (
-    <div className="mx-auto max-w-screen-xl p-8">
-      <AddNewPostButton />
-      {/* <h1 className="mb-4 text-3xl font-bold">Research Posts</h1> */}
+    <div className="w-full max-w-screen-xl p-8">
       <div className="grid grid-cols-3 gap-6">
         <div className="col-span-2">
           <AllFollowingTabs />
           <div className="mt-6">
-            {/* Render post cards here */}
-            {posts.map((post, index) => (
-              <PostCard
-                key={index}
-                title={post.title}
-                category={post.category}
-                author={post.author}
-                description={post.description}
-                timestamp={post.timestamp}
-              />
-            ))}
+            {FollowingPostLists.isLoading ? (
+              <LoadingSpinner />
+            ) : FollowingPostLists.followingResearchPosts.length === 0 ? (
+              <p className="text-lg font-medium text-gray-500 text-center mt-8">
+                Follow other users to see their research posts!
+              </p>
+            ) : (
+              FollowingPostLists.followingResearchPosts.map((post) => (
+                <li key={post.post_id} className="mb-8" style={{ listStyle: 'none' }}>
+                  <Post post={post} />
+                </li>
+              ))
+            )}
           </div>
         </div>
         <div className="col-span-1">
