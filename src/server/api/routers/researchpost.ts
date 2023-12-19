@@ -58,6 +58,7 @@ async function getInfiniteResearchPosts({
         author: post.author,
         created_at: post.created_at,
         user: post.user,
+        username: post.user.name,
       };
     }),
     nextCursor,

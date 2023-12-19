@@ -3,14 +3,20 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { FiHeart, FiMessageSquare } from 'react-icons/fi';
 import Card from '../Card';
+import AvatarPlaceholder from '../avatar/AvatarPlaceholder';
 import Comment from './Comment'; // Import the Comment component
 import PostComment from './PostComment';
 import CommentsList from './CommentList';
+
+
+//data fetching
 import { api } from '~/utils/api';
+import { useFetchUsers } from '~/utils/user';
 
 interface PostProps {
   post: {
     post_id: string;  //just added
+    user_id: string;
     category: string;
     title: string;
     author: string | null;
@@ -41,6 +47,15 @@ const getCategoryStyles = (category: string) => {
 
 const Post: React.FC<PostProps> = ({ post }) => {
   const categoryStyles = getCategoryStyles(post.category);
+
+  // Fetch user data
+  const { users, isLoading, error } = useFetchUsers();
+
+  // Find the user associated with the post
+  const associatedUser = users.find((user) => user.userId === post.user_id);
+
+  // Get the user name from the associated user or use a default value
+  const userName = associatedUser?.userName || 'DefaultName';
 
   // const [liked, setLiked] = useState(false);
   // const [likeCount, setLikeCount] = useState(post.likeCount);
@@ -79,14 +94,17 @@ const Post: React.FC<PostProps> = ({ post }) => {
 
   return (
     <Card title={post.title}>
-      <div className="flex items-center space-x-2 mb-2 md:mb-4">
+    <div className="flex items-center mb-2 md:mb-4">
+      <div className="aspect:square h-10 w-10">
+        <AvatarPlaceholder name={userName} shape="circle" />
+      </div>
+      <div className="ml-2">
         <span className={categoryStyles}>{post.category}</span>
       </div>
-
+    </div>
       <p className="mt-2 text-black text-sm md:text-base">
         {post.description || 'No description'}
       </p>
-      
 
       <div className="mt-2 flex items-center mb-2 md:mb-4">
         <p className="mt-2 text-gray-500 text-xs md:text-sm">
@@ -96,7 +114,7 @@ const Post: React.FC<PostProps> = ({ post }) => {
 
       <div className="mt-2 flex items-center mb-2 md:mb-4">
         <p className="mt-2 text-gray-500 text-xs md:text-sm">
-          Created At: {post.created_at.toLocaleString()}    {/* Convert Date to string */}
+          Created At: {post.created_at.toLocaleString()} {/* Convert Date to string */}
         </p>
       </div>
 
@@ -119,9 +137,6 @@ const Post: React.FC<PostProps> = ({ post }) => {
 
       {/* Add the Comment component here */}
       <Comment onAddComment={handleAddComment} />
-      {/* <CommentsList post_id={post.post_id} refetch={refetch} /> */}
-      {/* <PostComment post_id={post.post_id} refetch={refetch} /> */}
-      {/* <PostComment comment ={postComment} /> */}
 
       {/* Display existing comments */}
       <ul>
