@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/await-thenable */
 // Post.tsx - final FE (w/out comment section yet)
 import React, { useState } from 'react';
 import Image from 'next/image';
@@ -22,6 +23,7 @@ interface PostProps {
     author: string | null;
     description: string | null;
     created_at: Date;
+    likeCount: number;
 
   };
 }
@@ -75,7 +77,7 @@ const Post: React.FC<PostProps> = ({ post }) => {
 
  const handleLikeClick = async () => {
    try {
-     // eslint-disable-next-line @typescript-eslint/await-thenable
+     const likeCount =
      await toggleLike.mutate({ post_id: post.post_id });
 
      // Update local state
@@ -131,7 +133,7 @@ const Post: React.FC<PostProps> = ({ post }) => {
             size={18}
             className={`inline-block mr-1 md:mr-2 ${liked ? 'text-red-500 fill-red-500' : ''}`}
           />
-          Like
+          Like {post.likeCount}
         </button>
       </div>
 
