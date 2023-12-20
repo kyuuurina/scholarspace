@@ -74,10 +74,10 @@ const Workspace: NextPageWithLayout = () => {
               </Card>
               <MembersCard id={workspaceId} name={"workspace"} users={users} />
               <Card title={"Collaborative Score"} center>
-                <ScoreChart score={90} />
+                <ScoreChart name="Collaborative" score={90} />
               </Card>
               <Card title={"Productivity Score"} center>
-                <ScoreChart score={70} />
+                <ScoreChart name="Productivity" score={70} />
               </Card>
             </div>
           </div>

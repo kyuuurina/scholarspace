@@ -1,25 +1,9 @@
 import type { task, user } from "@prisma/client";
 import { api } from "./api";
+import type { taskRow, TaskFormData } from "~/types/task";
 
 export const useFetchTasksWithProperties = (phase_id: string) => {
-  const tasks: {
-    id: string;
-    name: string;
-    description: string | null;
-    created_at: Date;
-    status: string;
-    assignees: user[] | undefined;
-    phase_id: string;
-    end_at: Date | null;
-    deadline: Date | null;
-    properties: {
-      id: bigint;
-      property_id: string;
-      name: string;
-      value: string | null | undefined;
-    }[];
-    attachments: string[] | null;
-  }[] = [];
+  const tasks: taskRow[] = [];
 
   const tasksQuery = api.task.list.useQuery(
     {
@@ -122,8 +106,13 @@ export const useFetchTasksWithProperties = (phase_id: string) => {
     await assigneesQuery.refetch();
   };
 
-  tasks.sort((a, b) => b.created_at.getTime() - a.created_at.getTime());
-
+  // create refetch function
+  tasks.sort((a, b) => {
+    if (b && b.created_at && a && a.created_at) {
+      return b.created_at.getTime() - a.created_at.getTime();
+    }
+    return 0;
+  });
   return {
     tasks,
     refetch,

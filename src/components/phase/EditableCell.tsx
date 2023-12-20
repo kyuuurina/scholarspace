@@ -4,7 +4,7 @@ import { useFetchTasksWithProperties } from "~/utils/task";
 import { useClickAway } from "@uidotdev/usehooks";
 
 type CellProps = {
-  task_id: string;
+  task_id: string | undefined;
   property_id: string;
   setIsEditing: (isEditing: boolean) => void;
 };
@@ -22,7 +22,7 @@ const EditableCell: React.FC<CellProps> = ({
 
   // get phase id of property
   const phase_id = api.task.get.useQuery({
-    id: task_id,
+    id: task_id || "",
   }).data?.phase_id;
 
   const { refetch } = useFetchTasksWithProperties(phase_id ?? "");
@@ -36,7 +36,7 @@ const EditableCell: React.FC<CellProps> = ({
     if ("key" in event && event.key === "Enter") {
       // Add the new column to the database asynchronously
       await updateProperty.mutateAsync({
-        task_id,
+        task_id: task_id || "",
         property_id,
         value: newValue,
       });

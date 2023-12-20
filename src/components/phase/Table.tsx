@@ -169,17 +169,17 @@ const Table: React.FC<TableProps> = ({ phase_id }) => {
         </thead>
         <tbody>
           {tasks.map((task, rowIndex) => (
-            <tr key={task.id} className="border border-gray-300">
+            <tr key={task?.id} className="border border-gray-300">
               <td className="whitespace-nowrap border border-gray-300 px-6">
                 <div className="flex items-center">
                   <div className="ml-4">
                     <div
                       className="text-sm font-medium text-gray-900 hover:cursor-pointer hover:text-purple-900"
-                      onClick={() => handleTaskClick(task.id)}
+                      onClick={() => task && handleTaskClick(task.id)}
                     >
-                      {task.name}
+                      {task?.name ?? ''}
                       <AnimatePresence>
-                        {taskDrawerOpen[task.id] && (
+                        {task && taskDrawerOpen[task.id] && (
                           <motion.div
                             key={`drawer-${task.id}`}
                             initial="closed"
@@ -206,7 +206,7 @@ const Table: React.FC<TableProps> = ({ phase_id }) => {
                 </div>
               </td>
               <td className="whitespace-nowrap border border-gray-300 px-6 py-2">
-                {task.created_at?.toLocaleString()}
+                {task?.created_at?.toLocaleString() ?? ''}
               </td>
               <td className="whitespace-nowrap border border-gray-300 px-6 py-2">
                 <StatusBadge task={task} />
@@ -223,7 +223,7 @@ const Table: React.FC<TableProps> = ({ phase_id }) => {
               </td>
               {/* iterate properties and render column, */}
               {propertiesQuery?.data?.map((property, columnIndex) => {
-                const matchingProperty = task.properties.find(
+                const matchingProperty = task?.properties?.find(
                   (property) => property.id === BigInt(columnIndex)
                 );
 
@@ -236,7 +236,7 @@ const Table: React.FC<TableProps> = ({ phase_id }) => {
                     {editingCell?.rowIndex === rowIndex &&
                     editingCell?.columnIndex === columnIndex ? (
                       <EditableCell
-                        task_id={task.id}
+                        task_id={task?.id}
                         property_id={matchingProperty?.property_id || ""}
                         setIsEditing={(value) => {
                           if (!value) {

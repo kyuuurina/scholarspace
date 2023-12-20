@@ -11,7 +11,7 @@ const ScoreChart: React.FC<ScoreChartProps> = ({ name, score }) => {
     labels: [`${name} Score`, `Non-${name} Score`],
     datasets: [
       {
-        label: [`${name} Score`],
+        label: `${name} Score`,
         data: [score, 100 - score],
         backgroundColor: ["#935FEF", "#D1D5DB"],
         borderColor: ["#935FEF", "#D1D5DB"],
