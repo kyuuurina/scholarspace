@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 //to-do: add PageLoader
 //this file contains dummy data for Education, Research Experience and Achievement
 
@@ -19,6 +21,7 @@ import { useFetchProfile } from "~/utils/profile";
 import { useFetchEducation } from '~/utils/education';
 import { useFetchExperience } from '~/utils/experience';
 import { useFetchAchievement } from '~/utils/achievement';
+import { useFetchTry } from '~/utils/dummy';
 
 // types
 import type { ReactElement } from "react";
@@ -65,6 +68,8 @@ const ProfilePage: NextPageWithLayout = () => {
   const isCurrentUserProfile = userId === id;
 
   const {name, about_me, skills,research_interest, collab_status, isLoading, user_id} = useFetchProfile();
+  const myEducationLists = useFetchTry();
+  console.log("myEducationLists:", myEducationLists);
 
   //const modal states
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -203,24 +208,15 @@ const ProfilePage: NextPageWithLayout = () => {
               <h3 className="font-semibold text-2xl mb-4">
                 Education
               </h3>
-  
-              <div className="mb-4">
-                {/* Year */}
-                <p className="text-sm text-gray-600">
-                  <span className="font-semibold">Year:</span> 2020 - 2023
-                </p>
-  
-                {/* Institution Name */}
-                <p className="text-sm text-gray-600">
-                  <span className="font-semibold">Institution:</span> Universiti Malaya
-                </p>
-  
-                {/* Description */}
-                <p className="text-sm text-gray-600">
-                  <span className="font-semibold">Description:</span> Software Engineering.
-                </p>
-              </div>
-  
+
+              <ul className="grid grid-cols-1 gap-8">
+                {myEducationLists.myEducations.map((education) => (
+                  <li key={education.education_id} className="mb-8">
+                    <EducationCard education={education} />
+                  </li>
+                ))}
+              </ul>
+
               {/* Add Education Button on the right side */}
               {isCurrentUserProfile && (
                 <button
@@ -349,3 +345,4 @@ export default ProfilePage;
                     profile={profile}
                   />
                 )} */}
+

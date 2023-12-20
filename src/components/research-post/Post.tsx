@@ -23,7 +23,7 @@ interface PostProps {
     author: string | null;
     description: string | null;
     created_at: Date;
-    likeCount: number;
+    // likeCount: number;
 
   };
 }
@@ -133,7 +133,8 @@ const Post: React.FC<PostProps> = ({ post }) => {
             size={18}
             className={`inline-block mr-1 md:mr-2 ${liked ? 'text-red-500 fill-red-500' : ''}`}
           />
-          Like {post.likeCount}
+          Like 
+          {/* {post.likeCount} */}
         </button>
       </div>
 
