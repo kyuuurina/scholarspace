@@ -10,6 +10,8 @@ import { phaseRouter } from "./routers/phase";
 import { taskRouter } from "./routers/task";
 import { commentRouter } from "./routers/comment";
 import { scoreRouter } from "./routers/score";
+import { researchInterestRouter } from "./routers/research-interest";
+import { researchSkillRouter } from "./routers/research-skill";
 
 /**
  * This is the primary router for your server.
@@ -28,6 +30,8 @@ export const appRouter = router({
   task: taskRouter,
   comment: commentRouter,
   score: scoreRouter,
+  researchInterest: researchInterestRouter,
+  researchSkill: researchSkillRouter,
 });
 
 // export type definition of API

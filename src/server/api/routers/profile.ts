@@ -7,7 +7,6 @@ import { z } from "zod";
 import { router, protectedProcedure } from "~/server/api/trpc";
 import { PrismaClient } from "@prisma/client";
 
-
 const prisma = new PrismaClient();
 
 const profileRouter = router({
@@ -40,7 +39,10 @@ const profileRouter = router({
         education: z.array(z.string()),
         research_experience: z.array(z.string()).nullable(),
         research_interest: z.array(z.string()).nullable(),
-        collab_status: z.enum(['Open_For_Collaboration', 'Not_Open_For_Collaboration']),
+        collab_status: z.enum([
+          "Open_For_Collaboration",
+          "Not_Open_For_Collaboration",
+        ]),
       })
     )
     .mutation(async ({ input }) => {
@@ -76,11 +78,15 @@ const profileRouter = router({
             name,
             // avatar,
             about_me,
-            skills: skills ? { set: skills }: undefined, // Use Prisma set operation for arrays & accept nullable
-            achievements: achievements ? { set: achievements }: undefined ,
+            skills: skills ? { set: skills } : undefined, // Use Prisma set operation for arrays & accept nullable
+            achievements: achievements ? { set: achievements } : undefined,
             education: { set: education },
-            research_experience: research_experience ? { set: research_experience } : undefined,
-            research_interest: research_interest ? { set: research_interest } : undefined,
+            research_experience: research_experience
+              ? { set: research_experience }
+              : undefined,
+            research_interest: research_interest
+              ? { set: research_interest }
+              : undefined,
             //collab_status: collab_status ? { set: [collab_status] } : undefined as collab_status[],
             //collab_status: collab_status ? { set: [collab_status] as any } : undefined,
           },
@@ -89,6 +95,53 @@ const profileRouter = router({
         return updatedProfile;
       } catch (error: any) {
         throw new Error(`Failed to update profile: ${error.message}`);
+      }
+    }),
+
+  // create profile during registration
+  create: protectedProcedure
+    .input(
+      z.object({
+        name: z.string(),
+        avatar_url: z.string().nullable(),
+        about_me: z.string().nullable(),
+        research_interest: z.string().nullable(),
+        collab_status: z.enum([
+          "Open_For_Collaboration",
+          "Not_Open_For_Collaboration",
+        ]),
+        skills: z.string().nullable(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const {
+        name,
+        avatar_url,
+        about_me,
+        research_interest,
+        collab_status,
+        skills,
+      } = input;
+
+      const userId = ctx.user?.id;
+      console.log("User ID:", userId);
+
+      try {
+        const profile = await prisma.profile.create({
+          data: {
+            user_id: userId,
+            name,
+            avatar_url,
+            about_me,
+            research_interest,
+            collab_status,
+            skills,
+          },
+        });
+
+        return profile;
+      } catch (error: any) {
+        throw new Error(`Failed to create profile: ${error.message}`);
       }
     }),
 });

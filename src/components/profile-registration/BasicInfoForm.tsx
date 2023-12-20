@@ -1,35 +1,42 @@
-// i want this file
-import { useForm } from "react-hook-form";
-import { ZodType, z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { type UseFormRegister, type UseFormSetValue } from "react-hook-form";
+import type { FormData } from "~/types/profile";
+import CreatableSingleSelect from "../form/CreatableSingleSelect";
+import {
+  useListResearchInterests,
+  useListResearchSkills,
+} from "~/utils/researchOptions";
+import { api } from "~/utils/api";
 
-type BasicInfoData = {
-  name: string;
-  education: string | undefined;
-  // contactNum: string;
-  aboutMe: string;
+type BasicInfoFormProps = {
+  register: UseFormRegister<FormData>;
+  setValue: UseFormSetValue<FormData>;
 };
 
-type BasicInfoFormProps = BasicInfoData & {
-  updateFields: (fields: Partial<BasicInfoData>) => void;
-};
+const BasicInfoForm: React.FC<BasicInfoFormProps> = ({
+  register,
+  setValue,
+}) => {
+  const { refetch: refetchInterests, researchInterests } =
+    useListResearchInterests();
+  const createResearchInterest = api.researchInterest.create.useMutation();
+  const createResearchInterestOption = async (inputValue: string) => {
+    await createResearchInterest.mutateAsync({ name: inputValue });
+    await refetchInterests();
+  };
+  const setResearchInterest = (newValue: string) => {
+    setValue("research_interest", newValue);
+  };
 
-const educationOptions = [
-  { value: "Universiti Malaya", label: "Universiti Malaya" },
-  {
-    value: "Universiti Teknologi Malaysia",
-    label: "Universiti Teknologi Malaysia",
-  },
-  { value: "Universiti Sains Malaysia", label: "Universiti Sains Malaysia" },
-];
+  const { refetch: refetchSkills, researchSkills } = useListResearchSkills();
+  const createResearchSkill = api.researchSkill.create.useMutation();
+  const createResearchSkillOption = async (inputValue: string) => {
+    await createResearchSkill.mutateAsync({ name: inputValue });
+    await refetchSkills();
+  };
+  const setResearchSkill = (newValue: string) => {
+    setValue("skills", newValue);
+  };
 
-export function BasicInfoForm({
-  name,
-  // contactNum,
-  education,
-  aboutMe,
-  updateFields,
-}: BasicInfoFormProps) {
   return (
     <>
       <div className="my-6">
@@ -40,63 +47,62 @@ export function BasicInfoForm({
                 htmlFor="name"
                 className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
               >
-                Full Name
+                Name
               </label>
               <input
-                type="text"
                 id="name"
-                className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
-                placeholder="Enter your full name"
-                required
-                value={name}
-                onChange={(e) => updateFields({ name: e.target.value })}
+                className="block w-full"
+                {...register("name", { required: true })}
               />
             </div>
-            <div>
-              <label
-                htmlFor="education"
-                className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-              >
-                Institution
-              </label>
+            <div className="flex justify-between space-x-5">
+              <div className="w-1/2">
+                <label
+                  htmlFor="research_interest"
+                  className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  Research Interest
+                </label>
+                <CreatableSingleSelect
+                  optionsArr={researchInterests}
+                  createValue={createResearchInterestOption}
+                  setValue={setResearchInterest}
+                />
+              </div>
+              <div className="w-1/2">
+                <label
+                  htmlFor="skills"
+                  className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  Skills
+                </label>
+                <CreatableSingleSelect
+                  optionsArr={researchSkills}
+                  createValue={createResearchSkillOption}
+                  setValue={setResearchSkill}
+                />
+              </div>
             </div>
-            {/* <div>
-              <label
-                htmlFor="contactNum"
-                className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-              >
-                Contact Number
-              </label>
-              <input
-                type="string"
-                name="contactNum"
-                id="contactNum"
-                className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
-                placeholder="Write your contact number"
-                required
-                value={contactNum}
-                onChange={(e) => updateFields({ contactNum: e.target.value })}
-              />
-            </div> */}
             <div>
               <label
                 htmlFor="aboutMe"
                 className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
               >
-                About
+                About Me
               </label>
               <textarea
-                id="aboutMe"
+                id="about_me"
                 rows={4}
                 className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
-                placeholder="Write aboutMe yourself"
-                value={aboutMe}
-                onChange={(e) => updateFields({ aboutMe: e.target.value })}
-              ></textarea>
+                placeholder="Write about yourself"
+                {...register("about_me", { required: true })}
+              />
             </div>
           </div>
         </div>
       </div>
     </>
   );
-}
+};
+
+export default BasicInfoForm;

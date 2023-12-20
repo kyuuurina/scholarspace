@@ -1,8 +1,14 @@
 import { type FormEvent, useState } from "react";
 import type { NextPage } from "next";
-import Head from "next/head";
-import { User } from "@supabase/supabase-js";
+import { type User } from "@supabase/supabase-js";
 import { useUser } from "@supabase/auth-helpers-react";
+import { api } from "~/utils/api";
+import { useRouter } from "next/router";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
+
+import { useForm } from "react-hook-form";
+import { type ZodType, z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 // import custom hooks
 import { useMultistepForm } from "~/utils/useMultistepForm";
@@ -10,78 +16,106 @@ import { useMultistepForm } from "~/utils/useMultistepForm";
 // import custom components
 import PrimaryButton from "~/components/button/PrimaryButton";
 import Button from "~/components/button/Button";
-// import { RoleForm } from "~/components/profile-registration/RoleForm";
-import { BasicInfoForm } from "~/components/profile-registration/BasicInfoForm";
-import { ResearchForm } from "~/components/profile-registration/ResearchForm";
-
-type FormData = {
-  // collabStatus: string;
-  name: string;
-  education: string;
-  // contactNum: string;
-  aboutMe: string;
-  researchInterest: string[];
-};
-
-const INITIAL_DATA: FormData = {
-  // collabStatus: "",
-  name: "",
-  education: "",
-  // contactNum: "",
-  aboutMe: "",
-  researchInterest: [],
-};
-
+import FormErrorMessage from "~/components/FormErrorMessage";
 import SignoutButton from "~/components/auth/SignoutButton";
 
-const SignUp: NextPage = () => {
-  const user: User | null = useUser();
-  const [data, setData] = useState<FormData>(INITIAL_DATA);
-  const [isSelected, setIsSelected] = useState(true);
+// import { RoleForm } from "~/components/profile-registration/RoleForm";
+import BasicInfoForm from "~/components/profile-registration/BasicInfoForm";
+import ResearchForm from "~/components/profile-registration/ResearchForm";
+import ManageTasks from "~/components/profile-registration/ManageTasks";
 
-  function updateFields(fields: Partial<FormData>) {
-    setData((prevData) => ({ ...prevData, ...fields }));
-    console.log(fields);
-  }
+import type { FormData } from "~/types/profile";
+
+const INITIAL_DATA: FormData = {
+  name: "",
+  avatar_url: "",
+  about_me: "",
+  research_interest: "",
+  collab_status: "Open_For_Collaboration",
+  skills: "",
+};
+
+const SignUp: NextPage = () => {
+  const router = useRouter();
+  const user: User | null = useUser();
+  const supabase = useSupabaseClient();
+  const [isSelected, setIsSelected] = useState(true);
+  const [imageValue, setImageValue] = useState<File | null | undefined>(null);
+  const schema: ZodType<FormData> = z.object({
+    name: z.string().min(2, "Name must be at least 2 characters long."),
+    avatar_url: z.string().nullable(),
+    about_me: z.string().nullable(),
+    research_interest: z.string().nullable(),
+    collab_status: z.enum([
+      "Open_For_Collaboration",
+      "Not_Open_For_Collaboration",
+    ]),
+    skills: z.string().nullable(),
+  });
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    getValues,
+    setValue,
+    formState: { errors, isDirty },
+  } = useForm<FormData>({
+    resolver: zodResolver(schema),
+    defaultValues: INITIAL_DATA,
+  });
 
   const { currentStep, next, back, isFirstStep, isLastStep } = useMultistepForm(
     [
-      // <RoleForm
-      //   key={3}
-      //   updateFields={updateFields}
-      //   setIsSelected={setIsSelected}
-      // />,
-      <BasicInfoForm key={4} {...data} updateFields={updateFields} />,
-      <ResearchForm key={5} {...data} updateFields={updateFields} />,
+      <BasicInfoForm key={4} register={register} setValue={setValue} />,
+      <ResearchForm
+        key={5}
+        setValue={setValue}
+        setImageValue={setImageValue}
+      />,
     ]
   );
 
-  function onSubmit(e: FormEvent) {
+  const createProfileMut = api.profile.create.useMutation();
+
+  const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
+
     // Check if a card is selected
     if (!isSelected) {
       // Show an error message or perform any other actions to prompt the user to select a card
       console.log("Please select a collabStatus before proceeding!");
       return;
     }
-    if (!isLastStep) return next();
-    console.log(data);
-  }
 
+    if (!isLastStep) return next();
+
+    await createProfileMut.mutateAsync({
+      ...getValues(),
+    });
+
+    if (imageValue && getValues().avatar_url !== null) {
+      const { data, error } = await supabase.storage
+        .from("avatar")
+        .upload(getValues().avatar_url || "", imageValue);
+
+      console.log(error);
+      console.log(data);
+    } else {
+      console.error("Error: avatar_url is null or undefined");
+    }
+
+    // Navigate to the new page
+    void router.push("/");
+  };
   return (
     <>
       {/* layout */}
-      <main className="flex flex-col items-center justify-center md:flex-row">
-        <div className="mx-auto flex w-full flex-col overflow-hidden bg-blue-200 px-12 py-16 md:min-h-screen md:w-2/4 md:flex-row">
-          {/* description section  */}
-          <div>
-            <p>
-              Create a profile record where userId = {user?.id}. Refresh then go
-              to index page.{" "}
-            </p>
-            <SignoutButton />
-          </div>
+      <main className="flex flex-col items-center justify-center lg:flex-row">
+        <div className="relative hidden h-screen select-none flex-col bg-gradient-to-bl from-indigo-100 via-purple-100 to-blue-200 lg:flex lg:w-1/2">
+          <ManageTasks />
         </div>
+
         {/* form section  */}
         <div className="w-full bg-white px-12 py-16 md:min-h-screen md:w-1/2">
           <form onSubmit={onSubmit} autoComplete="off">
@@ -97,6 +131,7 @@ const SignUp: NextPage = () => {
                 type="submit"
                 name={`${isLastStep ? "Submit" : "Next"}`}
               />
+              <SignoutButton />
             </div>
           </form>
         </div>
