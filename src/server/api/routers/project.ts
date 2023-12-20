@@ -263,7 +263,36 @@ export const projectRouter = router({
           project_id: input.project_id,
         },
       });
-
+      // delete all tasks phase
+      await ctx.prisma.property_phase_task.deleteMany({
+        where: {
+          phase: {
+            project_id: input.project_id,
+          },
+        },
+      });
+      // delete all tasks
+      await ctx.prisma.task.deleteMany({
+        where: {
+          phase: {
+            project_id: input.project_id,
+          },
+        },
+      });
+      // delete all property phase 
+      await ctx.prisma.phase_property.deleteMany({
+        where: {
+          phase: {
+            project_id: input.project_id,
+          },
+        },
+      });
+      // delete all phase_projects record first
+      await ctx.prisma.phase.deleteMany({
+        where: {
+          project_id: input.project_id,
+        },
+      });
       await ctx.prisma.project.delete({
         where: {
           project_id: input.project_id,

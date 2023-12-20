@@ -15,7 +15,8 @@ export const useFetchTasksWithProperties = (phase_id: string) => {
     properties: {
       id: bigint;
       property_id: string;
-      value: string | null;
+      name: string;
+      value: string | null | undefined;
     }[];
     attachments: string[] | null;
   }[] = [];
@@ -61,6 +62,7 @@ export const useFetchTasksWithProperties = (phase_id: string) => {
       const taskProperties: {
         id: bigint;
         property_id: string;
+        name: string;
         value: string | null;
       }[] = [];
 
@@ -83,6 +85,7 @@ export const useFetchTasksWithProperties = (phase_id: string) => {
           taskProperties.push({
             id: propertyValue.index,
             property_id: matchedProperty.id,
+            name: matchedProperty.name,
             value: propertyValue.value,
           });
         }
@@ -93,6 +96,7 @@ export const useFetchTasksWithProperties = (phase_id: string) => {
         (assignee) => assignee.task_id === task.id
       );
 
+      taskProperties.sort((a, b) => a.name.localeCompare(b.name));
       // Update tasks with assignees
       tasks.push({
         id: task.id,
@@ -117,6 +121,8 @@ export const useFetchTasksWithProperties = (phase_id: string) => {
     await propertyValuesQuery.refetch();
     await assigneesQuery.refetch();
   };
+
+  tasks.sort((a, b) => b.created_at.getTime() - a.created_at.getTime());
 
   return {
     tasks,

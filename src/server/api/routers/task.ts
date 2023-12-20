@@ -186,7 +186,7 @@ export const taskRouter = router({
       z.object({
         task_id: z.string(),
         property_id: z.string(),
-        value: z.string(),
+        value: z.string().nullable(),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -434,7 +434,7 @@ export const taskRouter = router({
             },
           })
         )
-      );      
+      );
 
       return true;
     }),

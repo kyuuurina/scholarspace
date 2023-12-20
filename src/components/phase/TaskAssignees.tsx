@@ -42,8 +42,8 @@ const TaskAssignees: React.FC<TaskAssigneesProps> = ({
         assignees: selectedOptions.map((option) => option.value),
         phase_id,
       });
+      refetch();
     }
-    refetch();
     setIsSelectOpen(false);
   };
 
@@ -76,7 +76,7 @@ const TaskAssignees: React.FC<TaskAssigneesProps> = ({
         </div>
       ) : (
         <button onClick={() => setIsSelectOpen(!isSelectOpen)}>
-          Add assignees
+          Add assignees...
         </button>
       )}
     </div>

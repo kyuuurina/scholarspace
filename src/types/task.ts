@@ -21,6 +21,7 @@ type taskRow =
       properties: {
         id: bigint;
         property_id: string;
+        name: string;
         value: string | null;
       }[];
       attachments: string[] | null;

@@ -25,6 +25,7 @@ import AttachmentUpload from "./AttachmentUpload";
 import NonNullableDatePicker from "./NonNullableDatePicker";
 import NullableDatePicker from "./NullableDatePicker";
 import TaskAssignees from "./TaskAssignees";
+import TaskProperty from "./TaskProperty";
 
 type TaskDrawerProps = {
   task: taskRow;
@@ -164,16 +165,15 @@ const TaskDrawer: React.FC<TaskDrawerProps> = ({
               refetch={refetch}
             />
             {/* render properties input fields */}
-            {properties?.map((property) => (
-              <div key={property.id}>
-                <label className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
-                  {property.name}
-                </label>
-                <input
-                  type="text"
-                  className="focus:ring-primary-600 focus:border-primary-600 dark:dark:focus:border-primary-500 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900  "
-                />
-              </div>
+            {task?.properties.map((property) => (
+              <TaskProperty
+                key={property.property_id}
+                task_id={task?.id}
+                property_id={property.property_id}
+                value={property.value}
+                refetch={refetch}
+                label={property.name}
+              />
             ))}
           </div>
         </div>
