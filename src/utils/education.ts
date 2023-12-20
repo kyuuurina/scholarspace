@@ -2,21 +2,26 @@
 import { api } from "./api";
 import { useRouterId } from "./routerId";
 
-// Define the shape of the user object
-// type User = {
-//   userid: string;
-//   user: {
-//     name: string | null;
-//     email: string | null;
-//     avatar_url: string | null;
-//   };
-// };
+type Education = {
+  education_id: string;
+  user_id: string;
+  school: string;
+  start_year: string;
+  end_year: string;
+  description: string | null;
+};
+
+type EducationHookResult = {
+  data: Education | null;
+  isLoading: boolean;
+  // error: any; // Update this to your actual error type
+};
 
 // Utility function to fetch education details for a specific ID
 export const useFetchEducation = () => {
   // Get education ID from the router
   const id: string = useRouterId();
-
+  
   // Use TRPC query to fetch education details
   const education = api.education.getEducations.useQuery(
     {
@@ -28,21 +33,6 @@ export const useFetchEducation = () => {
   );
 
   // Destructure data, isLoading, and error from the education query result
-  const {
-    education_id,
-    user_id,
-    school,
-    start_year,
-    end_year,
-    description,
-  } = (education.data || {}) as {
-        education_id: string;
-        user_id: string;
-        school: string;
-        start_year: string | null;
-        end_year: string | null;
-        description: string | null;
-  };
   // const {
   //   education_id,
   //   user_id,
@@ -50,21 +40,42 @@ export const useFetchEducation = () => {
   //   start_year,
   //   end_year,
   //   description,
-  // } = education.data || {};
-
-  // Destructure isLoading and error from the education query
-  const { isLoading, error } = education;
-
-  // Return the relevant information
-  return {
+  // } = (education.data || {}) as {
+  //       education_id: string;
+  //       user_id: string;
+  //       school: string;
+  //       start_year: string;
+  //       end_year: string;
+  //       description: string | null;
+  // };
+  const {
+    education_id,
+    user_id,
     school,
     start_year,
     end_year,
     description,
+  } = education.data || {};
+
+  // Destructure isLoading and error from the education query
+  const { data, isLoading, error } = education;
+
+  // Return the relevant information
+  // return {
+  //   school,
+  //   start_year,
+  //   end_year,
+  //   description,
+  //   isLoading,
+  //   error,
+  //   education_id,
+  //   user_id,
+  // } as Education;
+
+  return {
+    data,
     isLoading,
     error,
-    education_id,
-    user_id,
   };
 };
 
@@ -188,66 +199,4 @@ export const useFetchEducation = () => {
 //   };
 // };
 
-// export const useCreateEducation = () => {
-//   const profileId: string = useRouterId();
 
-//   const createEducationMutation = api.education.create.useMutation();
-
-//   const handleCreateEducation = async (educationData: {
-//     school_name: string;
-//     start_date: Date;
-//     end_date: Date;
-//   }) => {
-//     try {
-//       await createEducationMutation.mutate({
-//         profile_id: profileId,
-//         ...educationData,
-//       });
-//     } catch (error) {
-//       console.error("Error creating education:", error);
-//     }
-//   };
-
-//   return {
-//     createEducation: handleCreateEducation,
-//   };
-// };
-
-// export const useUpdateEducation = () => {
-//   const updateEducationMutation = api.education.update.useMutation();
-
-//   const handleUpdateEducation = async (educationData: {
-//     education_id: string;
-//     school_name: string;
-//     start_date: Date;
-//     end_date: Date;
-//   }) => {
-//     try {
-//       await updateEducationMutation.mutate(educationData);
-//     } catch (error) {
-//       console.error("Error updating education:", error);
-//     }
-//   };
-
-//   return {
-//     updateEducation: handleUpdateEducation,
-//   };
-// };
-
-// export const useDeleteEducation = () => {
-//   const deleteEducationMutation = api.education.delete.useMutation();
-
-//   const handleDeleteEducation = async (educationId: string) => {
-//     try {
-//       await deleteEducationMutation.mutate({
-//         education_id: educationId,
-//       });
-//     } catch (error) {
-//       console.error("Error deleting education:", error);
-//     }
-//   };
-
-//   return {
-//     deleteEducation: handleDeleteEducation,
-//   };
-// };
