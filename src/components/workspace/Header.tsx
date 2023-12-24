@@ -32,11 +32,15 @@ const Header: React.FC<HeaderProps> = ({
             <AvatarPlaceholder name={name || "SS"} shape="square" />
           </div>
         )}
-        <h1 className="max-w-[80%] truncate text-2xl font-bold sm:text-4xl">
+        <h1 className="truncate text-2xl font-bold sm:text-4xl">
           {name}
         </h1>
       </Link>
       <div className="flex items-center gap-x-2">
+        {/* if purpose is project */}
+        {purpose === "project" && (
+          <HeaderButton purpose={purpose} type={"phases"} />
+        )}
         <HeaderButton purpose={purpose} type={"members"} />
         <HeaderButton purpose={purpose} type={"settings"} />
       </div>

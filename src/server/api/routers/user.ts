@@ -8,6 +8,25 @@ export const userRouter = router({
     const users = await ctx.prisma.user.findMany();
     return users;
   }),
+
+  get: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const user = await ctx.prisma.user.findUnique({
+        where: {
+          id: input.id,
+        },
+      });
+
+      if (!user) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "User not found",
+        });
+      }
+
+      return user;
+    }),
   //   get: publicProcedure
   //     .input(z.object({ id: z.string() }))
   //     .query(async ({ ctx, input }) => {

@@ -21,10 +21,9 @@ const MemberRow: React.FC<MemberRowProps> = ({
   isPersonal,
   ownerId,
 }) => {
-  const userId = getCookie("User ID");
+  const userId = getCookie("UserID");
   const isPersonalOwner = member.memberId === ownerId && isPersonal;
-  console.log(ownerId);
-  console.log(member.memberId);
+  console.log(member.memberId, userId);
 
   return (
     <tr className="bg-white hover:bg-gray-50">
@@ -86,7 +85,10 @@ const MemberRow: React.FC<MemberRowProps> = ({
                   handleDeleteMember(member.memberId);
                 }
               }}
-              disabled={userWorkspaceRole !== "Researcher Admin"}
+              disabled={
+                userWorkspaceRole !== "Researcher Admin" ||
+                member.memberId === userId
+              }
             >
               Remove user
             </button>

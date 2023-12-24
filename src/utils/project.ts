@@ -143,6 +143,7 @@ export const useFetchProjectMembers = () => {
     memberRole: string | null;
     memberAvatarUrl: string | null; // Make it nullable to handle potential null values
   }[] = [];
+  const userDropdown: any[] = [];
 
   if (members.data) {
     members.data.forEach((member: Member) => {
@@ -153,12 +154,19 @@ export const useFetchProjectMembers = () => {
         memberRole: member.project_role,
         memberAvatarUrl: member.user.avatar_url,
       });
+      userDropdown.push({
+        value: member.user?.id,
+        label: member.user.email || "",
+      });
     });
   }
 
   return {
     projectMembers,
+    userDropdown,
     error,
     isLoading,
   };
 };
+
+

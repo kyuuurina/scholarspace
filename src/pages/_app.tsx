@@ -9,6 +9,8 @@ import { Toaster } from "react-hot-toast";
 import ErrorBoundary from "~/components/ErrorBoundary";
 import "~/styles/globals.css";
 import { Inter } from "next/font/google";
+import "@mantine/tiptap/styles.css";
+import { MantineProvider, MantineTheme } from "@mantine/core";
 
 // supabase helpers for authentication and authorization
 import { createPagesBrowserClient } from "@supabase/auth-helpers-nextjs";
@@ -45,10 +47,12 @@ const MyApp = ({
           supabaseClient={supabaseClient}
           initialSession={initialSession as Session}
         >
-          <div className={`${poppins.className}`}>
-            {getLayout(<Component {...pageProps} />)}
-            <Toaster />
-          </div>
+          <MantineProvider>
+            <div className={`${poppins.className}`}>
+              {getLayout(<Component {...pageProps} />)}
+              <Toaster />
+            </div>
+          </MantineProvider>
         </SessionContextProvider>
       </ErrorBoundary>
     </>

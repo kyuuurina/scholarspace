@@ -16,7 +16,8 @@ export const workspaceRouter = router({
       if (!workspace) {
         throw new TRPCError({
           code: "NOT_FOUND",
-          message: "Workspace not found",
+          message:
+            "We're sorry, but the requested workspace could not be found.",
         });
       }
 
@@ -318,11 +319,15 @@ export const workspaceRouter = router({
             workspace_user: true,
           },
         });
-        // check if the workspace has only one researcher admin
+        // check if after leave, there will be no researcher admin left
         const researcherAdmins = workspace?.workspace_user.filter(
           (user) => user.workspace_role === "Researcher Admin"
         );
-        if (researcherAdmins?.length === 1) {
+
+        if (
+          researcherAdmins?.length === 1 &&
+          researcherAdmins[0]?.userid === userId
+        ) {
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
             message: "Workspace must have at least one researcher admin.",
@@ -443,7 +448,10 @@ export const workspaceRouter = router({
         (user) => user.workspace_role === "Researcher Admin"
       );
 
-      if (researcherAdmins?.length === 1) {
+      if (
+        researcherAdmins?.length === 1 &&
+        researcherAdmins[0]?.userid === ctx.user.id
+      ) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Workspace must have at least one researcher admin.",

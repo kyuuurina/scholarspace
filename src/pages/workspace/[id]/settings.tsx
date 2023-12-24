@@ -6,6 +6,7 @@ import { type ZodType, z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
 import { getCookie } from "cookies-next";
+import { useFetchWorkspace } from "~/utils/workspace";
 
 // types
 import type { ReactElement } from "react";
@@ -20,7 +21,6 @@ import { DeleteWorkspaceModal } from "~/components/workspace/DeleteWorkspaceModa
 import SuccessToast from "~/components/toast/SuccessToast";
 import ErrorToast from "~/components/toast/ErrorToast";
 import Header from "~/components/workspace/Header";
-import { useFetchWorkspace } from "~/utils/workspace";
 import LeaveModal from "~/components/modal/LeaveModal";
 
 // utils

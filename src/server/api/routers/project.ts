@@ -154,6 +154,44 @@ export const projectRouter = router({
         )
       );
 
+      // add a phase to project
+      const phase = await ctx.prisma.phase.create({
+        data: {
+          name: "Default phase",
+          start_at: new Date(),
+          project_id: project.project_id,
+        },
+      });
+
+      // create a task for the phase
+      await ctx.prisma.task.create({
+        data: {
+          name: "Default task",
+          phase_id: phase.id,
+          created_at: new Date(),
+        },
+      });
+
+      return project;
+    }),
+
+  updateCScore: protectedProcedure
+    .input(
+      z.object({
+        project_id: z.string(),
+        c_score: z.number(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const project = await ctx.prisma.project.update({
+        where: {
+          project_id: input.project_id,
+        },
+        data: {
+          c_score: input.c_score,
+        },
+      });
+
       return project;
     }),
 
@@ -225,7 +263,36 @@ export const projectRouter = router({
           project_id: input.project_id,
         },
       });
-
+      // delete all tasks phase
+      await ctx.prisma.property_phase_task.deleteMany({
+        where: {
+          phase: {
+            project_id: input.project_id,
+          },
+        },
+      });
+      // delete all tasks
+      await ctx.prisma.task.deleteMany({
+        where: {
+          phase: {
+            project_id: input.project_id,
+          },
+        },
+      });
+      // delete all property phase 
+      await ctx.prisma.phase_property.deleteMany({
+        where: {
+          phase: {
+            project_id: input.project_id,
+          },
+        },
+      });
+      // delete all phase_projects record first
+      await ctx.prisma.phase.deleteMany({
+        where: {
+          project_id: input.project_id,
+        },
+      });
       await ctx.prisma.project.delete({
         where: {
           project_id: input.project_id,
@@ -251,7 +318,7 @@ export const projectRouter = router({
 
       return members;
     }),
-  
+
   // add member to project
   addMember: protectedProcedure
     .input(
@@ -518,4 +585,4 @@ export const projectRouter = router({
 
       return true;
     }),
-  });
+});

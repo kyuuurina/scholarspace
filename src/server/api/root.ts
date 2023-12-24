@@ -3,9 +3,15 @@ import { memberRouter } from "~/server/api/routers/member";
 import { accountRouter } from "./routers/account";
 import { router } from "~/server/api/trpc";
 import { postRouter } from "~/server/api/routers/researchpost";
-import  profileRouter  from "./routers/profile";
+import profileRouter from "./routers/profile";
 import { userRouter } from "./routers/user";
 import { projectRouter } from "./routers/project";
+import { phaseRouter } from "./routers/phase";
+import { taskRouter } from "./routers/task";
+import { commentRouter } from "./routers/comment";
+import { scoreRouter } from "./routers/score";
+import { researchInterestRouter } from "./routers/research-interest";
+import { researchSkillRouter } from "./routers/research-skill";
 
 /**
  * This is the primary router for your server.
@@ -20,6 +26,12 @@ export const appRouter = router({
   researchpost: postRouter,
   user: userRouter,
   project: projectRouter,
+  phase: phaseRouter,
+  task: taskRouter,
+  comment: commentRouter,
+  score: scoreRouter,
+  researchInterest: researchInterestRouter,
+  researchSkill: researchSkillRouter,
 });
 
 // export type definition of API
