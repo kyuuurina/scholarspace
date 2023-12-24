@@ -77,7 +77,7 @@ const WorkspaceDropdown: React.FC<{ onClick: () => void }> = ({ onClick }) => {
                   className="block overflow-hidden text-clip px-4 py-2"
                   href={`/workspace/${workspace.id}`}
                 >
-                  {workspace.name}
+                  <div className="truncate">{workspace.name}</div>
                 </Link>
               </li>
             ))

@@ -1,16 +1,7 @@
 // utils/productivityCalculator.ts
 
 import { api } from "./api";
-type task = {
-  id: string;
-  created_at: Date;
-  name: string;
-  description: string | null;
-  status: string;
-  assignees: string | null;
-  phase_id: string;
-  end_at: Date | null;
-};
+import { type task } from "@prisma/client";
 /**
  * Calculate productivity score based on completed tasks and durations.
  * @returns {number} Productivity score.

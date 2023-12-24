@@ -83,6 +83,7 @@ const MemberModal: React.FC<MemberModalProps> = ({
                   id="email"
                   className="block w-full rounded-sm"
                   {...register("email", { required: true })}
+                  autoComplete="off"
                 />
               </div>
               <div className="flex flex-col">

@@ -1,45 +1,10 @@
+import type { task, user } from "@prisma/client";
 import { api } from "./api";
-import type { task } from "@prisma/client";
-
-export const useFetchTasks = (phase_id: string) => {
-  const tasksQuery = api.task.list.useQuery(
-    {
-      phase_id,
-    },
-    {
-      enabled: !!phase_id,
-    }
-  );
-
-  // returns an array of projects, push project data into array
-  const tasks: {
-    id: string;
-    name: string;
-    description: string | null;
-    created_at: Date;
-    status: string;
-    assignees: string | null;
-    phase_id: string;
-    end_at: Date | null;
-  }[] = [];
-  if (tasksQuery.data) {
-    tasksQuery.data.forEach((task: task) => {
-      tasks.push({
-        id: task.id,
-        name: task.name,
-        description: task.description,
-        created_at: task.created_at,
-        status: task.status,
-        assignees: task.assignees,
-        phase_id: task.phase_id,
-        end_at: task.end_at,
-      });
-    });
-  }
-  return tasks;
-};
+import type { taskRow, TaskFormData } from "~/types/task";
 
 export const useFetchTasksWithProperties = (phase_id: string) => {
+  const tasks: taskRow[] = [];
+
   const tasksQuery = api.task.list.useQuery(
     {
       phase_id,
@@ -49,21 +14,14 @@ export const useFetchTasksWithProperties = (phase_id: string) => {
     }
   );
 
-  const tasks: {
-    id: string;
-    name: string;
-    description: string | null;
-    start_at: Date;
-    status: string;
-    assignees: string | null;
-    phase_id: string;
-    end_at: Date | null;
-    properties: {
-      id: bigint;
-      property_id: string;
-      value: string | null;
-    }[];
-  }[] = [];
+  const assigneesQuery = api.task.getAssignees.useQuery(
+    {
+      phase_id,
+    },
+    {
+      enabled: !!phase_id,
+    }
+  );
 
   const propertiesQuery = api.phase.getProperties.useQuery(
     {
@@ -88,6 +46,7 @@ export const useFetchTasksWithProperties = (phase_id: string) => {
       const taskProperties: {
         id: bigint;
         property_id: string;
+        name: string;
         value: string | null;
       }[] = [];
 
@@ -110,21 +69,31 @@ export const useFetchTasksWithProperties = (phase_id: string) => {
           taskProperties.push({
             id: propertyValue.index,
             property_id: matchedProperty.id,
+            name: matchedProperty.name,
             value: propertyValue.value,
           });
         }
       });
 
+      // Filter assignees for the current task
+      const taskAssignees = assigneesQuery?.data?.filter(
+        (assignee) => assignee.task_id === task.id
+      );
+
+      taskProperties.sort((a, b) => a.name.localeCompare(b.name));
+      // Update tasks with assignees
       tasks.push({
         id: task.id,
         name: task.name,
         description: task.description,
-        start_at: task.created_at,
+        created_at: task.created_at,
         status: task.status,
-        assignees: task.assignees,
+        assignees: taskAssignees?.map((assignee) => assignee.user),
         phase_id: task.phase_id,
         end_at: task.end_at,
+        deadline: task.deadline,
         properties: taskProperties,
+        attachments: task.attachments,
       });
     });
   }
@@ -134,8 +103,16 @@ export const useFetchTasksWithProperties = (phase_id: string) => {
     await tasksQuery.refetch();
     await propertiesQuery.refetch();
     await propertyValuesQuery.refetch();
+    await assigneesQuery.refetch();
   };
 
+  // create refetch function
+  tasks.sort((a, b) => {
+    if (b && b.created_at && a && a.created_at) {
+      return b.created_at.getTime() - a.created_at.getTime();
+    }
+    return 0;
+  });
   return {
     tasks,
     refetch,

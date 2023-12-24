@@ -271,8 +271,8 @@ const Project: NextPageWithLayout = () => {
                 </p>
               </Card>
               <MembersCard id={id} name={"project"} users={users} />
-              <Card title={"Collaborativity Score"} center>
-                <ScoreChart name={"Collaborativity"} score={cScore.data} />
+              <Card title={"Collaborative Score"} center>
+                <ScoreChart name={"Collaborative"} score={cScore.data} />
               </Card>
               <Card title={"Productivity Score"} center>
                 <ScoreChart name={"Productivity"} score={pScore.data} />
