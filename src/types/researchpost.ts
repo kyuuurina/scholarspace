@@ -7,6 +7,7 @@ type ResearchPostFormData = {
     description: string | null;
     author: string | null;
     document : string | null;
+    // created_at: Date;
   };
   
   export type { ResearchPostFormData };

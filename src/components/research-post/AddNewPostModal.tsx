@@ -67,13 +67,10 @@ const AddNewPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
     title: z.string().refine((data) => !!data, {
       message: "Title is required", // Custom error message if validation fails
     }),
-    // .min(2, "Title must be at least 2 characters long.")
-    // .max(200, "Title must be at most 200 characters long."),
     description: z.string().nullable(),
     author: z.string().nullable(),
-    // .min(2, "Author must be at least 2 characters long.")
-    // .max(200, "Author must be at most 200 characters long."),
     document: z.string().nullable(),
+    // created_at: z.date(),
   });
 
   // react-hook-form
@@ -193,14 +190,6 @@ const AddNewPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
         title="Add New Post"
       >
         <form autoComplete="off" className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
-          {/* <div>
-            <label htmlFor="category" className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
-              Category
-            </label>
-            <input id="name" className="block w-full" {...register("category", { required: true })} />
-            {errors.category && <FormErrorMessage text={errors.category.message} />}
-          </div> */}
-
           <div>
             <label
               htmlFor="category"
@@ -284,7 +273,7 @@ const AddNewPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
                 <input
                   type="file"
                   className="hidden"
-                  accept="image/doc, image/docx" // Define file types accepted
+                  accept="image/doc, image/docx, image/pdf" // Define file types accepted
                   onChange={(e) => {
                     void handleOnChange(e);
                   }}
