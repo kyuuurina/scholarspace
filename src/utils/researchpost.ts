@@ -17,9 +17,9 @@ export const useFetchResearchPost = () => {
 
     const { isLoading, error } = researchpost;
 
-    let imgUrl = "";
+    let fileUrl = "";
     if (document) {
-        imgUrl = `https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/post-files-upload/${document}`;
+        fileUrl = `https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/post-files-upload/${document}`;
     }
 
     return {
@@ -30,7 +30,7 @@ export const useFetchResearchPost = () => {
         document,
         isLoading,
         error,
-        imgUrl,
+        fileUrl,
     };
 };
 

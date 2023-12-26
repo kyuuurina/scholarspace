@@ -20,6 +20,7 @@ interface PostProps {
     user_id: string;
     category: string;
     title: string;
+    document: string | null;
     author: string | null;
     description: string | null;
     created_at: Date;
@@ -58,6 +59,10 @@ const Post: React.FC<PostProps> = ({ post }) => {
 
   // Get the user name from the associated user or use a default value
   const userName = associatedUser?.userName || 'DefaultName';
+
+  const fileUrl = post.document
+    ? `https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/post-files-upload/${post.document}`
+    : null;
 
   // const [liked, setLiked] = useState(false);
   // const [likeCount, setLikeCount] = useState(post.likeCount);
@@ -107,6 +112,16 @@ const Post: React.FC<PostProps> = ({ post }) => {
       <p className="mt-2 text-black text-sm md:text-base">
         {post.description || 'No description'}
       </p>
+
+      <div className="mt-2 flex items-center mb-2 md:mb-4">
+        {fileUrl && (
+          <img
+            src={fileUrl}
+            alt=""
+            className="max-w-full h-auto"
+          />
+        )}
+      </div>
 
       <div className="mt-2 flex items-center mb-2 md:mb-4">
         <p className="mt-2 text-gray-500 text-xs md:text-sm">

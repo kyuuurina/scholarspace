@@ -117,6 +117,7 @@ export const researchpostRouter = router({
         },
       });
 
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       const followingUserIds = followingUsers.map((user) => user.following_id)  as string[];
 
       return await getInfiniteResearchPosts({
