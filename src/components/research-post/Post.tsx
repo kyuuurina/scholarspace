@@ -129,14 +129,27 @@ const Post: React.FC<PostProps> = ({ post }) => {
         {/* Display PDF file in an iframe */}
         {post.document && (
           <div className="mt-4">
-            <iframe
-              src={`https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/post-files-upload/${post.document}`}
-              title="PDF Viewer"
-              width="100%"
-              height="100px"
-              frameBorder="0"
-              scrolling="auto"
-            />
+            {post.document.toLowerCase().endsWith('.pdf') ? (
+              // If the document is a PDF, use the PDF viewer
+              <iframe
+                src={`https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/post-files-upload/${post.document}`}
+                title="PDF Viewer"
+                width="100%"
+                height="200px"
+                frameBorder="0"
+                scrolling="auto"
+              />
+            ) : (
+              // If the document is not a PDF, use Google Docs Viewer
+              <iframe
+                src={`https://docs.google.com/gview?url=https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/post-files-upload/${post.document}&embedded=true`}
+                title="Document Viewer"
+                width="100%"
+                height="200px"
+                frameBorder="0"
+                scrolling="auto"
+              />
+            )}
           </div>
         )}
       </div>
