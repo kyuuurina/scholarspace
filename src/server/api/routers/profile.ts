@@ -8,7 +8,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-const profileRouter = router({
+export const profileRouter = router({
   validate: protectedProcedure.query(async ({ ctx }) => {
     const userId = ctx.user?.id;
 
