@@ -9,6 +9,8 @@ import type { NextPageWithLayout } from "~/pages/_app";
 const Page: NextPageWithLayout = () => {
   const user = useUser();
   setCookie("UserID", user?.id);
+
+  console.log("User Display:", user);
   return <></>;
 };
 

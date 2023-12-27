@@ -3,8 +3,10 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 /* eslint-disable @typescript-eslint/no-misused-promises */
 
-//This page should be displayed when user click Home Page
-//atm, it appears on localhost:3000/home-rwp
+
+//auth
+import { getCookie } from "cookies-next";
+import { useSession, useSessionContext } from "@supabase/auth-helpers-react";
 
 //utils
 import { useState, useEffect } from "react";
@@ -39,8 +41,6 @@ import { ResearchPostCard } from "~/components/draft/ResearchPostCard";
 import UserProfileCard from "~/components/research-post/UserRecCards";
 import AddNewPostButton from "~/components/research-post/AddNewPostButton";
 import TestModal from "~/components/research-post/AddNewPostModal";
-//import { NewPostModal } from "~/components/draft/NewPostModal";
-//import NewPostForm from "~/components/draft/NewPostForm";
 
 
 
