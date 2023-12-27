@@ -1,117 +1,112 @@
-//Step 2
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
-// import { api } from "./api";
-// import { useRouterId } from "./routerId";
-// import { postRouter } from "~/server/api/routers/researchpost";
+import { api } from "./api";
+import { useRouterId } from "./routerId";
 
-// type ResearchPost = {
-//   category: "Article" | "Conference_Paper" | "Presentation" | "Preprint" | "Research_Proposal" | "Thesis" | "Others";
-//   title: string;
-//   author: string;
-//   description: string | null;
-//   document: string | null;
-// }
+export const useFetchResearchPost = () => {
+    const id: string = useRouterId();
 
-// export const useFetchResearchPost= () => {
-//   const id: string = useRouterId();
+    const researchpost = api.researchpost.get.useQuery(
+        {
+            post_id: id,
+        },
+        {
+            enabled: !!id,
+        }
+    );
 
-//   const post = api.post.get.useQuery(
-//   {
-//     post_id: id,
-//   },
-//   {
-//     enabled: !!id,
-//   }
-// );
+    const { category, title, author, description, document } = researchpost.data || {};
 
-// // Destructure with type annotation
-// const {
-//   category,
-//   title,
-//   description,
-//   document,
-//   author,
-// }: ResearchPost = post.data || {};
+    const { isLoading, error } = researchpost;
 
-//   let imgUrl = "";
-//   if (document) {
-//     imgUrl = document
-//   ? `https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/post-files-upload/${document}`
-//   : '';
+    let fileUrl = "";
+    if (document) {
+        fileUrl = `https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/post-files-upload/${document}`;
+    }
 
-//   }
-
-//   const { isLoading, error }: { isLoading: boolean; error: any } = post;
+    return {
+        category,
+        title,
+        author,
+        description,
+        document,
+        isLoading,
+        error,
+        fileUrl,
+    };
+};
 
 
-//   return {
-//     category,
-//     title,
-//     description,
-//     document,
-//     imgUrl,
-//     isLoading,
-//     error,
-//   };
+
+export const useFetchMyResearchPosts = () => {
+    const id: string = useRouterId();
+
+    const myResearchPosts = api.researchpost.getMyPosts.useQuery(
+        {
+            post_id: id,
+        },
+        {
+            enabled: !!id,
+        }
+    );
+
+    const { data, isLoading, error } = myResearchPosts;
+
+    return {
+        myResearchPosts: data || [],
+        isLoading,
+        error,
+    };
+};
+
+export const useFetchFollowingResearchPosts = (limit = 20, cursor?: string) => {
+    const followingResearchPosts = api.researchpost.getFollowingPosts.useQuery(
+        {
+            limit,
+            cursor,
+        },
+        {
+            //`enabled: true` if to fetch data immediately.
+            enabled: true,
+        }
+    );
+
+    const { data, isLoading, error } = followingResearchPosts;
+
+    return {
+        followingResearchPosts: data?.researchPosts || [], // Corrected: Access the correct property
+        isLoading,
+        error,
+    };
+};
+
+
+//hook for fetching user's research posts
+// export const useFetchUserResearchPosts = (userId: string) => {
+//     const userResearchPosts = api.researchpost.getMyPosts.useQuery(
+//         {
+//             user_id: userId,
+//         },
+//         {
+//             enabled: !!userId,
+//         }
+//     );
+
+//     return {
+//         category,
+//         title,
+//         author,
+//         description,
+//         document,
+//         isLoading,
+//         error,
+//         imgUrl,
+//     };
 // };
 
-
-
-
-
-
-// import { api } from "./api";
-// import { useRouterId } from "./routerId";
-// import { postRouter } from "~/server/api/routers/researchpost";
-
-// type ResearchPost = {
-//   category: string;
-//   title: string;
-//   author: string;
-//   description: string | null;
-//   document: string | null;
-// };
-
-// export const useCreateResearchPost = () => {
-//   const id: string = useRouterId();
-
-//   const researchpost = api.researchpost.get.useQuery(
-//     {
-//       post_id: id,
-//     },
-//     {
-//       enabled: !!id,
-//     }
-//   );
-
-//   const {  category, title, author, description, document } =
-//     researchpost.data || {};
-
-//   const { isLoading, error } = researchpost;
-
-//   let imgUrl = "";
-//   if (document) {
-//     imgUrl = `https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/post-files-upload/${document}`;
-//   }
-
-//   return {
-//     category,
-//     title,
-//     author,
-//     description,
-//     document,
-//     isLoading,
-//     error,
-//     imgUrl,
-//   };
-
-//   return {
-//     error,
-//     isLoading,
-//   };
-// };
-  
-// };
 
 
 
