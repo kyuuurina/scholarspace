@@ -3,7 +3,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import React, { useState } from "react";
-import CategoryPills from "./CategoryPills";
 import {
   FiHeart,
   FiMessageSquare,
