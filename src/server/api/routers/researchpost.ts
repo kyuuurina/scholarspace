@@ -137,7 +137,7 @@ export const researchpostRouter = router({
         description: z.string().nullable(),
         author: z.string().nullable(),
         document: z.string().nullable(),
-        created_at: z.date(),
+        // created_at: z.date(),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -145,6 +145,7 @@ export const researchpostRouter = router({
         data: {
           user_id: ctx.user.id,
           ...input,
+          created_at: new Date(),
         },
       });
 
@@ -159,7 +160,7 @@ export const researchpostRouter = router({
         title: z.string(),
         description: z.string().nullable(),
         document: z.string().nullable(),
-        created_at: z.date(),
+        // created_at: z.date(),
       })
     )
     .mutation(async ({ input, ctx }) => {
