@@ -15,7 +15,14 @@ import Card from "~/components/Card";
 import MembersCard from "~/components/members/MembersCard";
 import ScoreChart from "~/components/chart/ScoreChart";
 import PageLoader from "~/components/layout/PageLoader";
-import { Gantt, Task, EventOption, StylingOption, ViewMode, DisplayOption } from 'gantt-task-react';
+import {
+  Gantt,
+  Task,
+  EventOption,
+  StylingOption,
+  ViewMode,
+  DisplayOption,
+} from "gantt-task-react";
 import "gantt-task-react/dist/index.css";
 
 const Project: NextPageWithLayout = () => {
@@ -31,53 +38,38 @@ const Project: NextPageWithLayout = () => {
     users,
   } = useFetchProject();
 
-  // get c score and p score of project
-  const cScore = api.score.getCScore.useQuery(
-    { project_id: id },
-    {
-      enabled: !!id,
-    }
-  );
-
-  const pScore = api.score.getPScore.useQuery(
-    { project_id: id },
-    {
-      enabled: !!id,
-    }
-  );
-
   const tasks: Task[] = [
     {
       start: new Date(2023, 1, 10),
       end: new Date(2023, 7, 10),
-      name: 'Literature Review',
-      id: 'Task 0',
-      type:'task',
+      name: "Literature Review",
+      id: "Task 0",
+      type: "task",
       progress: 34,
       isDisabled: true,
-      styles: { progressColor: '#ffbb54', progressSelectedColor: '#ff9e0d' },
+      styles: { progressColor: "#ffbb54", progressSelectedColor: "#ff9e0d" },
     },
     {
       start: new Date(2023, 3, 10),
       end: new Date(2023, 5, 11),
-      name: 'Formulate Hypothesis',
-      id: 'Task 0',
-      type:'task',
+      name: "Formulate Hypothesis",
+      id: "Task 0",
+      type: "task",
       progress: 79,
       isDisabled: true,
-      styles: { progressColor: '#ffbb54', progressSelectedColor: '#ff9e0d' },
+      styles: { progressColor: "#ffbb54", progressSelectedColor: "#ff9e0d" },
     },
     {
       start: new Date(2023, 6, 10),
       end: new Date(2023, 9, 10),
-      name: 'Collect Data for H1',
-      id: 'Task 0',
-      type:'task',
+      name: "Collect Data for H1",
+      id: "Task 0",
+      type: "task",
       progress: 45,
       isDisabled: true,
-      styles: { progressColor: '#ffbb54', progressSelectedColor: '#ff9e0d' },
+      styles: { progressColor: "#ffbb54", progressSelectedColor: "#ff9e0d" },
     },
-];
+  ];
 
   return (
     <>
@@ -120,8 +112,8 @@ const Project: NextPageWithLayout = () => {
                 </div>
               </section>
               <div className="my-2 overflow-x-auto">
-              <Gantt tasks={tasks} />
-                <table className="w-full text-left text-sm text-gray-500 bg-white">
+                <Gantt tasks={tasks} />
+                <table className="w-full bg-white text-left text-sm text-gray-500">
                   <thead className="border-grey-50 border text-xs uppercase text-gray-700 ">
                     <tr>
                       <th scope="col" className="p-4">
@@ -272,10 +264,10 @@ const Project: NextPageWithLayout = () => {
               </Card>
               <MembersCard id={id} name={"project"} users={users} />
               <Card title={"Collaborative Score"} center>
-                <ScoreChart name={"Collaborative"} score={cScore.data} />
+                <ScoreChart name={"Collaborative"} score={c_score || 0} />
               </Card>
               <Card title={"Productivity Score"} center>
-                <ScoreChart name={"Productivity"} score={pScore.data} />
+                <ScoreChart name={"Productivity"} score={p_score || 0} />
               </Card>
             </div>
           </div>
