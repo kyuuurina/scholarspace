@@ -26,7 +26,6 @@ import AvatarPlaceholder from "~/components/avatar/AvatarPlaceholder";
 import Modal from "~/components/modal/Modal";
 
 //search 
-import { search } from "~/utils/searchService";
 import SearchBar from "~/components/profile/SearchBar";
 
 //research post components
