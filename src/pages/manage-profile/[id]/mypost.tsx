@@ -6,6 +6,7 @@ import { api } from '~/utils/api';
 import Image from 'next/image';
 import Link from 'next/link';
 import AddNewPostButton from '~/components/research-post/AddNewPostButton';
+import router, { useRouter } from 'next/router';
 
 //utils
 import { useRouterId } from '~/utils/routerId';
@@ -20,17 +21,48 @@ import Layout from '~/components/layout/Layout';
 import PageLoader from '~/components/layout/PageLoader';
 import LoadingSpinner from '~/components/LoadingSpinner';
 import { FaEdit, FaExclamationCircle } from 'react-icons/fa';
+import SuccessToast from "~/components/toast/SuccessToast";
+import ErrorToast from "~/components/toast/ErrorToast";
 
 //profile components
 import ProfileTabs from '~/components/profile/ProfileTabs';
 import Post from '~/components/research-post/Post';
 import Head from 'next/head';
+import { researchpostRouter } from '~/server/api/routers/researchpost';
+import toast from 'react-hot-toast';
 
 const MyPost: NextPageWithLayout = () => {
   const myPostLists = useFetchMyResearchPosts();
-  const router = useRouterId();
+  const router = useRouter();
+  const profileId = useRouterId();
 
   console.log("MyPost.tsx page router:", router)
+
+
+  
+  //handleDelete
+  const deleteMyPost = api.researchpost.delete.useMutation({
+    onSuccess: () => {
+      toast.custom(() => <SuccessToast message="Post successfully deleted" />);
+    },
+  });
+
+  const handleDeleteMyPost = (post_id: string) => {
+    deleteMyPost
+      .mutateAsync({
+        post_id: post_id,
+      })
+      .then(() => {
+        router.reload();
+      })
+      .catch((error) => {
+        console.error("Failed to delete post:", error);
+
+        toast.custom(() => <ErrorToast message="Failed to delete post" />);
+      });
+  };
+
+
 
   return (
     <>
@@ -58,6 +90,7 @@ const MyPost: NextPageWithLayout = () => {
             {myPostLists.myResearchPosts.map((post) => (
               <li key={post.post_id} className="mb-8">
                 <Post post={post} />
+                <button onClick={() => handleDeleteMyPost(post.post_id)}>Delete</button>
               </li>
             ))}
           </ul>
