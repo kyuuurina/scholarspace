@@ -73,9 +73,9 @@ const MyPost: NextPageWithLayout = () => {
         <title>Your Posts</title>
       </Head>
       <ProfileTabs />
-
+  
       <div className="container mx-auto mt-8">
-      <AddNewPostButton className="mb-4" />
+        <AddNewPostButton className="mb-4" />
         {/* if loading */}
         {myPostLists.isLoading && <LoadingSpinner />}
         {myPostLists.error && (
@@ -86,14 +86,17 @@ const MyPost: NextPageWithLayout = () => {
             </p>
           </div>
         )}
-
+  
         {/* if post exist */}
         {myPostLists.myResearchPosts.length > 0 ? (
           <ul className="grid grid-cols-1 gap-8">
             {myPostLists.myResearchPosts.map((post) => (
-              <li key={post.post_id} className="mb-8">
-                <Post post={post} />
-                <button onClick={() => handleDeleteMyPost(post.post_id)}>Delete</button>
+              <li key={post.post_id} className="mb-4">
+                {/* Add left and right padding to the Post component */}
+                <div className="p-4 rounded-md">
+                  <Post post={post} />
+                  <button onClick={() => handleDeleteMyPost(post.post_id)}>Delete</button>
+                </div>
               </li>
             ))}
           </ul>
@@ -101,7 +104,7 @@ const MyPost: NextPageWithLayout = () => {
           <div className="flex flex-col items-center justify-center h-50vh">
             <FaExclamationCircle className="text-gray-500 text-4xl mb-4" />
             <p className="font-semibold text-lg text-gray-500 leading-1.5 text-center max-w-md">
-              Uh-oh, you havent created any posts yet.
+              Uh-oh, you have not created any posts yet. Create one by clicking on the button above!
             </p>
             <p className="font-medium text-base text-gray-500 leading-1.5 text-center max-w-md">
               Navigate to the Home Page to add a new post and share your research!
@@ -111,6 +114,7 @@ const MyPost: NextPageWithLayout = () => {
       </div>
     </>
   );
+  
 };
 
 
