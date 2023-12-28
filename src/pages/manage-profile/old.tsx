@@ -66,6 +66,8 @@ const ProfilePage: NextPageWithLayout = () => {
   const [isExperienceModalOpen, setIsExperienceModalOpen] = useState(false);
   const [isAchievementModalOpen, setIsAchievementModalOpen] = useState(true);
 
+
+
   //custom hooks
   //fetch profile data
   const {name, about_me, skills,research_interest, collab_status, isLoading} = useFetchProfile();

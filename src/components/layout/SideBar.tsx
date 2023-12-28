@@ -18,15 +18,20 @@ import { IconContext } from "react-icons";
 // components
 import WorkspaceDropdown from "../workspace/WorkspaceDropdown";
 import WorkspaceModal from "../workspace/WorkspaceModal";
+import { profile } from "console";
+import { useRouterId } from "~/utils/routerId";
 
 
 type SideBarProps = {
   toggleSidebar: () => void;
   open: boolean;
+  profileId?: string;
 };
 
-export const SideBar: React.FC<SideBarProps> = ({ toggleSidebar, open }) => {
+export const SideBar: React.FC<SideBarProps> = ({ toggleSidebar, open, profileId }) => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
+
+  console.log("SideBar profileId:", profileId);
 
   const router = useRouter();
   // const session = useSession();
@@ -35,12 +40,17 @@ export const SideBar: React.FC<SideBarProps> = ({ toggleSidebar, open }) => {
   const { supabaseClient } = useSessionContext();
   const userId = getCookie("User ID");
 
+  // const id = useRouterId();
+
   // Check if router.query and router.query.id are defined before accessing their values
   const id =
     router.query && router.query.id ? router.query.id.toString() : "";
+  
+    console.log("Sidebar id", id);
 
   console.log("sidebar router",router.asPath);
   console.log("userId", userId);
+  // console.log("Profile_ID", profile_id);
 
   return (
     <>
@@ -101,7 +111,7 @@ export const SideBar: React.FC<SideBarProps> = ({ toggleSidebar, open }) => {
 
               <li className=" rounded-sm">
                 <Link
-                  href={`/manage-profile/${id}`}
+                  href={profileId ? `/manage-profile/${profileId}` : ''}
                   className={`flex items-center space-x-3 rounded-md hover:bg-purple-800 ${
                     open ? "text-purple-accent-2" : "text-purple-accent-2"
                   }`}

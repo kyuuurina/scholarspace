@@ -5,6 +5,24 @@ import { inferAsyncReturnType } from "@trpc/server";
 
 // Define the profile router
 export const profileRouter = router({
+
+  validate: protectedProcedure.query(async ({ ctx }) => {
+    const userId = ctx.user?.id;
+
+    // check if this user has a profile
+    const profile = await ctx.prisma.profile.findFirst({
+      where: {
+        user_id: userId,
+      },
+    });
+
+    if (!profile) {
+      return false;
+    }
+
+    return true;
+  }),
+  
   // Procedure to get a user's profile
   get: protectedProcedure
     .input(z.object({ profile_id: z.string() }))
