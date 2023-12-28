@@ -1,80 +1,71 @@
-//This page should be displayed when user click Home Page
-//atm, it appears on localhost:3000/home-rwp
-
-//auth
-import { getCookie } from "cookies-next";
-import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { useSession, useSessionContext } from "@supabase/auth-helpers-react";
-
-//utils
-import { useState, useEffect } from "react";
-import { useRouter } from "next/router";
-import toast from "react-hot-toast";
-
-// types
+// id.tsx
 import type { ReactElement } from "react";
+import Head from "~/components/layout/Head";
+import { useUser } from "@supabase/auth-helpers-react";
+import { setCookie } from "cookies-next";
+
+import Layout from "~/components/layout/Layout";
 import type { NextPageWithLayout } from "~/pages/_app";
 
-// pages
-import ErrorPage from "~/pages/error-page";
+import React from "react";
 
-// utils
-import { useFetchFollowingResearchPosts } from "~/utils/researchpost";
-import { api } from "~/utils/api";
-
-// local components
-import Layout from "~/components/layout/Layout";
-import Head from "~/components/layout/Head";
-import LoadingSpinner from "~/components/LoadingSpinner";
-import Link from "next/link";
-import Card from "~/components/Card";
-import AvatarPlaceholder from "~/components/avatar/AvatarPlaceholder";
-import Modal from "~/components/modal/Modal";
-
-//research post components
+// research post components
 import AllFollowingTabs from "~/components/research-post/AllFollowingTabs";
-import Post from "~/components/research-post/Post";
-import PostCard from "~/components/research-post/PostCard";
-import { ResearchPostCard } from "~/components/draft/ResearchPostCard";
-import UserProfileCard from "~/components/research-post/UserRecCards";
-import AddNewPostButton from "~/components/research-post/AddNewPostButton";
-import TestModal from "~/components/research-post/AddNewPostModal";
-//import { NewPostModal } from "~/components/draft/NewPostModal";
-//import NewPostForm from "~/components/draft/NewPostForm";
 
+// profile recommendation
+import { useFetchRecommendedProfiles } from "~/utils/profile";
+import ProfileRecommendation from "~/components/profile/ProfileRecommendation";
 
-const ResearchPostsPage: NextPageWithLayout = () => {
+const Page: NextPageWithLayout = () => {
+  const user = useUser();
+  setCookie("UserID", user?.id);
 
-    const router = useRouter();
-    const user = useUser();
-    const supabase = useSupabaseClient();
-    const userId = getCookie("User ID");
+  console.log("User Display:", user);
 
- //when user is authenticated
-  if (user) {
+  const {
+    recommendedProfiles,
+    isLoadingRecommendedProfiles,
+    errorRecommendedProfiles,
+  } = useFetchRecommendedProfiles();
+
+  console.log("Recommended Profiles:", recommendedProfiles);
+
+  if (errorRecommendedProfiles) {
+    return <div>Error fetching recommended profiles</div>;
   }
 
-    console.log("User home-rwp:", user);
-    console.log("User ID:", userId);
-
-return (
-      <div className="w-full max-w-screen-xl p-8">
-        <div className="grid grid-cols-3 gap-6">
-          <div className="col-span-2">
-            <AllFollowingTabs />
-          </div>
+  return (
+    <div className="w-full max-w-screen-xl p-8">
+      <div className="grid grid-cols-3 gap-6">
+        <div className="col-span-2">
+          <AllFollowingTabs />
+        </div>
+        <div className="flex space-x-4">
+          <section className="border rounded p-4">
+            <h2 className="text-xl font-bold mb-4">Suggested Profiles</h2>
+            <ul className="list-none list-inside space-y-4">
+              {recommendedProfiles.map((profiles) => (
+                <li key={profiles.profile_id}>
+                  <ProfileRecommendation profiles={profiles} />
+                </li>
+              ))}
+            </ul>
+          </section>
         </div>
       </div>
-  )
-};
-
-ResearchPostsPage.getLayout = function getLayout(page: ReactElement) {
-  return (
-    <Layout>
-      <Head title="Home Page" />
-      {page}
-    </Layout>
+    </div>
   );
 };
 
-export default ResearchPostsPage;
+console.log("Profile Recommendation:", ProfileRecommendation);
+
+Page.getLayout = function getLayout(page: ReactElement) {
+  return (
+    <>
+      <Head title="Main Page" />
+      <Layout>{page}</Layout>
+    </>
+  );
+};
+
+export default Page;

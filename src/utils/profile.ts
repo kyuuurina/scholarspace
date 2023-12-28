@@ -3,6 +3,7 @@
 import { api } from './api';
 import { useRouterId } from './routerId';
 
+
 //fetch a user profile based on profile_id from router
 export const useFetchProfile = () => {
     const id: string = useRouterId();
@@ -42,6 +43,36 @@ export const useFetchProfile = () => {
         user_id,
     };
 };
+
+
+// New export for fetching recommended profiles
+type RecommendedProfile = {
+  user_id: string;
+    profile_id: string;
+    name: string;
+    avatar_url: string | null;
+  };
+  
+  export const useFetchRecommendedProfiles = () => {
+    const id: string = useRouterId();
+  
+    const recommendedProfiles = api.profile.getRecommendations.useQuery<RecommendedProfile[]>(
+      undefined, // Pass undefined as input since getRecommendations doesn't require input
+      { enabled: !!id }
+    );
+  
+    const {
+      data: recommendedProfilesData,
+      isLoading: isLoadingRecommendedProfiles,
+      error: errorRecommendedProfiles,
+    } = recommendedProfiles;
+  
+    return {
+      recommendedProfiles: recommendedProfilesData || [],
+      isLoadingRecommendedProfiles,
+      errorRecommendedProfiles,
+    };
+  };
 
 
 //Step 2

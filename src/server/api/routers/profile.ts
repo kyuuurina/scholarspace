@@ -98,6 +98,51 @@ export const profileRouter = router({
       // Return the updated profile
       return updatedProfile;
     }),
+
+
+      //Procedure to get recommendations based on shared research interests
+      getRecommendations: protectedProcedure
+      .query(async ({ ctx }) => {
+        const userId = ctx.user?.id;
+    
+        // Get the user's research interests
+        const user = await ctx.prisma.profile.findFirst({
+          where: {
+            user_id: userId,
+          },
+          select: {
+            research_interest: true,
+          },
+        });
+    
+        if (!user || !user.research_interest) {
+          return [];
+        }
+    
+        const userResearchInterests = user.research_interest.split(",");
+    
+        // Find other users who share the same research interests
+        const recommendedUsers = await ctx.prisma.profile.findMany({
+          where: {
+            user_id: {
+              not: userId, // Exclude the current user
+            },
+            research_interest: {
+              in: userResearchInterests,
+            },
+          },
+          take: 5, // Limit the number of recommendations
+          select: {
+            user_id: true,
+            profile_id: true,
+            name: true,
+            avatar_url: true,
+          },
+        });
+    
+        return recommendedUsers;
+      }),
+    
 });
 
 
