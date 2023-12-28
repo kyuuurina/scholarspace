@@ -11,10 +11,8 @@ import React from "react";
 
 // research post components
 import AllFollowingTabs from "~/components/research-post/AllFollowingTabs";
-
-// profile recommendation
-import { useFetchRecommendedProfiles } from "~/utils/profile";
 import ProfileRecommendation from "~/components/profile/ProfileRecommendation";
+import { useFetchRecommendedProfiles } from "~/utils/profile";
 
 const Page: NextPageWithLayout = () => {
   const user = useUser();
@@ -36,20 +34,29 @@ const Page: NextPageWithLayout = () => {
 
   return (
     <div className="w-full max-w-screen-xl p-8">
-      <div className="grid grid-cols-3 gap-6">
-        <div className="col-span-2">
+      <div className="grid grid-cols-12 gap-6 mx-auto">
+        {/* All Following Tabs (2/3 width) */}
+        <div className="col-span-9">
           <AllFollowingTabs />
         </div>
-        <div className="flex space-x-4">
-          <section className="border rounded p-4">
+
+        {/* Suggested Profiles (1/4 width, Rightmost column) */}
+        <div className="col-span-3 sticky top-0">
+          <section className="border rounded p-4 mt-4">
             <h2 className="text-xl font-bold mb-4">Suggested Profiles</h2>
-            <ul className="list-none list-inside space-y-4">
-              {recommendedProfiles.map((profiles) => (
-                <li key={profiles.profile_id}>
-                  <ProfileRecommendation profiles={profiles} />
-                </li>
-              ))}
-            </ul>
+            {isLoadingRecommendedProfiles ? (
+              <p>Loading recommended profiles...</p>
+            ) : errorRecommendedProfiles ? (
+              <p>Error fetching recommended profiles</p>
+            ) : (
+              <ul className="list-none list-inside space-y-4">
+                {recommendedProfiles.map((profile) => (
+                  <li key={profile.profile_id}>
+                    <ProfileRecommendation profiles={profile} />
+                  </li>
+                ))}
+              </ul>
+            )}
           </section>
         </div>
       </div>

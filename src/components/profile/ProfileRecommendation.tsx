@@ -23,13 +23,17 @@ const ProfileRecommendation: React.FC<ProfileRecommendationProps> = ({ profiles 
           />
         </div>
       </Link>
-      <p className="ml-2">
+      <div className="ml-2">
         <Link href={`/profile/${profiles.profile_id}`}>
-          <span className="cursor-pointer">{profiles.name}</span>
+          <span className="cursor-pointer inline-block max-w-full sm:max-w-[150px] overflow-hidden whitespace-nowrap overflow-ellipsis">
+            {profiles.name}
+          </span>
         </Link>
-      </p>
+      </div>
     </div>
   );
 };
+
+
 
 export default ProfileRecommendation;

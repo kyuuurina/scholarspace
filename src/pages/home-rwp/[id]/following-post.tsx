@@ -1,8 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-floating-promises */
-/* eslint-disable @typescript-eslint/no-misused-promises */
-
 
 //auth
 import { getCookie } from "cookies-next";
@@ -42,14 +38,12 @@ import UserProfileCard from "~/components/research-post/UserRecCards";
 import AddNewPostButton from "~/components/research-post/AddNewPostButton";
 import TestModal from "~/components/research-post/AddNewPostModal";
 
+//profile recommendation
+import { useFetchRecommendedProfiles } from "~/utils/profile";
+import ProfileRecommendation from "~/components/profile/ProfileRecommendation";
 
 
 const FollowingPostPage: NextPageWithLayout = () => {
-  const users = [
-    { id: 1, name: "Ahmad Osama" },
-    { id: 2, name: "Hasbullah " },
-  ];
-
     // Customize the limit and cursor as needed
     // const { followingResearchPosts, isLoading, error } = useFetchFollowingResearchPosts();
     // if (isLoading) {
@@ -60,9 +54,21 @@ const FollowingPostPage: NextPageWithLayout = () => {
     //     return <p>Error: {error.message}</p>;
     // }
 
-
-    const FollowingPostLists = useFetchFollowingResearchPosts();
     const router = useRouter();
+    const FollowingPostLists = useFetchFollowingResearchPosts();
+
+    //profile recommendation
+    const {
+      recommendedProfiles,
+      isLoadingRecommendedProfiles,
+      errorRecommendedProfiles,
+    } = useFetchRecommendedProfiles();
+  
+    console.log("Recommended Profiles:", recommendedProfiles);
+  
+    if (errorRecommendedProfiles) {
+      return <div>Error fetching recommended profiles</div>;
+    }
 
   // Check if followingResearchPosts is an array
   if (!Array.isArray(FollowingPostLists.followingResearchPosts)) {
@@ -74,8 +80,9 @@ const FollowingPostPage: NextPageWithLayout = () => {
 
   return (
     <div className="w-full max-w-screen-xl p-8">
-      <div className="grid grid-cols-3 gap-6">
-        <div className="col-span-2">
+      <div className="grid grid-cols-12 gap-6 mx-auto">
+        {/* All Following Tabs (3/4 width) */}
+        <div className="col-span-9">
           <AllFollowingTabs />
           <div className="mt-6">
             {FollowingPostLists.isLoading ? (
@@ -93,8 +100,25 @@ const FollowingPostPage: NextPageWithLayout = () => {
             )}
           </div>
         </div>
-        <div className="col-span-1">
-          <UserProfileCard users={users} />
+    
+        {/* Suggested Profiles (1/4 width, Rightmost column) */}
+        <div className="col-span-3 sticky top-0">
+          <section className="border rounded p-4 mt-4">
+            <h2 className="text-xl font-bold mb-4">Suggested Profiles</h2>
+            {isLoadingRecommendedProfiles ? (
+              <p>Loading recommended profiles...</p>
+            ) : errorRecommendedProfiles ? (
+              <p>Error fetching recommended profiles</p>
+            ) : (
+              <ul className="list-none list-inside space-y-4">
+                {recommendedProfiles.map((profile) => (
+                  <li key={profile.profile_id}>
+                    <ProfileRecommendation profiles={profile} />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
         </div>
       </div>
     </div>
