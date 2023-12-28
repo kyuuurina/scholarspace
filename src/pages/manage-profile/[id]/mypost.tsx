@@ -16,6 +16,7 @@ import type { ReactElement } from 'react';
 import type { NextPageWithLayout } from '~/pages/_app';
 
 import ErrorPage from '~/pages/error-page';
+
 //local components
 import Layout from '~/components/layout/Layout';
 import PageLoader from '~/components/layout/PageLoader';
@@ -23,6 +24,7 @@ import LoadingSpinner from '~/components/LoadingSpinner';
 import { FaEdit, FaExclamationCircle } from 'react-icons/fa';
 import SuccessToast from "~/components/toast/SuccessToast";
 import ErrorToast from "~/components/toast/ErrorToast";
+import ConfirmationDialog from '~/components/ConfirmationDialog';
 
 //profile components
 import ProfileTabs from '~/components/profile/ProfileTabs';
@@ -38,8 +40,9 @@ const MyPost: NextPageWithLayout = () => {
 
   console.log("MyPost.tsx page router:", router)
 
+  const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
 
-  
+
   //handleDelete
   const deleteMyPost = api.researchpost.delete.useMutation({
     onSuccess: () => {
