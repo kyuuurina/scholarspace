@@ -3,21 +3,35 @@ import { TRPCError } from "@trpc/server";
 import { router, protectedProcedure, publicProcedure } from "~/server/api/trpc";
 
 export const experienceRouter = router({
-  getExperiences: publicProcedure
-    .input(z.object({ experience_id: z.string() }))
-    .query(async ({ input, ctx }) => {
-      const experiences = await ctx.prisma.profile_experience.findUnique({
-        where: {
-          experience_id: input.experience_id,
-        },
-      });
+  // getExperiences: publicProcedure
+  //   .input(z.object({ experience_id: z.string() }))
+  //   .query(async ({ input, ctx }) => {
+  //     const experiences = await ctx.prisma.profile_experience.findUnique({
+  //       where: {
+  //         experience_id: input.experience_id,
+  //       },
+  //     });
 
-      return experiences;
-    }),
+  //     return experiences;
+  //   }),
+
+  getExperiences: publicProcedure
+  .input(z.object({ profile_id: z.string() })) 
+  .query(async ({ input, ctx }) => {
+    const experiences = await ctx.prisma.profile_experience.findMany({
+      where: {
+        profile_id: input.profile_id, 
+        // education_id: input.education_id,
+      },
+    });
+
+    return experiences;
+  }),
 
   createExperience: protectedProcedure
     .input(
       z.object({
+        profile_id: z.string(),
         title: z.string(),
         start_year: z.string(),
         end_year: z.string(),
@@ -38,6 +52,7 @@ export const experienceRouter = router({
     updateExperience: protectedProcedure
     .input(
       z.object({
+        profile_id: z.string(),
         experience_id: z.string(),
         title: z.string(),
         start_year: z.string(),

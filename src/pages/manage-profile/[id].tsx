@@ -50,7 +50,7 @@ import UserProfileForm from "~/components/profile/UserProfileForm";
 import EducationForm from "~/components/profile/EducationForm";
 import EducationCard from "~/components/profile/EducationCard";
 import ExperienceForm from "~/components/profile/ExperienceForm";
-// import ExperienceCard from "~/components/profile/ExperienceCard";
+import ExperienceCard from "~/components/profile/ExperienceCard";
 import AchievementForm from "~/components/profile/AchievementForm";
 import AchievementCard from "~/components/profile/AchievementCard";
 
@@ -77,6 +77,7 @@ const ProfilePage: NextPageWithLayout = () => {
   // const { educations: educationsData, isLoading: isLoadingEducations } = useFetchEducation();
   const { educations, isLoading: EducationLoading, error: EducationError } = useFetchEducation();
   const { achievements, isLoading: AchievementLoading, error: AchievementError } = useFetchAchievement();
+  const { experiences, isLoading: ExperienceLoading, error: ExperienceError } = useFetchExperience();
 
   // const myEducationLists = useFetchTry();
   // console.log("myEducationLists:", myEducationLists);
@@ -211,6 +212,21 @@ const ProfilePage: NextPageWithLayout = () => {
                 <h3 className="font-semibold text-2xl mb-4">
                   Research Experience
                 </h3>
+                {experiences ? (
+                      experiences.map((experience) => (
+                        <ExperienceCard key={experience.experience_id} experience={experience} />
+                      ))
+                    ) : (
+                      <div>No achievement data available</div>
+                    )}
+                  <div className="mb-4">
+                  </div>
+                  {isEditModalOpen && (
+                    <AchievementForm
+                      openModal={isAchievementModalOpen}
+                      onClick={() => setIsAchievementModalOpen(false)}
+                    />
+                  )}
 
                 {isEditModalOpen && (
                   <ExperienceForm
