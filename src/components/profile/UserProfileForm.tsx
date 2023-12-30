@@ -60,11 +60,12 @@ const UserProfileForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
 
   //custom hooks
   //populate form fields with Profile details
-  const {name, about_me, skills,research_interest, collab_status, isLoading} = useFetchProfile();
+  const {avatar_url, name, about_me, skills,research_interest, collab_status, isLoading} = useFetchProfile();
 
 
 //schema for form validation
   const schema: ZodType<ProfileFormData> = z.object({
+    avatar_url: z.string().nullable(),
     name: z.string(),
     about_me: z.string().nullable(),
     skills: z.string().nullable(),
@@ -82,6 +83,7 @@ const UserProfileForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
     } = useForm<ProfileFormData>({
       resolver: zodResolver(schema),
       defaultValues :{
+        avatar_url: avatar_url,
         name: name,
         about_me: about_me,
         skills: skills,
@@ -93,6 +95,7 @@ const UserProfileForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
     //set form value to profile data
     useEffect(() => {
       if (!isLoading) {
+        setValue("avatar_url", avatar_url || "");
         setValue("name", name || "");
         setValue("about_me", about_me || "");
         setValue("skills", skills || "");
@@ -131,6 +134,7 @@ const UserProfileForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
   // handle cancel
   const handleCancel = () => {
     reset({
+      avatar_url: avatar_url ||"" ,
       name: name || "",
       about_me: about_me || "",
       skills: skills || "",
@@ -142,13 +146,12 @@ const UserProfileForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
   const handleEditClick = () => {setIsEditModalOpen(true);};
 
   return (
-
     <div>
       <Modal
         show={openModal}
         onClose={() => {
           onClick();
-          reset();
+          handleCancel();
         }}
         title="My Profile"
       >
@@ -159,13 +162,28 @@ const UserProfileForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
         >
           <div>
             <label
+              htmlFor="avatar_url"
+              className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+            >
+              Avatar
+            </label>
+            <input
+              className="w-full"
+              {...register("avatar_url")}
+            />
+            {errors.avatar_url && (
+              <FormErrorMessage text={errors.avatar_url.message} />
+            )}
+          </div>
+  
+          <div>
+            <label
               htmlFor="name"
               className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
             >
               Your Name
             </label>
-            <input className = "w-full" {...register("name")}
-            />
+            <input className="w-full" {...register("name")} />
             {errors.name && <FormErrorMessage text={errors.name.message} />}
           </div>
   
@@ -185,7 +203,7 @@ const UserProfileForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
               <FormErrorMessage text={errors.about_me.message} />
             )}
           </div>
-
+  
           <div>
             <label
               htmlFor="skills"
@@ -202,7 +220,7 @@ const UserProfileForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
               <FormErrorMessage text={errors.skills.message} />
             )}
           </div>
-
+  
           <div>
             <label
               htmlFor="research_interest"
@@ -216,10 +234,12 @@ const UserProfileForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
               {...register("research_interest", { required: false })}
             />
             {errors.research_interest && (
-              <FormErrorMessage text={errors.research_interest.message} />
+              <FormErrorMessage
+                text={errors.research_interest.message}
+              />
             )}
           </div>
-
+  
           <div>
             <label
               htmlFor="collab_status"
@@ -232,15 +252,36 @@ const UserProfileForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
               className="block w-full"
               {...register("collab_status", { required: true })}
             >
-              <option value="Open For Collaboration">Open for Collaboration</option>
-              <option value="Not Open For Collaboration">Not Open for Collaboration</option>
+              <option value="Open For Collaboration">
+                Open for Collaboration
+              </option>
+              <option value="Not Open For Collaboration">
+                Not Open for Collaboration
+              </option>
             </select>
             {errors.collab_status && (
-              <FormErrorMessage text={errors.collab_status.message} />
+              <FormErrorMessage
+                text={errors.collab_status.message}
+              />
             )}
           </div>
+        {/* Buttons container with justify-end */}
+        <div className="flex justify-end gap-4">
+          {/* Save button */}
+          <PrimaryButton name="Save" type="submit" />
 
-          <PrimaryButton name="Update My Profile" type="submit" />
+          {/* Cancel button */}
+          <button
+            type="button"
+            className="bg-gray-400 hover:bg-gray-500 text-gray-800 font-bold py-2 px-4 rounded-lg inline-flex items-center"
+            onClick={() => {
+              onClick();
+              handleCancel();
+            }}
+          >
+            Cancel
+          </button>
+        </div>
         </form>
       </Modal>
     </div>

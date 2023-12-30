@@ -55,6 +55,7 @@ export const profileRouter = router({
       // Define the input schema for the updateProfile mutation
       z.object({
         profile_id: z.string(),
+        avatar_url: z.string().nullable(),
         name: z.string(),
         about_me: z.string().nullable(),
         skills: z.string().nullable(),
@@ -64,7 +65,7 @@ export const profileRouter = router({
     )
     .mutation(async ({ input, ctx }) => {
       // Destructure input to get relevant properties
-      const { profile_id, name, about_me, skills, research_interest, collab_status } = input;
+      const { avatar_url, profile_id, name, about_me, skills, research_interest, collab_status } = input;
 
       // Find the profile in the database based on the provided profile_id
       const profile = await ctx.prisma.profile.findUnique({
@@ -87,6 +88,7 @@ export const profileRouter = router({
           profile_id,
         },
         data: {
+          avatar_url,
           name,
           about_me,
           skills,

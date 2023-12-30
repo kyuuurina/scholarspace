@@ -73,7 +73,7 @@ const ProfilePage: NextPageWithLayout = () => {
     profile_id: profileId, // pass the id to router.query
   });
 
-  const { name, about_me, skills, research_interest, collab_status, isLoading, user_id } = useFetchProfile();
+  const { avatar_url, name, about_me, skills, research_interest, collab_status, isLoading, user_id } = useFetchProfile();
   const myEducationLists = useFetchTry();
   console.log("myEducationLists:", myEducationLists);
 
@@ -105,6 +105,7 @@ const ProfilePage: NextPageWithLayout = () => {
 
   // schema for form validation
   const schema: ZodType<ProfileFormData> = z.object({
+    avatar_url: z.string().nullable(),
     name: z.string(),
     about_me: z.string().nullable(),
     skills: z.string().nullable(),
@@ -122,6 +123,7 @@ const ProfilePage: NextPageWithLayout = () => {
   } = useForm<ProfileFormData>({
     resolver: zodResolver(schema),
     defaultValues :{
+      avatar_url: avatar_url,
       name: name,
       about_me: about_me,
       skills: skills,
@@ -133,6 +135,7 @@ const ProfilePage: NextPageWithLayout = () => {
   // set form value to profile data
   useEffect(() => {
     if (!isLoading) {
+      setValue("avatar_url", Profile.data?.avatar_url || "");
       setValue("name", name || "");
       setValue("about_me", about_me || "");
       setValue("skills", skills || "");

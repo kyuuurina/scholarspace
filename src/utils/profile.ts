@@ -21,6 +21,7 @@ export const useFetchProfile = () => {
     const {
         profile_id,
         user_id,
+        avatar_url,
         name,
         about_me,
         skills,
@@ -30,7 +31,13 @@ export const useFetchProfile = () => {
 
     const { isLoading, error } = profile;
 
+    let avatarUrl = "";
+    if (avatar_url) {
+      avatarUrl = `https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/avatar/${avatar_url}`;
+    }
+
     return {
+        avatar_url,
         name,
         about_me,
         skills,

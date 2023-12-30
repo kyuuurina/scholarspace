@@ -1,6 +1,7 @@
 //user input in UserProfileForm.tsx, ProfileEducationForm.tsx, ProfileAchievementForm.tsx, ProfileExperienceForm.tsx
 
 type ProfileFormData = {
+    avatar_url: string | null;
     name: string;
     about_me: string | null;
     skills: string | null;
