@@ -42,10 +42,11 @@ import { FaEdit } from 'react-icons/fa';
 // import { DeleteProfileDetails } from "~/components/workspace/DeleteProfileDetails";
 import SuccessToast from "~/components/toast/SuccessToast";
 import ErrorToast from "~/components/toast/ErrorToast";
+import TagList from '~/components/profile/TagList';
+import CollabStatusBadge from '~/components/profile/CollabStatusBadge';
 
 // profile components
 import ProfileTabs from '~/components/profile/ProfileTabs';
-import UserProfileCard from "~/components/profile/UserProfileCard";
 import UserProfileForm from "~/components/profile/UserProfileForm";
 import EducationForm from "~/components/profile/EducationForm";
 import EducationCard from "~/components/profile/EducationCard";
@@ -192,7 +193,7 @@ const ProfilePage: NextPageWithLayout = () => {
             {/* User Profile Card */}
             <section className="mt-2 w-3/4 mx-auto rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
               <div className="flex justify-between items-center">
-                <h3 className="font-semibold text-2xl">Profile</h3>
+              <h3 className="font-semibold text-2xl mb-4">{`${name ?? 'User'}'s Profile`}</h3>
                 <div>
                   <button onClick={handleEditClick} className="flex items-center">
                     Edit <FaEdit className="ml-2" />
@@ -216,6 +217,28 @@ const ProfilePage: NextPageWithLayout = () => {
                 )}
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                   {/* ... */}
+                </div>
+                <div>
+                <div className="mb-4">
+                    <p className="text-sm text-gray-600">
+                      <CollabStatusBadge collabStatus={collab_status} />
+                    </p>
+                  </div>
+                  <div className="mb-4">
+                    <p className="text-base font-bold text-black mb-2">About Me:</p>
+                    <p className="text-sm text-gray-600">{about_me}</p>
+                  </div>
+                  <div className="mb-4">
+                    <p className="text-base font-bold text-black mb-2">Skills:</p>
+                    <p className="text-sm text-gray-600">
+                      {skills && <TagList tags={skills.split(',').map((tag) => tag.trim())} />}
+                    </p>
+                  </div>
+                  <div className="mb-4">
+                    <p className="text-base font-bold text-black mb-2">Research Interest:</p>
+                    {research_interest && <TagList tags={research_interest.split(',').map((tag) => tag.trim())} />}
+                    <p className="text-sm text-gray-600">{research_interest}</p>
+                  </div>
                 </div>
               </div>
               <div>
