@@ -1,5 +1,5 @@
-// ConfirmationDialog.tsx
 import React from 'react';
+import { FiAlertTriangle } from 'react-icons/fi';
 
 interface ConfirmationDialogProps {
   isOpen: boolean;
@@ -14,13 +14,22 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({ isOpen, onClose
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
-      <div className="bg-white p-4 rounded-md shadow-md">
-        <p className="text-lg mb-4">Confirm Delete?</p>
+      <div className="bg-white p-6 rounded-md shadow-md">
+        <div className="flex items-center mb-4">
+          <FiAlertTriangle className="text-red-500 mr-2" size={24} />
+          <p className="text-xl font-semibold">Confirm Delete?</p>
+        </div>
         <div className="flex justify-end">
-          <button className="mr-2 px-4 py-2 bg-red-500 text-white rounded-md" onClick={onConfirm}>
+          <button
+            className="mr-2 px-6 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-300"
+            onClick={onConfirm}
+          >
             Confirm Delete
           </button>
-          <button className="px-4 py-2 bg-gray-300 rounded-md" onClick={onClose}>
+          <button
+            className="px-6 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 transition duration-300"
+            onClick={onClose}
+          >
             Cancel
           </button>
         </div>
@@ -30,24 +39,3 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({ isOpen, onClose
 };
 
 export default ConfirmationDialog;
-
-
-// import React from 'react';
-
-// interface ConfirmationDialogProps {
-//   title: string;
-//   onConfirm: () => void;
-//   onCancel: () => void;
-// }
-
-// const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({ title, onConfirm, onCancel }) => {
-//   return (
-//     <div className="confirmation-dialog">
-//       <p>{`Confirm Delete ${title}?`}</p>
-//       <button onClick={onConfirm}>Confirm Delete</button>
-//       <button onClick={onCancel}>Cancel</button>
-//     </div>
-//   );
-// };
-
-// export default ConfirmationDialog;

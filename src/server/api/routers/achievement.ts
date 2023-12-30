@@ -71,7 +71,7 @@ export const achievementRouter = router({
     updateAchievement: protectedProcedure
     .input(
       z.object({
-        profile_id: z.string(),
+        // profile_id: z.string(),
         achievement_id: z.string(),
         title: z.string(),
         received_year: z.string(),
