@@ -20,7 +20,6 @@ import { useFetchProfile } from "~/utils/profile";
 import { useFetchEducation } from '~/utils/education';
 import { useFetchExperience } from '~/utils/experience';
 import { useFetchAchievement } from '~/utils/achievement';
-import { useFetchTry } from '~/utils/dummy';
 import { useFetchFollowers } from '~/utils/follow';
 import { useFetchFollowing } from '~/utils/follow';
 
@@ -53,12 +52,13 @@ import EducationCard from "~/components/profile/EducationCard";
 import ExperienceForm from "~/components/profile/ExperienceForm";
 // import ExperienceCard from "~/components/profile/ExperienceCard";
 import AchievementForm from "~/components/profile/AchievementForm";
-// import AchievementCard from "~/components/profile/AchievementCard";
+import AchievementCard from "~/components/profile/AchievementCard";
 
 // network component
 import FollowButton from '~/components/network/FollowButton';
 import Button from '~/components/button/Button';
 import FollowListModal from '~/components/network/FollowListModal';
+
 
 
 const ProfilePage: NextPageWithLayout = () => {
@@ -75,7 +75,8 @@ const ProfilePage: NextPageWithLayout = () => {
 
   const { avatar_url, name, about_me, skills, research_interest, collab_status, isLoading, user_id } = useFetchProfile();
   // const { educations: educationsData, isLoading: isLoadingEducations } = useFetchEducation();
-  const { educations, isLoading: EducationLoading, error } = useFetchEducation();
+  const { educations, isLoading: EducationLoading, error: EducationError } = useFetchEducation();
+  const { achievements, isLoading: AchievementLoading, error: AchievementError } = useFetchAchievement();
 
   // const myEducationLists = useFetchTry();
   // console.log("myEducationLists:", myEducationLists);
@@ -225,6 +226,13 @@ const ProfilePage: NextPageWithLayout = () => {
                   <h3 className="font-semibold text-2xl mb-4">
                     Achievement
                   </h3>
+                    {achievements ? (
+                      achievements.map((achievement) => (
+                        <AchievementCard key={achievement.achievement_id} achievement={achievement} />
+                      ))
+                    ) : (
+                      <div>No achievement data available</div>
+                    )}
                   <div className="mb-4">
                   </div>
                   {isEditModalOpen && (

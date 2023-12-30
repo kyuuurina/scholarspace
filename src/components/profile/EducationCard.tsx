@@ -20,7 +20,7 @@ const EducationCard: React.FC<EducationCardProps> = ({ education, isLastItem = f
           {`${education.start_year} - ${education.end_year}`}
         </p>
         <p className="text-sm text-gray-600">
-          <span className="font-semibold">Title:</span> {education.school}
+          <span className="font-semibold">Instituition:</span> {education.school}
         </p>
         <p className="text-sm text-gray-600">
           <span className="font-semibold">Description:</span>{" "}
