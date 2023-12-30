@@ -21,6 +21,8 @@ import { useFetchEducation } from '~/utils/education';
 import { useFetchExperience } from '~/utils/experience';
 import { useFetchAchievement } from '~/utils/achievement';
 import { useFetchTry } from '~/utils/dummy';
+import { useFetchFollowers } from '~/utils/follow';
+import { useFetchFollowing } from '~/utils/follow';
 
 // types
 import type { ReactElement } from "react";
@@ -54,6 +56,9 @@ import AchievementForm from "~/components/profile/AchievementForm";
 
 // network component
 import FollowButton from '~/components/network/FollowButton';
+import Button from '~/components/button/Button';
+import FollowListModal from '~/components/network/FollowListModal';
+
 
 const ProfilePage: NextPageWithLayout = () => {
 
@@ -71,11 +76,31 @@ const ProfilePage: NextPageWithLayout = () => {
   const myEducationLists = useFetchTry();
   console.log("myEducationLists:", myEducationLists);
 
+
+  // Fetch Followers and Following data
+  // const followers = api.follow.getFollowersList.useQuery({
+  //   userId: profileId, // pass the user's id
+  // });
+
+  // const following = api.follow.getFollowingList.useQuery({
+  //   userId: profileId, // pass the user's id
+  // });
+
+  // Fetch Followers and Following data
+  const { followers, isLoading: isLoadingFollowers } = useFetchFollowers();
+  const { following, isLoading: isLoadingFollowing } = useFetchFollowing();
+
   // const modal states
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isEducationModalOpen, setIsEducationModalOpen] = useState(false);
   const [isExperienceModalOpen, setIsExperienceModalOpen] = useState(false);
   const [isAchievementModalOpen, setIsAchievementModalOpen] = useState(false);
+
+  // state for Followers and Following modals
+  const [isFollowersModalOpen, setIsFollowersModalOpen] = useState(false);
+  const [isFollowingModalOpen, setIsFollowingModalOpen] = useState(false);
+  
+  
 
   // schema for form validation
   const schema: ZodType<ProfileFormData> = z.object({
@@ -175,6 +200,12 @@ const ProfilePage: NextPageWithLayout = () => {
                   {/* Follow button */}
                   {/* <FollowButton userId={id as string} /> */}
                 </div>
+                <div>
+                  <Button name="Followers" onClick={() => setIsFollowersModalOpen(true)} />
+                </div>
+                <div>
+                  <Button name="Following" onClick={() => setIsFollowersModalOpen(true)} />
+                </div>
               </div>
               <div>
                 {isEditModalOpen && (
@@ -188,7 +219,7 @@ const ProfilePage: NextPageWithLayout = () => {
                 </div>
               </div>
               <div>
-                {/* ... */}
+              {/* Following Modal */}
               </div>
             </section>
   

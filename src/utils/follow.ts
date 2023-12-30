@@ -1,6 +1,68 @@
 import { api } from "./api";
 import {useRouterId} from "./routerId";
 
+export const useFetchFollowers = () => {
+  const id: string = useRouterId();
+
+  const followers = api.follow.getFollowersList.useQuery(
+    {
+      userId: id,
+    },
+    {
+      enabled: !!id,
+    }
+  );
+
+  const { data, isLoading, error } = followers;
+
+  return {
+    followers: data || [],
+    isLoading,
+    error,
+  };
+};
+
+export const useFetchFollowing = () => {
+  const id: string = useRouterId();
+
+  const following = api.follow.getFollowingList.useQuery(
+    {
+      userId: id,
+    },
+    {
+      enabled: !!id,
+    }
+  );
+
+  const { data, isLoading, error } = following;
+
+  return {
+    following: data || [],
+    isLoading,
+    error,
+  };
+};
+
+// export const useFetchFollowers = () => {
+//     const id: string = useRouterId();
+
+//     const followers = api.follow.getFollowers.useQuery(
+//         {
+//             profile_id: id,
+//         },
+//         {
+//             enabled: !!id,
+//         }
+//     );
+
+//     const { data, isLoading, error } = followers;
+
+//     return {
+//         followers: data || [],
+//         isLoading,
+//         error,
+//     };
+
 
 
 // export const followUser = async (targetUserId: string): Promise<boolean> => {
