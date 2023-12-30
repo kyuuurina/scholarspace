@@ -1,7 +1,7 @@
 import React from 'react';
 
 // Predefined colors to iterate
-const colors = ['bg-blue-200', 'bg-grey-200', 'bg-yellow-200', 'bg-purple-200', 'bg-pink-200'];
+const colors = ['bg-blue-500', 'bg-pink-500', 'bg-yellow-500', 'bg-purple-500', 'bg-pink-500'];
 
 interface TagListProps {
   tags: string[];

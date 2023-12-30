@@ -196,6 +196,15 @@ const ProfilePage: NextPageWithLayout = () => {
             {/* User Profile Card */}
             <section className="mt-2 w-3/4 mx-auto rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
               <div className="flex justify-between items-center">
+              <div className="relative w-20 h-20">
+                  <Image
+                    src={`https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/avatar/${avatar_url}`}
+                    alt="User Avatar"
+                    layout="fill"
+                    objectFit="cover"
+                    className="rounded-full"
+                  />
+                </div>
               <h3 className="font-semibold text-2xl mb-4">{`${name ?? 'User'}'s Profile`}</h3>
                 <div>
                   <button onClick={handleEditClick} className="flex items-center">
@@ -240,7 +249,6 @@ const ProfilePage: NextPageWithLayout = () => {
                   <div className="mb-4">
                     <p className="text-base font-bold text-black mb-2">Research Interest:</p>
                     {research_interest && <TagList tags={research_interest.split(',').map((tag) => tag.trim())} />}
-                    <p className="text-sm text-gray-600">{research_interest}</p>
                   </div>
                 </div>
               </div>
