@@ -3,12 +3,55 @@ import { TRPCError } from "@trpc/server";
 import { router, protectedProcedure, publicProcedure } from "~/server/api/trpc";
 
 export const educationRouter = router({
+  // getEducations: publicProcedure
+  //   .input(z.object({ education_id: z.string() }))
+  //   .query(async ({ input, ctx }) => {
+  //     const educations = await ctx.prisma.profile_education.findUnique({
+  //       where: {
+  //         education_id: input.education_id,
+  //       },
+  //     });
+
+  //     return educations;
+  //   }),
+
   getEducations: publicProcedure
-    .input(z.object({ education_id: z.string() }))
+  .input(z.object({ profile_id: z.string() })) 
+  .query(async ({ input, ctx }) => {
+    const educations = await ctx.prisma.profile_education.findMany({
+      where: {
+        profile_id: input.profile_id, 
+        // education_id: input.education_id,
+      },
+    });
+
+    return educations;
+  }),
+
+  get: publicProcedure
+    .input(z.object({ profile_id: z.string() }))
     .query(async ({ input, ctx }) => {
-      const educations = await ctx.prisma.profile_education.findUnique({
+      // Ensure that the requesting user has permission to view education for the given profile_id
+      const userProfile = await ctx.prisma.profile.findUnique({
         where: {
-          education_id: input.education_id,
+          profile_id: input.profile_id,
+        },
+        select: {
+          profile_id: true,
+        },
+      });
+
+      if (!userProfile) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "User profile not found.",
+        });
+      }
+
+      // Fetch the education records for the given profile_id
+      const educations = await ctx.prisma.profile_education.findMany({
+        where: {
+          profile_id: input.profile_id,
         },
       });
 
@@ -18,6 +61,7 @@ export const educationRouter = router({
   createEducation: protectedProcedure
     .input(
       z.object({
+        profile_id: z.string(),
         school: z.string(),
         start_year: z.string(),
         end_year: z.string(),
@@ -39,6 +83,7 @@ export const educationRouter = router({
     .input(
       z.object({
         education_id: z.string(),
+        profile_id: z.string(),  
         school: z.string(),
         start_year: z.string(),
         end_year: z.string(),
@@ -46,7 +91,7 @@ export const educationRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const { education_id, school, start_year, end_year, description} = input;
+      const { education_id, profile_id, school, start_year, end_year, description} = input;
   
       const education = await ctx.prisma.profile_education.findUnique({
         where: {
@@ -55,6 +100,7 @@ export const educationRouter = router({
       });
   
       if (!education || education.user_id !== ctx.user.id) {
+        // if (!education || education.profile_id !== profile_id) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to update this education.",
@@ -89,6 +135,7 @@ export const educationRouter = router({
       });
 
       if (!education || education.user_id !== ctx.user.id) {
+        // if (!education || education.profile_id !== profile_id) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to delete this education.",

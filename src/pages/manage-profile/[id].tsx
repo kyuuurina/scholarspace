@@ -74,8 +74,11 @@ const ProfilePage: NextPageWithLayout = () => {
   });
 
   const { avatar_url, name, about_me, skills, research_interest, collab_status, isLoading, user_id } = useFetchProfile();
-  const myEducationLists = useFetchTry();
-  console.log("myEducationLists:", myEducationLists);
+  // const { educations: educationsData, isLoading: isLoadingEducations } = useFetchEducation();
+  const { educations, isLoading: EducationLoading, error } = useFetchEducation();
+
+  // const myEducationLists = useFetchTry();
+  // console.log("myEducationLists:", myEducationLists);
 
 
   // Fetch Followers and Following data
@@ -101,87 +104,11 @@ const ProfilePage: NextPageWithLayout = () => {
   const [isFollowersModalOpen, setIsFollowersModalOpen] = useState(false);
   const [isFollowingModalOpen, setIsFollowingModalOpen] = useState(false);
   
-  
 
-  // schema for form validation
-  const schema: ZodType<ProfileFormData> = z.object({
-    avatar_url: z.string().nullable(),
-    name: z.string(),
-    about_me: z.string().nullable(),
-    skills: z.string().nullable(),
-    research_interest: z.string().nullable(),
-    collab_status: z.string(),
-  });
-
-  // react-hook-form
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    reset,
-    formState: { errors, isDirty },
-  } = useForm<ProfileFormData>({
-    resolver: zodResolver(schema),
-    defaultValues :{
-      avatar_url: avatar_url,
-      name: name,
-      about_me: about_me,
-      skills: skills,
-      research_interest: research_interest,
-      collab_status: collab_status,
-    }
-  });
-
-  // set form value to profile data
-  useEffect(() => {
-    if (!isLoading) {
-      setValue("avatar_url", Profile.data?.avatar_url || "");
-      setValue("name", name || "");
-      setValue("about_me", about_me || "");
-      setValue("skills", skills || "");
-      setValue("research_interest", research_interest || "");
-      setValue("collab_status", collab_status || "");
-    }
-  }, [isLoading, setValue]);
-
-  // toast
-  const updateProfile = api.profile.updateProfile.useMutation({
-    onSuccess: () => {
-      toast.custom(() => <SuccessToast message="Profile successfully updated" />);
-      router.reload();
-    },
-    onError: () => {
-      toast.custom(() => <ErrorToast message="Error updating profile" />);
-    },
-  });
-
-  // handlers
-  const handleUpdateProfile = async (formData: ProfileFormData) => {
-    try {
-      await updateProfile.mutateAsync({
-        profile_id: id as string, // pass the id to router.query
-        ...formData,
-      });
-      console.log(formData);
-    } catch (error) {
-      // Handle any errors
-      console.error(error);
-    }
-  };
-
-  // handle cancel
-  const handleCancel = () => {
-    reset({
-      name: name || "",
-      about_me: about_me || "",
-      skills: skills || "",
-      research_interest: research_interest || "",
-      collab_status: collab_status || "",
-    });
-  };
 
   // Add this console.log to check the profile data
   console.log('Profile Data:', useFetchProfile());
+  console.log('Edu', useFetchEducation());
   console.log('Router Query:', router.query);
 
   const handleEditClick = () => { setIsEditModalOpen(true); };
@@ -196,7 +123,7 @@ const ProfilePage: NextPageWithLayout = () => {
             {/* User Profile Card */}
             <section className="mt-2 w-3/4 mx-auto rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
               <div className="flex justify-between items-center">
-              <div className="relative w-20 h-20">
+              {/* <div className="relative w-20 h-20">
                   <Image
                     src={`https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/avatar/${avatar_url}`}
                     alt="User Avatar"
@@ -204,7 +131,7 @@ const ProfilePage: NextPageWithLayout = () => {
                     objectFit="cover"
                     className="rounded-full"
                   />
-                </div>
+                </div> */}
               <h3 className="font-semibold text-2xl mb-4">{`${name ?? 'User'}'s Profile`}</h3>
                 <div>
                   <button onClick={handleEditClick} className="flex items-center">
@@ -259,16 +186,16 @@ const ProfilePage: NextPageWithLayout = () => {
   
             {/* Education section */}
             <section className="mt-2 w-3/4 mx-auto rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
-              <h3 className="font-semibold text-2xl mb-4">
-                Education
-              </h3>
-              <ul className="grid grid-cols-1 gap-8">
-                {myEducationLists.myEducations.map((education) => (
-                  <li key={education.education_id} className="mb-8">
-                    <EducationCard education={education} />
-                  </li>
-                ))}
-              </ul>
+              <h3 className="font-semibold text-2xl mb-4">Education</h3>
+
+              {educations ? (
+                educations.map((education) => (
+                  <EducationCard key={education.education_id} education={education} />
+                ))
+              ) : (
+                <div>No education data available</div>
+              )}
+
               {isEditModalOpen && (
                 <EducationForm
                   openModal={isEducationModalOpen}
@@ -283,17 +210,7 @@ const ProfilePage: NextPageWithLayout = () => {
                 <h3 className="font-semibold text-2xl mb-4">
                   Research Experience
                 </h3>
-                <div className="mb-4">
-                  <p className="text-sm text-gray-600">
-                    <span className="font-semibold">Year:</span> 2015 - 2016
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    <span className="font-semibold">Title:</span> Nursing at Hospital Kuala Lumpur
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    <span className="font-semibold">Description:</span> Research Assistant
-                  </p>
-                </div>
+
                 {isEditModalOpen && (
                   <ExperienceForm
                     openModal={isExperienceModalOpen}
@@ -309,15 +226,6 @@ const ProfilePage: NextPageWithLayout = () => {
                     Achievement
                   </h3>
                   <div className="mb-4">
-                    <p className="text-sm text-gray-600">
-                      <span className="font-semibold">Year:</span> 2018
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      <span className="font-semibold">Title:</span> Dean List Award
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      <span className="font-semibold">Description:</span> FCSIT Deans List
-                    </p>
                   </div>
                   {isEditModalOpen && (
                     <AchievementForm

@@ -1,11 +1,6 @@
-// EducationCard.tsx
-
 import React, { useState } from "react";
-import { FaPlus } from "react-icons/fa"; 
-import EducationForm from "./EducationForm"; 
 
 type EducationCardProps = {
-  //an object of an array of education
   education: {
     education_id: string;
     school: string;
@@ -13,47 +8,31 @@ type EducationCardProps = {
     end_year: string;
     description: string | null;
   };
+  isLastItem?: boolean; // New prop to indicate if it's the last item
 };
 
-const EducationCard: React.FC<EducationCardProps> = ({ education }) => {
-  const [isEducationFormOpen, setIsEducationFormOpen] = useState(false);
-
-  const handleAddEducationClick = () => {
-    setIsEducationFormOpen(true);
-  };
-
+const EducationCard: React.FC<EducationCardProps> = ({ education, isLastItem = false }) => {
   return (
-    <div className="max-w-md mx-auto bg-white rounded-xl overflow-hidden shadow-md">
-      <div className="px-6 py-4">
-        <div className="flex justify-between items-center mb-4">
-          <div className="font-bold text-xl">{education.school}</div>
-          <div className="text-gray-600">
-            {`${education.start_year} - ${education.end_year}`}
-          </div>
-        </div>
-        <div className="text-gray-600 mb-2">{education.description}</div>
-        
-        {/* Add Education Form Modal */}
-        {isEducationFormOpen && (
-          <EducationForm
-            openModal={isEducationFormOpen}
-            onClick={() => setIsEducationFormOpen(false)}
-          />
-        )}
-      </div>
-      <div className="flex justify-end px-6 py-4">
-        {/* Add Education Icon */}
-        <FaPlus
-          onClick={handleAddEducationClick}
-          className="cursor-pointer text-blue-500"
-          style={{ fontSize: "24px" }}
-        />
+    <div>
+      <div className={`mb-4 ${isLastItem ? '' : 'border-b border-gray-300 pb-4'}`}>
+        <p className="text-sm text-gray-600">
+          <span className="font-semibold">Year:</span>{" "}
+          {`${education.start_year} - ${education.end_year}`}
+        </p>
+        <p className="text-sm text-gray-600">
+          <span className="font-semibold">Title:</span> {education.school}
+        </p>
+        <p className="text-sm text-gray-600">
+          <span className="font-semibold">Description:</span>{" "}
+          {education.description || "No description available"}
+        </p>
       </div>
     </div>
   );
 };
 
 export default EducationCard;
+
 
 
 // import React from 'react';
