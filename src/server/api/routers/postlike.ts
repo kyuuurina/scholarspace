@@ -33,6 +33,7 @@ export const likeRouter = router({
     console.log("likeRouter getMyLikedPosts", myLikedPosts);
   }),
 
+  //like and unlike post
   toggleLike: protectedProcedure
   .input(z.object({post_id: z.string()}))
   .mutation(async ({input, ctx}) => {

@@ -128,7 +128,7 @@ const FollowingPostPage: NextPageWithLayout = () => {
 FollowingPostPage.getLayout = function getLayout(page: ReactElement) {
   return (
     <Layout>
-      <Head title="Home Page" />
+      <Head title="Following" />
       {page}
     </Layout>
   );

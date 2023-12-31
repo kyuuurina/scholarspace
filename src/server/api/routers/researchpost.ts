@@ -52,13 +52,14 @@ async function getInfiniteResearchPosts({
     researchPosts: data.map((post: any) => {
       return {
         post_id: post.post_id,
+        user_id: post.user_id,
         category: post.category,
         title: post.title,
+        document: post.document,
         description: post.description,
         author: post.author,
         created_at: post.created_at,
-        user: post.user,
-        username: post.user.name,
+
       };
     }),
     nextCursor,
