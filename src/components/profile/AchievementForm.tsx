@@ -26,7 +26,7 @@ type ModalProps = {
 };
 
 const AchievementForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
-  const achievement_id = useRouterId();
+  const profile_id = useRouterId();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const router = useRouter();
@@ -65,7 +65,7 @@ const AchievementForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
 
       const response = await achievementMutation.mutateAsync({
         ...formData,
-        achievement_id,
+        profile_id,
       });
 
       if (achievementMutation.error) {

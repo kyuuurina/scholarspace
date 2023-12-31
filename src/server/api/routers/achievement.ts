@@ -48,25 +48,52 @@ export const achievementRouter = router({
       return achievements;
     }),
 
-  createAchievement: protectedProcedure
-    .input(
-      z.object({
-        profile_id: z.string(),
-        title: z.string(),
-        received_year: z.string(),
-        description: z.string().nullable(),
-      })
-    )
-    .mutation(async ({ input, ctx }) => {
-      const newAchievement = await ctx.prisma.profile_achievement.create({
-        data: {
-          user_id: ctx.user.id,
-          ...input,
-        },
-      });
+  // createAchievement: protectedProcedure
+  //   .input(
+  //     z.object({
+  //       profile_id: z.string(),
+  //       title: z.string(),
+  //       received_year: z.string(),
+  //       description: z.string().nullable(),
+  //     })
+  //   )
+  //   .mutation(async ({ input, ctx }) => {
+  //     const newAchievement = await ctx.prisma.profile_achievement.create({
+  //       data: {
+  //         user_id: ctx.user.id,
+  //         ...input,
+  //       },
+  //     });
 
-      return newAchievement;
-    }),
+  //     return newAchievement;
+  //   }),
+
+  createAchievement: protectedProcedure
+  .input(
+    z.object({
+      profile_id: z.string(),
+      title: z.string(),
+      received_year: z.string(),
+      description: z.string().nullable(),
+    })
+  )
+  .mutation(async ({ input, ctx }) => {
+    const newEducation = await ctx.prisma.profile_achievement.create({
+      data: {
+        profile: {
+          connect: { profile_id: input.profile_id },
+        },
+        user: {
+          connect: { id: ctx.user.id },
+        },
+        title: input.title,
+        received_year: input.received_year,
+        description: input.description,
+      },
+    });
+
+    return newEducation;
+  }),
 
     updateAchievement: protectedProcedure
     .input(

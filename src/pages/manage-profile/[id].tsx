@@ -214,27 +214,25 @@ const ProfilePage: NextPageWithLayout = () => {
   
             {/* Experience section */}
             <div className="grid gap-y-5">
+              {/* Research Experience section */}
               <section className="mt-2 w-3/4 mx-auto rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
                 <h3 className="font-semibold text-2xl mb-4">
                   Research Experience
+                  <button
+                    className="ml-2 text-blue-500 cursor-pointer"
+                    onClick={() => setIsExperienceModalOpen(true)}
+                  >
+                    <FaPlus />
+                  </button>
                 </h3>
                 {experiences ? (
-                      experiences.map((experience) => (
-                        <ExperienceCard key={experience.experience_id} experience={experience} />
-                      ))
-                    ) : (
-                      <div>No achievement data available</div>
-                    )}
-                  <div className="mb-4">
-                  </div>
-                  {isEditModalOpen && (
-                    <AchievementForm
-                      openModal={isAchievementModalOpen}
-                      onClick={() => setIsAchievementModalOpen(false)}
-                    />
-                  )}
-
-                {isEditModalOpen && (
+                  experiences.map((experience) => (
+                    <ExperienceCard key={experience.experience_id} experience={experience} />
+                  ))
+                ) : (
+                  <div>No experience data available</div>
+                )}
+                {isExperienceModalOpen && (
                   <ExperienceForm
                     openModal={isExperienceModalOpen}
                     onClick={() => setIsExperienceModalOpen(false)}
@@ -247,17 +245,21 @@ const ProfilePage: NextPageWithLayout = () => {
                 <section className="mt-2 w-3/4 mx-auto rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
                   <h3 className="font-semibold text-2xl mb-4">
                     Achievement
+                    <button
+                      className="ml-2 text-blue-500 cursor-pointer"
+                      onClick={() => setIsAchievementModalOpen(true)}
+                    >
+                      <FaPlus />
+                    </button>
                   </h3>
-                    {achievements ? (
-                      achievements.map((achievement) => (
-                        <AchievementCard key={achievement.achievement_id} achievement={achievement} />
-                      ))
-                    ) : (
-                      <div>No achievement data available</div>
-                    )}
-                  <div className="mb-4">
-                  </div>
-                  {isEditModalOpen && (
+                  {achievements ? (
+                    achievements.map((achievement) => (
+                      <AchievementCard key={achievement.achievement_id} achievement={achievement} />
+                    ))
+                  ) : (
+                    <div>No achievement data available</div>
+                  )}
+                  {isAchievementModalOpen && (
                     <AchievementForm
                       openModal={isAchievementModalOpen}
                       onClick={() => setIsAchievementModalOpen(false)}
