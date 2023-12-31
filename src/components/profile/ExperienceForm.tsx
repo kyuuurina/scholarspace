@@ -26,7 +26,7 @@ type ModalProps = {
 };
 
 const ExperienceForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
-  const experience_id = useRouterId();
+  const profile_id = useRouterId();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const router = useRouter();
@@ -66,7 +66,7 @@ const ExperienceForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
 
       const response = await experienceMutation.mutateAsync({
         ...formData,
-        experience_id,
+        profile_id,
       });
 
       if (experienceMutation.error) {
@@ -108,7 +108,7 @@ const ExperienceForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
               htmlFor="title"
               className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
             >
-              Title
+              Research Title
             </label>
             <input
               id="title"

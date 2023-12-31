@@ -64,7 +64,7 @@ const EducationCard: React.FC<ExperienceCardProps> = ({ experience, isLastItem =
           {`${experience.start_year} - ${experience.end_year}`}
         </p>
         <p className="text-sm text-gray-600">
-          <span className="font-semibold">title:</span> {experience.title}
+          <span className="font-semibold">Research Title:</span> {experience.title}
         </p>
         <p className="text-sm text-gray-600">
           <span className="font-semibold">Description:</span>{" "}

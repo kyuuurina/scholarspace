@@ -28,6 +28,27 @@ export const experienceRouter = router({
     return experiences;
   }),
 
+  // createExperience: protectedProcedure
+  //   .input(
+  //     z.object({
+  //       profile_id: z.string(),
+  //       title: z.string(),
+  //       start_year: z.string(),
+  //       end_year: z.string(),
+  //       description: z.string().nullable(),
+  //     })
+  //   )
+  //   .mutation(async ({ input, ctx }) => {
+  //     const newExperience = await ctx.prisma.profile_experience.create({
+  //       data: {
+  //         user_id: ctx.user.id,
+  //         ...input,
+  //       },
+  //     });
+
+  //     return newExperience;
+  //   }),
+
   createExperience: protectedProcedure
     .input(
       z.object({
@@ -41,8 +62,16 @@ export const experienceRouter = router({
     .mutation(async ({ input, ctx }) => {
       const newExperience = await ctx.prisma.profile_experience.create({
         data: {
-          user_id: ctx.user.id,
-          ...input,
+          profile: {
+            connect: { profile_id: input.profile_id },
+          },
+          user: {
+            connect: { id: ctx.user.id },
+          },
+          title: input.title,
+          start_year: input.start_year,
+          end_year: input.end_year,
+          description: input.description,
         },
       });
 
