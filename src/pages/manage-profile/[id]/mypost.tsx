@@ -30,7 +30,8 @@ import ConfirmationDialog from '~/components/ConfirmationDialog';
 import ProfileTabs from '~/components/profile/ProfileTabs';
 import Post from '~/components/research-post/Post';
 import Head from 'next/head';
-import { researchpostRouter } from '~/server/api/routers/researchpost';
+import EditPostForm from '~/components/research-post/EditPostForm';
+
 import toast from 'react-hot-toast';
 
 const MyPost: NextPageWithLayout = () => {
@@ -40,15 +41,17 @@ const MyPost: NextPageWithLayout = () => {
 
   console.log("MyPost.tsx page router:", router)
 
-  const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [currentPostId, setCurrentPostId] = useState<string | null>(null);
+  const [isConfirmationOpen, setIsConfirmationOpen] = useState(false); 
 
 
-  //handleDelete
-  const deleteMyPost = api.researchpost.delete.useMutation({
-    onSuccess: () => {
-      toast.custom(() => <SuccessToast message="Post successfully deleted" />);
-    },
-  });
+//handleDelete
+const deleteMyPost = api.researchpost.delete.useMutation({
+  onSuccess: () => {
+    toast.custom(() => <SuccessToast message="Post successfully deleted" />);
+  },
+});
 
   const handleDeleteMyPost = (post_id: string) => {
     deleteMyPost
@@ -96,6 +99,7 @@ const MyPost: NextPageWithLayout = () => {
                 <div className="p-4 rounded-md">
                   <Post post={post} />
                   <button onClick={() => handleDeleteMyPost(post.post_id)}>Delete</button>
+                  <button onClick={() => { setEditModalOpen(true); setCurrentPostId(post.post_id); }}>Edit</button>
                 </div>
               </li>
             ))}
@@ -111,6 +115,15 @@ const MyPost: NextPageWithLayout = () => {
             </p>
           </div>
         )}
+
+        {/* Render EditPostForm component */}
+        {editModalOpen && (
+        <EditPostForm
+          openModal={editModalOpen}
+          onClick={() => setEditModalOpen(false)}
+          postIdToEdit={currentPostId || ''} 
+        />
+      )}
       </div>
     </>
   );

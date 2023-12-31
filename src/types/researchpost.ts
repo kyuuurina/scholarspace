@@ -7,6 +7,7 @@ type ResearchPostFormData = {
     description: string | null;
     author: string | null;
     document : string | null;
+    // user_id: string;
     // created_at: Date;
   };
   
