@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { router, protectedProcedure, publicProcedure } from "~/server/api/trpc";
+import { Prisma } from "@prisma/client";
 
 export const educationRouter = router({
   // getEducations: publicProcedure
@@ -16,39 +17,8 @@ export const educationRouter = router({
   //   }),
 
   getEducations: publicProcedure
-  .input(z.object({ profile_id: z.string() })) 
-  .query(async ({ input, ctx }) => {
-    const educations = await ctx.prisma.profile_education.findMany({
-      where: {
-        profile_id: input.profile_id, 
-        // education_id: input.education_id,
-      },
-    });
-
-    return educations;
-  }),
-
-  get: publicProcedure
     .input(z.object({ profile_id: z.string() }))
     .query(async ({ input, ctx }) => {
-      // Ensure that the requesting user has permission to view education for the given profile_id
-      const userProfile = await ctx.prisma.profile.findUnique({
-        where: {
-          profile_id: input.profile_id,
-        },
-        select: {
-          profile_id: true,
-        },
-      });
-
-      if (!userProfile) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "User profile not found.",
-        });
-      }
-
-      // Fetch the education records for the given profile_id
       const educations = await ctx.prisma.profile_education.findMany({
         where: {
           profile_id: input.profile_id,
@@ -57,6 +27,28 @@ export const educationRouter = router({
 
       return educations;
     }),
+
+  // createEducation: protectedProcedure
+  //   .input(
+  //     z.object({
+  //       education_id: z.string(),
+  //       profile_id: z.string(),
+  //       school: z.string(),
+  //       start_year: z.string(),
+  //       end_year: z.string(),
+  //       description: z.string().nullable(),
+  //     })
+  //   )
+  //   .mutation(async ({ input, ctx }) => {
+  //     const newEducation = await ctx.prisma.profile_education.create({
+  //       data: {
+  //         user_id: ctx.user.id,
+  //         ...input,
+  //       },
+  //     });
+
+  //     return newEducation;
+  //   }),
 
   createEducation: protectedProcedure
     .input(
@@ -71,19 +63,27 @@ export const educationRouter = router({
     .mutation(async ({ input, ctx }) => {
       const newEducation = await ctx.prisma.profile_education.create({
         data: {
-          user_id: ctx.user.id,
-          ...input,
+          profile: {
+            connect: { profile_id: input.profile_id },
+          },
+          user: {
+            connect: { id: ctx.user.id },
+          },
+          school: input.school,
+          start_year: input.start_year,
+          end_year: input.end_year,
+          description: input.description,
         },
       });
 
       return newEducation;
     }),
 
-    updateEducation: protectedProcedure
+  updateEducation: protectedProcedure
     .input(
       z.object({
         education_id: z.string(),
-        // profile_id: z.string(),  
+        // profile_id: z.string(),
         school: z.string(),
         start_year: z.string(),
         end_year: z.string(),
@@ -91,14 +91,14 @@ export const educationRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const { education_id, school, start_year, end_year, description} = input;
-  
+      const { education_id, school, start_year, end_year, description } = input;
+
       const education = await ctx.prisma.profile_education.findUnique({
         where: {
           education_id,
         },
       });
-  
+
       if (!education || education.user_id !== ctx.user.id) {
         // if (!education || education.profile_id !== profile_id) {
         throw new TRPCError({
@@ -106,7 +106,7 @@ export const educationRouter = router({
           message: "Failed to update this education.",
         });
       }
-  
+
       const updatedEducation = await ctx.prisma.profile_education.update({
         where: {
           education_id,
@@ -118,11 +118,11 @@ export const educationRouter = router({
           description,
         },
       });
-  
+
       return updatedEducation;
     }),
-  
-  //delete education procedure
+
+  // delete education procedure
   deleteEducation: protectedProcedure
     .input(z.object({ education_id: z.string() }))
     .mutation(async ({ input, ctx }) => {
@@ -151,6 +151,7 @@ export const educationRouter = router({
       return { success: true };
     }),
 });
+
 
 
 //nice

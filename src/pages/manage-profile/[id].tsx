@@ -13,6 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
 import Image from 'next/image';
 import Link from 'next/link';
+import { FaPlus } from 'react-icons/fa';
 
 // utils
 import { useRouterId } from "~/utils/routerId";
@@ -186,10 +187,16 @@ const ProfilePage: NextPageWithLayout = () => {
               </div>
             </section>
   
-            {/* Education section */}
             <section className="mt-2 w-3/4 mx-auto rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
-              <h3 className="font-semibold text-2xl mb-4">Education</h3>
-
+              <h3 className="font-semibold text-2xl mb-4">
+                Education
+                <button
+                  className="ml-2 text-blue-500 cursor-pointer"
+                  onClick={() => setIsEducationModalOpen(true)}
+                >
+                  <FaPlus />
+                </button>
+              </h3>
               {educations ? (
                 educations.map((education) => (
                   <EducationCard key={education.education_id} education={education} />
@@ -197,8 +204,7 @@ const ProfilePage: NextPageWithLayout = () => {
               ) : (
                 <div>No education data available</div>
               )}
-
-              {isEditModalOpen && (
+              {isEducationModalOpen && (
                 <EducationForm
                   openModal={isEducationModalOpen}
                   onClick={() => setIsEducationModalOpen(false)}

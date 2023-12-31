@@ -26,7 +26,7 @@ type ModalProps = {
 };
 
 const EducationModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
-  const education_id = useRouterId();
+  const profile_id = useRouterId();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const router = useRouter();
@@ -41,10 +41,10 @@ const EducationModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
       message: "Institution name is required",
     }),
     start_year: z.string().refine((data) => data.trim() !== '', {
-      message: "Start Year is required",
+      message: "Required",
     }),
     end_year: z.string().refine((data) => data.trim() !== '', {
-      message: "End name is required",
+      message: "Required",
     }),
     description: z.string().nullable(),
   });
@@ -67,12 +67,12 @@ const EducationModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
     if (isSubmitting) return;
     try {
       setIsSubmitting(true);
-
+  
       const response = await educationMutation.mutateAsync({
+        profile_id,
         ...formData,
-        education_id,
       });
-
+  
       if (educationMutation.error) {
         // Handle error case
         toast.custom(() => <ErrorToast message={"Failed to add Education"} />);
@@ -81,10 +81,10 @@ const EducationModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
         toast.custom(() => <SuccessToast message="Education successfully added" />);
         router.reload();
       }
-
+  
       onClick();
       reset();
-
+  
       setIsSubmitting(false);
     } catch (error) {
       // Handle any other errors
