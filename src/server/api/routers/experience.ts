@@ -52,7 +52,7 @@ export const experienceRouter = router({
     updateExperience: protectedProcedure
     .input(
       z.object({
-        profile_id: z.string(),
+        // profile_id: z.string(),
         experience_id: z.string(),
         title: z.string(),
         start_year: z.string(),
