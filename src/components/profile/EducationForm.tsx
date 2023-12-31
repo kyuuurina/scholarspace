@@ -40,8 +40,12 @@ const EducationModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
     school: z.string().refine((data) => data.trim() !== '', {
       message: "Institution name is required",
     }),
-    start_year: z.string(),
-    end_year: z.string(),
+    start_year: z.string().refine((data) => data.trim() !== '', {
+      message: "Start Year is required",
+    }),
+    end_year: z.string().refine((data) => data.trim() !== '', {
+      message: "End name is required",
+    }),
     description: z.string().nullable(),
   });
 

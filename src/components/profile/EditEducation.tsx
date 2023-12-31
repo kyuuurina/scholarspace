@@ -1,3 +1,6 @@
+
+
+
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
@@ -12,12 +15,10 @@ import React from "react";
 import { getCookie } from "cookies-next";
 
 // types
-import type { ProfileFormData } from "~/types/profile";
-import type { AchievementFormData } from "~/types/profile";
+import type { EducationFormData } from "~/types/profile";
 
 //utils
-import { useFetchProfile } from "~/utils/profile";
-import { useFetchAchievement } from "~/utils/achievement";
+import { useFetchEducation } from "~/utils/education";
 
 // local components
 import FormErrorMessage from "../FormErrorMessage";
@@ -31,7 +32,7 @@ type ModalProps = {
   onClick: () => void;
 };
 
-const EditAchievement: React.FC<ModalProps> = ({ openModal, onClick }) => {
+const EditEducation: React.FC<ModalProps> = ({ openModal, onClick }) => {
 
   //const
   const router = useRouter();
@@ -42,13 +43,14 @@ const EditAchievement: React.FC<ModalProps> = ({ openModal, onClick }) => {
   const userId = getCookie("UserID");
 
   //populate form fields 
-  const {title, received_year, description, achievement_id, isLoading} = useFetchAchievement();
+  const {education_id, school, start_year, end_year, description, isLoading} = useFetchEducation();
 
 
 //schema for form validation
-  const schema: ZodType<AchievementFormData> = z.object({
-    title: z.string().min(1, { message: "Title is required" }),
-    received_year: z.string().min(1, { message: "Year is required" }),
+  const schema: ZodType<EducationFormData> = z.object({
+    school: z.string().min(1, { message: "Title is required" }),
+    start_year: z.string().min(1, { message: "Start Year is required" }),
+    end_year: z.string().min(1, { message: "End Year is required" }),
     description: z.string().nullable(),
   });
 
@@ -59,11 +61,12 @@ const EditAchievement: React.FC<ModalProps> = ({ openModal, onClick }) => {
       setValue,
       reset,
       formState: { errors, isDirty },
-    } = useForm<AchievementFormData>({
+    } = useForm<EducationFormData>({
       resolver: zodResolver(schema),
       defaultValues :{
-        title: title,
-        received_year: received_year,
+        school: school,
+        start_year: start_year,
+        end_year: end_year,
         description: description,
       }
     });
@@ -71,31 +74,30 @@ const EditAchievement: React.FC<ModalProps> = ({ openModal, onClick }) => {
     //set form value to profile data
     useEffect(() => {
       if (!isLoading) {
-        setValue("title", title || "");
-        setValue("received_year", received_year || "");
+        setValue("school", school || "");
+        setValue("start_year", start_year || "");
+        setValue("end_year", end_year || "");
         setValue("description", description || "");
 
       }
     }, [isLoading, setValue]);
 
   //toast
-  const updateAchievement = api.achievement.updateAchievement.useMutation({
+  const updateEducation = api.education.updateEducation.useMutation({
     onSuccess: () => {
-      toast.custom(() => <SuccessToast message="Achievement successfully updated" />);
+      toast.custom(() => <SuccessToast message="Education successfully updated" />);
       router.reload();
     },
     onError: () => {
-      toast.custom(() => <ErrorToast message="Error updating achievement" />);
+      toast.custom(() => <ErrorToast message="Error updating Education" />);
     },
   });
 
   //handlers
-  const handleUpdateAchievement = async (formData: AchievementFormData) => {
+  const handleUpdateEducation = async (formData: EducationFormData) => {
     try {
-      await updateAchievement.mutateAsync({
-        achievement_id,
-        // profile_id,
-        // profile_id: id,
+      await updateEducation.mutateAsync({
+        education_id, 
         ...formData,
       });
       console.log(formData);
@@ -108,8 +110,9 @@ const EditAchievement: React.FC<ModalProps> = ({ openModal, onClick }) => {
   // handle cancel
   const handleCancel = () => {
     reset({
-      title: title || "",
-      received_year: received_year || "",
+      school: school || "",
+      start_year: start_year || "",
+      end_year: end_year || "",
       description: description || "",
     });
   };
@@ -124,42 +127,62 @@ const EditAchievement: React.FC<ModalProps> = ({ openModal, onClick }) => {
           onClick();
           reset();
         }}
-        title="Achievement"
+        title="Education"
       >
         <form
           autoComplete="off"
           className="flex flex-col gap-4"
-          onSubmit={handleSubmit(handleUpdateAchievement)}
+          onSubmit={handleSubmit(handleUpdateEducation)}
         >
           <div>
             <label
-              htmlFor="title"
+              htmlFor="school"
               className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
             >
-              Title
+              Instituition
             </label>
             <input
-              id="title"
+              id="school"
               className="block w-full"
-              {...register("title", { required: true })}
+              {...register("school", { required: true })}
             />
-            {errors.title && <FormErrorMessage text={errors.title.message} />}
+            {errors.school && <FormErrorMessage text={errors.school.message} />}
           </div>
 
+          <div className="flex gap-4">
+            <div className="flex flex-col flex-grow">
+              <label
+                htmlFor="start_year"
+                className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Start Year
+              </label>
+              <input
+                id="start_year"
+                className="block w-full"
+                {...register("start_year", { required: true })}
+              />
+              {errors.start_year && (
+                <FormErrorMessage text={errors.start_year.message} />
+              )}
+            </div>
 
-          <div>
-            <label
-              htmlFor="received_year"
-              className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-            >
-              Received Year
-            </label>
-            <input
-              id="received_year"
-              className="block w-full"
-              {...register("received_year", { required: true })}
-            />
-            {errors.received_year && <FormErrorMessage text={errors.received_year.message} />}
+            <div className="flex flex-col flex-grow">
+              <label
+                htmlFor="end_year"
+                className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+              >
+                End Year
+              </label>
+              <input
+                id="end_year"
+                className="block w-full"
+                {...register("end_year", { required: true })}
+              />
+              {errors.end_year && (
+                <FormErrorMessage text={errors.end_year.message} />
+              )}
+            </div>
           </div>
 
           <div>
@@ -178,6 +201,7 @@ const EditAchievement: React.FC<ModalProps> = ({ openModal, onClick }) => {
               <FormErrorMessage text={errors.description.message} />
             )}
           </div>
+
 
         {/* Buttons container with justify-end */}
         <div className="flex justify-end gap-4">
@@ -202,4 +226,4 @@ const EditAchievement: React.FC<ModalProps> = ({ openModal, onClick }) => {
   );
 };
 
-export default EditAchievement;
+export default EditEducation;

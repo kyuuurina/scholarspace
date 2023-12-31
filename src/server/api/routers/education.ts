@@ -83,7 +83,7 @@ export const educationRouter = router({
     .input(
       z.object({
         education_id: z.string(),
-        profile_id: z.string(),  
+        // profile_id: z.string(),  
         school: z.string(),
         start_year: z.string(),
         end_year: z.string(),
@@ -91,7 +91,7 @@ export const educationRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const { education_id, profile_id, school, start_year, end_year, description} = input;
+      const { education_id, school, start_year, end_year, description} = input;
   
       const education = await ctx.prisma.profile_education.findUnique({
         where: {

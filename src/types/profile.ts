@@ -16,7 +16,6 @@ type ProfileFormData = {
   };
 
   type EducationFormData = {
-    profile_id: string;
     school: string;
     description: string | null;
     start_year: string;

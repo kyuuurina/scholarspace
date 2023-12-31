@@ -1,4 +1,12 @@
 import React, { useState } from "react";
+import { FaEdit, FaTrash } from "react-icons/fa";
+import EditEducation from "./EditEducation";
+import { api } from "~/utils/api";
+import SuccessToast from "../toast/SuccessToast";
+import ErrorToast from "../toast/ErrorToast";
+import toast from "react-hot-toast";
+import Router from "next/router";
+import ConfirmationDialog from "../ConfirmationDialog";
 
 type EducationCardProps = {
   education: {
@@ -12,64 +20,89 @@ type EducationCardProps = {
 };
 
 const EducationCard: React.FC<EducationCardProps> = ({ education, isLastItem = false }) => {
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isConfirmationOpen, setIsConfirmationOpen] = useState(false); // New state for the confirmation dialog
+
+  const handleEditClick = () => {
+    setIsEditModalOpen(true);
+  };
+
+  // handleDelete
+  const deleteEducation = api.education.deleteEducation.useMutation({
+    onSuccess: () => {
+      toast.custom(() => <SuccessToast message="Education successfully deleted" />);
+    },
+  });
+
+  const handleDeleteEducation = () => {
+    setIsConfirmationOpen(true); // Show confirmation dialog
+  };
+
+  const confirmDelete = async () => {
+    try {
+      await deleteEducation.mutateAsync({
+        education_id: education.education_id,
+      });
+      Router.reload();
+    } catch (error) {
+      console.error("Failed to delete education:", error);
+      toast.custom(() => <ErrorToast message="Failed to delete education" />);
+    } finally {
+      setIsConfirmationOpen(false); // Close confirmation dialog
+    }
+  };
+
+  const cancelDelete = () => {
+    setIsConfirmationOpen(false); // Close confirmation dialog
+  };
+
   return (
-    <div>
-      <div className={`mb-4 ${isLastItem ? '' : 'border-b border-gray-300 pb-4'}`}>
+    <div className={`flex justify-between items-center mb-4 ${isLastItem ? "" : "border-b border-gray-300 pb-4"}`}>
+      <div>
         <p className="text-sm text-gray-600">
           <span className="font-semibold">Year:</span>{" "}
           {`${education.start_year} - ${education.end_year}`}
         </p>
         <p className="text-sm text-gray-600">
-          <span className="font-semibold">Instituition:</span> {education.school}
+          <span className="font-semibold">Institution:</span> {education.school}
         </p>
         <p className="text-sm text-gray-600">
           <span className="font-semibold">Description:</span>{" "}
           {education.description || "No description available"}
         </p>
       </div>
+
+      {/* Action buttons */}
+      <div className="flex items-center space-x-4">
+        {/* Edit button */}
+        <button onClick={handleEditClick} className="text-blue-500 hover:underline">
+          Edit <FaEdit className="inline ml-1" />
+        </button>
+
+        {/* Delete button */}
+        <button onClick={handleDeleteEducation} className="text-red-500 hover:underline">
+          Delete <FaTrash className="inline ml-1" />
+        </button>
+      </div>
+
+      {/* Edit Achievement Modal */}
+      {isEditModalOpen && (
+        <EditEducation
+          openModal={isEditModalOpen}
+          onClick={() => setIsEditModalOpen(false)}
+        />
+      )}
+
+      {/* Confirmation Dialog */}
+      {isConfirmationOpen && (
+        <ConfirmationDialog
+          isOpen={isConfirmationOpen}
+          onClose={cancelDelete}
+          onConfirm={confirmDelete}
+        />
+      )}
     </div>
   );
 };
 
 export default EducationCard;
-
-
-
-// import React from 'react';
-
-// type Education = {
-//   education_id: string;
-//   school_name: string;
-//   start_date: Date;
-//   end_date: Date;
-// };
-
-// type EducationCardProps = {
-//   educations: Education[];
-// };
-
-// const EducationCard: React.FC<EducationCardProps> = ({ educations }) => {
-//   return (
-//     <div className="max-w-md mx-auto bg-white rounded-xl overflow-hidden shadow-md">
-//       <div className="px-6 py-4">
-//         <div className="font-bold text-xl mb-2">Education</div>
-//         {educations.map((education, index) => (
-//           <div key={education.education_id}>
-//             <div className="flex items-center">
-//               <div className="w-2 h-2 bg-gray-500 rounded-full mr-2"></div>
-//               <div className="font-semibold">{education.school_name}</div>
-//             </div>
-//             <div className="text-gray-600">
-//               {`${education.start_date.toLocaleDateString()} - ${education.end_date.toLocaleDateString()}`}
-//             </div>
-//             {index < educations.length - 1 && (
-//               <div className="border-b border-gray-300 my-3"></div>
-//             )}
-//           </div>
-//         ))}
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default EducationCard;

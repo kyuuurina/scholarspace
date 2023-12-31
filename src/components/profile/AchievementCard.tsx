@@ -45,8 +45,8 @@ const AchievementCard: React.FC<AchievementCardProps> = ({ achievement, isLastIt
       });
       Router.reload();
     } catch (error) {
-      console.error("Failed to delete post:", error);
-      toast.custom(() => <ErrorToast message="Failed to delete post" />);
+      console.error("Failed to delete achievement:", error);
+      toast.custom(() => <ErrorToast message="Failed to delete achievement" />);
     } finally {
       setIsConfirmationOpen(false); // Close confirmation dialog
     }
