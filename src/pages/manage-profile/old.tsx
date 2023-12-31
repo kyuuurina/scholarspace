@@ -43,7 +43,6 @@ import Header from "~/components/workspace/Header";
 
 //profile components
 import ProfileTabs from '~/components/profile/ProfileTabs';
-import UserProfileCard from "~/components/profile/UserProfileCard";
 import UserProfileForm from "~/components/profile/UserProfileForm";
 import EducationForm from "~/components/profile/EducationForm";
 import EducationCard from "~/components/profile/EducationCard";
@@ -80,6 +79,7 @@ const ProfilePage: NextPageWithLayout = () => {
 
 
   const schema: ZodType<ProfileFormData> = z.object({
+    avatar_url: z.string().nullable(),
     name: z.string(),
     about_me: z.string().nullable(),
     skills: z.string().nullable(),
