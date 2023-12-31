@@ -1,40 +1,44 @@
-// //Query all post created by user, if null, display "You have not created any post yet"
+//Query all post created by user, if null, display "You have not created any post yet"
 
-// import React from 'react';
-// import {useEffect, useState} from 'react';
-// import {api} from "~/utils/api";
-// import Image from 'next/image';
-// import Link from 'next/link';
+import React from 'react';
+import {useEffect, useState} from 'react';
+import {api} from "~/utils/api";
+import Image from 'next/image';
+import Link from 'next/link';
 
-// //utils
-// import { useRouterId } from "~/utils/routerId";
-// import { useFetchProfile } from "~/utils/profile";
+//utils
+import { useRouterId } from "~/utils/routerId";
+import { useFetchProfile } from "~/utils/profile";
 
-// // types
-// import type { ReactElement } from "react";
-// import type { NextPageWithLayout } from "~/pages/_app";
+// types
+import type { ReactElement } from "react";
+import type { NextPageWithLayout } from "~/pages/_app";
 
-// import ErrorPage from "~/pages/error-page";
-// //local components
-// import Layout from "~/components/layout/Layout";
-// import PageLoader from "~/components/layout/PageLoader";
-// import LoadingSpinner from "~/components/LoadingSpinner";
-// import PrimaryButton from "~/components/button/PrimaryButton";
-// import AvatarPlaceholder from "~/components/avatar/AvatarPlaceholder";
-// import { FaEdit } from 'react-icons/fa';
+import ErrorPage from "~/pages/error-page";
+//local components
+import Layout from "~/components/layout/Layout";
+import PageLoader from "~/components/layout/PageLoader";
+import LoadingSpinner from "~/components/LoadingSpinner";
+import PrimaryButton from "~/components/button/PrimaryButton";
+import AvatarPlaceholder from "~/components/avatar/AvatarPlaceholder";
+import { FaEdit } from 'react-icons/fa';
 
-// //profile components
-// import ProfileTabs from '~/components/profile/ProfileTabs';
-// import Head from 'next/head';
+//profile components
+import ProfileTabs from '~/components/profile/ProfileTabs';
+import Head from 'next/head';
 
-// import { useRouter } from 'next/router';
-// import { useFetchResearchPost } from '~/utils/researchpost';
-// import { useFetchLikedPost } from '~/utils/postlike';
-// import { FaExclamationCircle } from 'react-icons/fa';
-// import Post from '~/components/research-post/Post';
+import { useRouter } from 'next/router';
+import { useFetchResearchPost } from '~/utils/researchpost';
+import { useFetchLikedPost } from '~/utils/postlike';
+import { FaExclamationCircle } from 'react-icons/fa';
+import Post from '~/components/research-post/Post';
 
 
-// const LikedPost: NextPageWithLayout = () => {
+const LikedPost: NextPageWithLayout = () => {
+
+    return (
+        <div> Like Post</div>
+    );
 //   const likedPostLists = useFetchLikedPost();
 //   const router = useRouter();
 //   const [likedPostsDetails, setLikedPostDetails] = useState([]);
@@ -100,14 +104,14 @@
 //       </div>
 //       </>
 //   );
-// };
+};
 
-// LikedPost.getLayout = function getLayout(page: ReactElement) {
-//   return (
-//     <>
-//       <Layout>{page}</Layout>
-//     </>
-//   );
-// };
+LikedPost.getLayout = function getLayout(page: ReactElement) {
+  return (
+    <>
+      <Layout>{page}</Layout>
+    </>
+  );
+};
 
-// export default LikedPost;
+export default LikedPost;
