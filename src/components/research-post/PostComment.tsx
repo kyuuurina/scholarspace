@@ -1,7 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-
 import type { post_comments } from "@prisma/client";
 import { api } from "~/utils/api";
 import Avatar from "../avatar/avatar";

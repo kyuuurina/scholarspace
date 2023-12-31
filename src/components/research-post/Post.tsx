@@ -50,6 +50,8 @@ const getCategoryStyles = (category: string) => {
 
 const Post: React.FC<PostProps> = ({ post }) => {
   const categoryStyles = getCategoryStyles(post.category);
+  const [liked, setLiked] = useState(false);
+  const toggleLike = api.postlike.toggleLike.useMutation();
 
   // Fetch user data
   const { users, isLoading, error } = useFetchUsers();
@@ -64,21 +66,7 @@ const Post: React.FC<PostProps> = ({ post }) => {
     ? `https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/post-files-upload/${post.document}`
     : null;
 
-  // const [liked, setLiked] = useState(false);
-  // const [likeCount, setLikeCount] = useState(post.likeCount);
 
-  // const handleLikeClick = async () => {
-  //   const { addedLike, likeCount: updatedLikeCount } = await toggleLike.mutate({
-  //     post_id: post.post_id,
-  //   });
-
-  //   setLiked(addedLike);
-  //   setLikeCount(updatedLikeCount);
-  // };
-
- // Like
- const [liked, setLiked] = useState(false);
- const toggleLike = api.postlike.toggleLike.useMutation();
 
  const handleLikeClick = async () => {
    try {
