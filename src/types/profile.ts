@@ -29,5 +29,14 @@ type ProfileFormData = {
     end_year: string;
   };
 
-  export type { ProfileFormData, AchievementFormData, EducationFormData, ExperienceFormData };
+  type FormData = {
+    name: string;
+    avatar_url: string | null;
+    about_me: string | null;
+    research_interest: string | null;
+    collab_status: "Open_For_Collaboration" | "Not_Open_For_Collaboration";
+    skills: string | null;
+  };
+
+  export type { ProfileFormData, AchievementFormData, EducationFormData, ExperienceFormData, FormData };
 
