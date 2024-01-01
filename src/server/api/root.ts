@@ -1,11 +1,21 @@
-import { workspaceRouter } from "~/server/api/routers/workspace";
-import { memberRouter } from "~/server/api/routers/member";
-import { accountRouter } from "./routers/account";
 import { router } from "~/server/api/trpc";
-import { researchpostRouter } from "~/server/api/routers/researchpost";
-import { profileRouter } from "./routers/profile";
+import { accountRouter } from "./routers/account";
 import { userRouter } from "./routers/user";
+import { workspaceRouter } from "~/server/api/routers/workspace";
 import { projectRouter } from "./routers/project";
+import { memberRouter } from "~/server/api/routers/member";
+import { researchpostRouter } from "~/server/api/routers/researchpost";
+import  { profileRouter }  from "./routers/profile";
+import { researchInterestRouter } from "./routers/research-interest";
+import { researchSkillRouter } from "./routers/research-skill";
+import { educationRouter } from "./routers/education";
+import { experienceRouter } from "./routers/experience";
+import { achievementRouter } from "./routers/achievement";
+import { followRouter } from "./routers/follow";
+import { likeRouter } from "./routers/postlike";
+import { postCommentRouter } from "./routers/postcomment";
+
+
 import { phaseRouter } from "./routers/phase";
 import { taskRouter } from "./routers/task";
 import { commentRouter } from "./routers/comment";
@@ -23,6 +33,11 @@ export const appRouter = router({
   member: memberRouter,
   account: accountRouter,
   profile: profileRouter,
+  researchInterest: researchInterestRouter,
+  researchSkill: researchSkillRouter,
+  education: educationRouter,
+  achievement: achievementRouter,
+  experience: experienceRouter,
   researchpost: researchpostRouter,
   user: userRouter,
   project: projectRouter,
@@ -32,6 +47,9 @@ export const appRouter = router({
   score: scoreRouter,
   researchInterest: researchInterestRouter,
   researchSkill: researchSkillRouter,
+  follow: followRouter,
+  postlike: likeRouter,
+  postcomment: postCommentRouter,
 });
 
 // export type definition of API

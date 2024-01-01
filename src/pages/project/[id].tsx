@@ -12,6 +12,7 @@ import Layout from "~/components/layout/Layout";
 import Head from "~/components/layout/Head";
 import Header from "~/components/workspace/Header";
 import Card from "~/components/Card";
+import AvatarPlaceholder from "~/components/avatar/AvatarPlaceholder";
 import MembersCard from "~/components/members/MembersCard";
 import ScoreChart from "~/components/chart/ScoreChart";
 import PageLoader from "~/components/layout/PageLoader";

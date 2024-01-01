@@ -1,11 +1,12 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
-/* eslint-disable @typescript-eslint/no-misused-promises */
-
 //This page should be displayed when user click Home Page
 //atm, it appears on localhost:3000/home-rwp
 
+//auth
+import { getCookie } from "cookies-next";
+import { useUser } from "@supabase/auth-helpers-react";
+
 //utils
-import { useState, useEffect } from "react";
+import React, { ChangeEvent, SetStateAction, useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import toast from "react-hot-toast";
 
@@ -24,15 +25,19 @@ import Card from "~/components/Card";
 import AvatarPlaceholder from "~/components/avatar/AvatarPlaceholder";
 import Modal from "~/components/modal/Modal";
 
+//search 
+import SearchBar from "~/components/profile/SearchBar";
+
 //research post components
 import AllFollowingTabs from "~/components/research-post/AllFollowingTabs";
 import PostCard from "~/components/research-post/PostCard";
 import { ResearchPostCard } from "~/components/draft/ResearchPostCard";
-import UserRecCard from "~/components/research-post/UserRecCards";
+import UserProfileCard from "~/components/research-post/UserRecCards";
 import AddNewPostButton from "~/components/research-post/AddNewPostButton";
 import TestModal from "~/components/research-post/AddNewPostModal";
 //import { NewPostModal } from "~/components/draft/NewPostModal";
 //import NewPostForm from "~/components/draft/NewPostForm";
+
 
 const ResearchPostsPage: NextPageWithLayout = () => {
   const users = [
@@ -71,35 +76,73 @@ const ResearchPostsPage: NextPageWithLayout = () => {
     },
 
   ];
+  
+    const router = useRouter();
+    const user = useUser();
 
-  return (
-    <div className="mx-auto max-w-screen-xl p-8">
-      <AddNewPostButton />
-      {/* <h1 className="mb-4 text-3xl font-bold">Research Posts</h1> */}
-      <div className="grid grid-cols-3 gap-6">
-        <div className="col-span-2">
-          <AllFollowingTabs />
-          <div className="mt-6">
-            {/* Render post cards here */}
-            {posts.map((post, index) => (
-              <PostCard
-                key={index}
-                title={post.title}
-                category={post.category}
-                author={post.author}
-                description={post.description}
-                created_at=""
-                // timestamp={post.timestamp}
-              />
-            ))}
+    console.log("User:", user);
+    // Define state for searchQuery
+    const [searchQuery, setSearchQuery] = useState<string>("");
+
+    // Inside your Home component
+    const userId = getCookie("User ID");
+
+    // Now you can use the userId variable in your component as needed
+    console.log("User ID:", userId);
+
+    // Handler for search query change
+    const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(event.target.value);
+    };
+  
+    // Handler for search form submission
+    const handleSearchSubmit = async () => {
+      // Perform the search with the current searchQuery value
+      console.log("Searching...:", searchQuery);
+
+      // Use try-catch to handle any errors during navigation
+      try {
+        await router.push(`/search-results?q=${searchQuery}`);
+      } catch (error) {
+        console.error("Error :", error);
+      }
+    };
+
+    return (
+      <div className="mx-auto max-w-screen-xl p-8">
+        <div className="mb-4">
+          <SearchBar
+            searchQuery={searchQuery}
+            onSearchChange={handleSearchChange}
+            onSearchSubmit={handleSearchSubmit}
+          />
+        </div>
+        <div className="mb-4">
+            <AddNewPostButton />
+          </div>
+        <div className="grid grid-cols-3 gap-6">
+          <div className="col-span-2">
+            <AllFollowingTabs />
+            <div className="mt-6">
+              {/* Render post cards here */}
+              {posts.map((post, index) => (
+                <PostCard
+                  key={index}
+                  title={post.title}
+                  category={post.category}
+                  author={post.author}
+                  description={post.description}
+                  created_at={post.timestamp}
+                />
+              ))}
+            </div>
+          </div>
+          <div className="col-span-1">
+            {/* <UserProfileCard users={users} /> */}
           </div>
         </div>
-        {/* <div className="col-span-1">
-          <UserRecCard users={users} />
-        </div> */}
       </div>
-    </div>
-  );
+    );
 };
 
 ResearchPostsPage.getLayout = function getLayout(page: ReactElement) {
