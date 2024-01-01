@@ -2,10 +2,6 @@ import { useState } from 'react';
 import router from 'next/router';
 import toast from 'react-hot-toast';
 import { useSessionContext } from '@supabase/auth-helpers-react';
-import { useState } from 'react';
-import router from 'next/router';
-import toast from 'react-hot-toast';
-import { useSessionContext } from '@supabase/auth-helpers-react';
 
 const SignoutButton: React.FC = () => {
   const { supabaseClient } = useSessionContext();
