@@ -12,7 +12,7 @@ type HeaderProps = {
   selectedPhase: string;
 };
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 const Header: React.FC<HeaderProps> = ({
   phases,
@@ -21,29 +21,55 @@ const Header: React.FC<HeaderProps> = ({
 }) => {
   const router = useRouter();
   const id = router.query && router.query.id ? router.query.id.toString() : "";
+  const { name } = useFetchProject();
+
   // states for isAdding button
   const [isAdding, setIsAdding] = useState(false);
-
-  const { name } = useFetchProject();
+  const [newPhaseName, setNewPhaseName] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // create phase
   const createPhase = api.phase.create.useMutation();
 
   // function to create phase with default name phase1
   const handleCreatePhase = () => {
-    // if isAdding is true, then exit the function
     if (isAdding) return;
-    else {
-      setIsAdding(true);
-      // await for createPhase to finish executing, then set isAdding to false
+
+    setIsAdding(true);
+    setNewPhaseName("Phase1");
+    setIsEditing(true);
+
+    // Set focus to the input field
+    setTimeout(() => {
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+    }, 0);
+  };
+
+  // function to handle phase name change
+  const handlePhaseNameChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setNewPhaseName(event.target.value);
+  };
+
+  // function to handle submit on Enter key press
+  const handleInputKeyPress = (
+    event: React.KeyboardEvent<HTMLInputElement>
+  ) => {
+    if (event.key === "Enter") {
+      // Perform the submit logic here
       createPhase.mutate(
         {
           project_id: id,
-          name: "phase1",
+          name: newPhaseName,
         },
         {
           onSuccess: () => {
             setIsAdding(false);
+            setIsEditing(false);
             router.reload();
           },
         }
@@ -71,15 +97,27 @@ const Header: React.FC<HeaderProps> = ({
         </div>
         {/* add phase button */}
         <div className="flex justify-end">
-          <button
-            className="rounded-md border border-gray-300 bg-gray-200 p-1 hover:bg-gray-400"
-            onClick={() => handleCreatePhase()}
-          >
-            <div className="flex items-center">
-              <FiLayout />
-              <span className="ml-2 text-xs">Add Phase</span>
-            </div>
-          </button>
+          {isEditing ? (
+            <input
+              type="text"
+              value={newPhaseName}
+              onChange={handlePhaseNameChange}
+              onKeyPress={handleInputKeyPress}
+              onBlur={() => setIsEditing(false)}
+              ref={inputRef}
+              className="mr-2 rounded-md border border-gray-300 p-1"
+            />
+          ) : (
+            <button
+              className="rounded-md border border-gray-300 bg-gray-200 p-1 hover:bg-gray-400"
+              onClick={() => handleCreatePhase()}
+            >
+              <div className="flex items-center">
+                <FiLayout />
+                <span className="ml-2 text-xs">Add Phase</span>
+              </div>
+            </button>
+          )}
         </div>
       </div>
       {/* Tabs of phases*/}

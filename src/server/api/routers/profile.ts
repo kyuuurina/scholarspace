@@ -98,7 +98,7 @@ export const profileRouter = router({
       }
     }),
 
-    updateProfile: protectedProcedure
+  updateProfile: protectedProcedure
     .input(
       z.object({
         profile_id: z.string(),
@@ -119,14 +119,14 @@ export const profileRouter = router({
         research_interest,
         collab_status,
       } = input;
-  
+
       // Find the profile in the database based on the provided profile_id
       const profile = await ctx.prisma.profile.findUnique({
         where: {
           profile_id,
         },
       });
-  
+
       // If the profile doesn't exist or the user is not the owner, throw an error
       if (!profile || profile.user_id !== ctx.user.id) {
         throw new TRPCError({
@@ -134,7 +134,7 @@ export const profileRouter = router({
           message: "Failed to update this profile.",
         });
       }
-  
+
       try {
         // Update the profile in the database with the provided data
         const updatedProfile = await ctx.prisma.profile.update({
@@ -149,7 +149,7 @@ export const profileRouter = router({
             collab_status,
           },
         });
-  
+
         console.log("profileRouter updatedProfile:", updatedProfile);
         // Return the updated profile
         return updatedProfile;
