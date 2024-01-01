@@ -34,24 +34,43 @@ export const postCommentRouter = router({
       return postComments;
     }),
 
-  // Mutation to create a new post comment
-  create: protectedProcedure
-    .input(
-      z.object({
-        value: z.string(),
-        post_id: z.string(),
-      })
-    )
-    .mutation(async ({ input, ctx }) => {
-      const postComment = await ctx.prisma.post_comments.create({
-        data: {
-          ...input,
-          user_id: ctx.user.id,
-        },
-      });
+// Mutation to create a new post comment
+create: protectedProcedure
+  .input(
+    z.object({
+      value: z.string(),
+      post_id: z.string(),
+    })
+  )
+  .mutation(async ({ input, ctx }) => {
+    const { value, post_id } = input;
 
-      return postComment;
-    }),
+    // Check if the associated post exists
+    const existingPost = await ctx.prisma.research_post.findUnique({
+      where: {
+        post_id,
+      },
+    });
+
+    // Throw an error if the post does not exist
+    if (!existingPost) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Associated post not found",
+      });
+    }
+
+    // Create a new comment for the associated post
+    const newComment = await ctx.prisma.post_comments.create({
+      data: {
+        value,
+        user_id: ctx.user.id,
+        post_id,
+      },
+    });
+
+    return newComment;
+  }),
 
   // Mutation to update an existing post comment
   update: protectedProcedure
@@ -92,38 +111,46 @@ export const postCommentRouter = router({
       return updatedComment;
     }),
 
-  // Mutation to delete an existing post comment
-  delete: protectedProcedure
-    .input(
-      z.object({
-        comment_id: z.string(),
-      })
-    )
-    .mutation(async ({ input, ctx }) => {
-      const { comment_id } = input;
+// Mutation to delete an existing post comment
+delete: protectedProcedure
+  .input(
+    z.object({
+      comment_id: z.string(),
+    })
+  )
+  .mutation(async ({ input, ctx }) => {
+    const { comment_id } = input;
 
-      // Check if the comment with the given ID exists
-      const existingComment = await ctx.prisma.post_comments.findUnique({
-        where: {
-          comment_id,
-        },
+    // Check if the comment with the given ID exists
+    const existingComment = await ctx.prisma.post_comments.findUnique({
+      where: {
+        comment_id,
+      },
+    });
+
+    // Throw an error if the comment does not exist
+    if (!existingComment) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Comment not found",
       });
+    }
 
-      // Throw an error if the comment does not exist
-      if (!existingComment) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Comment not found",
-        });
-      }
-
-      // Delete the comment with the given ID
-      await ctx.prisma.post_comments.delete({
-        where: {
-          comment_id,
-        },
+    // Check if the user is the owner of the comment
+    if (existingComment.user_id !== ctx.user.id) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "User is not authorized to delete this comment",
       });
+    }
 
-      return true;
-    }),
+    // Delete the comment with the given ID
+    await ctx.prisma.post_comments.delete({
+      where: {
+        comment_id,
+      },
+    });
+
+    return true;
+  }),
 });

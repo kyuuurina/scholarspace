@@ -1,6 +1,3 @@
-// //Comment section on a research post
-
-// Comment.tsx
 import React, { useState } from 'react';
 import { FiSend } from 'react-icons/fi';
 
