@@ -56,12 +56,12 @@ const Header: React.FC<HeaderProps> = ({
   };
 
   // function to handle submit on Enter key press
-  const handleInputKeyPress = (
+  const handleInputKeyPress = async (
     event: React.KeyboardEvent<HTMLInputElement>
   ) => {
     if (event.key === "Enter") {
       // Perform the submit logic here
-      createPhase.mutate(
+      await createPhase.mutateAsync(
         {
           project_id: id,
           name: newPhaseName,
