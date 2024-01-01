@@ -126,7 +126,7 @@ const ProfilePage: NextPageWithLayout = () => {
             {/* User Profile Card */}
             <section className="mt-2 w-3/4 mx-auto rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
               <div className="flex justify-between items-center">
-              {/* <div className="relative w-20 h-20">
+                {/* <div className="relative w-20 h-20">
                   <Image
                     src={`https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/avatar/${avatar_url}`}
                     alt="User Avatar"
@@ -135,7 +135,7 @@ const ProfilePage: NextPageWithLayout = () => {
                     className="rounded-full"
                   />
                 </div> */}
-              <h3 className="font-semibold text-2xl mb-4">{`${name ?? 'User'}'s Profile`}</h3>
+                <h3 className="font-semibold text-2xl mb-4">{`${name ?? 'User'}'s Profile`}</h3>
                 <div>
                   <button onClick={handleEditClick} className="flex items-center">
                     Edit <FaEdit className="ml-2" />
@@ -143,11 +143,23 @@ const ProfilePage: NextPageWithLayout = () => {
                   {/* Follow button */}
                   {/* <FollowButton userId={id as string} /> */}
                 </div>
-                <div>
-                  <Button name="Followers" onClick={() => setIsFollowersModalOpen(true)} />
-                </div>
-                <div>
-                  <Button name="Following" onClick={() => setIsFollowersModalOpen(true)} />
+                <div className="flex space-x-4">
+                  {/* <div className="mb-4">
+                    <p
+                      className="text-blue-500 cursor-pointer"
+                      onClick={() => setIsFollowersModalOpen(true)}
+                    >
+                      Followers
+                    </p>
+                  </div>
+                  <div className="mb-4">
+                    <p
+                      className="text-blue-500 cursor-pointer"
+                      onClick={() => setIsFollowingModalOpen(true)}
+                    >
+                      Following
+                    </p>
+                  </div> */}
                 </div>
               </div>
               <div>
@@ -161,7 +173,7 @@ const ProfilePage: NextPageWithLayout = () => {
                   {/* ... */}
                 </div>
                 <div>
-                <div className="mb-4">
+                  <div className="mb-4">
                     <p className="text-sm text-gray-600">
                       <CollabStatusBadge collabStatus={collab_status} />
                     </p>
@@ -178,13 +190,13 @@ const ProfilePage: NextPageWithLayout = () => {
                   </div>
                   <div className="mb-4">
                     <p className="text-base font-bold text-black mb-2">Research Interest:</p>
-                    {research_interest && <TagList tags={research_interest.split(',').map((tag) => tag.trim())} />}
+                    {research_interest && (
+                      <TagList tags={research_interest.split(',').map((tag) => tag.trim())} />
+                    )}
                   </div>
                 </div>
               </div>
-              <div>
-              {/* Following Modal */}
-              </div>
+              <div>{/* Following Modal */}</div>
             </section>
   
             <section className="mt-2 w-3/4 mx-auto rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
@@ -273,6 +285,7 @@ const ProfilePage: NextPageWithLayout = () => {
       </main>
     </>
   );
+  
 };
 
 ProfilePage.getLayout = function getLayout(page: ReactElement) {

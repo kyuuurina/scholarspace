@@ -82,6 +82,20 @@ type RecommendedProfile = {
   };
 
 
+  //to check whether the user is the owner of profile
+  export const UseCheckProfile = (userId: string) => {
+    const profileQuery = api.user.get.useQuery({ id: userId });
+  
+    const { data: user, isLoading, error } = profileQuery;
+  
+    return {
+      user,
+      isLoading,
+      error,
+    };
+  };
+
+
 //Step 2
 
 // import { api } from "./api";
