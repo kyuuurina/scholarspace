@@ -79,6 +79,25 @@ export const useFetchFollowingResearchPosts = (limit = 20, cursor?: string) => {
     };
 };
 
+export const useFetchSearchResults = (query: string) => {
+    const searchPostResults = api.researchpost.search.useQuery(
+      {
+        query,
+      },
+      {
+        enabled: !!query,
+      }
+    );
+  
+    const { data, isLoading, error } = searchPostResults;
+  
+    return {
+      searchPostResults: data || [],
+      isLoading,
+      error,
+    };
+  };
+
 
 //hook for fetching user's research posts
 // export const useFetchUserResearchPosts = (userId: string) => {

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/await-thenable */
-// Post.tsx - final FE (w/out comment section yet)
+// SearchPost.tsx - final FE (w/out comment section yet)
 import React, { useState, useRef } from 'react';
 import Image from 'next/image';
 import { FiHeart, FiMessageSquare } from 'react-icons/fi';
@@ -28,6 +28,8 @@ interface PostProps {
 
   };
 
+//   key: string;  //mapped
+
 }
 
 const getCategoryStyles = (category: string) => {
@@ -49,7 +51,7 @@ const getCategoryStyles = (category: string) => {
   }
 };
 
-const Post: React.FC<PostProps> = ({ post }) => {
+const SearchPost: React.FC<PostProps> = ({ post }) => {
   const categoryStyles = getCategoryStyles(post.category);
   const [liked, setLiked] = useState(false);
   const toggleLike = api.postlike.toggleLike.useMutation();
@@ -174,13 +176,5 @@ const Post: React.FC<PostProps> = ({ post }) => {
   );
 };
 
-export default Post;
+export default SearchPost;
 
-
-
-
-        {/* Uncomment the following section if you want to include Reshare */}
-        {/* <button className="flex items-center text-gray-500 hover:text-gray-700 focus:outline-none">
-          <FiRepeat size={20} className="inline-block mr-2" />
-          Reshare
-        </button> */}

@@ -222,4 +222,28 @@ export const researchpostRouter = router({
 
       return { success: true };
     }),
+
+    search: publicProcedure
+    .input(
+        z.object({
+            query: z.string(),
+        })
+    )
+    .query(async ({ input, ctx }) => {
+        const researchPosts = await ctx.prisma.research_post.findMany({
+            where: {
+                OR: [
+                    { title: { contains: input.query, mode: 'insensitive' } },
+                    { author: { contains: input.query, mode: 'insensitive' } },
+                    // { user: { profile: { name: { contains: input.query, mode: 'insensitive' } } } },
+                ],
+            },
+            orderBy: { created_at: 'desc' },
+        });
+        console.log("researchPostsearch:", researchPosts);
+        return researchPosts;
+
+    }),
+
+
 });

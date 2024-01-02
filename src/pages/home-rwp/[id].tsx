@@ -1,22 +1,28 @@
 // id.tsx
 import type { ReactElement } from "react";
+import React, { useState } from "react";
 import Head from "~/components/layout/Head";
 import { useUser } from "@supabase/auth-helpers-react";
 import { setCookie } from "cookies-next";
-
 import Layout from "~/components/layout/Layout";
 import type { NextPageWithLayout } from "~/pages/_app";
-
-import React from "react";
+import router, { useRouter } from "next/router";
 
 // research post components
 import AllFollowingTabs from "~/components/research-post/AllFollowingTabs";
+
+// profile components
 import ProfileRecommendation from "~/components/profile/ProfileRecommendation";
 import { useFetchRecommendedProfiles } from "~/utils/profile";
+
+// search components
+import SearchBar from "~/components/search/SearchBar";
+import SearchBaq from "~/components/search/SearchBaq";
 
 const Page: NextPageWithLayout = () => {
   const user = useUser();
   setCookie("UserID", user?.id);
+  const router = useRouter();
 
   console.log("User Display:", user);
 
@@ -28,6 +34,20 @@ const Page: NextPageWithLayout = () => {
 
   console.log("Recommended Profiles:", recommendedProfiles);
 
+  const [searchResults, setSearchResults] = useState<string[]>([]);
+  const handleSearch = (results: string[]) => {
+    setSearchResults(results);
+
+    // Redirect to the search results page
+    void (async () => {
+      // Redirect to the search results page
+      await router.push({
+        pathname: '/search',
+        query: { results: JSON.stringify(results) },
+      });
+    })();
+  };
+
   if (errorRecommendedProfiles) {
     return <div>Error fetching recommended profiles</div>;
   }
@@ -37,6 +57,8 @@ const Page: NextPageWithLayout = () => {
       <div className="grid grid-cols-12 gap-6 mx-auto">
         {/* All Following Tabs (2/3 width) */}
         <div className="col-span-9">
+          <SearchBar onSearch={handleSearch} />
+          <SearchBaq />
           <AllFollowingTabs />
         </div>
 
