@@ -210,13 +210,13 @@ export const researchpostRouter = router({
     )
     .mutation(async ({ input, ctx }) => {
       const { post_id, category, title, description, document } = input;
-
+      console.log("Help Me",post_id)
       const post = await ctx.prisma.research_post.findUnique({
         where: {
           post_id,
         },
       });
-
+      console.log('Amdwae',post)
       if (!post || post.user_id !== ctx.user.id) {
         throw new TRPCError({
           code: "UNAUTHORIZED",

@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
+
 // search/index.tsx
 import React, { useEffect, useState } from 'react';
 import SearchPost from '~/components/research-post/SearchPost';

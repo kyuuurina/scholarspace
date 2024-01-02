@@ -43,7 +43,7 @@ type ModalProps = {
   
     //populate form fields 
     const { myResearchPosts, isLoading, error } = useFetchMyResearchPosts();
-    const { post_id, category, title, author, description, document } = myResearchPosts[0] || {};
+    const { post_id, category, title, author, description, document } = myResearchPosts.filter((research)=>{return research.post_id == postIdToEdit})[0] || {};
 
     const [documentPlaceholder, setdocumentPlaceholder] = useState<string | null>(null);
     const [documentValue, setDocumentValue] = useState<File | null | undefined>(null);

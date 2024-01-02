@@ -26,7 +26,6 @@ const Test = () => {
     const user = useSession();
     const getData = async() => {
 
-        
         console.log('User',user?.user)
         await supabase.from('chat_message').select("*").then((data)=>{
             console.log(data)

@@ -98,8 +98,10 @@ const deleteMyPost = api.researchpost.delete.useMutation({
                 {/* Add left and right padding to the Post component */}
                 <div className="p-4 rounded-md">
                   <Post post={post} />
-                  <button onClick={() => handleDeleteMyPost(post.post_id)}>Delete</button>
-                  <button onClick={() => { setEditModalOpen(true); setCurrentPostId(post.post_id); }}>Edit</button>
+                  { true && <>
+                    <button onClick={() => handleDeleteMyPost(post.post_id)}>Delete</button>
+                    <button onClick={() => { setEditModalOpen(true); setCurrentPostId(post.post_id); }}>Edit</button>
+                  </>}
                 </div>
               </li>
             ))}
