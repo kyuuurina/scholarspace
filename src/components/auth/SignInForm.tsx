@@ -82,7 +82,7 @@ export const SignInForm: React.FC = () => {
             Password
           </label>
           <div className="text-sm">
-            <Link href="/auth/forgot">Forgot password?</Link>
+            <Link href="/auth/forgot-password">Forgot password?</Link>
           </div>
         </div>
         <div className="mt-1">

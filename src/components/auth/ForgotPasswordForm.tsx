@@ -1,41 +1,56 @@
-// ForgotPassword.tsx
+import { useState } from 'react';
+import { supabase } from '~/utils/supabase';
 
-import React, { useState } from 'react';
-//import { forgotPassword } from 'src/server/api/trpc'; // Import tRPC function
+const ForgotPasswordForm: React.FC = () => {
+  const [email, setEmail] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
-function ForgotPassword() {
-//   const [email, setEmail] = useState('');
-//   const [message, setMessage] = useState('');
+  const handleResetPassword = async () => {
+    try {
+      const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: 'http://localhost:3000/auth/reset-password',
+      });
+      if (error) {
+        setError(error.message);
+      } else {
+        setSuccess(true);
+        setError(null);
+      }
+    } catch (error) {
+      console.error('Error resetting password:', error as Error);
+      setError('Error resetting password. Please try again.');
+    }
+  };
 
-//   const handleForgotPassword = async () => {
-//     try {
-//       await forgotPassword.call({ email });
-//       setMessage('Password reset email sent. Please check your inbox.');
-//     } catch (error) {
-//       setMessage('An error occurred. Please try again later.');
-//     }
-//   };
+  return (
+    <div className="max-w-md mx-auto">
+      <h1 className="text-3xl font-semibold mb-4">Reset Password</h1>
+      <div className="mb-4">
+        <label htmlFor="email" className="block text-sm font-medium text-gray-600">
+          Email
+        </label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="mt-1 p-2 w-full border rounded-md"
+        />
+      </div>
+      {error && <p className="text-red-500">{error}</p>}
+      {success && <p className="text-green-500">Password reset instructions sent to your email.</p>}
+      <div className="mt-4">
+        <button
+          onClick={handleResetPassword}
+          className="bg-blue-500 text-white p-2 rounded-md"
+        >
+          Reset Password
+        </button>
+      </div>
+    </div>
+  );
+};
 
-//   return (
-//     <div className="max-w-md mx-auto">
-//       <h1 className="text-3xl font-semibold mb-4">Forgot Password</h1>
-//       <p className="mb-4">Enter your email address to reset your password.</p>
-//       <input
-//         type="email"
-//         placeholder="Email"
-//         className="w-full p-2 mb-2 border rounded"
-//         value={email}
-//         onChange={(e) => setEmail(e.target.value)}
-//       />
-//       <button
-//         onClick={handleForgotPassword}
-//         className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-//       >
-//         Reset Password
-//       </button>
-//       <p className="text-red-500 mt-2">{message}</p>
-//     </div>
-//   );
-// }
-}
-export default ForgotPassword;
+export default ForgotPasswordForm;
