@@ -1,26 +1,29 @@
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useFetchProject } from "~/utils/project";
+import { useRouterId } from "../../utils/routerId";
+import React, { useState, useRef } from "react";
 import { api } from "~/utils/api";
-import { FiLayout } from "react-icons/fi";
 import type { phase } from "@prisma/client";
+import { FiLayout } from "react-icons/fi";
+import { useClickAway } from "@uidotdev/usehooks";
+import PhaseActions from "./PhaseActions";
 
 type HeaderProps = {
   phases: phase[];
   onSelectPhase: (phaseId: string) => void;
   selectedPhase: string;
+  refetch: () => void;
 };
-
-import { useState, useRef } from "react";
 
 const Header: React.FC<HeaderProps> = ({
   phases,
   onSelectPhase,
   selectedPhase,
+  refetch,
 }) => {
   const router = useRouter();
-  const id = router.query && router.query.id ? router.query.id.toString() : "";
+  const id = useRouterId();
   const { name } = useFetchProject();
 
   // states for isAdding button
@@ -29,11 +32,21 @@ const Header: React.FC<HeaderProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const [isPhaseActionOpen, setIsPhaseActionOpen] = useState(false);
+  const handleContextMenu = (event: React.MouseEvent<HTMLLIElement>) => {
+    event.preventDefault();
+    setIsPhaseActionOpen(!isPhaseActionOpen);
+  };
+
+  const ref = useClickAway(() => {
+    // setIsPhaseActionOpen(false);
+  });
+
   // create phase
   const createPhase = api.phase.create.useMutation();
 
-  // function to create phase with default name phase1
-  const handleCreatePhase = () => {
+  // function to trigger create phase button
+  const onClickCreatePhase = () => {
     if (isAdding) return;
 
     setIsAdding(true);
@@ -102,7 +115,7 @@ const Header: React.FC<HeaderProps> = ({
               type="text"
               value={newPhaseName}
               onChange={handlePhaseNameChange}
-              onKeyPress={handleInputKeyPress}
+              onKeyDown={handleInputKeyPress}
               onBlur={() => setIsEditing(false)}
               ref={inputRef}
               className="mr-2 rounded-md border border-gray-300 p-1"
@@ -110,7 +123,7 @@ const Header: React.FC<HeaderProps> = ({
           ) : (
             <button
               className="rounded-md border border-gray-300 bg-gray-200 p-1 hover:bg-gray-400"
-              onClick={() => handleCreatePhase()}
+              onClick={() => onClickCreatePhase()}
             >
               <div className="flex items-center">
                 <FiLayout />
@@ -124,15 +137,25 @@ const Header: React.FC<HeaderProps> = ({
       <div>
         <ul className="hidden text-center text-sm text-gray-800 sm:flex">
           {phases?.map((phase) => (
-            <li
-              key={phase.id}
-              className={`rounded-t-md border ${
-                selectedPhase === phase.id ? "bg-gray-300" : "bg-gray-100"
-              } p-2 px-3 py-1 hover:cursor-pointer hover:bg-gray-50 hover:text-gray-700`}
-              onClick={() => onSelectPhase(phase.id)}
-            >
-              {phase.name}
-            </li>
+            <React.Fragment key={phase.id}>
+              <li
+                ref={ref as React.MutableRefObject<HTMLLIElement>}
+                onContextMenu={handleContextMenu}
+                className={`rounded-t-md border ${
+                  selectedPhase === phase.id ? "bg-gray-300" : "bg-gray-100"
+                } p-2 px-3 py-1 hover:cursor-pointer hover:bg-gray-50 hover:text-gray-700`}
+                onClick={() => onSelectPhase(phase.id)}
+              >
+                {phase.name}
+              </li>
+              {isPhaseActionOpen && (
+                <PhaseActions
+                  phase_id={phase.id}
+                  setIsCellActionOpen={setIsPhaseActionOpen}
+                  refetch={refetch}
+                />
+              )}
+            </React.Fragment>
           ))}
         </ul>
       </div>

@@ -1,32 +1,34 @@
 import { api } from "~/utils/api";
-import { useFetchTasksWithProperties } from "~/utils/task";
+import { useRouter } from "next/router";
 
 type CellProps = {
-  property_id: string;
+  phase_id: string;
   setIsCellActionOpen: (isCellActionOpen: boolean) => void;
+  refetch: () => void;
 };
 
-const CellActions: React.FC<CellProps> = ({
-  property_id,
+const PhaseActions: React.FC<CellProps> = ({
+  phase_id,
   setIsCellActionOpen,
+  refetch,
 }) => {
-  const deleteProperty = api.phase.deleteProperty.useMutation();
-
-  const propertyQuery = api.phase.getProperty.useQuery({
-    id: property_id,
-  });
-
-  const { refetch } = useFetchTasksWithProperties(
-    propertyQuery.data?.phase_id ?? ""
-  );
+  const deletePhase = api.phase.deletePhase.useMutation();
+  const router = useRouter();
   const handleRename = () => {
     console.log("rename");
   };
   const handleDelete = async () => {
-    await deleteProperty.mutateAsync({ id: property_id });
-    await refetch();
-    setIsCellActionOpen(false);
+    await deletePhase.mutateAsync(
+      { id: phase_id },
+      {
+        onSuccess: () => {
+          router.reload();
+          setIsCellActionOpen(false);
+        },
+      }
+    );
   };
+
   const handleEditType = () => {
     console.log("edit type");
   };
@@ -60,4 +62,4 @@ const CellActions: React.FC<CellProps> = ({
   );
 };
 
-export default CellActions;
+export default PhaseActions;

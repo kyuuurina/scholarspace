@@ -32,6 +32,7 @@ const Phase: NextPageWithLayout = () => {
     data: phases,
     isLoading: phasesIsLoading,
     error: phasesError,
+    refetch: refetchPhases,
   } = api.phase.list.useQuery({ project_id: id }, { enabled: !!id });
 
   // state to store the selected phase
@@ -59,6 +60,10 @@ const Phase: NextPageWithLayout = () => {
     }
   }, [phases, selectedPhase]);
 
+  const updateChanges = async () => {
+    await refetchPhases();
+  };
+
   return (
     <>
       <Head title={name} />
@@ -69,6 +74,7 @@ const Phase: NextPageWithLayout = () => {
             phases={safePhases}
             onSelectPhase={handleSelectPhase}
             selectedPhase={selectedPhase}
+            refetch={updateChanges}
           />
           {/* selected phase section */}
           <section className="p-2">

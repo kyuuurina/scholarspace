@@ -4,9 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 // utils
 import { api } from "~/utils/api";
-import {
-  useFetchTasksWithProperties,
-} from "~/utils/task";
+import { useFetchTasksWithProperties } from "~/utils/task";
 
 // local components
 import EditableCell from "./EditableCell";
@@ -87,26 +85,6 @@ const Table: React.FC<TableProps> = ({ phase_id }) => {
 
   return (
     <div>
-      {/* <AnimatePresence>
-        {isDrawerOpen && (
-          <motion.div
-            key="drawer"
-            initial="closed"
-            animate="open"
-            exit="closed"
-            variants={variants}
-            className="fixed inset-0 overflow-hidden"
-            style={{ zIndex: 50, transition: "transform 0.13s linear" }}
-          >
-            <TaskDrawer
-              task={selectedTask}
-              properties={propertiesQuery?.data}
-              onClose={() => setIsDrawerOpen(false)}
-              refetch={refetch}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence> */}
       <table className="w-full border border-gray-200 text-left text-sm text-gray-700">
         <thead className="bg-gray-50 text-xs uppercase text-gray-700">
           <tr className="whitespace-nowrap border border-gray-300 px-6 py-4">
@@ -177,7 +155,7 @@ const Table: React.FC<TableProps> = ({ phase_id }) => {
                       className="text-sm font-medium text-gray-900 hover:cursor-pointer hover:text-purple-900"
                       onClick={() => task && handleTaskClick(task.id)}
                     >
-                      {task?.name ?? ''}
+                      {task?.name ?? ""}
                       <AnimatePresence>
                         {task && taskDrawerOpen[task.id] && (
                           <motion.div
@@ -206,7 +184,7 @@ const Table: React.FC<TableProps> = ({ phase_id }) => {
                 </div>
               </td>
               <td className="whitespace-nowrap border border-gray-300 px-6 py-2">
-                {task?.created_at?.toLocaleString() ?? ''}
+                {task?.created_at?.toLocaleString() ?? ""}
               </td>
               <td className="whitespace-nowrap border border-gray-300 px-6 py-2">
                 <StatusBadge task={task} />
