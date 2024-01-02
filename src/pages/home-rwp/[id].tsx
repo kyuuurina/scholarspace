@@ -7,9 +7,12 @@ import { setCookie } from "cookies-next";
 import Layout from "~/components/layout/Layout";
 import type { NextPageWithLayout } from "~/pages/_app";
 import router, { useRouter } from "next/router";
+import { api } from "~/utils/api";
+import { useRouterId } from "~/utils/routerId";
 
 // research post components
 import AllFollowingTabs from "~/components/research-post/AllFollowingTabs";
+import Tabs from "~/components/research-post/Tab";
 
 // profile components
 import ProfileRecommendation from "~/components/profile/ProfileRecommendation";
@@ -23,6 +26,13 @@ const Page: NextPageWithLayout = () => {
   const user = useUser();
   setCookie("UserID", user?.id);
   const router = useRouter();
+
+  const userId= useRouterId();
+
+  //get user
+  const User = api.user.get.useQuery({
+    id: userId,
+  })
 
   console.log("User Display:", user);
 

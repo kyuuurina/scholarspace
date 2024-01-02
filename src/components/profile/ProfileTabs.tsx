@@ -31,7 +31,7 @@ const ProfileTabs: React.FC = () => {
                 id="dashboard-tab"
                 role="tab"
                 aria-controls="dashboard"
-                aria-selected={router.asPath === `/manage-profile`}
+                aria-selected={router.asPath === `/manage-profile/${profile_id}`}
               >
                 My Profile
               </span>

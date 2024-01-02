@@ -352,6 +352,7 @@ model profile {
   profile_achievement profile_achievement[]
   profile_education   profile_education[]
   profile_experience  profile_experience[]
+  research_post       research_post[]
 
   @@schema("public")
 }
@@ -397,8 +398,10 @@ model research_post {
   category      String
   user_id       String          @db.Uuid
   summary       String?
+  profile_id    String?         @db.Uuid
   post_comments post_comments[]
   likes         post_likes[]
+  profile       profile?        @relation(fields: [profile_id], references: [profile_id], onDelete: Cascade)
   user          user            @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@schema("public")
