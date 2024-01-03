@@ -274,19 +274,34 @@ export const researchpostRouter = router({
         })
     )
     .query(async ({ input, ctx }) => {
-        const researchPosts = await ctx.prisma.research_post.findMany({
-            where: {
-                OR: [
-                    { title: { contains: input.query, mode: 'insensitive' } },
-                    { author: { contains: input.query, mode: 'insensitive' } },
-                    // { user: { profile: { name: { contains: input.query, mode: 'insensitive' } } } },
-                ],
+      const researchPosts = await ctx.prisma.research_post.findMany({
+        where: {
+          OR: [
+            { title: { contains: input.query, mode: 'insensitive' } },
+            { author: { contains: input.query, mode: 'insensitive' } },
+            {
+              user: {
+                profile: {
+                  some: {
+                    name: { contains: input.query, mode: 'insensitive' },
+                  },
+                },
+              },
             },
-            orderBy: { created_at: 'desc' },
-        });
-        console.log("researchPostsearch:", researchPosts);
-        return researchPosts;
-
+          ],
+        },
+        orderBy: { created_at: 'desc' },
+        include: {
+          user: {
+            include: {
+              profile: true, // Include the profile information in the result
+            },
+          },
+        },
+      });
+    
+      console.log("researchPostsearch:", researchPosts);
+      return researchPosts;
     }),
 
 //get post recommendations
