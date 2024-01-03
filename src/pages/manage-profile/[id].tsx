@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+
 // to-do: add PageLoader
 // this file contains dummy data for Education, Research Experience, and Achievement
 
