@@ -15,7 +15,7 @@ const SearchBaq: React.FC = () => {
     <div className="flex items-center">
       <input
         type="text"
-        placeholder="Search for an author or research scope..."
+        placeholder="Search for a profile or research post..."
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
         className="border p-2 mr-2 rounded-l-lg focus:border-purple-200" // Rounded left corners for the input

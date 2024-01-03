@@ -279,6 +279,7 @@ export const researchpostRouter = router({
           OR: [
             { title: { contains: input.query, mode: 'insensitive' } },
             { author: { contains: input.query, mode: 'insensitive' } },
+            { category: { contains: input.query, mode: 'insensitive' } },
             {
               user: {
                 profile: {
