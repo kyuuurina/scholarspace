@@ -69,7 +69,7 @@ import FollowingList from '~/components/network/FollowingList';
 const ProfilePage: NextPageWithLayout = () => {
 
   const router = useRouter();
-  // const { id }  = router.query; // query id
+  const { id }  = router.query; // query id
 
   const profileId = useRouterId();
 
@@ -78,10 +78,11 @@ const ProfilePage: NextPageWithLayout = () => {
     profile_id: profileId, // pass the id to router.query
   });
 
+  //check id is owner
   const userId = getCookie("UserID") as string;
   const { user } = UseCheckProfile(userId);
-
-  const isOwner = user && user.id === Profile.data?.user_id;
+  const isOwner = user && user.id === Profile.data?.user_id; // check if the logged in user matches Profile user
+  const isNotOwner = !user || (user && user.id !== Profile.data?.user_id);    //not owner
 
 
   const { avatar_url, name, about_me, skills, research_interest, collab_status, isLoading, user_id } = useFetchProfile();
@@ -103,20 +104,12 @@ const ProfilePage: NextPageWithLayout = () => {
   //   userId: profileId, // pass the user's id
   // });
 
-  // Fetch Followers and Following data
-  const { followers, isLoading: isLoadingFollowers } = useFetchFollowers();
-  const { following, isLoading: isLoadingFollowing } = useFetchFollowing();
 
   // const modal states
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isEducationModalOpen, setIsEducationModalOpen] = useState(false);
   const [isExperienceModalOpen, setIsExperienceModalOpen] = useState(false);
   const [isAchievementModalOpen, setIsAchievementModalOpen] = useState(false);
-
-  // state for Followers and Following modals
-  const [isFollowersModalOpen, setIsFollowersModalOpen] = useState(false);
-  const [isFollowingModalOpen, setIsFollowingModalOpen] = useState(false);
-  
 
 
   // Add this console.log to check the profile data
@@ -152,13 +145,19 @@ const ProfilePage: NextPageWithLayout = () => {
                     Edit <FaEdit className="ml-2" />
                   </button>
                 )}
-                  {/* Follow button */}
-                  {/* <FollowButton userId={id as string} /> */}
+                </div>
+
+                <div>
+              {/* Follow Button */}
+                  { (isNotOwner&&
+                    <FollowButton userId={id as string} />
+                  )}
                 </div>
                 <div className="flex space-x-4">
                   {/*  */}
                 </div>
               </div>
+
               <div>
                 {isEditModalOpen && (
                   <UserProfileForm
