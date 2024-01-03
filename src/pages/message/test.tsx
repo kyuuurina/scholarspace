@@ -1,5 +1,5 @@
-"use client"
 import { useSession, useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
+import { getCookie } from "cookies-next";
 import { useEffect, useState } from "react";
 import Layout from "~/components/layout/Layout";
 
@@ -8,16 +8,20 @@ const Test = () => {
 
     const user1 = '65d058bb-bfad-4c2d-9737-dcb5ef2c2824'
     const user2 = '6d669922-389d-4cb5-92b8-165bd648223f'
-    const [currentUserID,setCurrentUserID] = useState('')
+    const userID = getCookie("UserID");
+    const session = useSession();
+    const [currentUserID,setCurrentUserID] = useState(session?.user.id)
     const [newMessage, setNewMessage] = useState({
         content : '',
-        sender_id : user1,
+        sender_id : userID,
         recipient_id : user2,
     });
     const clientID = 1;
     const [messages, setMessages] = useState<any[]>([]);
 
-    const handleSend = async () => {
+    const handleSend = async (e) => {
+        e.preventDefault()
+        console.log(messages)
         const {data, error} =await supabase.from('chat_message').insert(newMessage)
         console.log(error)
         // setMessages([...messages, newMessage])
@@ -29,10 +33,9 @@ const Test = () => {
         console.log('User',user?.user)
         await supabase.from('chat_message').select("*").then((data)=>{
             console.log(data)
-            setMessages([...data.data])
+            setMessages(data.data)
         })
     }
-    const session = useSession();
     useEffect(() => {
         getData();
         
@@ -53,14 +56,14 @@ const Test = () => {
         return () => {
             supabase.removeChannel(channel);
         }
-    },[]
+    },[session]
     )
 
     return (
         <Layout>
-            {currentUserID}
+            {/* {userID} */}
             {messages.map((message) => {
-                return <div key={message.id} style={{backgroundColor:message.sender_id == currentUserID ? "green":'blue', color:'white'}}>{message.content}</div>
+                return <div key={message.id} style={{backgroundColor:message.sender_id == userID ? "green":'blue', color:'white'}}>{message.content}</div>
             })}
             <input onChange={(e)=>{newMessage.content = e.target.value; setNewMessage(newMessage)}}></input>
             <button onClick={handleSend}>Send</button>
