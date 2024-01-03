@@ -32,8 +32,6 @@ import Modal from "~/components/modal/Modal";
 //research post components
 import AllFollowingTabs from "~/components/research-post/AllFollowingTabs";
 import Post from "~/components/research-post/Post";
-import PostCard from "~/components/research-post/PostCard";
-import { ResearchPostCard } from "~/components/draft/ResearchPostCard";
 import UserProfileCard from "~/components/research-post/UserRecCards";
 import AddNewPostButton from "~/components/research-post/AddNewPostButton";
 import TestModal from "~/components/research-post/AddNewPostModal";
@@ -41,6 +39,9 @@ import TestModal from "~/components/research-post/AddNewPostModal";
 //profile recommendation
 import { useFetchRecommendedProfiles } from "~/utils/profile";
 import ProfileRecommendation from "~/components/profile/ProfileRecommendation";
+
+//search
+import SearchBaq from "~/components/search/SearchBaq";
 
 
 const FollowingPostPage: NextPageWithLayout = () => {
@@ -83,6 +84,8 @@ const FollowingPostPage: NextPageWithLayout = () => {
       <div className="grid grid-cols-12 gap-6 mx-auto">
         {/* All Following Tabs (3/4 width) */}
         <div className="col-span-9">
+        <SearchBaq />
+          <div className="mb-4"></div>
           <AllFollowingTabs />
           <div className="mt-6">
             {FollowingPostLists.isLoading ? (

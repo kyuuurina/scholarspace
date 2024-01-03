@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 // search.tsx
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';

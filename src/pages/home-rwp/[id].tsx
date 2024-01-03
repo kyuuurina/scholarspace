@@ -19,7 +19,7 @@ import ProfileRecommendation from "~/components/profile/ProfileRecommendation";
 import { useFetchRecommendedProfiles } from "~/utils/profile";
 
 // search components
-import SearchBar from "~/components/search/SearchBar";
+// import SearchBar from "~/components/search/SearchBar";
 import SearchBaq from "~/components/search/SearchBaq";
 
 const Page: NextPageWithLayout = () => {
@@ -67,8 +67,8 @@ const Page: NextPageWithLayout = () => {
       <div className="grid grid-cols-12 gap-6 mx-auto">
         {/* All Following Tabs (2/3 width) */}
         <div className="col-span-9">
-          <SearchBar onSearch={handleSearch} />
           <SearchBaq />
+          <div className="mb-4"></div>
           <AllFollowingTabs />
         </div>
 
