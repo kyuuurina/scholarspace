@@ -3,6 +3,7 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { router, protectedProcedure, publicProcedure } from "~/server/api/trpc";
+import { Prisma } from "@prisma/client";
 
 export const likeRouter = router({
   get: publicProcedure
@@ -34,18 +35,19 @@ export const likeRouter = router({
   }),
 
   //like and unlike post
-  toggleLike: protectedProcedure
-  .input(z.object({post_id: z.string()}))
-  .mutation(async ({input, ctx}) => {
-    const {user} = ctx;
+//like and unlike post
+toggleLike: protectedProcedure
+  .input(z.object({ post_id: z.string() }))
+  .mutation(async ({ input, ctx }) => {
+    const { user } = ctx;
 
     const existingLike = await ctx.prisma.post_likes.findUnique({
       where: {
         post_id_user_id: {
-          post_id: input.post_id,
-          user_id: user.id,
-        },
+        post_id: input.post_id,
+        user_id: user.id,
       },
+     },
     });
 
     if (existingLike) {
@@ -55,15 +57,22 @@ export const likeRouter = router({
         },
       });
 
-      //Fetch updated like count after deletion
+      // Fetch updated like count after deletion
       const likeCount = await ctx.prisma.post_likes.count({
         where: {
           post_id: input.post_id,
         },
       });
 
-      // return {addedLike: false, likeCount};
-      return {addedLike: !existingLike, likeCount};
+      // Check if the user has liked the post after deletion
+      const hasLiked = await ctx.prisma.post_likes.findFirst({
+        where: {
+          post_id: input.post_id,
+          user_id: user.id,
+        },
+      });
+
+      return { addedLike: !existingLike, likeCount, hasLiked: !!hasLiked };
     } else {
       await ctx.prisma.post_likes.create({
         data: {
@@ -73,13 +82,15 @@ export const likeRouter = router({
         },
       });
 
-      //Fetch updated like count after creation
+      // Fetch updated like count after creation
       const likeCount = await ctx.prisma.post_likes.count({
         where: {
           post_id: input.post_id,
         },
       });
-      return {addedLike: true, likeCount};
+
+      return { addedLike: true, likeCount, hasLiked: true };
     }
   }),
+
 });
