@@ -14,9 +14,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { FaPlus } from 'react-icons/fa';
 
+// Auth
+import { getCookie } from "cookies-next";
+
 // utils
 import { useRouterId } from "~/utils/routerId";
-import { useFetchProfile } from "~/utils/profile";
+import { useFetchProfile, UseCheckProfile } from "~/utils/profile";
 import { useFetchEducation } from '~/utils/education';
 import { useFetchExperience } from '~/utils/experience';
 import { useFetchAchievement } from '~/utils/achievement';
@@ -66,7 +69,7 @@ import FollowingList from '~/components/network/FollowingList';
 const ProfilePage: NextPageWithLayout = () => {
 
   const router = useRouter();
-  const { id }  = router.query; // query id
+  // const { id }  = router.query; // query id
 
   const profileId = useRouterId();
 
@@ -74,6 +77,12 @@ const ProfilePage: NextPageWithLayout = () => {
   const Profile = api.profile.get.useQuery({
     profile_id: profileId, // pass the id to router.query
   });
+
+  const userId = getCookie("UserID") as string;
+  const { user } = UseCheckProfile(userId);
+
+  const isOwner = user && user.id === Profile.data?.user_id;
+
 
   const { avatar_url, name, about_me, skills, research_interest, collab_status, isLoading, user_id } = useFetchProfile();
   // const { educations: educationsData, isLoading: isLoadingEducations } = useFetchEducation();
@@ -138,9 +147,11 @@ const ProfilePage: NextPageWithLayout = () => {
                 </div> */}
                 <h3 className="font-semibold text-2xl mb-4">{`${name ?? 'User'}'s Profile`}</h3>
                 <div>
+                {isOwner && (
                   <button onClick={handleEditClick} className="flex items-center">
                     Edit <FaEdit className="ml-2" />
                   </button>
+                )}
                   {/* Follow button */}
                   {/* <FollowButton userId={id as string} /> */}
                 </div>
@@ -196,12 +207,14 @@ const ProfilePage: NextPageWithLayout = () => {
             <section className="mt-2 w-3/4 mx-auto rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
               <h3 className="font-semibold text-2xl mb-4">
                 Education
+                {isOwner && (
                 <button
                   className="ml-2 text-blue-500 cursor-pointer"
                   onClick={() => setIsEducationModalOpen(true)}
                 >
                   <FaPlus />
                 </button>
+                )}
               </h3>
               {educations ? (
                 educations.map((education) => (
@@ -224,12 +237,14 @@ const ProfilePage: NextPageWithLayout = () => {
               <section className="mt-2 w-3/4 mx-auto rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
                 <h3 className="font-semibold text-2xl mb-4">
                   Research Experience
+                  {isOwner && (
                   <button
                     className="ml-2 text-blue-500 cursor-pointer"
                     onClick={() => setIsExperienceModalOpen(true)}
                   >
                     <FaPlus />
                   </button>
+                  )}
                 </h3>
                 {experiences ? (
                   experiences.map((experience) => (
@@ -251,12 +266,14 @@ const ProfilePage: NextPageWithLayout = () => {
                 <section className="mt-2 w-3/4 mx-auto rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
                   <h3 className="font-semibold text-2xl mb-4">
                     Achievement
+                    {isOwner && (
                     <button
                       className="ml-2 text-blue-500 cursor-pointer"
                       onClick={() => setIsAchievementModalOpen(true)}
                     >
                       <FaPlus />
                     </button>
+                    )}
                   </h3>
                   {achievements ? (
                     achievements.map((achievement) => (

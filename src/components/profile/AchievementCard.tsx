@@ -8,12 +8,19 @@ import toast from "react-hot-toast";
 import Router from "next/router";
 import ConfirmationDialog from "../ConfirmationDialog";
 
+// Auth
+import { getCookie } from "cookies-next";
+
+// Utils
+import { UseCheckProfile } from "~/utils/profile";
+
 type AchievementCardProps = {
   achievement: {
     achievement_id: string;
     title: string;
     received_year: string;
     description: string | null;
+    user_id: string;
   };
   isLastItem?: boolean;
 };
@@ -21,6 +28,11 @@ type AchievementCardProps = {
 const AchievementCard: React.FC<AchievementCardProps> = ({ achievement, isLastItem = false }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false); // New state for confirmation dialog
+
+  const userId = getCookie("UserID") as string;
+  const { user } = UseCheckProfile(userId);
+
+  const isOwner = user && user.id === achievement.user_id;
 
   const handleEditClick = () => {
     setIsEditModalOpen(true);
@@ -77,14 +89,18 @@ const AchievementCard: React.FC<AchievementCardProps> = ({ achievement, isLastIt
           {/* Action buttons */}
           <div className="flex items-center space-x-4">
             {/* Edit button */}
+            {isOwner && (
             <button onClick={handleEditClick} className="text-blue-500 hover:underline">
               Edit <FaEdit className="inline ml-1" />
             </button>
+            )}
 
             {/* Delete button */}
+            {isOwner && (
             <button onClick={() => handleDeleteAchievement(achievement.achievement_id)} className="text-red-500 hover:underline">
               Delete <FaTrash className="inline ml-1" />
             </button>
+            )}
           </div>
         </div>
       ) : (
