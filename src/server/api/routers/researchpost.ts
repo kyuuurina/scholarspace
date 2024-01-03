@@ -7,31 +7,6 @@ import { TRPCError } from "@trpc/server";
 import { router, protectedProcedure, publicProcedure } from "~/server/api/trpc";
 import { Prisma, PrismaClient } from "@prisma/client";
 
-type UserRelationFilter = {
-  profile: {
-    research_interest: {
-      contains: string;
-    };
-  };
-};
-
-type ResearchPostCondition = {
-  user: {
-    profile: {
-      research_interest: {
-        contains: string;
-      };
-    };
-  };
-};
-
-// Update this type definition based on your Prisma client setup
-type ProfileListRelationFilter = {
-  research_interest: {
-    contains: string;
-  };
-};
-
 
 // Helper function to fetch infinite research posts
 async function getInfiniteResearchPosts({
@@ -155,8 +130,6 @@ export const researchpostRouter = router({
       });
     }),
 
-  
-  
 
   // Helper function to fetch infinite research posts
   create: protectedProcedure
