@@ -58,6 +58,8 @@ import AchievementCard from "~/components/profile/AchievementCard";
 import FollowButton from '~/components/network/FollowButton';
 import Button from '~/components/button/Button';
 import FollowListModal from '~/components/network/FollowListModal';
+import FollowersList from '~/components/network/FollowerList';
+import FollowingList from '~/components/network/FollowingList';
 
 
 
@@ -143,22 +145,7 @@ const ProfilePage: NextPageWithLayout = () => {
                   {/* <FollowButton userId={id as string} /> */}
                 </div>
                 <div className="flex space-x-4">
-                  {/* <div className="mb-4">
-                    <p
-                      className="text-blue-500 cursor-pointer"
-                      onClick={() => setIsFollowersModalOpen(true)}
-                    >
-                      Followers
-                    </p>
-                  </div>
-                  <div className="mb-4">
-                    <p
-                      className="text-blue-500 cursor-pointer"
-                      onClick={() => setIsFollowingModalOpen(true)}
-                    >
-                      Following
-                    </p>
-                  </div> */}
+                  {/*  */}
                 </div>
               </div>
               <div>
@@ -172,7 +159,15 @@ const ProfilePage: NextPageWithLayout = () => {
                   {/* ... */}
                 </div>
                 <div>
-                  <div className="mb-4">
+                  <div className="flex space-x-4">
+                    <div className="mb-4">
+                      <FollowersList />
+                    </div>
+                    <div className="mb-4">
+                      <FollowingList />
+                    </div>
+                  </div>
+                  <div className="mt-4 mb-4">
                     <p className="text-sm text-gray-600">
                       <CollabStatusBadge collabStatus={collab_status} />
                     </p>
