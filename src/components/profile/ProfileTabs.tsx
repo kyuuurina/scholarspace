@@ -33,7 +33,7 @@ const ProfileTabs: React.FC = () => {
                 aria-controls="dashboard"
                 aria-selected={router.asPath === `/manage-profile/${profile_id}`}
               >
-                My Profile
+                Profile
               </span>
             </Link>
           </li>
@@ -53,7 +53,7 @@ const ProfileTabs: React.FC = () => {
                   router.asPath === `/manage-profile/${profile_id}/mypost`
                 }
               >
-                My Post
+                Post
               </span>
             </Link>
           </li>

@@ -10,6 +10,7 @@ import router, { useRouter } from 'next/router';
 
 //utils
 import { useRouterId } from '~/utils/routerId';
+import { useFetchProfile } from '~/utils/profile';
 
 // types
 import type { ReactElement } from 'react';
@@ -39,6 +40,8 @@ const MyPost: NextPageWithLayout = () => {
   console.log("Front call",profile_id)
   const myPostLists = useFetchMyResearchPosts(profile_id);
   const router = useRouter();
+
+  const { name, isLoading } = useFetchProfile();  //To print in head
   
 
   console.log("MyPost.tsx page router:", router)
@@ -48,34 +51,11 @@ const MyPost: NextPageWithLayout = () => {
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false); 
 
 
-//handleDelete
-const deleteMyPost = api.researchpost.delete.useMutation({
-  onSuccess: () => {
-    toast.custom(() => <SuccessToast message="Post successfully deleted" />);
-  },
-});
-
-  const handleDeleteMyPost = (post_id: string) => {
-    deleteMyPost
-      .mutateAsync({
-        post_id: post_id,
-      })
-      .then(() => {
-        router.reload();
-      })
-      .catch((error) => {
-        console.error("Failed to delete post:", error);
-
-        toast.custom(() => <ErrorToast message="Failed to delete post" />);
-      });
-  };
-
-
 
   return (
     <>
       <Head>
-        <title>Your Posts</title>
+        <title>{`${name ?? 'User'}'s Posts`}</title>
       </Head>
       <ProfileTabs />
   
@@ -101,7 +81,6 @@ const deleteMyPost = api.researchpost.delete.useMutation({
                 <div className="p-4 rounded-md">
                   <Post post={post} />
                   { true && <>
-                    <button onClick={() => handleDeleteMyPost(post.post_id)}>Delete</button>
                     <button onClick={() => { setEditModalOpen(true); setCurrentPostId(post.post_id); }}>Edit</button>
                   </>}
                 </div>
@@ -125,13 +104,12 @@ const deleteMyPost = api.researchpost.delete.useMutation({
         <EditPostForm
           openModal={editModalOpen}
           onClick={() => setEditModalOpen(false)}
-          postIdToEdit={currentPostId || ''} 
+          postIdToEdit={currentPostId || ''}
         />
       )}
       </div>
     </>
   );
-  
 };
 
 

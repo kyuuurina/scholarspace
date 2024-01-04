@@ -42,7 +42,7 @@ type ModalProps = {
     const userId = getCookie("UserID");
   
     //populate form fields 
-    const { myResearchPosts, isLoading, error } = useFetchMyResearchPosts();
+    const { myResearchPosts, isLoading, error } = useFetchMyResearchPosts(profile_id);
     const { post_id, category, title, author, description, document } = myResearchPosts.filter((research)=>{return research.post_id == postIdToEdit})[0] || {};
 
     const [documentPlaceholder, setdocumentPlaceholder] = useState<string | null>(null);

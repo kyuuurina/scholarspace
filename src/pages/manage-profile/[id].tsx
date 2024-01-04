@@ -121,6 +121,9 @@ const ProfilePage: NextPageWithLayout = () => {
 
   return (
     <>
+      <Head>
+        <title>{`${name ?? 'User'}'s Profile`}</title>
+      </Head>
       <ProfileTabs />
   
       <main className="min-h-screen w-full">

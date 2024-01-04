@@ -9,6 +9,19 @@ import Comment from './Comment'; // Import the Comment component
 import PostComment from './PostComment';
 import CommentsList from './CommentList';
 
+import router, { useRouter } from 'next/router';
+
+//local
+import SuccessToast from '../toast/SuccessToast';
+import ErrorToast from '../toast/ErrorToast';
+import toast from 'react-hot-toast';
+
+// Auth
+import { getCookie } from "cookies-next";
+
+// Utils
+import { UseCheckProfile } from "~/utils/profile";
+
 
 //data fetching
 import { api } from '~/utils/api';
@@ -18,6 +31,7 @@ interface PostProps {
   post: {
     post_id: string;  //just added
     user_id: string;
+    // profile_id: string;
     category: string;
     title: string;
     document: string | null;
@@ -50,24 +64,54 @@ const getCategoryStyles = (category: string) => {
 };
 
 const Post: React.FC<PostProps> = ({ post }) => {
-  const categoryStyles = getCategoryStyles(post.category);
-  const [liked, setLiked] = useState(false);
-  const toggleLike = api.postlike.toggleLike.useMutation();
+
+
+  //get user id and check profile
+  const userId = getCookie("UserID") as string;
+  const { user } = UseCheckProfile(userId);
+
+  const isOwner = user && user.id === post.user_id;
 
   // Fetch user data
   const { users, isLoading, error } = useFetchUsers();
+  const associatedUser = users.find((user) => user.userId === post.user_id);   //find user associated with post
+  const userName = associatedUser?.userName || 'DefaultName';         // Get the user name from the associated user or use a default value
 
-  // Find the user associated with the post
-  const associatedUser = users.find((user) => user.userId === post.user_id);
+  //Delete post
+  const deleteMyPost = api.researchpost.delete.useMutation({
+    onSuccess: () => {
+      toast.custom(() => <SuccessToast message="Post successfully deleted" />);
+    },
+  });
 
-  // Get the user name from the associated user or use a default value
-  const userName = associatedUser?.userName || 'DefaultName';
+  const handleDeleteMyPost = (post_id: string) => {
+      deleteMyPost
+        .mutateAsync({
+          post_id: post_id,
+        })
+        .then(() => {
+          router.reload();
+        })
+        .catch((error) => {
+          console.error("Failed to delete post:", error);
 
+          toast.custom(() => <ErrorToast message="Failed to delete post" />);
+        });
+  };
+
+
+  //Edit Post
+
+
+  //Document Storage
   const fileUrl = post.document
-    ? `https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/post-files-upload/${post.document}`
-    : null;
+  ? `https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/post-files-upload/${post.document}`
+  : null;
 
-
+  //Like
+  const categoryStyles = getCategoryStyles(post.category);
+  const [liked, setLiked] = useState(false);
+  const toggleLike = api.postlike.toggleLike.useMutation();
 
  const handleLikeClick = async () => {
    try {
@@ -80,6 +124,7 @@ const Post: React.FC<PostProps> = ({ post }) => {
      console.error('Error toggling like:', error);
    }
  };
+
 
   // Comment
   const [comments, setComments] = useState<string[]>([]);
@@ -140,6 +185,9 @@ const Post: React.FC<PostProps> = ({ post }) => {
               />
             )}
           </div>
+
+          //delete
+          
         )}
       </div>
   
@@ -159,6 +207,13 @@ const Post: React.FC<PostProps> = ({ post }) => {
           Like
           {/* {post.likeCount} */}
         </button>
+
+        <div>
+          {/* <button onClick={() => handleDeleteMyPost(post.post_id)}>Delete</button> */}
+          {isOwner && (
+            <button onClick={() => handleDeleteMyPost(post.post_id)}>Delete</button>
+          )}
+        </div>
       </div>
   
       {/* Add the Comment component here */}

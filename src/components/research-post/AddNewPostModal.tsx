@@ -34,6 +34,8 @@ const AddNewPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
   const user = useUser();
   const supabase = useSupabaseClient();
 
+  const profile_id = router.query.id as string;
+
   const createResearchPost = api.researchpost.create.useMutation({
     onSuccess: () => {
       // toast.custom(() => <SuccessToast message="Post created successfully" />);
@@ -87,6 +89,7 @@ const AddNewPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
       }
 
       const response = await createResearchPost.mutateAsync({
+        profile_id,
         ...formData,
       });
 
