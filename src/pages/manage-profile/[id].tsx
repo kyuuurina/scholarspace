@@ -218,13 +218,15 @@ const ProfilePage: NextPageWithLayout = () => {
                 </button>
                 )}
               </h3>
-              {educations ? (
-                educations.map((education) => (
-                  <EducationCard key={education.education_id} education={education} />
-                ))
-              ) : (
-                <div>No education data available</div>
-              )}
+              {EducationLoading ? (
+                  <LoadingSpinner />
+                ) : educations && educations.length > 0 ? (
+                  educations.map((education) => (
+                    <EducationCard key={education.education_id} education={{...education, isLoading: false}} />
+                  ))
+                ) : (
+                  <div>No education data available</div>
+                )}
               {isEducationModalOpen && (
                 <EducationForm
                   openModal={isEducationModalOpen}
@@ -248,9 +250,11 @@ const ProfilePage: NextPageWithLayout = () => {
                   </button>
                   )}
                 </h3>
-                {experiences ? (
+                {ExperienceLoading ? (
+                  <LoadingSpinner />
+                ) : experiences && experiences.length > 0 ? (
                   experiences.map((experience) => (
-                    <ExperienceCard key={experience.experience_id} experience={experience} />
+                    <ExperienceCard key={experience.experience_id} experience={{...experience, isLoading: false}} />
                   ))
                 ) : (
                   <div>No experience data available</div>
@@ -277,13 +281,15 @@ const ProfilePage: NextPageWithLayout = () => {
                     </button>
                     )}
                   </h3>
-                  {achievements ? (
-                    achievements.map((achievement) => (
-                      <AchievementCard key={achievement.achievement_id} achievement={achievement} />
-                    ))
-                  ) : (
-                    <div>No achievement data available</div>
-                  )}
+                  {AchievementLoading ? (
+                  <LoadingSpinner />
+                ) : achievements && achievements.length > 0 ? (
+                  achievements.map((achievement) => (
+                    <AchievementCard key={achievement.achievement_id} achievement={{...achievement, isLoading: false}} />
+                  ))
+                ) : (
+                  <div>No achievement data available</div>
+                )}
                   {isAchievementModalOpen && (
                     <AchievementForm
                       openModal={isAchievementModalOpen}

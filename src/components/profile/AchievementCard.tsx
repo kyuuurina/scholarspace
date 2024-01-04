@@ -21,6 +21,7 @@ type AchievementCardProps = {
     received_year: string;
     description: string | null;
     user_id: string;
+    isLoading: boolean;
   };
   isLastItem?: boolean;
 };
@@ -110,6 +111,7 @@ const AchievementCard: React.FC<AchievementCardProps> = ({ achievement, isLastIt
       {/* Edit Achievement Modal */}
       {isEditModalOpen && (
         <EditAchievement
+          achievement={achievement}
           openModal={isEditModalOpen}
           onClick={() => setIsEditModalOpen(false)}
         />

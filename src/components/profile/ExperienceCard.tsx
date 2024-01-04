@@ -22,6 +22,7 @@ type ExperienceCardProps = {
     end_year: string;
     description: string | null;
     user_id: string;
+    isLoading: boolean;
   };
   isLastItem?: boolean; // New prop to indicate if it's the last item
 
@@ -105,6 +106,7 @@ const EducationCard: React.FC<ExperienceCardProps> = ({ experience, isLastItem =
       {/* Edit Achievement Modal */}
       {isEditModalOpen && (
         <EditExperience
+          experience = {experience}
           openModal={isEditModalOpen}
           onClick={() => setIsEditModalOpen(false)}
         />
