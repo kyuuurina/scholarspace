@@ -35,9 +35,11 @@ import EditPostForm from '~/components/research-post/EditPostForm';
 import toast from 'react-hot-toast';
 
 const MyPost: NextPageWithLayout = () => {
-  const myPostLists = useFetchMyResearchPosts();
+  const profile_id = useRouterId(); 
+  console.log("Front call",profile_id)
+  const myPostLists = useFetchMyResearchPosts(profile_id);
   const router = useRouter();
-  const profileId = useRouterId();
+  
 
   console.log("MyPost.tsx page router:", router)
 

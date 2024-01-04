@@ -37,9 +37,9 @@ export const useFetchResearchPost = () => {
 
 
 
-export const useFetchMyResearchPosts = () => {
-    const id: string = useRouterId();
-
+export const useFetchMyResearchPosts = (id:string) => {
+    
+    console.log('Dari depam',id)
     const myResearchPosts = api.researchpost.getMyPosts.useQuery(
         {
             post_id: id,
@@ -50,7 +50,7 @@ export const useFetchMyResearchPosts = () => {
     );
 
     const { data, isLoading, error } = myResearchPosts;
-
+        console.log(myResearchPosts)
     return {
         myResearchPosts: data || [],
         isLoading,

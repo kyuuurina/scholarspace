@@ -36,7 +36,7 @@ const FollowingList: React.FC = () => {
       <ScrollableModal
         show={isModalOpen}
         onClose={closeModal}
-        title="Followers"
+        title="Following"
       >
         {following.length === 0 ? (
           <p>No following account</p>

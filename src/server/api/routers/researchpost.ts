@@ -87,7 +87,7 @@ export const researchpostRouter = router({
     .query(async ({ input, ctx }) => {
       const myPosts = await ctx.prisma.research_post.findMany({
         where: {
-          user_id: ctx.user.id,
+          profile_id:input.post_id,  //pass profile_id to router
         },
         orderBy: {
           created_at: 'desc', // Order by created_at in descending order
