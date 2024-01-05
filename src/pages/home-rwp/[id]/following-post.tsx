@@ -45,15 +45,9 @@ import SearchBaq from "~/components/search/SearchBaq";
 
 
 const FollowingPostPage: NextPageWithLayout = () => {
-    // Customize the limit and cursor as needed
-    // const { followingResearchPosts, isLoading, error } = useFetchFollowingResearchPosts();
-    // if (isLoading) {
-    //     return <p>Loading...</p>;
-    // }
 
-    // if (error) {
-    //     return <p>Error: {error.message}</p>;
-    // }
+  //fetch user id
+    const userId = getCookie("UserID");
 
     const router = useRouter();
     const FollowingPostLists = useFetchFollowingResearchPosts();
