@@ -34,7 +34,7 @@ export const likeRouter = router({
     console.log("likeRouter getMyLikedPosts", myLikedPosts);
   }),
 
-  //like and unlike post
+
 //like and unlike post
 toggleLike: protectedProcedure
   .input(z.object({ post_id: z.string() }))
@@ -92,5 +92,59 @@ toggleLike: protectedProcedure
       return { addedLike: true, likeCount, hasLiked: true };
     }
   }),
+
+  //new like
+  createPostLike: protectedProcedure
+  .input(z.object({
+    id: z.string(),
+  }))
+  .mutation(({ ctx, input }) => ctx.prisma.post_likes.create({
+    data: {
+      research_post: {
+        connect: {
+          post_id: input.id,
+        },
+      },
+      user: {
+        connect: {
+          id: ctx.user.id,
+        },
+      },
+      liked_at: new Date(), // Provide the current timestamp
+    },
+  })),
+
+  //new unlike
+  deletePostLike: protectedProcedure
+    .input(z.object({
+      id: z.string(),
+    }))
+    .mutation(({ ctx, input }) => ctx.prisma.post_likes.deleteMany({
+      where: {
+        research_post: {
+          post_id: input.id,
+        },
+        user: {
+          id: ctx.user.id,
+        },
+      },
+    })),
+
+
+    //getLikesCount
+    getLikesCount: publicProcedure
+    .input(z.object({
+      postId: z.string(),
+    }))
+    .query(async ({ ctx, input }) => {
+      const likesCount = await ctx.prisma.post_likes.count({
+        where: {
+          post_id: input.postId,
+        },
+      });
+
+      return likesCount;
+    }),
+
 
 });
