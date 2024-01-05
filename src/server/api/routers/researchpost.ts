@@ -278,58 +278,55 @@ export const researchpostRouter = router({
       return researchPosts;
     }),
 
-//get post recommendations
-// getPostRecommendations: protectedProcedure
-//   .query(async ({ ctx }) => {
-//     const userId = ctx.user?.id;
-
-//     // Get the user's research interests
-//     const user = await ctx.prisma.profile.findFirst({
-//       where: {
-//         user_id: userId,
-//       },
-//       select: {
-//         research_interest: true,
-//       },
-//     });
-
-//     if (!user || !user.research_interest) {
-//       return [];
-//     }
-
-//     const userResearchInterests = user.research_interest
-//       .toLowerCase()
-//       .split(",")
-//       .map((interest) => interest.trim());
-
-//     // Find other users who share at least 1 similar research interest
-//     const recommendedPosts = await ctx.prisma.research_post.findMany({
-//       where: {
-//         user: {
-//           profile: {
-//             research_interest: {
-//               some: {
-//                 in: userResearchInterests,
-//               },
-//             },
-//           },
-//         },
-//       },
-//       take: 10, // Limit the number of recommendations
-//       select: {
-//         post_id: true,
-//         category: true,
-//         title: true,
-//         description: true,
-//         author: true,
-//         created_at: true,
-//         user: {
-//           select: { id: true, name: true, avatar_url: true },
-//         },
-//       },
-//     });
-
-//     return recommendedPosts;
-//   }),
+    //recommendations:
+    getResearchPostRecommendations: protectedProcedure.query(async ({ ctx }) => {
+      const userId = ctx.user?.id;
+    
+      // Get the user's research interests
+      const user = await ctx.prisma.profile.findFirst({
+        where: {
+          user_id: userId,
+        },
+        select: {
+          research_interest: true,
+        },
+      });
+    
+      if (!user || !user.research_interest) {
+        return [];
+      }
+    
+      const userResearchInterests = user.research_interest.toLowerCase().split(",");
+    
+      // Find research posts with at least 1 similar research interest
+      const recommendedResearchPosts = await ctx.prisma.research_post.findMany({
+        where: {
+          user_id: {
+            not: userId,
+          },
+          OR: userResearchInterests.map((interest) => ({
+            profile: {
+              research_interest: {
+                contains: interest.trim(),
+              },
+            },
+          })),
+        },
+        take: 10, // Limit the number of recommendations
+        select: {
+          post_id: true,
+          user_id: true,
+          category: true,
+          title: true,
+          author: true,
+          description: true,
+          document: true,
+          created_at: true,
+          // summary: true,
+        },
+      });
+    
+      return recommendedResearchPosts;
+    }),
 
 });

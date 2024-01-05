@@ -9,9 +9,12 @@ import type { NextPageWithLayout } from "~/pages/_app";
 import router, { useRouter } from "next/router";
 import { api } from "~/utils/api";
 import { useRouterId } from "~/utils/routerId";
+import LoadingSpinner from "~/components/LoadingSpinner";
 
 // research post components
 import AllFollowingTabs from "~/components/research-post/AllFollowingTabs";
+import Post from "~/components/research-post/Post";
+import { useFetchPostRecommendations } from "~/utils/researchpost";
 import Tabs from "~/components/research-post/Tab";
 
 // profile components
@@ -27,40 +30,53 @@ const Page: NextPageWithLayout = () => {
   setCookie("UserID", user?.id);
   const router = useRouter();
 
-  const userId= useRouterId();
+  const userId = useRouterId();
 
   //get user
   const User = api.user.get.useQuery({
     id: userId,
-  })
+  });
 
   console.log("User Display:", user);
 
-  const {
-    recommendedProfiles,
-    isLoadingRecommendedProfiles,
-    errorRecommendedProfiles,
-  } = useFetchRecommendedProfiles();
+// Research post recommendation
+const {
+  postRecommendations,
+  isLoadingPostRecommendations,
+  errorPostRecommendations,
+} = useFetchPostRecommendations();
 
-  console.log("Recommended Profiles:", recommendedProfiles);
 
-  const [searchResults, setSearchResults] = useState<string[]>([]);
-  const handleSearch = (results: string[]) => {
-    setSearchResults(results);
 
+// Profile recommendation
+const {
+  recommendedProfiles,
+  isLoadingRecommendedProfiles,
+  errorRecommendedProfiles,
+} = useFetchRecommendedProfiles();
+
+const [searchResults, setSearchResults] = useState<string[]>([]);
+const handleSearch = (results: string[]) => {
+  setSearchResults(results);
+
+  // Redirect to the search results page
+  void (async () => {
     // Redirect to the search results page
-    void (async () => {
-      // Redirect to the search results page
-      await router.push({
-        pathname: '/search',
-        query: { results: JSON.stringify(results) },
-      });
-    })();
-  };
+    await router.push({
+      pathname: "/search",
+      query: { results: JSON.stringify(results) },
+    });
+  })();
+};
 
-  if (errorRecommendedProfiles) {
-    return <div>Error fetching recommended profiles</div>;
-  }
+if (errorPostRecommendations) {
+  return <div>Error fetching post recommendations</div>;
+}
+
+if (errorRecommendedProfiles) {
+  return <div>Error fetching recommended profiles</div>;
+}
+
 
   return (
     <div className="w-full max-w-screen-xl p-8">
@@ -70,6 +86,22 @@ const Page: NextPageWithLayout = () => {
           <SearchBaq />
           <div className="mb-4"></div>
           <AllFollowingTabs />
+
+          <div className="mt-6">
+            {isLoadingPostRecommendations ? (
+              <LoadingSpinner />
+            ) : errorPostRecommendations ? (
+              <p className="text-lg font-medium text-gray-500 text-center mt-8">
+                Error Fetching Post Recommendations
+              </p>
+            ) : (
+              postRecommendations.map((post) => (
+                <li key={post.post_id} className="mb-8" style={{ listStyle: 'none' }}>
+                  <Post post={post} />
+                </li>
+              ))
+            )}
+          </div>
         </div>
 
         {/* Suggested Profiles (1/4 width, Rightmost column) */}
@@ -95,6 +127,7 @@ const Page: NextPageWithLayout = () => {
     </div>
   );
 };
+
 
 console.log("Profile Recommendation:", ProfileRecommendation);
 

@@ -87,6 +87,7 @@ const FollowingPostPage: NextPageWithLayout = () => {
         <SearchBaq />
           <div className="mb-4"></div>
           <AllFollowingTabs />
+
           <div className="mt-6">
             {FollowingPostLists.isLoading ? (
               <LoadingSpinner />

@@ -36,7 +36,7 @@ export const useFetchResearchPost = () => {
 };
 
 
-
+//fetch my research posts
 export const useFetchMyResearchPosts = (id:string) => {
     
     console.log('Dari depam',id)
@@ -58,6 +58,8 @@ export const useFetchMyResearchPosts = (id:string) => {
     };
 };
 
+
+//fetch following posts
 export const useFetchFollowingResearchPosts = (limit = 20, cursor?: string) => {
     const followingResearchPosts = api.researchpost.getFollowingPosts.useQuery(
         {
@@ -79,6 +81,8 @@ export const useFetchFollowingResearchPosts = (limit = 20, cursor?: string) => {
     };
 };
 
+
+//search post
 export const useFetchSearchResults = (query: string) => {
     const searchPostResults = api.researchpost.search.useQuery(
       {
@@ -95,6 +99,22 @@ export const useFetchSearchResults = (query: string) => {
       searchPostResults: data || [],
       isLoading,
       error,
+    };
+  };
+
+
+//fetch recommendations:
+export const useFetchPostRecommendations = () => {
+    const {
+      data: postRecommendations,
+      isLoading: isLoadingPostRecommendations,
+      error: errorPostRecommendations,
+    } = api.researchpost.getResearchPostRecommendations.useQuery();
+  
+    return {
+      postRecommendations: postRecommendations || [],
+      isLoadingPostRecommendations,
+      errorPostRecommendations,
     };
   };
 
