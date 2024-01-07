@@ -12,8 +12,8 @@ import { api } from "~/utils/api";
 
 // components
 import Comment from "./Comment";
-import PrimaryButton from "../button/PrimaryButton";
-import TextEditor from "./TextEditor";
+import PrimaryButton from "../../button/PrimaryButton";
+import TextEditor from "../TextEditor";
 import FormErrorMessage from "~/components/FormErrorMessage";
 
 type CommentsSectionProps = {
