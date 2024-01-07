@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-
 import { z } from "zod";
 import { router, protectedProcedure } from "~/server/api/trpc";
 import { TRPCError } from "@trpc/server";
@@ -95,10 +92,13 @@ export const profileRouter = router({
       }
     }),
 
+  // Procedure to update a user's profile
   updateProfile: protectedProcedure
     .input(
+      // Define the input schema for the updateProfile mutation
       z.object({
         profile_id: z.string(),
+        avatar_url: z.string().nullable(),
         name: z.string(),
         about_me: z.string().nullable(),
         skills: z.string().nullable(),
@@ -108,14 +108,7 @@ export const profileRouter = router({
     )
     .mutation(async ({ input, ctx }) => {
       // Destructure input to get relevant properties
-      const {
-        profile_id,
-        name,
-        about_me,
-        skills,
-        research_interest,
-        collab_status,
-      } = input;
+      const { avatar_url, profile_id, name, about_me, skills, research_interest, collab_status } = input;
 
       // Find the profile in the database based on the provided profile_id
       const profile = await ctx.prisma.profile.findUnique({
@@ -132,28 +125,71 @@ export const profileRouter = router({
         });
       }
 
-      try {
-        // Update the profile in the database with the provided data
-        const updatedProfile = await ctx.prisma.profile.update({
-          where: {
-            profile_id,
-          },
-          data: {
-            name,
-            about_me,
-            skills,
-            research_interest,
-            collab_status,
-          },
-        });
+      // Update the profile in the database with the provided data
+      const updatedProfile = await ctx.prisma.profile.update({
+        where: {
+          profile_id,
+        },
+        data: {
+          avatar_url,
+          name,
+          about_me,
+          skills,
+          research_interest,
+          collab_status,
+        },
+      });
 
-        console.log("profileRouter updatedProfile:", updatedProfile);
-        // Return the updated profile
-        return updatedProfile;
-      } catch (error: any) {
-        throw new Error(`Failed to update profile: ${error.message}`);
-      }
+      console.log("profileRouter updatedProfile:", updatedProfile);
+      // Return the updated profile
+      return updatedProfile;
     }),
+
+
+    //procedure to get recommendations based on shared research interests
+    getRecommendations: protectedProcedure.query(async ({ ctx }) => {
+      const userId = ctx.user?.id;
+    
+      // Get the user's research interests
+      const user = await ctx.prisma.profile.findFirst({
+        where: {
+          user_id: userId,
+        },
+        select: {
+          research_interest: true,
+        },
+      });
+    
+      if (!user || !user.research_interest) {
+        return [];
+      }
+    
+      const userResearchInterests = user.research_interest.toLowerCase().split(",");
+    
+      // Find other users who share at least 1 similar research interest
+      const recommendedUsers = await ctx.prisma.profile.findMany({
+        where: {
+          user_id: {
+            not: userId, // Exclude the current user
+          },
+          OR: userResearchInterests.map((interest) => ({
+            research_interest: {
+              contains: interest.trim(),
+            },
+          })),
+        },
+        take: 10, // Limit the number of recommendations
+        select: {
+          user_id: true,
+          profile_id: true,
+          name: true,
+          avatar_url: true,
+        },
+      });
+    
+      return recommendedUsers;
+    }),
+
 });
 
 export default profileRouter;
