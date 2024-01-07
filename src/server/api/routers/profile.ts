@@ -1,13 +1,18 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
+
 import { z } from "zod";
-import { router, protectedProcedure } from "~/server/api/trpc";
+import { router, protectedProcedure, publicProcedure } from "~/server/api/trpc";
 import { TRPCError } from "@trpc/server";
+import { inferAsyncReturnType } from "@trpc/server";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+
+// Define the profile router
 export const profileRouter = router({
+
   validate: protectedProcedure.query(async ({ ctx }) => {
     const userId = ctx.user?.id;
 
@@ -25,6 +30,8 @@ export const profileRouter = router({
     return true;
   }),
 
+
+  
   // Procedure to get a user's profile
   get: protectedProcedure
     .input(z.object({ profile_id: z.string() }))
@@ -50,7 +57,7 @@ export const profileRouter = router({
       };
     }),
 
-  // create profile during registration
+    // create profile during registration
   create: protectedProcedure
     .input(
       z.object({
@@ -72,27 +79,27 @@ export const profileRouter = router({
         skills,
       } = input;
 
-      const userId = ctx.user?.id;
-      console.log("User ID:", userId);
+    const userId = ctx.user?.id;
+    console.log("User ID:", userId);
 
-      try {
-        const profile = await prisma.profile.create({
-          data: {
-            user_id: userId,
-            name,
-            avatar_url,
-            about_me,
-            research_interest,
-            collab_status,
-            skills,
-          },
-        });
+    try {
+      const profile = await prisma.profile.create({
+        data: {
+          user_id: userId,
+          name,
+          avatar_url,
+          about_me,
+          research_interest,
+          collab_status,
+          skills,
+        },
+      });
 
-        return profile;
-      } catch (error: any) {
-        throw new Error(`Failed to create profile: ${error.message}`);
-      }
-    }),
+      return profile;
+    } catch (error: any) {
+      throw new Error(`Failed to create profile: ${error.message}`);
+    }
+  }),
 
   // Procedure to update a user's profile
   updateProfile: protectedProcedure
@@ -194,4 +201,45 @@ export const profileRouter = router({
 
 });
 
-export default profileRouter;
+    // //Procedure to get recommendations based on shared research interests
+    // getRecommendations: protectedProcedure
+    // .query(async ({ ctx }) => {
+    //   const userId = ctx.user?.id;
+  
+    //   // Get the user's research interests
+    //   const user = await ctx.prisma.profile.findFirst({
+    //     where: {
+    //       user_id: userId,
+    //     },
+    //     select: {
+    //       research_interest: true,
+    //     },
+    //   });
+  
+    //   if (!user || !user.research_interest) {
+    //     return [];
+    //   }
+  
+    //   const userResearchInterests = user.research_interest.split(",");
+  
+    //   // Find other users who share the same research interests
+    //   const recommendedUsers = await ctx.prisma.profile.findMany({
+    //     where: {
+    //       user_id: {
+    //         not: userId, // Exclude the current user
+    //       },
+    //       research_interest: {
+    //         in: userResearchInterests,
+    //       },
+    //     },
+    //     take: 5, // Limit the number of recommendations
+    //     select: {
+    //       user_id: true,
+    //       profile_id: true,
+    //       name: true,
+    //       avatar_url: true,
+    //     },
+    //   });
+  
+    //   return recommendedUsers;
+    // }),

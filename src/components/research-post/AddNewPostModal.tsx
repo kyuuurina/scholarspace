@@ -1,7 +1,8 @@
 // AddNewPostModal.tsx 
 // to do - success toast/error toast
 
-import { useState } from "react";
+// AddNewPostModal.tsx
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import Image from "next/image";
 import { useRouter } from "next/router";
@@ -22,11 +23,6 @@ import PrimaryButton from "../button/PrimaryButton";
 import SuccessToast from "../toast/SuccessToast";
 import ErrorToast from "../toast/ErrorToast";
 
-
-//huggingface-vercelai
-// import { HfInference } from "@huggingface/inference";
-//import { summarizeText } from "~/utils/summarization";
-
 type ModalProps = {
   openModal: boolean;
   onClick: () => void;
@@ -41,39 +37,33 @@ const AddNewPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
 
 
   const router = useRouter();
-  // const { user } = useUser();
   const user = useUser();
   const supabase = useSupabaseClient();
-  //const huggingface = new HfInference({token: process.env.HUGGING_FACE_API_TOKEN }); // Initialize Hugging Face Inference
 
-  // hot toast for success and error message
-  const createResearchPost = api.researchpost.create.useMutation(
-  //   {
-  //   onSuccess: () => {
-  //     toast.custom(() => <SuccessToast message="Post successfully created" />);
-  //     // Reload the page or perform any necessary actions after successful submission
-  //   },
-  //   onError: (error) => {
-  //     toast.custom(() => <ErrorToast message={error.toString()} />);
-  //     onClick();
-  //     reset();
-  //   },
-  // }
-  );
+  const createResearchPost = api.researchpost.create.useMutation({
+    onSuccess: () => {
+      // toast.custom(() => <SuccessToast message="Post created successfully" />);
+      onClick();
+      reset();
+      setdocumentPlaceholder(null);
+      router.reload(); // Reload the page after successful submission
+      toast.custom(() => <SuccessToast message="Post created successfully" />);
+    },
+    onError: (error) => {
+      toast.custom(() => <ErrorToast message={error.toString()} />);
+    },
+  });
 
-  // schema for form validation
   const schema: ZodType<ResearchPostFormData> = z.object({
     category: z.string(),
     title: z.string().refine((data) => !!data, {
-      message: "Title is required", // Custom error message if validation fails
+      message: "Title is required",
     }),
     description: z.string().nullable(),
     author: z.string().nullable(),
     document: z.string().nullable(),
-    // created_at: z.date(),
   });
 
-  // react-hook-form
   const {
     register,
     handleSubmit,
@@ -86,12 +76,11 @@ const AddNewPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
     },
   });
 
-  // handler for onSubmit form
   const onSubmit = async (formData: ResearchPostFormData) => {
     if (isSubmitting) return;
     try {
       setIsSubmitting(true);
-      // Upload the document to the "post-files-upload" storage bucket
+
       if (documentValue && user) {
         formData.document = docpostId;
         const fileUrl = `/${docpostId}`;
@@ -99,7 +88,6 @@ const AddNewPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
           .from("post-files-upload")
           .upload(fileUrl, documentValue);
 
-        // Handle errors or log data if needed
         console.log(error);
         console.log(data);
       }
@@ -120,30 +108,28 @@ const AddNewPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
       //   document: formData.document,
       // });
 
+
       const response = await createResearchPost.mutateAsync({
         ...formData,
       });
+
+      onClick();
       // Reset form and state
       onClick();
       reset();
       setdocumentPlaceholder(null);
-
-      // Navigate to the newly created post
-      await router.push(`/home-rwp/${response.post_id}`);
       setIsSubmitting(false);
     } catch (error) {
       console.error(error);
     }
   };
 
-  // handler for onChange input for document upload
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     try {
       if (!e.target.files) return;
       const file = e.target.files[0];
       const reader = new FileReader();
 
-      // Read the document as a data URL
       if (file) {
         reader.readAsDataURL(file);
         reader.onloadend = () => {
@@ -156,26 +142,6 @@ const AddNewPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
     } catch (error) {
       console.log(error);
     }
-  };
-
-  // utility function to read the content of the uploaded document
-  const readFileContent = async (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-
-      reader.onload = (event) => {
-        if (event.target) {
-          const content = event.target.result as string;
-          resolve(content);
-        }
-      };
-
-      reader.onerror = (error) => {
-        reject(error);
-      };
-
-      reader.readAsText(file);
-    });
   };
 
   return (
@@ -191,12 +157,19 @@ const AddNewPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
       >
         <form autoComplete="off" className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
           <div>
-            <label
-              htmlFor="category"
-              className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-            >
+            <label htmlFor="category" className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
               Category
             </label>
+            <select id="category" className="block w-full" {...register("category", { required: true })}>
+              <option value="Article">Article</option>
+              <option value="Conference Paper">Conference Paper</option>
+              <option value="Presentation">Presentation</option>
+              <option value="Preprint">Preprint</option>
+              <option value="Research Proposal">Research Proposal</option>
+              <option value="Thesis">Thesis</option>
+              <option value="Idea">Idea</option>
+            </select>
+            {errors.category && <FormErrorMessage text={errors.category.message} />}
             <select
               id="category"
               className="block w-full"
@@ -290,6 +263,7 @@ const AddNewPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
 };
 
 export default AddNewPostModal;
+
 
 function summarizeText(documentContent: string) {
   throw new Error("Function not implemented.");
