@@ -113,6 +113,25 @@ export const commentRouter = router({
       return comment;
     }),
 
+  createReply: protectedProcedure
+    .input(
+      z.object({
+        value: z.string(),
+        task_id: z.string(),
+        parent_id: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const comment = await ctx.prisma.comment.create({
+        data: {
+          ...input,
+          user_id: ctx.user.id,
+        },
+      });
+
+      return comment;
+    }),
+
   edit: protectedProcedure
     .input(
       z.object({

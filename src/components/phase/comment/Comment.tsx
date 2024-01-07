@@ -23,8 +23,10 @@ const Comment: React.FC<CommentProps> = ({ comment, refetch }) => {
   const { user_id, created_at, id } = comment;
   const [showActions, setShowActions] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [isReplyMode, setIsReplyMode] = useState(false);
 
   const editComment = api.comment.edit.useMutation();
+  const createReplyComment = api.comment.createReply.useMutation();
 
   // form schema
   const schema: ZodType<{ value: string }> = z.object({
@@ -68,6 +70,31 @@ const Comment: React.FC<CommentProps> = ({ comment, refetch }) => {
       setIsEditMode(false);
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  const handleCreateReplyComment = async (formData: { value: string }) => {
+    // Send the reply request to the server
+    try {
+      await createReplyComment.mutateAsync({
+        value: formData.value,
+        task_id: comment.task_id,
+        parent_id: comment.id,
+      });
+      reset();
+      await refetch();
+      setIsReplyMode(false);
+    } catch (error) {
+      toast.custom(() => {
+        if (error instanceof TRPCClientError) {
+          return <ErrorToast message={error.message} />;
+        } else {
+          // Handle other types of errors or fallback to a default message
+          return (
+            <ErrorToast message="Error to create reply. Please try again later." />
+          );
+        }
+      });
     }
   };
 
@@ -168,12 +195,43 @@ const Comment: React.FC<CommentProps> = ({ comment, refetch }) => {
             </div>
           </div>
         </div>
+      ) : isReplyMode ? (
+        <div>
+          <TextEditor
+            documentValue={comment.value}
+            setDocumentValue={(value) => setValue("value", value)}
+          />
+          <div className="flex justify-between">
+            <div>
+              {errors.value && <FormErrorMessage text={errors.value.message} />}
+            </div>
+            <div className="flex justify-end">
+              <button className="px-3" onClick={() => setIsReplyMode(false)}>
+                Cancel
+              </button>
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  await handleSubmit(handleCreateReplyComment)(e);
+                }}
+                autoComplete="off"
+              >
+                <button type="submit" className="btn btn-primary">
+                  Reply
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
       ) : (
-        <div
-          dangerouslySetInnerHTML={{
-            __html: comment.value || "Add a comment here....",
-          }}
-        />
+        <div>
+          <div
+            dangerouslySetInnerHTML={{
+              __html: comment.value || "Add a comment here....",
+            }}
+          />
+          <button onClick={() => setIsReplyMode(true)}>Reply</button>
+        </div>
       )}
     </div>
   );
