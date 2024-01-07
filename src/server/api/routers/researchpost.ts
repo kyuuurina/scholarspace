@@ -177,12 +177,13 @@ export const researchpostRouter = router({
         category: z.string(),
         title: z.string(),
         description: z.string().nullable(),
+        author: z.string().nullable(),
         document: z.string().nullable(),
         // created_at: z.date(),
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const { post_id, category, title, description, document } = input;
+      const { post_id, category, title, description, author, document } = input;
       console.log("Help Me",post_id)
       const post = await ctx.prisma.research_post.findUnique({
         where: {
@@ -205,6 +206,7 @@ export const researchpostRouter = router({
           category,
           title,
           description,
+          author,
           document,
         },
       });
