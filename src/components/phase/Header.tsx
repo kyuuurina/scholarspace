@@ -13,14 +13,12 @@ type HeaderProps = {
   phases: phase[];
   onSelectPhase: (phaseId: string) => void;
   selectedPhase: string;
-  refetch: () => void;
 };
 
 const Header: React.FC<HeaderProps> = ({
   phases,
   onSelectPhase,
   selectedPhase,
-  refetch,
 }) => {
   const router = useRouter();
   const id = useRouterId();
@@ -36,6 +34,12 @@ const Header: React.FC<HeaderProps> = ({
     [key: string]: boolean;
   }>({});
 
+  // states for renaming phase
+  const [isRenaming, setIsRenaming] = useState<{ [key: string]: boolean }>({});
+  const [newPhaseNames, setNewPhaseNames] = useState<{ [key: string]: string }>(
+    {}
+  );
+
   const handleContextMenu = (
     event: React.MouseEvent<HTMLLIElement>,
     phaseId: string
@@ -50,6 +54,8 @@ const Header: React.FC<HeaderProps> = ({
 
   // create phase
   const createPhase = api.phase.create.useMutation();
+  // rename phase
+  const renamePhase = api.phase.renamePhase.useMutation();
 
   // function to trigger create phase button
   const onClickCreatePhase = () => {
@@ -65,6 +71,15 @@ const Header: React.FC<HeaderProps> = ({
         inputRef.current.focus();
       }
     }, 0);
+  };
+
+  // function to trigger rename phase
+  const onClickRenamePhase = (phaseId: string) => {
+    setIsRenaming((prev) => ({ ...prev, [phaseId]: true }));
+    setNewPhaseNames((prev) => ({
+      ...prev,
+      [phaseId]: phases.find((phase) => phase.id === phaseId)?.name || "",
+    }));
   };
 
   // function to handle phase name change
@@ -93,6 +108,39 @@ const Header: React.FC<HeaderProps> = ({
           },
         }
       );
+    }
+  };
+
+  // function to handle rename input change
+  const handleRenameInputChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    phaseId: string
+  ) => {
+    setNewPhaseNames((prev) => ({ ...prev, [phaseId]: event.target.value }));
+  };
+
+  // function to handle rename submit on Enter key press
+  const handleRenameInputKeyPress = async (
+    event: React.KeyboardEvent<HTMLInputElement>,
+    phaseId: string
+  ) => {
+    if (event.key === "Enter") {
+      // Perform the submit logic here
+      await renamePhase.mutateAsync(
+        {
+          id: phaseId,
+          name: newPhaseNames[phaseId] || "",
+        },
+        {
+          onSuccess: () => {
+            setIsRenaming((prev) => ({ ...prev, [phaseId]: false }));
+            router.reload();
+          },
+        }
+      );
+
+      setIsRenaming((prev) => ({ ...prev, [phaseId]: false }));
+      router.reload();
     }
   };
 
@@ -152,7 +200,27 @@ const Header: React.FC<HeaderProps> = ({
                 } p-2 px-3 py-1 hover:cursor-pointer hover:bg-gray-50 hover:text-gray-700`}
                 onClick={() => onSelectPhase(phase.id)}
               >
-                {phase.name}
+                {isRenaming[phase.id] ? (
+                  <input
+                    type="text"
+                    value={newPhaseNames[phase.id]}
+                    onChange={(event) =>
+                      handleRenameInputChange(event, phase.id)
+                    }
+                    onKeyDown={(event) =>
+                      handleRenameInputKeyPress(event, phase.id)
+                    }
+                    onBlur={() =>
+                      setIsRenaming((prev) => ({ ...prev, [phase.id]: false }))
+                    }
+                    autoFocus
+                    className="rounded-md border border-gray-300 p-1"
+                  />
+                ) : (
+                  <div onDoubleClick={() => onClickRenamePhase(phase.id)}>
+                    {phase.name}
+                  </div>
+                )}
               </li>
               {phaseActionStates[phase.id] && (
                 <PhaseActions
@@ -163,7 +231,7 @@ const Header: React.FC<HeaderProps> = ({
                       [phase.id]: isOpen,
                     }))
                   }
-                  refetch={refetch}
+                  onClickRename={() => onClickRenamePhase(phase.id)} // Pass the function to trigger renaming mode
                 />
               )}
             </React.Fragment>

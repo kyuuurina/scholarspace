@@ -4,17 +4,18 @@ import { useRouter } from "next/router";
 type CellProps = {
   phase_id: string;
   setIsCellActionOpen: (isCellActionOpen: boolean) => void;
-  refetch: () => void;
+  onClickRename: () => void; // Add the onClickRename prop
 };
 
 const PhaseActions: React.FC<CellProps> = ({
   phase_id,
   setIsCellActionOpen,
+  onClickRename, // Destructure the prop
 }) => {
   const deletePhase = api.phase.deletePhase.useMutation();
   const router = useRouter();
   const handleRename = () => {
-    console.log("rename");
+    onClickRename(); // Call the function to trigger renaming mode
   };
   const handleDelete = async () => {
     await deletePhase.mutateAsync(
@@ -28,9 +29,6 @@ const PhaseActions: React.FC<CellProps> = ({
     );
   };
 
-  const handleEditType = () => {
-    console.log("edit type");
-  };
   return (
     <div
       className="absolute z-30 flex w-full flex-col rounded-lg border border-gray-200 bg-white text-gray-900"

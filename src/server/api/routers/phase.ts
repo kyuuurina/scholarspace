@@ -249,4 +249,26 @@ export const phaseRouter = router({
 
       return phase;
     }),
+
+  renamePhase: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        name: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { id, name } = input;
+
+      const phase = await ctx.prisma.phase.update({
+        where: {
+          id,
+        },
+        data: {
+          name,
+        },
+      });
+
+      return phase;
+    }),
 });
