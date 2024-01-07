@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 import { z } from "zod";
 import { router, protectedProcedure } from "~/server/api/trpc";
 import { TRPCError } from "@trpc/server";
