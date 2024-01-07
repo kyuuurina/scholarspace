@@ -5,16 +5,19 @@ type CellProps = {
   phase_id: string;
   setIsCellActionOpen: (isCellActionOpen: boolean) => void;
   onClickRename: () => void; // Add the onClickRename prop
+  onClosePhaseActions: () => void; // Add the onClosePhaseActions prop
 };
 
 const PhaseActions: React.FC<CellProps> = ({
   phase_id,
   setIsCellActionOpen,
   onClickRename, // Destructure the prop
+  onClosePhaseActions,
 }) => {
   const deletePhase = api.phase.deletePhase.useMutation();
   const router = useRouter();
   const handleRename = () => {
+    onClosePhaseActions();
     onClickRename(); // Call the function to trigger renaming mode
   };
   const handleDelete = async () => {
@@ -24,6 +27,7 @@ const PhaseActions: React.FC<CellProps> = ({
         onSuccess: () => {
           router.reload();
           setIsCellActionOpen(false);
+          onClosePhaseActions();
         },
       }
     );

@@ -49,7 +49,14 @@ const Header: React.FC<HeaderProps> = ({
   };
 
   const ref = useClickAway(() => {
-    // setIsPhaseActionOpen(false);
+    // Close phase actions for all phases
+    setPhaseActionStates((prev) => {
+      const nextState = { ...prev };
+      for (const phaseId in nextState) {
+        nextState[phaseId] = false;
+      }
+      return nextState;
+    });
   });
 
   // create phase
@@ -197,7 +204,7 @@ const Header: React.FC<HeaderProps> = ({
                 onContextMenu={(event) => handleContextMenu(event, phase.id)}
                 className={`rounded-t-md border ${
                   selectedPhase === phase.id ? "bg-gray-300" : "bg-gray-100"
-                } p-2 px-3 py-1 hover:cursor-pointer hover:bg-gray-50 hover:text-gray-700`}
+                } relative p-2 px-3 py-1 hover:cursor-pointer hover:bg-gray-50 hover:text-gray-700`}
                 onClick={() => onSelectPhase(phase.id)}
               >
                 {isRenaming[phase.id] ? (
@@ -221,19 +228,25 @@ const Header: React.FC<HeaderProps> = ({
                     {phase.name}
                   </div>
                 )}
+                {phaseActionStates[phase.id] && (
+                  <PhaseActions
+                    phase_id={phase.id}
+                    setIsCellActionOpen={(isOpen) =>
+                      setPhaseActionStates((prev) => ({
+                        ...prev,
+                        [phase.id]: isOpen,
+                      }))
+                    }
+                    onClickRename={() => onClickRenamePhase(phase.id)} // Pass the function to trigger renaming mode
+                    onClosePhaseActions={() =>
+                      setPhaseActionStates((prev) => ({
+                        ...prev,
+                        [phase.id]: false,
+                      }))
+                    }
+                  />
+                )}
               </li>
-              {phaseActionStates[phase.id] && (
-                <PhaseActions
-                  phase_id={phase.id}
-                  setIsCellActionOpen={(isOpen) =>
-                    setPhaseActionStates((prev) => ({
-                      ...prev,
-                      [phase.id]: isOpen,
-                    }))
-                  }
-                  onClickRename={() => onClickRenamePhase(phase.id)} // Pass the function to trigger renaming mode
-                />
-              )}
             </React.Fragment>
           ))}
         </ul>

@@ -28,7 +28,7 @@ const PropertyCell: React.FC<PropertyCellProps> = ({ property, index }) => {
       ref={ref as React.MutableRefObject<HTMLTableCellElement>}
       key={index}
       onContextMenu={handleContextMenu}
-      className="relative border border-gray-300 px-6 py-3 hover:bg-gray-100"
+      className=" border border-gray-300 px-6 py-3 hover:bg-gray-100"
     >
       {property.name}
       {isCellActionOpen && (
