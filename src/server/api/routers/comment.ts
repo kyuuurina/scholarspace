@@ -132,4 +132,20 @@ export const commentRouter = router({
 
       return comment;
     }),
+
+  delete: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const comment = await ctx.prisma.comment.delete({
+        where: {
+          id: input.id,
+        },
+      });
+
+      return comment;
+    }),
 });

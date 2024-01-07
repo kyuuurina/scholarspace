@@ -10,6 +10,9 @@ import { type ZodType, z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import FormErrorMessage from "~/components/FormErrorMessage";
+import toast from "react-hot-toast";
+import ErrorToast from "~/components/toast/ErrorToast";
+import { TRPCClientError } from "@trpc/client";
 
 type CommentProps = {
   comment: comment;
@@ -72,6 +75,25 @@ const Comment: React.FC<CommentProps> = ({ comment, refetch }) => {
     setShowActions(false);
   });
 
+  // delete comment
+  const deleteComment = api.comment.delete.useMutation();
+  const handleDeleteComment = async () => {
+    try {
+      await deleteComment.mutateAsync({ id });
+      await refetch();
+    } catch (error) {
+      toast.custom(() => {
+        if (error instanceof TRPCClientError) {
+          return <ErrorToast message={error.message} />;
+        } else {
+          // Handle other types of errors or fallback to a default message
+          return (
+            <ErrorToast message="Error to delete comment. Please try again later." />
+          );
+        }
+      });
+    }
+  };
   return (
     <div className="mb-1 border-t border-gray-200 bg-white p-4 text-base dark:border-gray-700 dark:bg-gray-900">
       <div className="mb-1 flex items-center justify-between">
@@ -110,8 +132,8 @@ const Comment: React.FC<CommentProps> = ({ comment, refetch }) => {
                   setIsEditMode(true);
                   setShowActions(false);
                 }}
-                onDeleteClick={() => {
-                  // Implement delete logic
+                onDeleteClick={async () => {
+                  await handleDeleteComment();
                 }}
               />
             </div>
