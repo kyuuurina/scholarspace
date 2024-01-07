@@ -21,6 +21,7 @@ import Tabs from "~/components/research-post/Tab";
 import ProfileRecommendation from "~/components/profile/ProfileRecommendation";
 import { useFetchRecommendedProfiles } from "~/utils/profile";
 
+
 // search components
 // import SearchBar from "~/components/search/SearchBar";
 import SearchBaq from "~/components/search/SearchBaq";
@@ -38,6 +39,10 @@ const Page: NextPageWithLayout = () => {
   });
 
   console.log("User Display:", user);
+
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [currentPostId, setCurrentPostId] = useState<string | null>(null);
+  const [isConfirmationOpen, setIsConfirmationOpen] = useState(false); 
 
 // Research post recommendation
 const {
@@ -78,6 +83,15 @@ if (errorRecommendedProfiles) {
 }
 
 
+
+// Render EditPostForm component
+  const handleEditClick = (postId: string) => {
+    setEditModalOpen(true);
+    setCurrentPostId(postId);
+  };
+
+
+
   return (
     <div className="w-full max-w-screen-xl p-8">
       <div className="grid grid-cols-12 gap-6 mx-auto">
@@ -97,7 +111,7 @@ if (errorRecommendedProfiles) {
             ) : (
               postRecommendations.map((post) => (
                 <li key={post.post_id} className="mb-8" style={{ listStyle: 'none' }}>
-                  <Post post={post} />
+                <Post post={post} onEditClick={() => handleEditClick(post.post_id)} />
                 </li>
               ))
             )}

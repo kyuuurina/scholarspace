@@ -2,9 +2,10 @@
 // Post.tsx - final FE (w/out comment section yet)
 import React, { useState, useRef } from 'react';
 import Image from 'next/image';
-import { FiHeart, FiMessageSquare } from 'react-icons/fi';
+import { FiEdit2, FiTrash2, FiMessageSquare, FiHeart } from 'react-icons/fi';
 import Card from '../Card';
 import AvatarPlaceholder from '../avatar/AvatarPlaceholder';
+import ProfileAvatarPlaceholder from '../avatar/ProfileAvatar';
 import Comment from './Comment'; // Import the Comment component
 import PostComment from './PostComment';
 import CommentsList from './CommentList';
@@ -32,6 +33,7 @@ interface PostProps {
     post_id: string;  //just added
     user_id: string;
     // profile_id: string;
+    // avatar_url: string | null;
     category: string;
     title: string;
     document: string | null;
@@ -41,6 +43,7 @@ interface PostProps {
     // likeCount: number;
 
   };
+  onEditClick: () => void;
 
 }
 
@@ -63,7 +66,7 @@ const getCategoryStyles = (category: string) => {
   }
 };
 
-const Post: React.FC<PostProps> = ({ post }) => {
+const Post: React.FC<PostProps> = ({ post, onEditClick }) => {
 
 
   //get user id and check profile
@@ -135,17 +138,38 @@ const Post: React.FC<PostProps> = ({ post }) => {
 
   return (
     <Card title={post.title}>
-      <div className="flex items-center mb-2 md:mb-4">
+      <div className="flex flex-col md:flex-row items-center mb-2 md:mb-4 relative">
         <div className="aspect:square h-10 w-10">
           <AvatarPlaceholder name={userName} shape="circle" />
+            {/* {post.avatar_url !== null ? (
+              <ProfileAvatarPlaceholder name={userName} shape="circle" avatar_url={`https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/avatar/${post.avatar_url}`} />
+            ) : (
+              <ProfileAvatarPlaceholder name={userName} shape="circle" />
+            )} */}
         </div>
-        <div className="ml-2">
+        <div className="md:ml-2 md:mt-0 mt-2">
+          {/* Move the category span below the AvatarPlaceholder */}
           <span className={categoryStyles}>{post.category}</span>
         </div>
+
+        {isOwner && (
+          <div className="absolute top-0 right-0 flex items-center mt-2 space-x-2">
+            <button onClick={onEditClick} className="text-blue-500 hover:text-blue-700 focus:outline-none text-xs md:text-sm">
+              <FiEdit2 size={18} className="inline-block" />
+            </button>
+            {/* Place the red outline trash icon on the right side, inline with category span */}
+            <button onClick={() => handleDeleteMyPost(post.post_id)} className="text-red-500 hover:text-red-700 focus:outline-none text-xs md:text-sm">
+              <FiTrash2 size={18} className="inline-block" />
+            </button>
+          </div>
+        )}
       </div>
-      <p className="mt-2 text-black text-sm md:text-base">
-        {post.description || 'No description'}
-      </p>
+  
+      <div className="mt-2 flex items-center mb-2 md:mb-4">
+        <p className="mt-2 text-black text-sm md:text-base">
+          {post.description || 'No description'}
+        </p>
+      </div>
   
       <div className="mt-2 flex items-center mb-2 md:mb-4">
         <p className="mt-2 text-gray-500 text-xs md:text-sm">
@@ -185,9 +209,6 @@ const Post: React.FC<PostProps> = ({ post }) => {
               />
             )}
           </div>
-
-          //delete
-          
         )}
       </div>
   
@@ -207,13 +228,6 @@ const Post: React.FC<PostProps> = ({ post }) => {
           Like
           {/* {post.likeCount} */}
         </button>
-
-        <div>
-          {/* <button onClick={() => handleDeleteMyPost(post.post_id)}>Delete</button> */}
-          {isOwner && (
-            <button onClick={() => handleDeleteMyPost(post.post_id)}>Delete</button>
-          )}
-        </div>
       </div>
   
       {/* Add the Comment component here */}

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
 //auth
@@ -52,6 +53,11 @@ const FollowingPostPage: NextPageWithLayout = () => {
     const router = useRouter();
     const FollowingPostLists = useFetchFollowingResearchPosts();
 
+    //
+    const [editModalOpen, setEditModalOpen] = useState(false);
+    const [currentPostId, setCurrentPostId] = useState<string | null>(null);
+    const [isConfirmationOpen, setIsConfirmationOpen] = useState(false); 
+
     //profile recommendation
     const {
       recommendedProfiles,
@@ -71,6 +77,13 @@ const FollowingPostPage: NextPageWithLayout = () => {
     console.error("Following research posts data is not an array:", FollowingPostLists.followingResearchPosts);
     return <p>Error: Unable to fetch research posts</p>;
   }
+
+  
+// Render EditPostForm component
+const handleEditClick = (postId: string) => {
+  setEditModalOpen(true);
+  setCurrentPostId(postId);
+};
 
 
   return (
@@ -92,7 +105,7 @@ const FollowingPostPage: NextPageWithLayout = () => {
             ) : (
               FollowingPostLists.followingResearchPosts.map((post) => (
                 <li key={post.post_id} className="mb-8" style={{ listStyle: 'none' }}>
-                  <Post post={post} />
+                  <Post post={post} onEditClick={() => handleEditClick(post.post_id)} />
                 </li>
               ))
             )}

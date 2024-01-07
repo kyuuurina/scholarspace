@@ -51,6 +51,12 @@ const MyPost: NextPageWithLayout = () => {
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false); 
 
 
+    // Render EditPostForm component
+    const handleEditClick = (postId: string) => {
+      setEditModalOpen(true);
+      setCurrentPostId(postId);
+    };
+
 
   return (
     <>
@@ -79,10 +85,8 @@ const MyPost: NextPageWithLayout = () => {
               <li key={post.post_id} className="mb-4">
                 {/* Add left and right padding to the Post component */}
                 <div className="p-4 rounded-md">
-                  <Post post={post} />
-                  { true && <>
-                    <button onClick={() => { setEditModalOpen(true); setCurrentPostId(post.post_id); }}>Edit</button>
-                  </>}
+                <Post post={post} onEditClick={() => handleEditClick(post.post_id)} />
+                  {/* <Post post={post} /> */}
                 </div>
               </li>
             ))}
