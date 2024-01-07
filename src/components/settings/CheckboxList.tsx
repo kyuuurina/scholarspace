@@ -1,14 +1,33 @@
+import React, { useState } from "react";
+
 type CheckboxListProps = {
   title: string;
   subtitle: string;
-  disabled?: boolean;
+  onCheck: () => Promise<void>;
+  onUncheck: () => Promise<void>;
+  checked: boolean;
 };
 
 const CheckboxList: React.FC<CheckboxListProps> = ({
   title,
   subtitle,
-  disabled = false,
+  onCheck,
+  onUncheck,
+  checked,
 }) => {
+  const [isChecked, setIsChecked] = useState(checked);
+
+  const handleCheckboxChange = async () => {
+    setIsChecked(!isChecked);
+
+    // Execute the appropriate callback based on the checkbox state
+    if (!isChecked) {
+      await onCheck();
+    } else {
+      await onUncheck();
+    }
+  };
+
   return (
     <li className="flex pt-6 sm:pt-4">
       <div className="flex h-5 items-center">
@@ -16,7 +35,8 @@ const CheckboxList: React.FC<CheckboxListProps> = ({
           type="checkbox"
           value=""
           className="h-4 w-4 rounded border-gray-300 bg-gray-100"
-          disabled={disabled}
+          checked={isChecked}
+          onChange={handleCheckboxChange}
         />
       </div>
       <div className="ms-2 text-sm">
