@@ -15,7 +15,7 @@ const Avatar: React.FC<AvatarProps> = ({ user, avatar_url, email }) => {
         <Image
           key={avatar_url}
           src={avatar_url}
-          alt="Workspace member avatar"
+          alt="avatar"
           width={30}
           height={30}
           className="rounded-full"
@@ -38,7 +38,7 @@ const Avatar: React.FC<AvatarProps> = ({ user, avatar_url, email }) => {
         <Image
           key={user.avatar_url}
           src={user.avatar_url}
-          alt="Workspace member avatar"
+          alt="avatar"
           width={30}
           height={30}
           className="rounded-full"

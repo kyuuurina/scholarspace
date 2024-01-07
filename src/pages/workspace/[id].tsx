@@ -16,6 +16,7 @@ import ProjectCard from "~/components/project/ProjectCard";
 import ScoreChart from "~/components/chart/ScoreChart";
 import Card from "~/components/Card";
 import Header from "~/components/workspace/Header";
+import AvatarPlaceholder from "~/components/avatar/AvatarPlaceholder";
 import CreateProjectModal from "~/components/project/CreateProjectModal";
 import PageLoader from "~/components/layout/PageLoader";
 import MembersCard from "~/components/members/MembersCard";

@@ -13,7 +13,7 @@ export const useFetchResearchPost = () => {
         }
     );
 
-    const { category, title, author, description, document } = researchpost.data || {};
+    const { category, title, author, description, document, created_at } = researchpost.data || {};
 
     const { isLoading, error } = researchpost;
 
@@ -31,6 +31,7 @@ export const useFetchResearchPost = () => {
         isLoading,
         error,
         fileUrl,
+        created_at
     };
 };
 
