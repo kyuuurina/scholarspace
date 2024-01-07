@@ -14,6 +14,7 @@ import toast from "react-hot-toast";
 import ErrorToast from "~/components/toast/ErrorToast";
 import { TRPCClientError } from "@trpc/client";
 import { FiMessageSquare } from "react-icons/fi";
+import ReactionButton from "./ReactionButton";
 
 type CommentProps = {
   comment: comment;
@@ -238,23 +239,26 @@ const Comment: React.FC<CommentProps> = ({
       ) : (
         <div>
           <div
-          className="pb-2 font-normal"
+            className="pb-2 font-normal"
             dangerouslySetInnerHTML={{
               __html: comment.value || "Add a comment here....",
             }}
           />
-          {canReply && (
-            <div className="mt-1 flex items-center">
-              <button
-                type="button"
-                className="flex items-center text-sm text-gray-500 hover:underline space-x-1"
-                onClick={() => setIsReplyMode(true)}
-              >
-                <FiMessageSquare />
-                <span>Reply</span>
-              </button>
-            </div>
-          )}
+          <div className="mt-1 flex items-center justify-start space-x-3">
+            {canReply && (
+              <div className="flex items-center">
+                <button
+                  type="button"
+                  className="flex items-center space-x-1 text-sm text-gray-500 hover:underline"
+                  onClick={() => setIsReplyMode(true)}
+                >
+                  <FiMessageSquare />
+                  <span>Reply</span>
+                </button>
+              </div>
+            )}
+            <ReactionButton commentId={id} />
+          </div>
         </div>
       )}
     </div>
