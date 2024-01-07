@@ -28,7 +28,7 @@ const NullableDatePicker: React.FC<NullableDatePickerProps> = ({
         onChange={(date: Date, event: React.SyntheticEvent<any> | undefined) =>
           onChange(date || undefined, event)
         }
-        className="focus:ring-primary-600 focus:border-primary-600 dark:dark:focus:border-primary-500 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900"
+        className="focus:ring-primary-600 focus:border-primary-600 dark:dark:focus:border-primary-500 block w-full cursor-pointer rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900"
       />
     </div>
   );

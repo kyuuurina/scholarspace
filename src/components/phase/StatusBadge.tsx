@@ -95,15 +95,13 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({
   };
 
   return (
-    <div
-      style={{ position: "relative" }}
-      ref={ref as React.MutableRefObject<HTMLTableCellElement>}
-    >
+    <div style={{ position: "relative" }}>
       <span
-        className={`badge rounded-md p-2 text-xs ${getStatusBadgeClassName(
+        className={`badge cursor-pointer rounded-md p-2 text-xs ${getStatusBadgeClassName(
           task?.status || status || ""
         )}`}
         onClick={() => setDropdownOpen(!isDropdownOpen)}
+        ref={ref as React.MutableRefObject<HTMLSpanElement>}
       >
         {task ? task.status : status}
       </span>

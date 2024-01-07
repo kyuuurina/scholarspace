@@ -13,13 +13,19 @@ import FormErrorMessage from "~/components/FormErrorMessage";
 import toast from "react-hot-toast";
 import ErrorToast from "~/components/toast/ErrorToast";
 import { TRPCClientError } from "@trpc/client";
+import { FiMessageSquare } from "react-icons/fi";
 
 type CommentProps = {
   comment: comment;
   refetch: () => Promise<void>;
+  canReply?: boolean;
 };
 
-const Comment: React.FC<CommentProps> = ({ comment, refetch }) => {
+const Comment: React.FC<CommentProps> = ({
+  comment,
+  refetch,
+  canReply = false,
+}) => {
   const { user_id, created_at, id } = comment;
   const [showActions, setShowActions] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -123,7 +129,7 @@ const Comment: React.FC<CommentProps> = ({ comment, refetch }) => {
   };
   return (
     <div className="mb-1 border-t border-gray-200 bg-white p-4 text-base dark:border-gray-700 dark:bg-gray-900">
-      <div className="mb-1 flex items-center justify-between">
+      <div className="mb-2 flex items-center justify-between">
         <div className="flex items-center">
           <p className="mr-3 inline-flex items-center text-sm font-semibold text-gray-900 dark:text-white">
             {user && <Avatar avatar_url={user.avatar_url} email={user.email} />}
@@ -195,10 +201,16 @@ const Comment: React.FC<CommentProps> = ({ comment, refetch }) => {
             </div>
           </div>
         </div>
-      ) : isReplyMode ? (
+      ) : isReplyMode && canReply ? (
         <div>
+          <div
+            className="pb-2 font-normal"
+            dangerouslySetInnerHTML={{
+              __html: comment.value || "Add a comment here....",
+            }}
+          />
           <TextEditor
-            documentValue={comment.value}
+            documentValue={""}
             setDocumentValue={(value) => setValue("value", value)}
           />
           <div className="flex justify-between">
@@ -226,11 +238,23 @@ const Comment: React.FC<CommentProps> = ({ comment, refetch }) => {
       ) : (
         <div>
           <div
+          className="pb-2 font-normal"
             dangerouslySetInnerHTML={{
               __html: comment.value || "Add a comment here....",
             }}
           />
-          <button onClick={() => setIsReplyMode(true)}>Reply</button>
+          {canReply && (
+            <div className="mt-1 flex items-center">
+              <button
+                type="button"
+                className="flex items-center text-sm text-gray-500 hover:underline space-x-1"
+                onClick={() => setIsReplyMode(true)}
+              >
+                <FiMessageSquare />
+                <span>Reply</span>
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

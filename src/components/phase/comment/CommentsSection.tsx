@@ -11,10 +11,10 @@ import { useForm } from "react-hook-form";
 import { api } from "~/utils/api";
 
 // components
-import Comment from "./Comment";
 import PrimaryButton from "../../button/PrimaryButton";
 import TextEditor from "../TextEditor";
 import FormErrorMessage from "~/components/FormErrorMessage";
+import Comments from "./Comments";
 
 type CommentsSectionProps = {
   task_id: string;
@@ -51,6 +51,15 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({
     (a, b) =>
       new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   );
+
+  const rootComments = sortedComments.filter(
+    (rootComment) => rootComment.parent_id === null
+  );
+
+  const getReplies = (commentId: string) =>
+    sortedComments.filter(
+      (sortedComments) => sortedComments.parent_id === commentId
+    );
 
   // Create a new comment
   const addComment = api.comment.create.useMutation();
@@ -100,13 +109,14 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({
           </div>
         </div>
         {/* Display Comments */}
-        {sortedComments.map((comment) => (
-          <Comment
-            key={comment.id}
-            comment={comment}
+        {rootComments.map((rootComment) => (
+          <Comments
+            key={rootComment.id}
+            rootComment={rootComment}
             refetch={async () => {
               await commentsQuery.refetch();
             }}
+            replies={getReplies(rootComment.id)}
           />
         ))}
       </div>
