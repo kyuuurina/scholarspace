@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 
 import { z } from "zod";
 import { router, protectedProcedure } from "~/server/api/trpc";
@@ -9,7 +9,6 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export const profileRouter = router({
-  
   validate: protectedProcedure.query(async ({ ctx }) => {
     const userId = ctx.user?.id;
 
@@ -60,10 +59,7 @@ export const profileRouter = router({
         avatar_url: z.string().nullable(),
         about_me: z.string().nullable(),
         research_interest: z.string().nullable(),
-        collab_status: z.enum([
-          "Open_For_Collaboration",
-          "Not_Open_For_Collaboration",
-        ]),
+        collab_status: z.string().nullable(),
         skills: z.string().nullable(),
       })
     )

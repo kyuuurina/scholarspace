@@ -15,7 +15,7 @@ type FormData = {
   avatar_url: string | null;
   about_me: string | null;
   research_interest: string | null;
-  collab_status: "Open_For_Collaboration" | "Not_Open_For_Collaboration";
+  collab_status: string | null;
   skills: string | null;
 };
 
