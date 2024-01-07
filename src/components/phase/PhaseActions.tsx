@@ -10,7 +10,6 @@ type CellProps = {
 const PhaseActions: React.FC<CellProps> = ({
   phase_id,
   setIsCellActionOpen,
-  refetch,
 }) => {
   const deletePhase = api.phase.deletePhase.useMutation();
   const router = useRouter();
@@ -50,13 +49,6 @@ const PhaseActions: React.FC<CellProps> = ({
         onClick={handleDelete}
       >
         Delete
-      </button>
-      <button
-        type="button"
-        className="relative inline-flex w-full items-center border-b border-gray-200 px-2 py-1 text-sm font-medium hover:bg-gray-100 hover:text-blue-700 focus:z-10 "
-        onClick={handleEditType}
-      >
-        Edit
       </button>
     </div>
   );

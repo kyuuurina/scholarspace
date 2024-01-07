@@ -32,10 +32,16 @@ const Header: React.FC<HeaderProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const [isPhaseActionOpen, setIsPhaseActionOpen] = useState(false);
-  const handleContextMenu = (event: React.MouseEvent<HTMLLIElement>) => {
+  const [phaseActionStates, setPhaseActionStates] = useState<{
+    [key: string]: boolean;
+  }>({});
+
+  const handleContextMenu = (
+    event: React.MouseEvent<HTMLLIElement>,
+    phaseId: string
+  ) => {
     event.preventDefault();
-    setIsPhaseActionOpen(!isPhaseActionOpen);
+    setPhaseActionStates((prev) => ({ ...prev, [phaseId]: !prev[phaseId] }));
   };
 
   const ref = useClickAway(() => {
@@ -140,7 +146,7 @@ const Header: React.FC<HeaderProps> = ({
             <React.Fragment key={phase.id}>
               <li
                 ref={ref as React.MutableRefObject<HTMLLIElement>}
-                onContextMenu={handleContextMenu}
+                onContextMenu={(event) => handleContextMenu(event, phase.id)}
                 className={`rounded-t-md border ${
                   selectedPhase === phase.id ? "bg-gray-300" : "bg-gray-100"
                 } p-2 px-3 py-1 hover:cursor-pointer hover:bg-gray-50 hover:text-gray-700`}
@@ -148,10 +154,15 @@ const Header: React.FC<HeaderProps> = ({
               >
                 {phase.name}
               </li>
-              {isPhaseActionOpen && (
+              {phaseActionStates[phase.id] && (
                 <PhaseActions
                   phase_id={phase.id}
-                  setIsCellActionOpen={setIsPhaseActionOpen}
+                  setIsCellActionOpen={(isOpen) =>
+                    setPhaseActionStates((prev) => ({
+                      ...prev,
+                      [phase.id]: isOpen,
+                    }))
+                  }
                   refetch={refetch}
                 />
               )}
