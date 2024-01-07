@@ -1,5 +1,9 @@
 import { api } from "~/utils/api";
 import { useRouter } from "next/router";
+import { useRouterId } from "~/utils/routerId";
+import toast from "react-hot-toast";
+import ErrorToast from "../toast/ErrorToast";
+import { TRPCClientError } from "@trpc/client";
 
 type CellProps = {
   phase_id: string;
@@ -16,21 +20,33 @@ const PhaseActions: React.FC<CellProps> = ({
 }) => {
   const deletePhase = api.phase.deletePhase.useMutation();
   const router = useRouter();
+  const projectId = useRouterId();
   const handleRename = () => {
     onClosePhaseActions();
     onClickRename(); // Call the function to trigger renaming mode
   };
   const handleDelete = async () => {
-    await deletePhase.mutateAsync(
-      { id: phase_id },
-      {
-        onSuccess: () => {
-          router.reload();
-          setIsCellActionOpen(false);
-          onClosePhaseActions();
-        },
-      }
-    );
+    try {
+      await deletePhase.mutateAsync(
+        { id: phase_id, project_id: projectId },
+        {
+          onSuccess: () => {
+            router.reload();
+            setIsCellActionOpen(false);
+            onClosePhaseActions();
+          },
+        }
+      );
+    } catch (error) {
+      toast.custom(() => {
+        if (error instanceof TRPCClientError) {
+          return <ErrorToast message={error.message} />;
+        } else {
+          // Handle other types of errors or fallback to a default message
+          return <ErrorToast message="An error occurred." />;
+        }
+      });
+    }
   };
 
   return (

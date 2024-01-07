@@ -207,10 +207,24 @@ export const phaseRouter = router({
     .input(
       z.object({
         id: z.string(),
+        project_id: z.string(),
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const { id } = input;
+      const { id, project_id } = input;
+      // if there is only one phase after delete, throw error
+      const phases = await ctx.prisma.phase.findMany({
+        where: {
+          project_id: project_id,
+        },
+      });
+
+      if (phases.length === 1) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "You cannot delete the last phase",
+        });
+      }
 
       // if tasks exist, delete them first
       const tasks = await ctx.prisma.task.findMany({
@@ -224,20 +238,6 @@ export const phaseRouter = router({
           where: {
             phase_id: id,
           },
-        });
-      }
-
-      // if there is only one phase after delete, throw error
-      const phases = await ctx.prisma.phase.findMany({
-        where: {
-          project_id: id,
-        },
-      });
-
-      if (phases.length - 1 === 1) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "You cannot delete the last phase",
         });
       }
 
