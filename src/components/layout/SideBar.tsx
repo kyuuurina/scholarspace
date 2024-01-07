@@ -38,7 +38,7 @@ export const SideBar: React.FC<SideBarProps> = ({ toggleSidebar, open, profileId
   useSessionContext();
   // const { user } = session.data?.user;
   const { supabaseClient } = useSessionContext();
-  const userId = getCookie("User ID");
+  const userId = getCookie("User ID") as string;
 
   // const id = useRouterId();
 
@@ -93,7 +93,7 @@ export const SideBar: React.FC<SideBarProps> = ({ toggleSidebar, open, profileId
                   className={`flex items-center space-x-3 rounded-md hover:bg-purple-800 ${
                     open ? "text-purple-accent-2" : "text-purple-accent-2"
                   }`}
-                  href={`/home-rwp/${id}`}
+                  href={`/home-rwp/${userId}`}
                   onClick={toggleSidebar}
                 >
                   <FiHome className="h-6 w-6" />
@@ -132,7 +132,7 @@ export const SideBar: React.FC<SideBarProps> = ({ toggleSidebar, open, profileId
 
               <li className="rounded-sm">
                 <Link
-                  href="/"
+                  href="/message"
                   className={`flex items-center space-x-3 rounded-md hover:bg-purple-800 ${
                     open ? "text-purple-accent-2" : "text-purple-accent-2"
                   }`}
