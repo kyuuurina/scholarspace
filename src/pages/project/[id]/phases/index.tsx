@@ -59,6 +59,7 @@ const Phase: NextPageWithLayout = () => {
     }
   }, [phases, selectedPhase]);
 
+
   return (
     <>
       <Head title={name} />

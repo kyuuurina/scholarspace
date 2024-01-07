@@ -1,7 +1,5 @@
 import { api } from "~/utils/api";
-import { useState } from "react";
 import { useFetchTasksWithProperties } from "~/utils/task";
-import { set } from "zod";
 
 type CellProps = {
   property_id: string;
@@ -25,7 +23,7 @@ const CellActions: React.FC<CellProps> = ({
     console.log("rename");
   };
   const handleDelete = async () => {
-    deleteProperty.mutate({ id: property_id });
+    await deleteProperty.mutateAsync({ id: property_id });
     await refetch();
     setIsCellActionOpen(false);
   };
