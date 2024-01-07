@@ -112,4 +112,24 @@ export const commentRouter = router({
 
       return comment;
     }),
+
+  edit: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        value: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const comment = await ctx.prisma.comment.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          value: input.value,
+        },
+      });
+
+      return comment;
+    }),
 });

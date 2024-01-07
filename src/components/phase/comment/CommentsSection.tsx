@@ -27,7 +27,7 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({
 }) => {
   // form schema
   const schema: ZodType<{ commentN: string }> = z.object({
-    commentN: z.string().min(3, { message: "Task description is too short" }),
+    commentN: z.string().min(10, { message: "Comment is too short" }),
   });
 
   // react-hook-form
@@ -47,6 +47,11 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({
   );
   const comments = commentsQuery.data || [];
 
+  const sortedComments = comments.sort(
+    (a, b) =>
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  );
+
   // Create a new comment
   const addComment = api.comment.create.useMutation();
 
@@ -57,8 +62,6 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({
         task_id,
         value: formData.commentN,
       });
-
-      // Clear the input field
       reset();
       refetch();
       await commentsQuery.refetch();
@@ -81,20 +84,30 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({
             documentValue={""}
             setDocumentValue={(value) => setValue("commentN", value)}
           />
-          {errors.commentN && (
-            <FormErrorMessage text={errors.commentN.message} />
-          )}
-          <form
-            onSubmit={handleSubmit(handleCommentSubmit)}
-            className="mb-3 justify-between"
-          >
-            {/* Post Comment Button */}
-            <PrimaryButton name="Post comment" type="submit" />
-          </form>
+          <div className="flex justify-between">
+            <div>
+              {errors.commentN && (
+                <FormErrorMessage text={errors.commentN.message} />
+              )}
+            </div>
+            <form
+              onSubmit={handleSubmit(handleCommentSubmit)}
+              className="mb-3 justify-between"
+            >
+              {/* Post Comment Button */}
+              <PrimaryButton name="Post comment" type="submit" />
+            </form>
+          </div>
         </div>
         {/* Display Comments */}
-        {comments.map((comment) => (
-          <Comment key={comment.id} comment={comment} />
+        {sortedComments.map((comment) => (
+          <Comment
+            key={comment.id}
+            comment={comment}
+            refetch={async () => {
+              await commentsQuery.refetch();
+            }}
+          />
         ))}
       </div>
     </section>

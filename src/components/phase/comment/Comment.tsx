@@ -3,22 +3,70 @@ import { api } from "~/utils/api";
 import Avatar from "../../avatar/avatar";
 import { FiMoreHorizontal } from "react-icons/fi";
 import CommentActions from "./CommentActions";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useClickAway } from "@uidotdev/usehooks";
+import TextEditor from "../TextEditor";
+import { type ZodType, z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import FormErrorMessage from "~/components/FormErrorMessage";
 
 type CommentProps = {
   comment: comment;
+  refetch: () => Promise<void>;
 };
 
-const Comment: React.FC<CommentProps> = ({ comment }) => {
-  const { value, user_id, created_at } = comment;
+const Comment: React.FC<CommentProps> = ({ comment, refetch }) => {
+  const { user_id, created_at, id } = comment;
   const [showActions, setShowActions] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+
+  const editComment = api.comment.edit.useMutation();
+
+  // form schema
+  const schema: ZodType<{ value: string }> = z.object({
+    value: z.string().min(10, { message: "Comment is too short" }),
+  });
+
+  // react-hook-form
+  const {
+    handleSubmit,
+    setValue,
+    reset,
+    formState: { errors },
+  } = useForm<{ value: string }>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      value: comment.value ?? "",
+    },
+  });
+
+  useEffect(() => {
+    if (comment.value !== undefined) {
+      setValue("value", comment.value || "");
+    }
+  }, [comment.value, setValue]);
 
   // get user from api
   const { data: user } = api.user.get.useQuery(
     { id: user_id },
     { enabled: !!user_id }
   );
+
+  const handleUpdateComment = async (formData: { value: string }) => {
+    // Send the edit request to the server
+    try {
+      await editComment.mutateAsync({
+        id,
+        ...formData,
+      });
+      reset();
+      await refetch();
+      setIsEditMode(false);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const ref = useClickAway(() => {
     setShowActions(false);
@@ -57,16 +105,54 @@ const Comment: React.FC<CommentProps> = ({ comment }) => {
               className="absolute left-0 top-full"
               ref={ref as React.MutableRefObject<HTMLDivElement>}
             >
-              <CommentActions />
+              <CommentActions
+                onEditClick={() => {
+                  setIsEditMode(true);
+                  setShowActions(false);
+                }}
+                onDeleteClick={() => {
+                  // Implement delete logic
+                }}
+              />
             </div>
           )}
         </div>
       </div>
-      <div
-        dangerouslySetInnerHTML={{
-          __html: value || "Add a comment here....",
-        }}
-      />
+      {isEditMode ? (
+        <div>
+          <TextEditor
+            documentValue={comment.value}
+            setDocumentValue={(value) => setValue("value", value)}
+          />
+          <div className="flex justify-between">
+            <div>
+              {errors.value && <FormErrorMessage text={errors.value.message} />}
+            </div>
+            <div className="flex justify-end">
+              <button className="px-3" onClick={() => setIsEditMode(false)}>
+                Cancel
+              </button>
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  await handleSubmit(handleUpdateComment)(e);
+                }}
+                autoComplete="off"
+              >
+                <button type="submit" className="btn btn-primary">
+                  Save
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div
+          dangerouslySetInnerHTML={{
+            __html: comment.value || "Add a comment here....",
+          }}
+        />
+      )}
     </div>
   );
 };

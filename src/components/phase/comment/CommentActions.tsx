@@ -17,7 +17,10 @@ const CommentActions: React.FC<CommentActionsProps> = ({
         className="py-1 text-sm text-gray-700 dark:text-gray-200"
         aria-labelledby="dropdownMenuIconHorizontalButton"
       >
-        <li className="block cursor-pointer px-4 py-2 hover:bg-gray-100">
+        <li
+          className="block cursor-pointer px-4 py-2 hover:bg-gray-100"
+          onClick={onEditClick}
+        >
           Edit
         </li>
         <li className="block cursor-pointer px-4 py-2 hover:bg-gray-100">
