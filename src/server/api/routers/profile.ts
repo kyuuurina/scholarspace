@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+
 import { z } from "zod";
 import { router, protectedProcedure, publicProcedure } from "~/server/api/trpc";
 import { TRPCError } from "@trpc/server";
@@ -56,28 +59,25 @@ export const profileRouter = router({
 
     // create profile during registration
   create: protectedProcedure
-  .input(
-    z.object({
-      name: z.string(),
-      avatar_url: z.string().nullable(),
-      about_me: z.string().nullable(),
-      research_interest: z.string().nullable(),
-      collab_status: z.enum([
-        "Open_For_Collaboration",
-        "Not_Open_For_Collaboration",
-      ]),
-      skills: z.string().nullable(),
-    })
-  )
-  .mutation(async ({ input, ctx }) => {
-    const {
-      name,
-      avatar_url,
-      about_me,
-      research_interest,
-      collab_status,
-      skills,
-    } = input;
+    .input(
+      z.object({
+        name: z.string(),
+        avatar_url: z.string().nullable(),
+        about_me: z.string().nullable(),
+        research_interest: z.string().nullable(),
+        collab_status: z.string().nullable(),
+        skills: z.string().nullable(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const {
+        name,
+        avatar_url,
+        about_me,
+        research_interest,
+        collab_status,
+        skills,
+      } = input;
 
     const userId = ctx.user?.id;
     console.log("User ID:", userId);

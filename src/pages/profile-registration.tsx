@@ -14,9 +14,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMultistepForm } from "~/utils/useMultistepForm";
 
 // import custom components
-import PrimaryButton from "~/components/button/PrimaryButton";
 import Button from "~/components/button/Button";
-import FormErrorMessage from "~/components/FormErrorMessage";
 import SignoutButton from "~/components/auth/SignoutButton";
 
 // import { RoleForm } from "~/components/profile-registration/RoleForm";
@@ -46,10 +44,7 @@ const SignUp: NextPage = () => {
     avatar_url: z.string().nullable(),
     about_me: z.string().nullable(),
     research_interest: z.string().nullable(),
-    collab_status: z.enum([
-      "Open_For_Collaboration",
-      "Not_Open_For_Collaboration",
-    ]),
+    collab_status: z.string().nullable(),
     skills: z.string().nullable(),
   });
 

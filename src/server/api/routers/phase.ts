@@ -203,4 +203,72 @@ export const phaseRouter = router({
       return property;
     }),
 
+  deletePhase: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        project_id: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { id, project_id } = input;
+      // if there is only one phase after delete, throw error
+      const phases = await ctx.prisma.phase.findMany({
+        where: {
+          project_id: project_id,
+        },
+      });
+
+      if (phases.length === 1) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "You cannot delete the last phase",
+        });
+      }
+
+      // if tasks exist, delete them first
+      const tasks = await ctx.prisma.task.findMany({
+        where: {
+          phase_id: id,
+        },
+      });
+
+      if (tasks) {
+        await ctx.prisma.task.deleteMany({
+          where: {
+            phase_id: id,
+          },
+        });
+      }
+
+      const phase = await ctx.prisma.phase.delete({
+        where: {
+          id,
+        },
+      });
+
+      return phase;
+    }),
+
+  renamePhase: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        name: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { id, name } = input;
+
+      const phase = await ctx.prisma.phase.update({
+        where: {
+          id,
+        },
+        data: {
+          name,
+        },
+      });
+
+      return phase;
+    }),
 });
