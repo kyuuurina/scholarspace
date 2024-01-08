@@ -7,7 +7,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 // eslint-disable-next-line import/no-anonymous-default-export
 export default async (_req: NextApiRequest, res: NextApiResponse) => {
   const { data, error } = await resend.emails.send({
-    from: "onboarding@resend.dev", // change after dah verify scholarspace domain
+    from: "notify@scholarspace.site", // change after dah verify scholarspace domain
     to: "khairinahizar@gmail.com",
     subject: "Hello world",
     react: EmailTemplate({ firstName: "John" }),

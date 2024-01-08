@@ -4,6 +4,23 @@ import { TRPCError } from "@trpc/server";
 import { router, protectedProcedure } from "~/server/api/trpc";
 
 export const notificationsRouter = router({
+  // getNotification: protectedProcedure.query(async ({ ctx }) => {
+  //   try {
+  //     const notifications = await ctx.prisma.notification.findMany({
+  //       where: {
+  //         user_id: ctx.user.id,
+  //       },
+  //     });
+
+  //     return notifications;
+  //   } catch (err) {
+  //     throw new TRPCError({
+  //       code: "INTERNAL_SERVER_ERROR",
+  //       message: "Internal server error",
+  //     });
+  //   }
+  // }),
+
   getSettings: protectedProcedure.query(async ({ ctx }) => {
     try {
       const notificationSettings =
@@ -101,5 +118,24 @@ export const notificationsRouter = router({
           message: "Internal server error",
         });
       }
+    }),
+
+  createNotification: protectedProcedure
+    .input(
+      z.object({
+        message: z.string(),
+        type: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const notification = await ctx.prisma.notification.create({
+        data: {
+          ...input,
+          user_id: ctx.user.id,
+          notif_settings_id: ctx.user.id,
+        },
+      });
+
+      return notification;
     }),
 });
