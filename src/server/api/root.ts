@@ -19,6 +19,7 @@ import { taskRouter } from "./routers/task";
 import { commentRouter } from "./routers/comment";
 import { scoreRouter } from "./routers/score";
 import { reactionRouter } from "./routers/reaction";
+import { notificationsRouter } from "./routers/notifications";
 
 /**
  * This is the primary router for your server.
@@ -46,6 +47,7 @@ export const appRouter = router({
   follow: followRouter,
   postlike: likeRouter,
   postcomment: postCommentRouter,
+  notifications: notificationsRouter,
 });
 
 // export type definition of API

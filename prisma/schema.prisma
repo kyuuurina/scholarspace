@@ -304,18 +304,19 @@ model workspace_user {
 }
 
 model user {
-  id                                           String                @id @db.Uuid
+  id                                           String                 @id @db.Uuid
   name                                         String?
   avatar_url                                   String?
   email                                        String?
-  chat_chat_user1_idTouser                     chat[]                @relation("chat_user1_idTouser")
-  chat_chat_user2_idTouser                     chat[]                @relation("chat_user2_idTouser")
-  chat_message_chat_message_recipient_idTouser chat_message[]        @relation("chat_message_recipient_idTouser")
-  chat_message_chat_message_sender_idTouser    chat_message[]        @relation("chat_message_sender_idTouser")
+  chat_chat_user1_idTouser                     chat[]                 @relation("chat_user1_idTouser")
+  chat_chat_user2_idTouser                     chat[]                 @relation("chat_user2_idTouser")
+  chat_message_chat_message_recipient_idTouser chat_message[]         @relation("chat_message_recipient_idTouser")
+  chat_message_chat_message_sender_idTouser    chat_message[]         @relation("chat_message_sender_idTouser")
   comment                                      comment[]
-  follow_follow_follower_idTouser              follow[]              @relation("follow_follower_idTouser")
-  follow_follow_following_idTouser             follow[]              @relation("follow_following_idTouser")
+  follow_follow_follower_idTouser              follow[]               @relation("follow_follower_idTouser")
+  follow_follow_following_idTouser             follow[]               @relation("follow_following_idTouser")
   message                                      message[]
+  notification_settings                        notification_settings?
   post_comments                                post_comments[]
   post_likes                                   post_likes[]
   profile                                      profile[]
@@ -640,6 +641,26 @@ model reaction {
   user       user     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@id([comment_id, user_id])
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model notification_settings {
+  email_enbld      Boolean  @default(true)
+  web_enbld        Boolean  @default(true)
+  types            String[] @default(["TASK_RMND"])
+  user_id          String   @id @unique @db.Uuid
+  task_rmndr_enbld Boolean  @default(true)
+  user             user     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model test {
+  id  String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  yes Boolean @default(true)
+
   @@schema("public")
 }
 
