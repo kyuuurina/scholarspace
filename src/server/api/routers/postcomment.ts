@@ -87,6 +87,44 @@ create: protectedProcedure
     return newComment;
   }),
 
+  //get comments of post
+  getComments: protectedProcedure
+    .input(
+      z.object({
+        post_id: z.string(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const { post_id } = input;
+
+      // Fetch post comments based on the provided post_id
+      const postComments = await ctx.prisma.post_comments.findMany({
+        where: {
+          post_id,
+        },
+        select: {
+          comment_id: true,
+          value: true,
+          created_at: true,
+          user: {
+            select: {
+              profile: {
+                select: {
+                  name: true,
+                  avatar_url: true,
+                },
+              },
+            },
+          },
+        },
+        // orderBy: {
+        //   created_at: "asc", // Order comments by creation date (you can adjust this based on your needs)
+        // },
+      });
+
+      return postComments;
+    }),
+
   // Mutation to update an existing post comment
   update: protectedProcedure
     .input(

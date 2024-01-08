@@ -7,7 +7,8 @@ import Card from '../Card';
 import AvatarPlaceholder from '../avatar/AvatarPlaceholder';
 import ProfileAvatarPlaceholder from '../avatar/ProfileAvatar';
 import PostComment from '../research-post-att/PostComment'; // Import the PostComment component
-import CommentsList from './CommentList'; // Import the CommentList component
+// import CommentsList from './CommentList'; // Import the CommentList component
+import CommentList from '../research-post-att/PostCommentList';
 
 import router, { useRouter } from 'next/router';
 
@@ -263,6 +264,10 @@ const Post: React.FC<PostProps> = ({ post, onEditClick }) => {
       {/* Display comment creation form */}
       <div className="mt-4">
       <PostComment post_id={post.post_id} onCommentSubmit={handleCommentSubmit} />
+      </div>
+
+      <div className="mt-4">
+        {/* <CommentList post_id={post.post_id} /> */}
       </div>
     </Card>
   );
