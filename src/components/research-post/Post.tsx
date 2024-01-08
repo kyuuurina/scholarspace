@@ -50,7 +50,7 @@ interface PostProps {
     author: string | null;
     description: string | null;
     created_at: Date;
-    comments: Comment[];
+    comments?: Comment[];
   };
   onEditClick: () => void;
 }

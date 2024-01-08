@@ -304,18 +304,20 @@ model workspace_user {
 }
 
 model user {
-  id                                           String                @id @db.Uuid
+  id                                           String                 @id @db.Uuid
   name                                         String?
   avatar_url                                   String?
   email                                        String?
-  chat_chat_user1_idTouser                     chat[]                @relation("chat_user1_idTouser")
-  chat_chat_user2_idTouser                     chat[]                @relation("chat_user2_idTouser")
-  chat_message_chat_message_recipient_idTouser chat_message[]        @relation("chat_message_recipient_idTouser")
-  chat_message_chat_message_sender_idTouser    chat_message[]        @relation("chat_message_sender_idTouser")
+  chat_chat_user1_idTouser                     chat[]                 @relation("chat_user1_idTouser")
+  chat_chat_user2_idTouser                     chat[]                 @relation("chat_user2_idTouser")
+  chat_message_chat_message_recipient_idTouser chat_message[]         @relation("chat_message_recipient_idTouser")
+  chat_message_chat_message_sender_idTouser    chat_message[]         @relation("chat_message_sender_idTouser")
   comment                                      comment[]
-  follow_follow_follower_idTouser              follow[]              @relation("follow_follower_idTouser")
-  follow_follow_following_idTouser             follow[]              @relation("follow_following_idTouser")
+  follow_follow_follower_idTouser              follow[]               @relation("follow_follower_idTouser")
+  follow_follow_following_idTouser             follow[]               @relation("follow_following_idTouser")
   message                                      message[]
+  notification                                 notification[]
+  notification_settings                        notification_settings?
   post_comments                                post_comments[]
   post_likes                                   post_likes[]
   profile                                      profile[]
@@ -323,6 +325,7 @@ model user {
   profile_education                            profile_education[]
   profile_experience                           profile_experience[]
   project_users                                project_users[]
+  reaction                                     reaction[]
   research_post                                research_post[]
   task_assignees                               task_assignees[]
   workspace_user                               workspace_user[]
@@ -486,13 +489,17 @@ model profile_experience {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model comment {
-  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  created_at DateTime @default(now()) @db.Timestamptz(6)
-  value      String
-  task_id    String   @db.Uuid
-  user_id    String   @db.Uuid
-  task       task     @relation(fields: [task_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  user       user     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id            String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at    DateTime   @default(now()) @db.Timestamptz(6)
+  value         String
+  task_id       String     @db.Uuid
+  user_id       String     @db.Uuid
+  parent_id     String?    @db.Uuid
+  comment       comment?   @relation("commentTocomment", fields: [parent_id], references: [id], onDelete: Cascade)
+  other_comment comment[]  @relation("commentTocomment")
+  task          task       @relation(fields: [task_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user          user       @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  reaction      reaction[]
 
   @@schema("public")
 }
@@ -622,6 +629,53 @@ model message {
   timestamp  DateTime @default(now()) @db.Timestamptz(6)
   chat       chat?    @relation(fields: [chat_id], references: [chat_id], onDelete: NoAction, onUpdate: NoAction)
   user       user?    @relation(fields: [sender_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model notification {
+  id                    String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at            DateTime              @default(now()) @db.Timestamptz(6)
+  user_id               String                @db.Uuid
+  notif_settings_id     String                @db.Uuid
+  message               String
+  type                  String
+  notification_settings notification_settings @relation(fields: [notif_settings_id], references: [user_id], onDelete: Cascade)
+  user                  user                  @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model notification_settings {
+  email_enbld      Boolean        @default(true)
+  web_enbld        Boolean        @default(true)
+  types            String[]       @default(["TASK_RMND"])
+  user_id          String         @id @unique @db.Uuid
+  task_rmndr_enbld Boolean        @default(true)
+  notification     notification[]
+  user             user           @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model reaction {
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  comment_id String   @db.Uuid
+  user_id    String   @db.Uuid
+  comment    comment  @relation(fields: [comment_id], references: [id], onDelete: Cascade)
+  user       user     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@id([comment_id, user_id])
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model test {
+  id  String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  yes Boolean @default(true)
 
   @@schema("public")
 }
