@@ -60,12 +60,27 @@ create: protectedProcedure
       });
     }
 
-    // Create a new comment for the associated post
+    // Create a new comment for the associated post and select additional fields
     const newComment = await ctx.prisma.post_comments.create({
       data: {
         value,
         user_id: ctx.user.id,
         post_id,
+      },
+      select: {
+        comment_id: true,
+        value: true,
+        created_at: true,
+        user: {
+          select: {
+            profile: {
+              select: {
+                name: true,
+                avatar_url: true,
+              },
+            },
+          },
+        },
       },
     });
 
