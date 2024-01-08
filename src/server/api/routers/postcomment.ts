@@ -16,10 +16,17 @@ export const postCommentRouter = router({
     .query(async ({ input, ctx }) => {
       const { post_id } = input;
 
-      // Fetch post comments based on the provided post_id
+      // Fetch post comments based on the provided post_id and include user profile
       const postComments = await ctx.prisma.post_comments.findMany({
         where: {
           post_id,
+        },
+        include: {
+          user: {
+            select: {
+              profile: true,
+            },
+          },
         },
       });
 

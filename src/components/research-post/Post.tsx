@@ -9,6 +9,7 @@ import ProfileAvatarPlaceholder from '../avatar/ProfileAvatar';
 import PostComment from '../research-post-att/PostComment'; // Import the PostComment component
 // import CommentsList from './CommentList'; // Import the CommentList component
 import CommentList from '../research-post-att/PostCommentList';
+import PostCommentList from '../research-post-att/PostCommentList';
 
 import router, { useRouter } from 'next/router';
 
@@ -171,6 +172,15 @@ const Post: React.FC<PostProps> = ({ post, onEditClick }) => {
     },
   });
 
+
+  // State for toggling comment list visibility
+  const [showCommentList, setShowCommentList] = useState(false);
+
+  // Function to toggle comment list visibility
+  const toggleCommentList = () => {
+    setShowCommentList((prev) => !prev);
+  };
+
   
 
   return (
@@ -267,7 +277,7 @@ const Post: React.FC<PostProps> = ({ post, onEditClick }) => {
       </div>
 
       <div className="mt-4">
-        {/* <CommentList post_id={post.post_id} /> */}
+      <PostCommentList post_id={post.post_id} />
       </div>
     </Card>
   );

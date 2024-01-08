@@ -44,17 +44,17 @@ const PostComment: React.FC<PostCommentProps> = ({ post_id, onCommentSubmit }) =
   const createComment = api.postcomment.create.useMutation(); // Create useMutation here
 
   return (
-    <article className="mb-1 border-t border-gray-200 bg-white p-4 text-base dark:border-gray-700 dark:bg-gray-900">
+    <div className="mb-1 border-t border-gray-200 bg-white p-4 text-base dark:border-gray-700 dark:bg-gray-900">
       {/* Form for creating a new comment */}
       <form className="flex items-center" onSubmit={handleSubmit(handleCommentSubmit)}>
         <div className="flex items-center w-full border rounded overflow-hidden">
           {/* <Avatar name="User" shape="circle" size="8" className="mr-2" /> */}
           <textarea
-              {...register('value')}
-              placeholder="Add a public comment..."
-              className="w-full p-1 bg-transparent focus:outline-none"
-              style={{ minWidth: 0, flex: 1, height: '2.5rem' }}
-            />
+            {...register('value')}
+            placeholder="Add a comment..."
+            className="w-full p-2 border-none bg-transparent focus:outline-none focus:border-none"
+            style={{ minWidth: 0, flex: 1, verticalAlign: 'middle' }}
+          />
         </div>
         <div className="ml-2">
           <PrimaryButton
@@ -64,8 +64,7 @@ const PostComment: React.FC<PostCommentProps> = ({ post_id, onCommentSubmit }) =
           />
         </div>
       </form>
-      <FormErrorMessage text={errors.value?.message} />
-    </article>
+    </div>
   );
 };
 
