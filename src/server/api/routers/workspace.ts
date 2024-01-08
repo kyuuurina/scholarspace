@@ -242,7 +242,7 @@ export const workspaceRouter = router({
                   project_id: project.project_id,
                   user_id: user.id,
                   project_role: role,
-                  is_external_collaborator: true,
+                  is_external_collaborator: false,
                 },
               });
             } else {
