@@ -20,7 +20,7 @@ type FormValues = { value: string }; // Define FormValues type
 const PostComment: React.FC<PostCommentProps> = ({ post_id, onCommentSubmit }) => {
   // Zod schema for form validation
   const schema: ZodType<FormValues> = z.object({
-    value: z.string().min(10, { message: 'Comment is too short' }),
+    value: z.string().min(3, { message: 'Comment is too short' }),
   });
 
   // React-hook-form setup
