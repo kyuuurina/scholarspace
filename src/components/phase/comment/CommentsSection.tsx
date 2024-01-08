@@ -11,10 +11,10 @@ import { useForm } from "react-hook-form";
 import { api } from "~/utils/api";
 
 // components
-import Comment from "./Comment";
-import PrimaryButton from "../button/PrimaryButton";
-import TextEditor from "./TextEditor";
+import PrimaryButton from "../../button/PrimaryButton";
+import TextEditor from "../TextEditor";
 import FormErrorMessage from "~/components/FormErrorMessage";
+import Comments from "./Comments";
 
 type CommentsSectionProps = {
   task_id: string;
@@ -27,7 +27,7 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({
 }) => {
   // form schema
   const schema: ZodType<{ commentN: string }> = z.object({
-    commentN: z.string().min(3, { message: "Task description is too short" }),
+    commentN: z.string().min(10, { message: "Comment is too short" }),
   });
 
   // react-hook-form
@@ -47,6 +47,20 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({
   );
   const comments = commentsQuery.data || [];
 
+  const sortedComments = comments.sort(
+    (a, b) =>
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  );
+
+  const rootComments = sortedComments.filter(
+    (rootComment) => rootComment.parent_id === null
+  );
+
+  const getReplies = (commentId: string) =>
+    sortedComments.filter(
+      (sortedComments) => sortedComments.parent_id === commentId
+    );
+
   // Create a new comment
   const addComment = api.comment.create.useMutation();
 
@@ -57,8 +71,6 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({
         task_id,
         value: formData.commentN,
       });
-
-      // Clear the input field
       reset();
       refetch();
       await commentsQuery.refetch();
@@ -81,20 +93,31 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({
             documentValue={""}
             setDocumentValue={(value) => setValue("commentN", value)}
           />
-          {errors.commentN && (
-            <FormErrorMessage text={errors.commentN.message} />
-          )}
-          <form
-            onSubmit={handleSubmit(handleCommentSubmit)}
-            className="mb-3 justify-between"
-          >
-            {/* Post Comment Button */}
-            <PrimaryButton name="Post comment" type="submit" />
-          </form>
+          <div className="flex justify-between">
+            <div>
+              {errors.commentN && (
+                <FormErrorMessage text={errors.commentN.message} />
+              )}
+            </div>
+            <form
+              onSubmit={handleSubmit(handleCommentSubmit)}
+              className="mb-3 justify-between"
+            >
+              {/* Post Comment Button */}
+              <PrimaryButton name="Post comment" type="submit" />
+            </form>
+          </div>
         </div>
         {/* Display Comments */}
-        {comments.map((comment) => (
-          <Comment key={comment.id} comment={comment} />
+        {rootComments.map((rootComment) => (
+          <Comments
+            key={rootComment.id}
+            rootComment={rootComment}
+            refetch={async () => {
+              await commentsQuery.refetch();
+            }}
+            replies={getReplies(rootComment.id)}
+          />
         ))}
       </div>
     </section>

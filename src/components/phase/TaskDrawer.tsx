@@ -1,24 +1,16 @@
 // libraries and hooks
-import React, { useState, useEffect } from "react";
-import Select, { type MultiValue } from "react-select";
-import { useForm } from "react-hook-form";
-import { type ZodType, z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import React, { useState } from "react";
 
 // utils
-import { useFetchProjectMembers } from "~/utils/project";
-import { useFetchTasksWithProperties } from "~/utils/task";
 import { api } from "~/utils/api";
 
 // types
-import type { taskRow, TaskFormData } from "~/types/task";
+import type { taskRow } from "~/types/task";
 import type { phase_property } from "@prisma/client";
 
 // components
-import CommentsSection from "./CommentsSection";
-import Avatar from "../avatar/avatar";
+import CommentsSection from "./comment/CommentsSection";
 import StatusBadge from "./StatusBadge";
-import FormErrorMessage from "~/components/FormErrorMessage";
 import TaskHeader from "./TaskHeader";
 import TaskDescription from "./TaskDescription";
 import AttachmentUpload from "./AttachmentUpload";
@@ -37,14 +29,9 @@ type TaskDrawerProps = {
 const TaskDrawer: React.FC<TaskDrawerProps> = ({
   task,
   onClose,
-  properties,
   refetch,
 }) => {
   const [taskStatus, setTaskStatus] = useState("pending");
-  const [addAssignees, setAddAssignees] = useState<boolean>(false);
-  const [selectedAssignees, setSelectedAssignees] = useState<MultiValue<never>>(
-    []
-  );
 
   const handleContentClick = (
     event: React.MouseEvent<HTMLDivElement> | undefined
@@ -53,14 +40,6 @@ const TaskDrawer: React.FC<TaskDrawerProps> = ({
     event?.stopPropagation();
   };
 
-  console.log("hi");
-  const { userDropdown } = useFetchProjectMembers();
-
-  const handleAssigneesChange = (selectedOptions: MultiValue<never>) => {
-    setSelectedAssignees(selectedOptions);
-  };
-
-  const [tdescription, setTDescription] = useState("");
 
   // date
   const [startDate, setStartDate] = useState<Date | undefined>(
@@ -144,7 +123,7 @@ const TaskDrawer: React.FC<TaskDrawerProps> = ({
             </div>
             <NonNullableDatePicker
               selectedDate={startDate}
-              onChange={async (date, event) => {
+              onChange={async (date) => {
                 setStartDate(date);
                 await onStartDateChange(date);
               }}
@@ -152,7 +131,7 @@ const TaskDrawer: React.FC<TaskDrawerProps> = ({
             />
             <NullableDatePicker
               selectedDate={deadline}
-              onChange={async (date, event) => {
+              onChange={async (date) => {
                 setDeadline(date);
                 await onDeadlineChange(date);
               }}
