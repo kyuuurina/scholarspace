@@ -36,6 +36,7 @@ const Phase: NextPageWithLayout = () => {
 
   // state to store the selected phase
   const [selectedPhase, setSelectedPhase] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   // boolean conditions for loading and error
   const isLoading = phasesIsLoading;
@@ -46,6 +47,10 @@ const Phase: NextPageWithLayout = () => {
     setSelectedPhase(phaseId);
   };
   const [safePhases, setSafePhases] = useState<phase[]>([]); // Replace 'phase' with the actual type of your phases
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(event.target.value);
+  };
 
   useEffect(() => {
     // Set the default selected phase when the component mounts
@@ -58,7 +63,6 @@ const Phase: NextPageWithLayout = () => {
       }
     }
   }, [phases, selectedPhase]);
-
 
   return (
     <>
@@ -80,6 +84,8 @@ const Phase: NextPageWithLayout = () => {
                     type="text"
                     className="block w-80 rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900"
                     placeholder="Search for tasks"
+                    value={searchQuery}
+                    onChange={handleSearchChange}
                   />
                   <div className="flex justify-between space-x-2">
                     <PrimaryButton
@@ -88,12 +94,12 @@ const Phase: NextPageWithLayout = () => {
                     />
                     <PrimaryButton
                       name="Sort"
-                      onClick={() => router.push(`/project/${id}/tasks/new`)}
+                      onClick={() => console.log("sort")}
                     />
                   </div>
                 </div>
                 <div className="overflow-x-auto">
-                  <Table phase_id={selectedPhase} />
+                  <Table phase_id={selectedPhase} searchQuery={searchQuery} />
                 </div>
               </div>
             )}

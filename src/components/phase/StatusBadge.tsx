@@ -1,7 +1,6 @@
 import { api } from "~/utils/api";
 import type { taskRow } from "~/types/task";
 import { useState, useEffect } from "react";
-import { useClickAway } from "@uidotdev/usehooks";
 import { useFetchTasksWithProperties } from "~/utils/task";
 import { set } from "zod";
 
@@ -18,9 +17,6 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({
 }) => {
   const updateStatusTask = api.task.updateStatus.useMutation();
   const [isDropdownOpen, setDropdownOpen] = useState(false);
-  const ref = useClickAway(() => {
-    setDropdownOpen(false);
-  });
 
   useEffect(() => {
     if (task && setStatus) {
@@ -101,7 +97,6 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({
           task?.status || status || ""
         )}`}
         onClick={() => setDropdownOpen(!isDropdownOpen)}
-        ref={ref as React.MutableRefObject<HTMLSpanElement>}
       >
         {task ? task.status : status}
       </span>
