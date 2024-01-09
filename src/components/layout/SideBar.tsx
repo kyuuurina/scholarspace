@@ -2,9 +2,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import Router, { useRouter } from "next/router";
-import { getCookie } from "cookies-next";
 import { useSession, useSessionContext } from "@supabase/auth-helpers-react";
-import { api } from "~/utils/api";
+import { useUser } from "@supabase/auth-helpers-react";
 
 // icons
 import {
@@ -19,8 +18,6 @@ import { IconContext } from "react-icons";
 import WorkspaceDropdown from "../workspace/WorkspaceDropdown";
 import WorkspaceModal from "../workspace/WorkspaceModal";
 import { profile } from "console";
-import { useRouterId } from "~/utils/routerId";
-
 
 type SideBarProps = {
   toggleSidebar: () => void;
@@ -28,28 +25,30 @@ type SideBarProps = {
   profileId?: string;
 };
 
-export const SideBar: React.FC<SideBarProps> = ({ toggleSidebar, open, profileId }) => {
+export const SideBar: React.FC<SideBarProps> = ({
+  toggleSidebar,
+  open,
+  profileId,
+}) => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
 
-  console.log("SideBar profileId:", profileId);
-
+  // auth objects
+  const user = useUser(); // user object from supabase
   const router = useRouter();
   // const session = useSession();
   useSessionContext();
-  // const { user } = session.data?.user;
   const { supabaseClient } = useSessionContext();
-  const userId = getCookie("User ID") as string;
 
-  // const id = useRouterId();
+  // id constants
+  // const { user } = session.data?.user; // user object from supabase session
 
   // Check if router.query and router.query.id are defined before accessing their values
-  const id =
-    router.query && router.query.id ? router.query.id.toString() : "";
-  
-    console.log("Sidebar id", id);
+  const id = router.query && router.query.id ? router.query.id.toString() : "";
 
-  console.log("sidebar router",router.asPath);
-  console.log("userId", userId);
+  console.log("Sidebar id", id);
+  console.log("SideBar profileId:", profileId);
+  console.log("sidebar router", router.asPath);
+  console.log("userId", user?.id);
   // console.log("Profile_ID", profile_id);
 
   return (
@@ -93,7 +92,7 @@ export const SideBar: React.FC<SideBarProps> = ({ toggleSidebar, open, profileId
                   className={`flex items-center space-x-3 rounded-md hover:bg-purple-800 ${
                     open ? "text-purple-accent-2" : "text-purple-accent-2"
                   }`}
-                  href={`/home-rwp/${userId}`}
+                  href={user?.id ? `/home-rwp/${user.id}` : `/`}
                   onClick={toggleSidebar}
                 >
                   <FiHome className="h-6 w-6" />
@@ -111,7 +110,7 @@ export const SideBar: React.FC<SideBarProps> = ({ toggleSidebar, open, profileId
 
               <li className=" rounded-sm">
                 <Link
-                  href={profileId ? `/manage-profile/${profileId}` : ''}
+                  href={profileId ? `/manage-profile/${profileId}` : ""}
                   className={`flex items-center space-x-3 rounded-md hover:bg-purple-800 ${
                     open ? "text-purple-accent-2" : "text-purple-accent-2"
                   }`}
@@ -150,7 +149,7 @@ export const SideBar: React.FC<SideBarProps> = ({ toggleSidebar, open, profileId
                   </span>
                 </Link>
               </li>
-  
+
               <li className="rounded-sm">
                 <Link
                   href="/"
