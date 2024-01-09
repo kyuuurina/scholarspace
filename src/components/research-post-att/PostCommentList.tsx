@@ -131,10 +131,10 @@ const PostCommentList: React.FC<PostCommentListProps> = ({ post_id }) => {
                         <Link href={`/manage-profile/${profile.profile_id}`}>
                           <span className="relative inline-block cursor-pointer">
                             <Image
-                              src={`/${profile.avatar_url}`}
+                              src={`https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/avatar/${profile.avatar_url}`}
                               alt={`Profile Avatar - ${profile.name}`}
-                              width={80}
-                              height={80}
+                              width={30}
+                              height={30}
                               className="rounded-full"
                             />
                             <span className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-800 opacity-50 rounded-full" />

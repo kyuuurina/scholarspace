@@ -5,6 +5,10 @@ import Router, { useRouter } from "next/router";
 import { useSession, useSessionContext } from "@supabase/auth-helpers-react";
 import { useUser } from "@supabase/auth-helpers-react";
 
+import { api } from "~/utils/api";
+import { useFetchProfile } from "~/utils/profile";
+import { useEffect } from "react";
+
 // icons
 import {
   FiHome,
@@ -42,6 +46,17 @@ export const SideBar: React.FC<SideBarProps> = ({
   // id constants
   // const { user } = session.data?.user; // user object from supabase session
 
+  // Fetch user profile based on the router query
+  const { profile_id, name, avatar_url, isLoading, error } = useFetchProfile();
+
+  // Check for errors during profile fetch
+  useEffect(() => {
+    if (error) {
+      console.error("Error fetching profile:", error);
+    }
+  }, [error]);
+
+
   // Check if router.query and router.query.id are defined before accessing their values
   const id = router.query && router.query.id ? router.query.id.toString() : "";
 
@@ -50,6 +65,8 @@ export const SideBar: React.FC<SideBarProps> = ({
   console.log("sidebar router", router.asPath);
   console.log("userId", user?.id);
   // console.log("Profile_ID", profile_id);
+
+
 
   return (
     <>
@@ -63,7 +80,7 @@ export const SideBar: React.FC<SideBarProps> = ({
             ? "translate-x-0 sm:w-56"
             : "-translate-x-full sm:w-16 sm:translate-x-0"
         } fixed left-0 top-0 z-40 bg-dark-purple
-           p-4 sm:static sm:flex`}
+          p-4 sm:static sm:flex`}
         tabIndex={-1}
       >
         <div className="flex flex-col space-y-6 font-medium">
@@ -110,7 +127,8 @@ export const SideBar: React.FC<SideBarProps> = ({
 
               <li className=" rounded-sm">
                 <Link
-                  href={profileId ? `/manage-profile/${profileId}` : ""}
+                  // href={profileId ? `/manage-profile/${profileId}` : ""}
+                  href={profile_id ? `/manage-profile/${profile_id}` : ""}
                   className={`flex items-center space-x-3 rounded-md hover:bg-purple-800 ${
                     open ? "text-purple-accent-2" : "text-purple-accent-2"
                   }`}
