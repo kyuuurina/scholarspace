@@ -226,6 +226,21 @@ export const phaseRouter = router({
         });
       }
 
+      // if additional task properties exist, delete them first
+      const properties = await ctx.prisma.phase_property.findMany({
+        where: {
+          phase_id: id,
+        },
+      });
+
+      if (properties) {
+        await ctx.prisma.phase_property.deleteMany({
+          where: {
+            phase_id: id,
+          },
+        });
+      }
+
       // if tasks exist, delete them first
       const tasks = await ctx.prisma.task.findMany({
         where: {
