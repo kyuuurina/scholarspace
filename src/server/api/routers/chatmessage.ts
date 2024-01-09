@@ -55,34 +55,34 @@ export const chatRouter = router({
     }),
 
   // Procedure to send a message in a chat
-  sendMessage: protectedProcedure
-  .input(
-    z.object({
-      chat_id: z.number(),
-      content: z.string(),
-    })
-  )
-  .mutation(async ({ input, ctx }) => {
-    const { chat_id, content } = input;
-    const sender_id = ctx.user?.id;
+  // sendMessage: protectedProcedure
+  // .input(
+  //   z.object({
+  //     chat_id: z.number(),
+  //     content: z.string(),
+  //   })
+  // )
+  // .mutation(async ({ input, ctx }) => {
+  //   const { chat_id, content } = input;
+  //   const sender_id = ctx.user?.id;
 
-    // Ensure ctx has the supabaseRealtime property
-    if (!('supabaseRealtime' in ctx)) {
-      throw new Error('supabaseRealtime is not available in the context');
-    }
+  //   // Ensure ctx has the supabaseRealtime property
+  //   if (!('supabaseRealtime' in ctx)) {
+  //     throw new Error('supabaseRealtime is not available in the context');
+  //   }
 
-    // Create a new message in the specified chat
-    const message = await ctx.prisma.message.create({
-      data: {
-        chat_id,
-        sender_id,
-        content,
-      },
-    });
+  //   // Create a new message in the specified chat
+  //   const message = await ctx.prisma.message.create({
+  //     data: {
+  //       chat_id,
+  //       sender_id,
+  //       content,
+  //     },
+  //   });
 
-    // Notify subscribers about the new message using Supabase Realtime
-    ctx.supabaseRealtime.publish(`chat:${chat_id}`, { event: "new_message", payload: message });
+  //   // Notify subscribers about the new message using Supabase Realtime
+  //   ctx.supabaseRealtime.publish(`chat:${chat_id}`, { event: "new_message", payload: message });
 
-    return message;
-  }),
+  //   return message;
+  // }),
 });
