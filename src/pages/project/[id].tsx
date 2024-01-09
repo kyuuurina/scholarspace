@@ -12,19 +12,19 @@ import Layout from "~/components/layout/Layout";
 import Head from "~/components/layout/Head";
 import Header from "~/components/workspace/Header";
 import Card from "~/components/Card";
-import AvatarPlaceholder from "~/components/avatar/AvatarPlaceholder";
 import MembersCard from "~/components/members/MembersCard";
 import ScoreChart from "~/components/chart/ScoreChart";
 import PageLoader from "~/components/layout/PageLoader";
 import {
   Gantt,
-  Task,
+  type Task,
   EventOption,
   StylingOption,
   ViewMode,
   DisplayOption,
 } from "gantt-task-react";
 import "gantt-task-react/dist/index.css";
+import React from "react";
 
 const Project: NextPageWithLayout = () => {
   const id = useRouterId();
@@ -39,38 +39,190 @@ const Project: NextPageWithLayout = () => {
     users,
   } = useFetchProject();
 
-  const tasks: Task[] = [
-    {
-      start: new Date(2023, 1, 10),
-      end: new Date(2023, 7, 10),
-      name: "Literature Review",
-      id: "Task 0",
-      type: "task",
-      progress: 34,
-      isDisabled: true,
-      styles: { progressColor: "#ffbb54", progressSelectedColor: "#ff9e0d" },
-    },
-    {
-      start: new Date(2023, 3, 10),
-      end: new Date(2023, 5, 11),
-      name: "Formulate Hypothesis",
-      id: "Task 0",
-      type: "task",
-      progress: 79,
-      isDisabled: true,
-      styles: { progressColor: "#ffbb54", progressSelectedColor: "#ff9e0d" },
-    },
-    {
-      start: new Date(2023, 6, 10),
-      end: new Date(2023, 9, 10),
-      name: "Collect Data for H1",
-      id: "Task 0",
-      type: "task",
-      progress: 45,
-      isDisabled: true,
-      styles: { progressColor: "#ffbb54", progressSelectedColor: "#ff9e0d" },
-    },
-  ];
+  const [tasks, setTasks] = React.useState<Task[]>(initTasks());
+  const [isChecked, setIsChecked] = React.useState(true);
+
+  function initTasks() {
+    const currentDate = new Date();
+    const tasks: Task[] = [
+      {
+        start: new Date(currentDate.getFullYear(), currentDate.getMonth(), 1),
+        end: new Date(currentDate.getFullYear(), currentDate.getMonth(), 15),
+        name: "Some Project",
+        id: "ProjectSample",
+        progress: 25,
+        type: "project",
+        hideChildren: false,
+        displayOrder: 1,
+      },
+      {
+        start: new Date(currentDate.getFullYear(), currentDate.getMonth(), 1),
+        end: new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          2,
+          12,
+          28
+        ),
+        name: "Idea",
+        id: "Task 0",
+        progress: 45,
+        type: "task",
+        project: "ProjectSample",
+        displayOrder: 2,
+      },
+      {
+        start: new Date(currentDate.getFullYear(), currentDate.getMonth(), 2),
+        end: new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          4,
+          0,
+          0
+        ),
+        name: "Research",
+        id: "Task 1",
+        progress: 25,
+        dependencies: ["Task 0"],
+        type: "task",
+        project: "ProjectSample",
+        displayOrder: 3,
+      },
+      {
+        start: new Date(currentDate.getFullYear(), currentDate.getMonth(), 4),
+        end: new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          8,
+          0,
+          0
+        ),
+        name: "Discussion with team",
+        id: "Task 2",
+        progress: 10,
+        dependencies: ["Task 1"],
+        type: "task",
+        project: "ProjectSample",
+        displayOrder: 4,
+      },
+      {
+        start: new Date(currentDate.getFullYear(), currentDate.getMonth(), 8),
+        end: new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          9,
+          0,
+          0
+        ),
+        name: "Developing",
+        id: "Task 3",
+        progress: 2,
+        dependencies: ["Task 2"],
+        type: "task",
+        project: "ProjectSample",
+        displayOrder: 5,
+      },
+      {
+        start: new Date(currentDate.getFullYear(), currentDate.getMonth(), 8),
+        end: new Date(currentDate.getFullYear(), currentDate.getMonth(), 10),
+        name: "Review",
+        id: "Task 4",
+        type: "task",
+        progress: 70,
+        dependencies: ["Task 2"],
+        project: "ProjectSample",
+        displayOrder: 6,
+      },
+      {
+        start: new Date(currentDate.getFullYear(), currentDate.getMonth(), 15),
+        end: new Date(currentDate.getFullYear(), currentDate.getMonth(), 15),
+        name: "Release",
+        id: "Task 6",
+        progress: currentDate.getMonth(),
+        type: "milestone",
+        dependencies: ["Task 4"],
+        project: "ProjectSample",
+        displayOrder: 7,
+      },
+      {
+        start: new Date(currentDate.getFullYear(), currentDate.getMonth(), 18),
+        end: new Date(currentDate.getFullYear(), currentDate.getMonth(), 19),
+        name: "Party Time",
+        id: "Task 9",
+        progress: 0,
+        isDisabled: true,
+        type: "task",
+      },
+    ];
+    return tasks;
+  }
+
+  function getStartEndDateForProject(tasks: Task[], projectId: string) {
+    const projectTasks = tasks.filter((t) => t.project === projectId);
+    let start = projectTasks[0].start;
+    let end = projectTasks[0].end;
+
+    for (let i = 0; i < projectTasks.length; i++) {
+      const task = projectTasks[i];
+      if (start.getTime() > task.start.getTime()) {
+        start = task.start;
+      }
+      if (end.getTime() < task.end.getTime()) {
+        end = task.end;
+      }
+    }
+    return [start, end];
+  }
+
+  const handleTaskChange = (task: Task) => {
+    console.log("On date change Id:" + task.id);
+    let newTasks = tasks.map((t) => (t.id === task.id ? task : t));
+    if (task.project) {
+      const [start, end] = getStartEndDateForProject(newTasks, task.project);
+      const project =
+        newTasks[newTasks.findIndex((t) => t.id === task.project)];
+      if (
+        project.start.getTime() !== start.getTime() ||
+        project.end.getTime() !== end.getTime()
+      ) {
+        const changedProject = { ...project, start, end };
+        newTasks = newTasks.map((t) =>
+          t.id === task.project ? changedProject : t
+        );
+      }
+    }
+    setTasks(newTasks);
+  };
+
+  const handleTaskDelete = (task: Task) => {
+    const conf = window.confirm("Are you sure about " + task.name + " ?");
+    if (conf) {
+      setTasks(tasks.filter((t) => t.id !== task.id));
+    }
+    return conf;
+  };
+
+  const handleProgressChange = async (task: Task) => {
+    setTasks(tasks.map((t) => (t.id === task.id ? task : t)));
+    console.log("On progress change Id:" + task.id);
+  };
+
+  const handleDblClick = (task: Task) => {
+    alert("On Double Click event Id:" + task.id);
+  };
+
+  const handleClick = (task: Task) => {
+    console.log("On Click event Id:" + task.id);
+  };
+
+  const handleSelect = (task: Task, isSelected: boolean) => {
+    console.log(task.name + " has " + (isSelected ? "selected" : "unselected"));
+  };
+
+  const handleExpanderClick = (task: Task) => {
+    setTasks(tasks.map((t) => (t.id === task.id ? task : t)));
+    console.log("On expander click Id:" + task.id);
+  };
 
   return (
     <>
@@ -113,7 +265,17 @@ const Project: NextPageWithLayout = () => {
                 </div>
               </section>
               <div className="my-2 overflow-x-auto">
-                <Gantt tasks={tasks} />
+                <Gantt
+                  tasks={tasks}
+                  onDateChange={handleTaskChange}
+                  onDelete={handleTaskDelete}
+                  onProgressChange={handleProgressChange}
+                  onDoubleClick={handleDblClick}
+                  onClick={handleClick}
+                  onSelect={handleSelect}
+                  onExpanderClick={handleExpanderClick}
+                  listCellWidth={isChecked ? "155px" : ""}
+                />
                 <table className="w-full bg-white text-left text-sm text-gray-500">
                   <thead className="border-grey-50 border text-xs uppercase text-gray-700 ">
                     <tr>
