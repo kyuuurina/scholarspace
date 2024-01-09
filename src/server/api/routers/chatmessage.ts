@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { router, protectedProcedure } from "~/server/api/trpc";
-import { REALTIME_SUBSCRIBE_STATES } from "@supabase/realtime-js";
+import { TRPCError } from "@trpc/server"; // Add this import if not present
 
 export const chatRouter = router({
   // Procedure to get or create a chat for a given pair of users
@@ -14,45 +14,89 @@ export const chatRouter = router({
       let chat = await ctx.prisma.chat.findFirst({
         where: {
           OR: [
-            {
-              user1_id,
-              user2_id,
-            },
-            {
-              user1_id: user2_id,
-              user2_id: user1_id,
-            }, // Check both directions
+            { user1_id, user2_id },
+            { user1_id: user2_id, user2_id: user1_id }, // Check both directions
           ],
         },
       });
 
       // If no chat exists, create a new one
       if (!chat) {
-        chat = await ctx.prisma.chat.create({
-          data: {
-            user1_id,
-            user2_id,
-          },
-        });
+        try {
+          chat = await ctx.prisma.chat.create({
+            data: { user1_id, user2_id },
+          });
+        } catch (error) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to create a new chat.",
+          });
+        }
       }
 
       return chat;
     }),
 
-  // Procedure to get messages for a specific chat
-  getChatMessages: protectedProcedure
-    .input(z.object({ chat_id: z.number() }))
-    .query(async ({ input, ctx }) => {
-      const { chat_id } = input;
 
-      // Fetch messages for the specified chat_id
-      const messages = await ctx.prisma.message.findMany({
-        where: { chat_id },
-        orderBy: { timestamp: "asc" }, // Order messages by timestamp
+  // getChatList: protectedProcedure
+  // .query(async ({ ctx }) => {
+  //   const userId = ctx.user?.id;
+
+  //   // Fetch chat list for the logged-in user (user2)
+  //   const chatList = await ctx.prisma.chat.findMany({
+  //     where: { user2_id: userId },
+  //     orderBy: { created_at: "desc" }, // Order by creation time, descending
+  //     include: {
+  //       user_chat_user1_idTouser: { select: { name: true, avatar_url: true } },
+  //       user_chat_user2_idTouser: { select: { name: true, avatar_url: true } },
+  //     },
+  //   });
+
+  //   return chatList;
+  // }),
+
+    // Procedure to get the chat list for a user
+    getChatList: protectedProcedure
+    .input(z.object({ user_id: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const { user_id } = input;
+
+      // Fetch the chat list for the specified user_id
+      const chatList = await ctx.prisma.chat.findMany({
+        where: {
+          OR: [
+            { user1_id: user_id },
+            { user2_id: user_id },
+          ],
+        },
+        include: {
+          user_chat_user1_idTouser: true,
+          user_chat_user2_idTouser: true,
+        },
       });
 
-      return messages;
+      return chatList;
     }),
+
+  // Procedure to get messages for a specific chat
+  // getChatMessages: protectedProcedure
+  //   .input(z.object({ chat_id: z.number() }))
+  //   .query(async ({ input, ctx }) => {
+  //     const { chat_id } = input;
+
+  //     // Fetch messages for the specified chat_id
+  //     const messages = await ctx.prisma.message.findMany({
+  //       where: { chat_id },
+  //       orderBy: { timestamp: "asc" }, // Order messages by timestamp
+  //     });
+
+  //     return messages;
+  //   }),
+
+
+
+
+});
 
   // Procedure to send a message in a chat
   // sendMessage: protectedProcedure
@@ -85,4 +129,4 @@ export const chatRouter = router({
 
   //   return message;
   // }),
-});
+// });
