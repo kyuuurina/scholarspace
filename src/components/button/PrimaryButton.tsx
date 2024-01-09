@@ -17,7 +17,7 @@ const PrimaryButton: React.FC<ButtonProps> = ({
   return (
     <button
       type={type}
-      className={`rounded-lg bg-purple-accent-1 px-3 py-2 text-center text-sm font-medium text-white hover:bg-purple-accent-2 focus:outline-none
+      className={`rounded-lg border border-purple-accent-1 bg-purple-accent-1 px-3 py-2 text-center text-sm font-medium text-white hover:bg-purple-accent-2 focus:outline-none
       ${disabled ? "opacity-50" : ""}
       `}
       disabled={disabled}

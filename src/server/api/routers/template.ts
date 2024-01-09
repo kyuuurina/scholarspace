@@ -39,18 +39,25 @@ export const templateRouter = router({
   create: protectedProcedure
     .input(
       z.object({
-        comment_id: z.string(),
+        name: z.string(),
+        phase_template_properties: z.array(z.string()),
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const reaction = await ctx.prisma.reaction.create({
+      if (input.phase_template_properties.length < 1) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Phase template must have at least one property",
+        });
+      }
+      const template = await ctx.prisma.phase_template.create({
         data: {
           ...input,
-          user_id: "b9f96aea-9a6d-4fbb-bb48-b5285894a743",
+          user_id: ctx.user.id,
         },
       });
 
-      return reaction;
+      return template;
     }),
 
   delete: protectedProcedure
