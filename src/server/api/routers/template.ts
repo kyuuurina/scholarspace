@@ -63,20 +63,16 @@ export const templateRouter = router({
   delete: protectedProcedure
     .input(
       z.object({
-        comment_id: z.string(),
-        user_id: z.string(),
+        id: z.string(),
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const reaction = await ctx.prisma.reaction.delete({
+      const template = await ctx.prisma.phase_template.delete({
         where: {
-          comment_id_user_id: {
-            comment_id: input.comment_id,
-            user_id: input.user_id,
-          },
+          id: input.id,
         },
       });
 
-      return reaction;
+      return template;
     }),
 });

@@ -10,6 +10,7 @@ import PrimaryButton from "~/components/button/PrimaryButton";
 import ErrorToast from "~/components/toast/ErrorToast";
 import { TRPCClientError } from "@trpc/client";
 import toast from "react-hot-toast";
+import { DeleteButton } from "~/components/button/DeleteButton";
 
 const ManageTemplates: NextPageWithLayout = () => {
   // get templates of the user
@@ -85,6 +86,26 @@ const ManageTemplates: NextPageWithLayout = () => {
     setAddProperties([]);
   };
 
+  // delete template
+  const deleteTemplate = api.template.delete.useMutation();
+
+  const handleDeleteTemplate = async (templateId: string) => {
+    try {
+      await deleteTemplate.mutateAsync({ id: templateId });
+      await refetchTemplates();
+      setSelectedTemplate(null);
+    } catch (error) {
+      toast.custom(() => {
+        if (error instanceof TRPCClientError) {
+          return <ErrorToast message={error.message} />;
+        } else {
+          // Handle other types of errors or fallback to a default message
+          return <ErrorToast message="An error occurred." />;
+        }
+      });
+    }
+  };
+
   return (
     <div className="w-full max-w-screen-xl p-8">
       <h1 className="truncate pb-4 text-2xl font-bold sm:text-4xl">
@@ -121,7 +142,17 @@ const ManageTemplates: NextPageWithLayout = () => {
         <div className="col-span-3 ">
           {selectedTemplate && (
             <div>
-              <h1>{selectedTemplate.name}</h1>
+              <div className="flex justify-between py-2">
+                <h1 className="text-2xl font-semibold text-gray-700">
+                  {selectedTemplate.name}
+                </h1>
+                <DeleteButton
+                  onClick={async () => {
+                    await handleDeleteTemplate(selectedTemplate.id);
+                  }}
+                  name="Delete Template"
+                />
+              </div>
               <table className="max-w-min border border-gray-200 text-left text-sm text-gray-700">
                 <thead className="bg-gray-50 text-xs uppercase text-gray-700">
                   <tr className="whitespace-nowrap border border-gray-300 px-6 py-4">
@@ -268,17 +299,27 @@ const ManageTemplates: NextPageWithLayout = () => {
                   </tr>
                 </tbody>
               </table>
-              <div className="flex items-center justify-start space-x-5 py-4">
-                {addProperties.length > 0 && (
+              {!isAddColumnVisible && (
+                <div className="flex items-center justify-start space-x-5 py-4">
                   <button
                     onClick={() => handleCancel()}
-                    className="rounded-lg border border-purple-accent-1 bg-white px-3 py-2 text-center text-sm font-medium text-purple-accent-1 hover:bg-purple-accent-2 focus:outline-none"
+                    className="rounded-lg border border-purple-accent-1 bg-white px-3 py-2 text-center text-sm font-medium text-purple-accent-1 hover:border-none hover:bg-purple-accent-2 hover:text-white focus:outline-none"
+                    disabled={
+                      addPhaseName.trim() === "" || addProperties.length === 0
+                    }
                   >
                     Reset
                   </button>
-                )}
-                <PrimaryButton name="Save" onClick={() => onSubmit()} />
-              </div>
+
+                  <PrimaryButton
+                    name="Save"
+                    onClick={() => onSubmit()}
+                    disabled={
+                      addPhaseName.trim() === "" || addProperties.length === 0
+                    }
+                  />
+                </div>
+              )}
             </div>
           )}
         </div>
