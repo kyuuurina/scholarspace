@@ -16,15 +16,6 @@ import MembersCard from "~/components/members/MembersCard";
 import ScoreChart from "~/components/chart/ScoreChart";
 import PageLoader from "~/components/layout/PageLoader";
 import GanttChart from "~/components/project/GanttChart";
-import {
-  Gantt,
-  type Task,
-  EventOption,
-  StylingOption,
-  ViewMode,
-  DisplayOption,
-} from "gantt-task-react";
-import "gantt-task-react/dist/index.css";
 import React from "react";
 import { useFetchProjectSummary } from "~/utils/project";
 
@@ -41,7 +32,7 @@ const Project: NextPageWithLayout = () => {
     users,
   } = useFetchProject();
 
-  console.log(useFetchProjectSummary(id));
+  const { projectSummary, refetch } = useFetchProjectSummary(id);
 
   return (
     <>
@@ -83,7 +74,8 @@ const Project: NextPageWithLayout = () => {
                   </dl>
                 </div>
               </section>
-              <GanttChart id={id}/>
+              <GanttChart projectSummary={projectSummary} refetch={refetch} />
+
               <div className="my-2 overflow-x-auto">
                 <table className="w-full bg-white text-left text-sm text-gray-500">
                   <thead className="border-grey-50 border text-xs uppercase text-gray-700 ">

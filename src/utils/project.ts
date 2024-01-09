@@ -22,7 +22,7 @@ type Project = {
   p_score: number; // Make it nullable to handle potential null values
 };
 
-type ProjectSummary = {
+export type ProjectSummary = {
   project_name: string; // Assuming a project has an ID
   phases: {
     phase_id: string;

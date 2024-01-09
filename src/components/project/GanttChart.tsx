@@ -3,15 +3,17 @@ import { Gantt, type Task } from "gantt-task-react";
 import "gantt-task-react/dist/index.css";
 import { useRouter } from "next/router";
 import { api } from "~/utils/api";
+import { type ProjectSummary } from "~/utils/project";
+import { useRouterId } from "~/utils/routerId";
 
 type GanttChartProps = {
-  id: string;
+  projectSummary: ProjectSummary;
+  refetch: () => Promise<void>;
 };
-import { useFetchProjectSummary } from "~/utils/project";
 
-const GanttChart: React.FC<GanttChartProps> = ({ id }) => {
+const GanttChart: React.FC<GanttChartProps> = ({ projectSummary, refetch }) => {
   const router = useRouter();
-  const { projectSummary: query, refetch } = useFetchProjectSummary(id);
+  const id = useRouterId();
   const test: Task[] = [];
 
   const updateStartDate = api.task.updateStartDate.useMutation();
@@ -20,7 +22,7 @@ const GanttChart: React.FC<GanttChartProps> = ({ id }) => {
   const tasks: Task[] = initTest();
   function initTest() {
     let displayCount = 1;
-    query.phases?.map((phase) => {
+    projectSummary.phases?.map((phase) => {
       if (phase) {
         test.push({
           start: new Date(phase.start_at),
