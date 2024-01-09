@@ -1,4 +1,4 @@
-import { type ReactElement, useState } from "react";
+import { type ReactElement, useState, useEffect } from "react";
 import type { NextPageWithLayout } from "~/pages/_app";
 import Head from "~/components/layout/Head";
 import Layout from "~/components/layout/Layout";
@@ -24,6 +24,10 @@ const ManageTemplates: NextPageWithLayout = () => {
   const [editedHeader, setEditedHeader] = useState("");
   const [addProperties, setAddProperties] = useState<string[]>([]);
   const [addPhaseName, setAddPhaseName] = useState("Phase Title"); // New state for editable header
+
+  useEffect(() => {
+    setSelectedTemplate(templates?.[0] ?? null);
+  }, [templates]);
 
   const handleAddColumnClick = () => {
     setIsAddColumnVisible(!isAddColumnVisible); // Step 2
