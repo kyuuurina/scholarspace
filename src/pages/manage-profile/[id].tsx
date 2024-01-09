@@ -151,9 +151,9 @@ const ProfilePage: NextPageWithLayout = () => {
                 </div>
 
                 <div>
-              {/* Follow Button */}
-                  { (isNotOwner&&
-                    <FollowButton userId={id as string} />
+                  {/* Follow Button */}
+                  {isNotOwner && user_id && (
+                    <FollowButton userId={user_id} />
                   )}
                 </div>
                 <div className="flex space-x-4">

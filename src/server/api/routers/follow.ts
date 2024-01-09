@@ -6,7 +6,6 @@ export const followRouter = router({
   toggleFollow: protectedProcedure
     .input(z.object({ userId: z.string() }))
     .mutation(async ({ input: { userId }, ctx }) => {
-      // const currentUserId = ctx.session?.user.id;
       const { user } = ctx;
 
       if (!user) {
@@ -16,26 +15,8 @@ export const followRouter = router({
         });
       }
 
-      const existingFollow = await ctx.prisma.follow.findUnique({
-        where: {
-          follower_id_following_id: {
-            // follower_id: currentUserId,
-            follower_id: user.id,
-            following_id: userId,
-          },
-        },
-      });
-
-      if (!existingFollow) {
-        await ctx.prisma.follow.create({
-          data: {
-            follower_id: user.id,
-            following_id: userId,
-          },
-        });
-        return { isFollowing: true };
-      } else {
-        await ctx.prisma.follow.delete({
+      try {
+        const existingFollow = await ctx.prisma.follow.findUnique({
           where: {
             follower_id_following_id: {
               follower_id: user.id,
@@ -43,8 +24,55 @@ export const followRouter = router({
             },
           },
         });
-        return { isFollowing: false };
+
+        if (!existingFollow) {
+          await ctx.prisma.follow.create({
+            data: {
+              follower_id: user.id,
+              following_id: userId,
+            },
+          });
+          return { isFollowing: true };
+        } else {
+          await ctx.prisma.follow.delete({
+            where: {
+              follower_id_following_id: {
+                follower_id: user.id,
+                following_id: userId,
+              },
+            },
+          });
+          return { isFollowing: false };
+        }
+      } catch (error) {
+        console.error('Error toggling follow:', error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Error toggling follow",
+        });
       }
+    }),
+
+    //get follow status
+    getFollowStatus: protectedProcedure
+    .input(z.object({ userId: z.string() }))
+    .query(async ({ input: { userId }, ctx }) => {
+      const { user } = ctx;
+
+      if (!user) {
+        return { isFollowing: false }; // Return false if the user is not authenticated
+      }
+
+      const existingFollow = await ctx.prisma.follow.findUnique({
+        where: {
+          follower_id_following_id: {
+            follower_id: user.id,
+            following_id: userId,
+          },
+        },
+      });
+
+      return { isFollowing: !!existingFollow }; // Convert to boolean
     }),
 
   // getfollowerslist
@@ -97,4 +125,5 @@ export const followRouter = router({
 
       return { success: true };
     }),
+
 });
