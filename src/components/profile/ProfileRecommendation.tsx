@@ -15,16 +15,17 @@ interface ProfileRecommendationProps {
 const ProfileRecommendation: React.FC<ProfileRecommendationProps> = ({ profiles }) => {
   return (
     <div className="flex items-center">
-      <Link href={`/profile/${profiles.profile_id}`}>
+      <Link href={`/manage-profile/${profiles.profile_id}`}>
         <div className="aspect:square h-10 w-10 cursor-pointer">
-          <AvatarPlaceholder 
+          <AvatarPlaceholder
+            // src={`https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/avatar/${profiles.avatar_url}`}
             name={profiles.name} 
             shape="circle"
           />
         </div>
       </Link>
       <div className="ml-2">
-        <Link href={`/profile/${profiles.profile_id}`}>
+        <Link href={`/manage-profile/${profiles.profile_id}`}>
           <span className="cursor-pointer inline-block max-w-full sm:max-w-[150px] overflow-hidden whitespace-nowrap overflow-ellipsis">
             {profiles.name}
           </span>

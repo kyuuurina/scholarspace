@@ -8,6 +8,12 @@ import toast from "react-hot-toast";
 import Router from "next/router";
 import ConfirmationDialog from "../ConfirmationDialog";
 
+// Auth
+import { getCookie } from "cookies-next";
+
+// Utils
+import { UseCheckProfile } from "~/utils/profile";
+
 type ExperienceCardProps = {
   experience: {
     experience_id: string;
@@ -15,13 +21,21 @@ type ExperienceCardProps = {
     start_year: string;
     end_year: string;
     description: string | null;
+    user_id: string;
+    isLoading: boolean;
   };
   isLastItem?: boolean; // New prop to indicate if it's the last item
+
 };
 
 const EducationCard: React.FC<ExperienceCardProps> = ({ experience, isLastItem = false }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false); // New state for the confirmation dialog
+
+  const userId = getCookie("UserID") as string;
+  const { user } = UseCheckProfile(userId);
+
+  const isOwner = user && user.id === experience.user_id;
 
   const handleEditClick = () => {
     setIsEditModalOpen(true);
@@ -75,19 +89,24 @@ const EducationCard: React.FC<ExperienceCardProps> = ({ experience, isLastItem =
       {/* Action buttons */}
       <div className="flex items-center space-x-4">
         {/* Edit button */}
-        <button onClick={handleEditClick} className="text-blue-500 hover:underline">
+        {isOwner && (
+          <button onClick={handleEditClick} className="text-blue-500 hover:underline">
           Edit <FaEdit className="inline ml-1" />
         </button>
+        )}
 
         {/* Delete button */}
-        <button onClick={handleDeleteExperience} className="text-red-500 hover:underline">
-          Delete <FaTrash className="inline ml-1" />
-        </button>
+        {isOwner && (
+          <button onClick={handleDeleteExperience} className="text-red-500 hover:underline">
+            Delete <FaTrash className="inline ml-1" />
+          </button>
+        )}
       </div>
 
       {/* Edit Achievement Modal */}
       {isEditModalOpen && (
         <EditExperience
+          experience = {experience}
           openModal={isEditModalOpen}
           onClick={() => setIsEditModalOpen(false)}
         />

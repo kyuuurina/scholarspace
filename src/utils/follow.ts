@@ -43,6 +43,25 @@ export const useFetchFollowing = () => {
   };
 };
 
+export const useFetchFollowStatus = (userId: string) => {
+  const followStatus = api.follow.getFollowStatus.useQuery(
+    {
+      userId,
+    },
+    {
+      enabled: !!userId,
+    }
+  );
+
+  const { data, isLoading, error } = followStatus;
+
+  return {
+    isFollowing: data?.isFollowing || false,
+    isLoading,
+    error,
+  };
+};
+
 // export const useFetchFollowers = () => {
 //     const id: string = useRouterId();
 

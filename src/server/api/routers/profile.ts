@@ -175,17 +175,37 @@ export const profileRouter = router({
     
       const userResearchInterests = user.research_interest.toLowerCase().split(",");
     
-      // Find other users who share at least 1 similar research interest
+      // Find other users who share at least 1 similar research interest and are not followed by the current user
+      const followedUsersIds = await ctx.prisma.follow.findMany({
+        where: {
+          follower_id: userId,
+        },
+        select: {
+          following_id: true,
+        },
+      });
+    
       const recommendedUsers = await ctx.prisma.profile.findMany({
         where: {
           user_id: {
             not: userId, // Exclude the current user
           },
-          OR: userResearchInterests.map((interest) => ({
-            research_interest: {
-              contains: interest.trim(),
+          AND: [
+            {
+              OR: userResearchInterests.map((interest) => ({
+                research_interest: {
+                  contains: interest.trim(),
+                },
+              })),
             },
-          })),
+            {
+              NOT: {
+                user_id: {
+                  in: followedUsersIds.map((followedUser) => followedUser.following_id),
+                },
+              },
+            },
+          ],
         },
         take: 10, // Limit the number of recommendations
         select: {

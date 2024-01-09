@@ -30,9 +30,18 @@ import ErrorToast from "../toast/ErrorToast";
 type ModalProps = {
   openModal: boolean;
   onClick: () => void;
+  education: {
+    education_id: string;
+    school: string;
+    start_year: string;
+    end_year: string;
+    description: string | null;
+    user_id: string;
+    isLoading: boolean;
+  };
 };
 
-const EditEducation: React.FC<ModalProps> = ({ openModal, onClick }) => {
+const EditEducation: React.FC<ModalProps> = ({ education, openModal, onClick }) => {
 
   //const
   const router = useRouter();
@@ -42,8 +51,8 @@ const EditEducation: React.FC<ModalProps> = ({ openModal, onClick }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const userId = getCookie("UserID");
 
-  //populate form fields 
-  const {education_id, school, start_year, end_year, description, isLoading} = useFetchEducation();
+  //populate form fields
+  const {education_id, school, start_year, end_year, description, isLoading} = education;
 
 
 //schema for form validation
@@ -64,10 +73,10 @@ const EditEducation: React.FC<ModalProps> = ({ openModal, onClick }) => {
     } = useForm<EducationFormData>({
       resolver: zodResolver(schema),
       defaultValues :{
-        school: school,
-        start_year: start_year,
-        end_year: end_year,
-        description: description,
+        school,
+        start_year,
+        end_year,
+        description,
       }
     });
 

@@ -7,6 +7,7 @@ import { TRPCError } from "@trpc/server";
 import { router, protectedProcedure, publicProcedure } from "~/server/api/trpc";
 import { Prisma, PrismaClient } from "@prisma/client";
 
+
 // Helper function to fetch infinite research posts
 async function getInfiniteResearchPosts({
   whereClause,
@@ -86,7 +87,7 @@ export const researchpostRouter = router({
     .query(async ({ input, ctx }) => {
       const myPosts = await ctx.prisma.research_post.findMany({
         where: {
-          user_id: ctx.user.id,
+          profile_id:input.post_id,  //pass profile_id to router
         },
         orderBy: {
           created_at: 'desc', // Order by created_at in descending order
@@ -129,10 +130,12 @@ export const researchpostRouter = router({
       });
     }),
 
+
   // Helper function to fetch infinite research posts
   create: protectedProcedure
     .input(
       z.object({
+        profile_id: z.string(),
         category: z.string(),
         title: z.string(),
         description: z.string().nullable(),
@@ -150,6 +153,20 @@ export const researchpostRouter = router({
         },
       });
 
+    //   .mutation(async ({ input, ctx }) => {
+    //     const post = await ctx.prisma.research_post.create({
+    //       data: {
+    //         profile: {
+    //           connect: { profile_id: input.profile_id },
+    //         },
+    //         user: {
+    //           connect: { id: ctx.user.id },
+    //         },
+    //         ...input,
+    //         created_at: new Date(),
+    //       },
+    //     });
+
       return post;
     }),
 
@@ -160,19 +177,20 @@ export const researchpostRouter = router({
         category: z.string(),
         title: z.string(),
         description: z.string().nullable(),
+        author: z.string().nullable(),
         document: z.string().nullable(),
         // created_at: z.date(),
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const { post_id, category, title, description, document } = input;
-
+      const { post_id, category, title, description, author, document } = input;
+      console.log("Help Me",post_id)
       const post = await ctx.prisma.research_post.findUnique({
         where: {
           post_id,
         },
       });
-
+      console.log('Amdwae',post)
       if (!post || post.user_id !== ctx.user.id) {
         throw new TRPCError({
           code: "UNAUTHORIZED",
@@ -188,6 +206,7 @@ export const researchpostRouter = router({
           category,
           title,
           description,
+          author,
           document,
         },
       });
@@ -222,4 +241,106 @@ export const researchpostRouter = router({
 
       return { success: true };
     }),
+
+    search: publicProcedure
+    .input(
+        z.object({
+            query: z.string(),
+        })
+    )
+    .query(async ({ input, ctx }) => {
+      const researchPosts = await ctx.prisma.research_post.findMany({
+        where: {
+          OR: [
+            { title: { contains: input.query, mode: 'insensitive' } },
+            { author: { contains: input.query, mode: 'insensitive' } },
+            { category: { contains: input.query, mode: 'insensitive' } },
+            {
+              user: {
+                profile: {
+                  some: {
+                    name: { contains: input.query, mode: 'insensitive' },
+                  },
+                },
+              },
+            },
+          ],
+        },
+        orderBy: { created_at: 'desc' },
+        include: {
+          user: {
+            include: {
+              profile: true, // Include the profile information in the result
+            },
+          },
+        },
+      });
+    
+      console.log("researchPostsearch:", researchPosts);
+      return researchPosts;
+    }),
+
+    //recommendations:
+    getResearchPostRecommendations: protectedProcedure.query(async ({ ctx }) => {
+      const userId = ctx.user?.id;
+    
+      // Get the user's research interests
+      const user = await ctx.prisma.profile.findFirst({
+        where: {
+          user_id: userId,
+        },
+        select: {
+          research_interest: true,
+        },
+      });
+    
+      if (!user || !user.research_interest) {
+        return [];
+      }
+    
+      const userResearchInterests = user.research_interest.toLowerCase().split(",");
+    
+      // Find research posts with at least 1 similar research interest
+      const recommendedResearchPosts = await ctx.prisma.research_post.findMany({
+        where: {
+          user_id: {
+            not: userId,
+          },
+          OR: userResearchInterests.map((interest) => ({
+            profile: {
+              research_interest: {
+                contains: interest.trim(),
+              },
+            },
+          })),
+        },
+        take: 10, // Limit the number of recommendations
+        select: {
+          post_id: true,
+          user_id: true,
+          category: true,
+          title: true,
+          author: true,
+          description: true,
+          document: true,
+          created_at: true,
+          summary: true,
+          profile: {
+            select: {
+              profile_id: true,
+              user_id: true,
+              name: true,
+              avatar_url: true,
+              about_me: true,
+              research_interest: true,
+              collab_status: true,
+              skills: true,
+            },
+          },
+        },
+      });
+    
+      return recommendedResearchPosts;
+    }),
+
 });

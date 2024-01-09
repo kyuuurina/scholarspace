@@ -4,6 +4,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import SuccessToast from "../toast/SuccessToast";
 import ErrorToast from "../toast/ErrorToast";
+import React from "react";
 
 type InviteUserButtonProps = {
   email: string;

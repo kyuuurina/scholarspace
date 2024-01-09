@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+
 // to-do: add PageLoader
 // this file contains dummy data for Education, Research Experience, and Achievement
 
@@ -15,9 +14,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { FaPlus } from 'react-icons/fa';
 
+// Auth
+import { getCookie } from "cookies-next";
+
 // utils
 import { useRouterId } from "~/utils/routerId";
-import { useFetchProfile } from "~/utils/profile";
+import { useFetchProfile, UseCheckProfile } from "~/utils/profile";
 import { useFetchEducation } from '~/utils/education';
 import { useFetchExperience } from '~/utils/experience';
 import { useFetchAchievement } from '~/utils/achievement';
@@ -59,6 +61,8 @@ import AchievementCard from "~/components/profile/AchievementCard";
 import FollowButton from '~/components/network/FollowButton';
 import Button from '~/components/button/Button';
 import FollowListModal from '~/components/network/FollowListModal';
+import FollowersList from '~/components/network/FollowerList';
+import FollowingList from '~/components/network/FollowingList';
 
 
 
@@ -73,6 +77,13 @@ const ProfilePage: NextPageWithLayout = () => {
   const Profile = api.profile.get.useQuery({
     profile_id: profileId, // pass the id to router.query
   });
+
+  //check id is owner
+  const userId = getCookie("UserID") as string;
+  const { user } = UseCheckProfile(userId);
+  const isOwner = user && user.id === Profile.data?.user_id; // check if the logged in user matches Profile user
+  const isNotOwner = !user || (user && user.id !== Profile.data?.user_id);    //not owner
+
 
   const { avatar_url, name, about_me, skills, research_interest, collab_status, isLoading, user_id } = useFetchProfile();
   // const { educations: educationsData, isLoading: isLoadingEducations } = useFetchEducation();
@@ -93,20 +104,12 @@ const ProfilePage: NextPageWithLayout = () => {
   //   userId: profileId, // pass the user's id
   // });
 
-  // Fetch Followers and Following data
-  const { followers, isLoading: isLoadingFollowers } = useFetchFollowers();
-  const { following, isLoading: isLoadingFollowing } = useFetchFollowing();
 
   // const modal states
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isEducationModalOpen, setIsEducationModalOpen] = useState(false);
   const [isExperienceModalOpen, setIsExperienceModalOpen] = useState(false);
   const [isAchievementModalOpen, setIsAchievementModalOpen] = useState(false);
-
-  // state for Followers and Following modals
-  const [isFollowersModalOpen, setIsFollowersModalOpen] = useState(false);
-  const [isFollowingModalOpen, setIsFollowingModalOpen] = useState(false);
-  
 
 
   // Add this console.log to check the profile data
@@ -118,6 +121,9 @@ const ProfilePage: NextPageWithLayout = () => {
 
   return (
     <>
+      <Head>
+        <title>{`${name ?? 'User'}'s Profile`}</title>
+      </Head>
       <ProfileTabs />
   
       <main className="min-h-screen w-full">
@@ -137,31 +143,24 @@ const ProfilePage: NextPageWithLayout = () => {
                 </div> */}
                 <h3 className="font-semibold text-2xl mb-4">{`${name ?? 'User'}'s Profile`}</h3>
                 <div>
+                {isOwner && (
                   <button onClick={handleEditClick} className="flex items-center">
                     Edit <FaEdit className="ml-2" />
                   </button>
-                  {/* Follow button */}
-                  {/* <FollowButton userId={id as string} /> */}
+                )}
+                </div>
+
+                <div>
+                  {/* Follow Button */}
+                  {isNotOwner && user_id && (
+                    <FollowButton userId={user_id} />
+                  )}
                 </div>
                 <div className="flex space-x-4">
-                  {/* <div className="mb-4">
-                    <p
-                      className="text-blue-500 cursor-pointer"
-                      onClick={() => setIsFollowersModalOpen(true)}
-                    >
-                      Followers
-                    </p>
-                  </div>
-                  <div className="mb-4">
-                    <p
-                      className="text-blue-500 cursor-pointer"
-                      onClick={() => setIsFollowingModalOpen(true)}
-                    >
-                      Following
-                    </p>
-                  </div> */}
+                  {/*  */}
                 </div>
               </div>
+
               <div>
                 {isEditModalOpen && (
                   <UserProfileForm
@@ -173,7 +172,15 @@ const ProfilePage: NextPageWithLayout = () => {
                   {/* ... */}
                 </div>
                 <div>
-                  <div className="mb-4">
+                  <div className="flex space-x-4">
+                    <div className="mb-4">
+                      <FollowersList />
+                    </div>
+                    <div className="mb-4">
+                      <FollowingList />
+                    </div>
+                  </div>
+                  <div className="mt-4 mb-4">
                     <p className="text-sm text-gray-600">
                       <CollabStatusBadge collabStatus={collab_status} />
                     </p>
@@ -202,20 +209,24 @@ const ProfilePage: NextPageWithLayout = () => {
             <section className="mt-2 w-3/4 mx-auto rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
               <h3 className="font-semibold text-2xl mb-4">
                 Education
+                {isOwner && (
                 <button
                   className="ml-2 text-blue-500 cursor-pointer"
                   onClick={() => setIsEducationModalOpen(true)}
                 >
                   <FaPlus />
                 </button>
+                )}
               </h3>
-              {educations ? (
-                educations.map((education) => (
-                  <EducationCard key={education.education_id} education={education} />
-                ))
-              ) : (
-                <div>No education data available</div>
-              )}
+              {EducationLoading ? (
+                  <LoadingSpinner />
+                ) : educations && educations.length > 0 ? (
+                  educations.map((education) => (
+                    <EducationCard key={education.education_id} education={{...education, isLoading: false}} />
+                  ))
+                ) : (
+                  <div>No education data available</div>
+                )}
               {isEducationModalOpen && (
                 <EducationForm
                   openModal={isEducationModalOpen}
@@ -230,16 +241,20 @@ const ProfilePage: NextPageWithLayout = () => {
               <section className="mt-2 w-3/4 mx-auto rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
                 <h3 className="font-semibold text-2xl mb-4">
                   Research Experience
+                  {isOwner && (
                   <button
                     className="ml-2 text-blue-500 cursor-pointer"
                     onClick={() => setIsExperienceModalOpen(true)}
                   >
                     <FaPlus />
                   </button>
+                  )}
                 </h3>
-                {experiences ? (
+                {ExperienceLoading ? (
+                  <LoadingSpinner />
+                ) : experiences && experiences.length > 0 ? (
                   experiences.map((experience) => (
-                    <ExperienceCard key={experience.experience_id} experience={experience} />
+                    <ExperienceCard key={experience.experience_id} experience={{...experience, isLoading: false}} />
                   ))
                 ) : (
                   <div>No experience data available</div>
@@ -257,20 +272,24 @@ const ProfilePage: NextPageWithLayout = () => {
                 <section className="mt-2 w-3/4 mx-auto rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
                   <h3 className="font-semibold text-2xl mb-4">
                     Achievement
+                    {isOwner && (
                     <button
                       className="ml-2 text-blue-500 cursor-pointer"
                       onClick={() => setIsAchievementModalOpen(true)}
                     >
                       <FaPlus />
                     </button>
+                    )}
                   </h3>
-                  {achievements ? (
-                    achievements.map((achievement) => (
-                      <AchievementCard key={achievement.achievement_id} achievement={achievement} />
-                    ))
-                  ) : (
-                    <div>No achievement data available</div>
-                  )}
+                  {AchievementLoading ? (
+                  <LoadingSpinner />
+                ) : achievements && achievements.length > 0 ? (
+                  achievements.map((achievement) => (
+                    <AchievementCard key={achievement.achievement_id} achievement={{...achievement, isLoading: false}} />
+                  ))
+                ) : (
+                  <div>No achievement data available</div>
+                )}
                   {isAchievementModalOpen && (
                     <AchievementForm
                       openModal={isAchievementModalOpen}
