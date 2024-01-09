@@ -21,6 +21,7 @@ import { scoreRouter } from "./routers/score";
 import { reactionRouter } from "./routers/reaction";
 import { notificationsRouter } from "./routers/notifications";
 import { grantRouter } from "./routers/grant";
+import { templateRouter } from "./routers/template";
 
 /**
  * This is the primary router for your server.
@@ -50,6 +51,7 @@ export const appRouter = router({
   postcomment: postCommentRouter,
   notifications: notificationsRouter,
   grant: grantRouter,
+  template: templateRouter,
 });
 
 // export type definition of API

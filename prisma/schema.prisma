@@ -319,6 +319,7 @@ model user {
   message                                      message[]
   notification                                 notification[]
   notification_settings                        notification_settings?
+  phase_template                               phase_template[]
   post_comments                                post_comments[]
   post_likes                                   post_likes[]
   profile                                      profile[]
@@ -624,6 +625,7 @@ model chat {
   user_chat_user2_idTouser user      @relation("chat_user2_idTouser", fields: [user2_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   message                  message[]
 
+  @@unique([user1_id, user2_id], map: "unique_user_pair")
   @@schema("public")
 }
 
@@ -698,6 +700,18 @@ model grant {
   workspace_id String    @db.Uuid
   workspace    workspace @relation(fields: [workspace_id], references: [id], onDelete: Cascade)
   project      project[]
+
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model phase_template {
+  id                        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at                DateTime @default(now()) @db.Timestamptz(6)
+  name                      String   @default("Phase Template Example")
+  phase_template_properties String[] @default(["Property 1"])
+  user_id                   String   @db.Uuid
+  user                      user     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@schema("public")
 }
