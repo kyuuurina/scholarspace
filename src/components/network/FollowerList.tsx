@@ -39,13 +39,22 @@ const FollowersList: React.FC = () => {
         title="Followers"
       >
         {followers.length === 0 ? (
-          <p>You do not have any followers yet.</p>
+          <p>No Followers.</p>
         ) : (
           <ul>
             {followers.map((follower) => (
-              <li key={follower.id} className="flex items-center space-x-2">
-                <AvatarPlaceholder name={follower.name || "Unknown"} shape="circle" />
-                <span>{follower.name || "Unknown"}</span>
+              <li key={follower.id} className="flex items-center space-x-2 p-4">
+                <div className="aspect:square h-10 w-10 cursor-pointer">
+                  <AvatarPlaceholder
+                    name={follower.name || "Unknown"}
+                    shape="circle"
+                  />
+                </div>
+                <div className="ml-2">
+                  <span className="cursor-pointer inline-block max-w-full sm:max-w-[150px] overflow-hidden whitespace-nowrap overflow-ellipsis">
+                    {follower.name || "Unknown"}
+                  </span>
+                </div>
               </li>
             ))}
           </ul>
