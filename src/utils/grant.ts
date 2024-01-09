@@ -1,7 +1,7 @@
 import { api } from "./api";
 import type { grant, project } from "@prisma/client";
 
-type GrantSummary = {
+export type GrantSummary = {
   workspace_id: string;
   grants: {
     name: string;
@@ -49,32 +49,34 @@ export const useFetchGrantSummary = (workspace_id: string) => {
     // Populate grantSummary with data from grants
     grantSummary = {
       workspace_id: workspace_id,
-      grants: grants.data.map((grant: grant) => {
-        // Filter tasks for the current phase
-        const grantProjects = projects.data.filter(
-          (project: project) => project.grant_id === grant.id
-        );
+      grants: grants.data
+        .map((grant: grant) => {
+          // Filter tasks for the current phase
+          const grantProjects = projects.data.filter(
+            (project: project) => project.grant_id === grant.id
+          );
 
-        // Map tasks to the desired structure
-        const mappedProjects = grantProjects
-          .map((project: project) => ({
-            id: project.project_id,
-            start_at: project.start_at,
-            end_at: project.end_at,
-            name: project.name,
-            progress: project.progress,
-          }))
-          .sort((a, b) => a.start_at.getTime() - b.start_at.getTime());
+          // Map tasks to the desired structure
+          const mappedProjects = grantProjects
+            .map((project: project) => ({
+              id: project.project_id,
+              start_at: project.start_at,
+              end_at: project.end_at,
+              name: project.name,
+              progress: project.progress,
+            }))
+            .sort((a, b) => a.start_at.getTime() - b.start_at.getTime());
 
-        return {
-          id: grant.id,
-          start_at: grant.start_at,
-          end_at: grant.end_at,
-          name: grant.name,
-          progress: grant.progress,
-          projects: mappedProjects,
-        };
-      }),
+          return {
+            id: grant.id,
+            start_at: grant.start_at,
+            end_at: grant.end_at,
+            name: grant.name,
+            progress: grant.progress,
+            projects: mappedProjects,
+          };
+        })
+        .sort((a, b) => a.start_at.getTime() - b.start_at.getTime()),
     };
   }
 

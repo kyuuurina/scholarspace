@@ -1,12 +1,5 @@
-import React, { useState } from "react";
-import {
-  Gantt,
-  type Task,
-  EventOption,
-  StylingOption,
-  ViewMode,
-  DisplayOption,
-} from "gantt-task-react";
+import React from "react";
+import { Gantt, type Task } from "gantt-task-react";
 import "gantt-task-react/dist/index.css";
 import { useRouter } from "next/router";
 import { api } from "~/utils/api";

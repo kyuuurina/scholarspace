@@ -66,4 +66,42 @@ export const grantRouter = router({
         );
       }
     }),
+
+  delete: protectedProcedure
+    .input(
+      z.object({
+        grant_id: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { grant_id } = input;
+      // remove grant id from project record first
+      const projects = await ctx.prisma.project.findMany({
+        where: {
+          grant_id,
+        },
+      });
+
+      if (projects.length > 0) {
+        await Promise.all(
+          projects.map(async (project) => {
+            await ctx.prisma.project.update({
+              where: {
+                project_id: project.project_id,
+              },
+              data: {
+                grant_id: null,
+              },
+            });
+          })
+        );
+      }
+
+      // delete grant
+      await ctx.prisma.grant.delete({
+        where: {
+          id: grant_id,
+        },
+      });
+    }),
 });

@@ -22,6 +22,7 @@ import CreateProjectModal from "~/components/project/CreateProjectModal";
 import CreateGrantModal from "~/components/grant/create-grant-form";
 import PageLoader from "~/components/layout/PageLoader";
 import MembersCard from "~/components/members/MembersCard";
+import GanttChart from "~/components/grant/GanttChart";
 
 import { useState } from "react";
 
@@ -61,6 +62,7 @@ const Workspace: NextPageWithLayout = () => {
             {/* Left section of workspace dashboard */}
             {/* Projects Section */}
             <div className="w-full md:col-span-8">
+              <GanttChart grantSummary={grantSummary} refetch={refetch} />
               <div className="mb-5 flex items-center justify-between">
                 <h5 className="text-xl font-medium text-gray-900 ">Projects</h5>
                 {workspaceRole.data === "Researcher Admin" && (
@@ -68,10 +70,6 @@ const Workspace: NextPageWithLayout = () => {
                     <PrimaryButton
                       name="Add Project"
                       onClick={() => setModalIsOpen(true)}
-                    />
-                    <PrimaryButton
-                      name="Add Grant"
-                      onClick={() => setGrantModalIsOpen(true)}
                     />
                   </div>
                 )}
