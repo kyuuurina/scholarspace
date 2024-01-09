@@ -422,6 +422,27 @@ export const taskRouter = router({
         data: { deadline },
       });
 
+      // get tasks and get the latest deadline
+      const tasks = await ctx.prisma.task.findMany({
+        where: {
+          phase_id: task.phase_id,
+        },
+      });
+
+      const latestDeadline = tasks.reduce((prev, current) =>
+        prev.deadline && current.deadline && prev.deadline > current.deadline
+          ? prev
+          : current
+      );
+
+      // update phase deadline
+      await ctx.prisma.phase.update({
+        where: { id: task.phase_id },
+        data: { end_at: latestDeadline.deadline },
+      });
+
+      console.log(latestDeadline.deadline);
+
       return task;
     }),
 

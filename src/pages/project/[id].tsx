@@ -83,7 +83,7 @@ const Project: NextPageWithLayout = () => {
                   </dl>
                 </div>
               </section>
-              <GanttChart />
+              <GanttChart id={id}/>
               <div className="my-2 overflow-x-auto">
                 <table className="w-full bg-white text-left text-sm text-gray-500">
                   <thead className="border-grey-50 border text-xs uppercase text-gray-700 ">

@@ -1,6 +1,6 @@
 import { api } from "./api";
 import { useRouterId } from "./routerId";
-import { phase, task } from "@prisma/client";
+import type { phase, task } from "@prisma/client";
 
 type Member = {
   user: {
@@ -22,24 +22,6 @@ type Project = {
   p_score: number; // Make it nullable to handle potential null values
 };
 
-// type ProjectSummary = {
-//   project_id: string; // Assuming a project has an ID
-//   phases: {
-//     phase_id: string;
-//     tasks: {
-//       task_id: string;
-//       start_at: Date;
-//       end_at: Date | null;
-//       progress: number;
-//       name: string | null;
-//     }[];
-//     start_at: Date;
-//     end_at: Date | null;
-//     progress: number;
-//     name: string | null;
-//   }[];
-// };
-
 type ProjectSummary = {
   project_name: string; // Assuming a project has an ID
   phases: {
@@ -52,7 +34,6 @@ type ProjectSummary = {
       task_id: string;
       start_at: Date;
       end_at: Date | null;
-      progress: number;
       name: string | null;
       phase_id: string;
     }[];
@@ -255,14 +236,15 @@ export const useFetchProjectSummary = (project_id: string) => {
         );
 
         // Map tasks to the desired structure
-        const mappedTasks = phaseTasks.map((task: task) => ({
-          task_id: task.id,
-          start_at: task.created_at,
-          end_at: task.end_at,
-          progress: 0,
-          name: task.name,
-          phase_id: task.phase_id,
-        }));
+        const mappedTasks = phaseTasks
+          .map((task: task) => ({
+            task_id: task.id,
+            start_at: task.created_at,
+            end_at: task.deadline,
+            name: task.name,
+            phase_id: task.phase_id,
+          }))
+          .sort((a, b) => a.start_at.getTime() - b.start_at.getTime());
 
         return {
           phase_id: phase.id,
@@ -274,7 +256,16 @@ export const useFetchProjectSummary = (project_id: string) => {
         };
       }),
     };
+    projectSummary.phases.sort(
+      (a, b) => a.start_at.getTime() - b.start_at.getTime()
+    );
   }
 
-  return projectSummary;
+  const refetch = async () => {
+    await project.refetch();
+    await phases.refetch();
+    await tasks.refetch();
+  };
+
+  return { projectSummary, refetch };
 };
