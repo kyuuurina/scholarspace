@@ -285,6 +285,7 @@ model workspace {
   cover_img      String?
   is_personal    Boolean          @default(false)
   ownerid        String?
+  grant          grant[]
   project        project[]
   workspace_user workspace_user[]
 
@@ -375,7 +376,12 @@ model project {
   c_score       Int             @default(0) @db.SmallInt
   p_score       Int             @default(0) @db.SmallInt
   cover_img     String?
+  grant_id      String?         @db.Uuid
+  progress      Float           @default(0)
+  start_at      DateTime        @default(now()) @db.Timestamptz(6)
+  end_at        DateTime?       @db.Timestamptz(6)
   phase         phase[]
+  grant         grant?          @relation(fields: [grant_id], references: [id], onDelete: NoAction)
   workspace     workspace       @relation(fields: [workspace_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   project_users project_users[]
 
@@ -511,6 +517,7 @@ model phase {
   start_at            DateTime              @db.Date
   end_at              DateTime?             @db.Date
   project_id          String                @db.Uuid
+  progress            Float                 @default(0)
   project             project               @relation(fields: [project_id], references: [project_id], onDelete: Cascade, onUpdate: NoAction)
   phase_property      phase_property[]
   property_phase_task property_phase_task[]
@@ -617,6 +624,7 @@ model chat {
   user_chat_user2_idTouser user      @relation("chat_user2_idTouser", fields: [user2_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   message                  message[]
 
+  @@unique([user1_id, user2_id], map: "unique_user_pair")
   @@schema("public")
 }
 
@@ -676,6 +684,21 @@ model reaction {
 model test {
   id  String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   yes Boolean @default(true)
+
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model grant {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at   DateTime  @default(now()) @db.Timestamptz(6)
+  progress     Float     @default(0)
+  name         String    @default("Grant 1")
+  start_at     DateTime  @default(now()) @db.Timestamptz(6)
+  end_at       DateTime? @db.Timestamptz(6)
+  workspace_id String    @db.Uuid
+  workspace    workspace @relation(fields: [workspace_id], references: [id], onDelete: Cascade)
+  project      project[]
 
   @@schema("public")
 }
