@@ -134,18 +134,24 @@ const GanttChart: React.FC = () => {
 
   function getStartEndDateForProject(tasks: Task[], projectId: string) {
     const projectTasks = tasks.filter((t) => t.project === projectId);
-    let start = projectTasks[0].start;
-    let end = projectTasks[0].end;
+
+    if (projectTasks.length === 0) {
+      return null;
+    }
+
+    let start = projectTasks[0]?.start;
+    let end = projectTasks[0]?.end;
 
     for (let i = 0; i < projectTasks.length; i++) {
       const task = projectTasks[i];
-      if (start.getTime() > task.start.getTime()) {
+      if (task?.start && start!.getTime() > task.start.getTime()) {
         start = task.start;
       }
-      if (end.getTime() < task.end.getTime()) {
+      if (task?.end && end!.getTime() < task.end.getTime()) {
         end = task.end;
       }
     }
+
     return [start, end];
   }
 
@@ -153,17 +159,20 @@ const GanttChart: React.FC = () => {
     console.log("On date change Id:" + task.id);
     let newTasks = tasks.map((t) => (t.id === task.id ? task : t));
     if (task.project) {
-      const [start, end] = getStartEndDateForProject(newTasks, task.project);
+      const startEndDates = getStartEndDateForProject(newTasks, task.project);
+      const start = startEndDates ? startEndDates[0] : new Date();
+      const end = startEndDates ? startEndDates[1] : new Date();
       const project =
         newTasks[newTasks.findIndex((t) => t.id === task.project)];
       if (
-        project.start.getTime() !== start.getTime() ||
-        project.end.getTime() !== end.getTime()
+        project?.start.getTime() !== start!.getTime() ||
+        project.end.getTime() !== end!.getTime()
       ) {
         const changedProject = { ...project, start, end };
-        newTasks = newTasks.map((t) =>
-          t.id === task.project ? changedProject : t
-        );
+        newTasks = newTasks.map((t) => ({
+          ...t,
+          id: t.id || "", // Set id to an empty string if it's undefined
+        }));
       }
     }
     setTasks(newTasks);
@@ -177,7 +186,7 @@ const GanttChart: React.FC = () => {
     return conf;
   };
 
-  const handleProgressChange = async (task: Task) => {
+  const handleProgressChange = (task: Task) => {
     setTasks(tasks.map((t) => (t.id === task.id ? task : t)));
     console.log("On progress change Id:" + task.id);
   };
