@@ -11,6 +11,7 @@ import {
   FiActivity,
   FiMessageCircle,
   FiBriefcase,
+  FiColumns,
 } from "react-icons/fi";
 import { IconContext } from "react-icons";
 
@@ -166,6 +167,25 @@ export const SideBar: React.FC<SideBarProps> = ({
                     }`}
                   >
                     Projects
+                  </span>
+                </Link>
+              </li>
+              <li className="rounded-sm">
+                <Link
+                  href="/manage-templates"
+                  className={`flex items-center space-x-3 rounded-md hover:bg-purple-800 ${
+                    open ? "text-purple-accent-2" : "text-purple-accent-2"
+                  }`}
+                >
+                  <FiColumns className="h-6 w-6" />
+                  <span
+                    className={`transition-all duration-500 ${
+                      open
+                        ? "text-purple-accent-2 opacity-100"
+                        : "sr-only opacity-0"
+                    }`}
+                  >
+                    Manage Templates
                   </span>
                 </Link>
               </li>
