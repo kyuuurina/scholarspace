@@ -271,4 +271,41 @@ export const phaseRouter = router({
 
       return phase;
     }),
+
+  createWithTemplate: protectedProcedure
+    .input(
+      z.object({
+        project_id: z.string(),
+        template: z.object({
+          id: z.string(),
+          name: z.string(),
+          phase_template_properties: z.array(z.string()),
+        }),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      // create phase
+      const phase = await ctx.prisma.phase.create({
+        data: {
+          name: input.template.name,
+          project_id: input.project_id,
+          start_at: new Date(),
+        },
+      });
+
+      // if phase success then create properties
+      if (phase) {
+        for (const property of input.template.phase_template_properties) {
+          await ctx.prisma.phase_property.create({
+            data: {
+              name: property,
+              type: "text",
+              phase_id: phase.id,
+            },
+          });
+        }
+      }
+
+      return phase;
+    }),
 });
