@@ -21,23 +21,19 @@ export const templateRouter = router({
     }
   }),
 
-  getByCommentAndUserId: protectedProcedure
+  get: protectedProcedure
     .input(
       z.object({
-        comment_id: z.string(),
-        user_id: z.string(),
+        id: z.string(),
       })
     )
     .query(async ({ input, ctx }) => {
-      const reaction = await ctx.prisma.reaction.findUnique({
+      const template = await ctx.prisma.phase_template.findUnique({
         where: {
-          comment_id_user_id: {
-            comment_id: input.comment_id,
-            user_id: input.user_id,
-          },
+          id: input.id,
         },
       });
-      return reaction;
+      return template;
     }),
 
   create: protectedProcedure
