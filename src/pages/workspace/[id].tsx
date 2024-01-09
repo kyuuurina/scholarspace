@@ -2,6 +2,7 @@
 import { useFetchWorkspace, useFetchWorkspaceMembers } from "~/utils/workspace";
 import { useRouterId } from "~/utils/routerId";
 import { useFetchWorkspaceProjects } from "~/utils/project";
+import { useFetchGrantSummary } from "~/utils/grant";
 
 // types
 import type { ReactElement } from "react";
@@ -18,6 +19,7 @@ import Card from "~/components/Card";
 import Header from "~/components/workspace/Header";
 import AvatarPlaceholder from "~/components/avatar/AvatarPlaceholder";
 import CreateProjectModal from "~/components/project/CreateProjectModal";
+import CreateGrantModal from "~/components/grant/create-grant-form";
 import PageLoader from "~/components/layout/PageLoader";
 import MembersCard from "~/components/members/MembersCard";
 
@@ -29,11 +31,15 @@ const Workspace: NextPageWithLayout = () => {
   const projects = useFetchWorkspaceProjects();
   const workspaceId = useRouterId();
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [grantModalIsOpen, setGrantModalIsOpen] = useState(false);
 
   // get workspace role
   const workspaceRole = api.workspace.getWorkspaceRole.useQuery({
     workspaceId: workspaceId,
   });
+
+  const { grantSummary, refetch } = useFetchGrantSummary(workspaceId);
+  console.log(grantSummary);
 
   return (
     <>
@@ -41,6 +47,11 @@ const Workspace: NextPageWithLayout = () => {
       <CreateProjectModal
         openModal={modalIsOpen}
         onClick={() => setModalIsOpen(false)}
+      />
+      <CreateGrantModal
+        openModal={grantModalIsOpen}
+        onClick={() => setGrantModalIsOpen(false)}
+        refetch={refetch}
       />
       <PageLoader isLoading={isLoading} errorMsg={error?.message}>
         <main className="flex flex-col">
@@ -53,10 +64,16 @@ const Workspace: NextPageWithLayout = () => {
               <div className="mb-5 flex items-center justify-between">
                 <h5 className="text-xl font-medium text-gray-900 ">Projects</h5>
                 {workspaceRole.data === "Researcher Admin" && (
-                  <PrimaryButton
-                    name="Add Project"
-                    onClick={() => setModalIsOpen(true)}
-                  />
+                  <div className="flex">
+                    <PrimaryButton
+                      name="Add Project"
+                      onClick={() => setModalIsOpen(true)}
+                    />
+                    <PrimaryButton
+                      name="Add Grant"
+                      onClick={() => setGrantModalIsOpen(true)}
+                    />
+                  </div>
                 )}
               </div>
               <div className="grid max-w-max gap-5 md:grid-cols-2">
