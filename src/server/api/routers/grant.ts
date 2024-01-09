@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { router, protectedProcedure } from "~/server/api/trpc";
+import { each } from "chart.js/dist/helpers/helpers.core";
 
 export const grantRouter = router({
   listByWorkspace: protectedProcedure
@@ -27,6 +28,7 @@ export const grantRouter = router({
         start_at: z.date(),
         end_at: z.date().nullable(),
         workspace_id: z.string(),
+        project_id: z.array(z.string()).optional(),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -40,10 +42,28 @@ export const grantRouter = router({
       }
       const grant = await ctx.prisma.grant.create({
         data: {
-          ...input,
+          name: input.name,
+          start_at: input.start_at,
+          end_at: input.end_at,
+          workspace_id: input.workspace_id,
         },
       });
 
-      return grant;
+      // if project_id is not null, update project with grant id
+      // iterate each project_id
+      if (input.project_id && input.project_id.length > 0) {
+        await Promise.all(
+          (input.project_id || []).map(async (project_id) => {
+            await ctx.prisma.project.update({
+              where: {
+                project_id: project_id,
+              },
+              data: {
+                grant_id: grant.id,
+              },
+            });
+          })
+        );
+      }
     }),
 });

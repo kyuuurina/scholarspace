@@ -25,6 +25,7 @@ type GrantFormData = {
   name: string;
   start_at: Date;
   end_at: Date | null;
+  project_id?: string[];
 };
 
 const CreateGrantModal: React.FC<ModalProps> = ({
@@ -33,6 +34,7 @@ const CreateGrantModal: React.FC<ModalProps> = ({
   refetch,
 }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const selectedProjects: string[] = [];
   const id = useRouterId();
 
   // schema for form validation
@@ -43,6 +45,7 @@ const CreateGrantModal: React.FC<ModalProps> = ({
       .max(100, "Name must be at most 100 characters long."),
     start_at: z.date(),
     end_at: z.date().nullable(),
+    project_id: z.array(z.string()).optional(),
   });
 
   // react-hook-form
@@ -50,9 +53,27 @@ const CreateGrantModal: React.FC<ModalProps> = ({
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<GrantFormData>({
     resolver: zodResolver(schema),
+  });
+
+  // handle when a project is selected
+  const handleProjectSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    // if selected exists in array, remove it
+    if (selectedProjects.includes(e.target.value)) {
+      const index = selectedProjects.indexOf(e.target.value);
+      if (index > -1) {
+        selectedProjects.splice(index, 1);
+      }
+    } else {
+      selectedProjects.push(e.target.value);
+    }
+  };
+  // get projects of workspace
+  const projects = api.project.getWorkspaceProjects.useQuery({
+    workspace_id: id,
   });
 
   // create grant
@@ -61,6 +82,7 @@ const CreateGrantModal: React.FC<ModalProps> = ({
   // submit handler
   const onSubmit = async (formData: GrantFormData) => {
     if (isSubmitting) return;
+    setValue("project_id", selectedProjects);
     try {
       setIsSubmitting(true);
       await createGrant.mutateAsync({
@@ -83,7 +105,6 @@ const CreateGrantModal: React.FC<ModalProps> = ({
       });
     }
   };
-
   return (
     <div>
       <Modal
@@ -146,6 +167,32 @@ const CreateGrantModal: React.FC<ModalProps> = ({
               {...register("end_at", { required: false, valueAsDate: true })}
             />
             {errors.end_at && <FormErrorMessage text={errors.end_at.message} />}
+          </div>
+
+          {/* display projects in list */}
+          <div>
+            <label
+              htmlFor="project_id"
+              className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+            >
+              Projects
+            </label>
+            <select
+              id="project_id"
+              className="block w-full"
+              onChange={(e) => {
+                handleProjectSelect(e);
+              }}
+            >
+              {projects.data?.map((project) => (
+                <option key={project.project_id} value={project.project_id}>
+                  {project.name}
+                </option>
+              ))}
+            </select>
+            {errors.project_id && (
+              <FormErrorMessage text={errors.project_id.message} />
+            )}
           </div>
 
           <PrimaryButton name="Create Grant" type="submit" />
