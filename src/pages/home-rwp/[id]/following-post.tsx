@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
 //auth
@@ -32,8 +33,6 @@ import Modal from "~/components/modal/Modal";
 //research post components
 import AllFollowingTabs from "~/components/research-post/AllFollowingTabs";
 import Post from "~/components/research-post/Post";
-import PostCard from "~/components/research-post/PostCard";
-import { ResearchPostCard } from "~/components/draft/ResearchPostCard";
 import UserProfileCard from "~/components/research-post/UserRecCards";
 import AddNewPostButton from "~/components/research-post/AddNewPostButton";
 import TestModal from "~/components/research-post/AddNewPostModal";
@@ -42,20 +41,22 @@ import TestModal from "~/components/research-post/AddNewPostModal";
 import { useFetchRecommendedProfiles } from "~/utils/profile";
 import ProfileRecommendation from "~/components/profile/ProfileRecommendation";
 
+//search
+import SearchBaq from "~/components/search/SearchBaq";
+
 
 const FollowingPostPage: NextPageWithLayout = () => {
-    // Customize the limit and cursor as needed
-    // const { followingResearchPosts, isLoading, error } = useFetchFollowingResearchPosts();
-    // if (isLoading) {
-    //     return <p>Loading...</p>;
-    // }
 
-    // if (error) {
-    //     return <p>Error: {error.message}</p>;
-    // }
+  //fetch user id
+    const userId = getCookie("UserID");
 
     const router = useRouter();
     const FollowingPostLists = useFetchFollowingResearchPosts();
+
+    //
+    const [editModalOpen, setEditModalOpen] = useState(false);
+    const [currentPostId, setCurrentPostId] = useState<string | null>(null);
+    const [isConfirmationOpen, setIsConfirmationOpen] = useState(false); 
 
     //profile recommendation
     const {
@@ -77,13 +78,23 @@ const FollowingPostPage: NextPageWithLayout = () => {
     return <p>Error: Unable to fetch research posts</p>;
   }
 
+  
+// Render EditPostForm component
+const handleEditClick = (postId: string) => {
+  setEditModalOpen(true);
+  setCurrentPostId(postId);
+};
+
 
   return (
     <div className="w-full max-w-screen-xl p-8">
       <div className="grid grid-cols-12 gap-6 mx-auto">
         {/* All Following Tabs (3/4 width) */}
         <div className="col-span-9">
+        <SearchBaq />
+          <div className="mb-4"></div>
           <AllFollowingTabs />
+
           <div className="mt-6">
             {FollowingPostLists.isLoading ? (
               <LoadingSpinner />
@@ -94,7 +105,7 @@ const FollowingPostPage: NextPageWithLayout = () => {
             ) : (
               FollowingPostLists.followingResearchPosts.map((post) => (
                 <li key={post.post_id} className="mb-8" style={{ listStyle: 'none' }}>
-                  <Post post={post} />
+                  <Post post={post} onEditClick={() => handleEditClick(post.post_id)} />
                 </li>
               ))
             )}

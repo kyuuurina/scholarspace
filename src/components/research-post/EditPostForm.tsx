@@ -42,8 +42,8 @@ type ModalProps = {
     const userId = getCookie("UserID");
   
     //populate form fields 
-    const { myResearchPosts, isLoading, error } = useFetchMyResearchPosts();
-    const { post_id, category, title, author, description, document } = myResearchPosts[0] || {};
+    const { myResearchPosts, isLoading, error } = useFetchMyResearchPosts(profile_id);
+    const { post_id, category, title, author, description, document } = myResearchPosts.filter((research)=>{return research.post_id == postIdToEdit})[0] || {};
 
     const [documentPlaceholder, setdocumentPlaceholder] = useState<string | null>(null);
     const [documentValue, setDocumentValue] = useState<File | null | undefined>(null);
@@ -160,6 +160,7 @@ type ModalProps = {
         category: category || "",
         title: title || "",
         description: description || "",
+        author: author || "",
         document: document || "",
       });
     };
@@ -184,12 +185,13 @@ type ModalProps = {
                 </label>
                 <select id="category" className="block w-full" {...register("category", { required: true })}>
                   <option value="Article">Article</option>
-                  <option value="Conference Paper">Conference Paper</option>
-                  <option value="Presentation">Presentation</option>
-                  <option value="Preprint">Preprint</option>
                   <option value="Research Proposal">Research Proposal</option>
+                  <option value="Preprint">Preprint</option>
                   <option value="Thesis">Thesis</option>
+                  <option value="Presentation">Presentation</option>
+                  <option value="Conference Paper">Conference Paper</option>
                   <option value="Idea">Idea</option>
+                  <option value="Idea">Sharing</option>
                 </select>
                 {errors.category && <FormErrorMessage text={errors.category.message} />}
               </div>

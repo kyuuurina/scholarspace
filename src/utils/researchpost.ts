@@ -36,10 +36,10 @@ export const useFetchResearchPost = () => {
 };
 
 
-
-export const useFetchMyResearchPosts = () => {
-    const id: string = useRouterId();
-
+//fetch my research posts
+export const useFetchMyResearchPosts = (id:string) => {
+    
+    console.log('Dari depam',id)
     const myResearchPosts = api.researchpost.getMyPosts.useQuery(
         {
             post_id: id,
@@ -50,7 +50,7 @@ export const useFetchMyResearchPosts = () => {
     );
 
     const { data, isLoading, error } = myResearchPosts;
-
+        console.log(myResearchPosts)
     return {
         myResearchPosts: data || [],
         isLoading,
@@ -58,6 +58,8 @@ export const useFetchMyResearchPosts = () => {
     };
 };
 
+
+//fetch following posts
 export const useFetchFollowingResearchPosts = (limit = 20, cursor?: string) => {
     const followingResearchPosts = api.researchpost.getFollowingPosts.useQuery(
         {
@@ -78,6 +80,43 @@ export const useFetchFollowingResearchPosts = (limit = 20, cursor?: string) => {
         error,
     };
 };
+
+
+//search post
+export const useFetchSearchResults = (query: string) => {
+    const searchPostResults = api.researchpost.search.useQuery(
+      {
+        query,
+      },
+      {
+        enabled: !!query,
+      }
+    );
+  
+    const { data, isLoading, error } = searchPostResults;
+  
+    return {
+      searchPostResults: data || [],
+      isLoading,
+      error,
+    };
+  };
+
+
+//fetch recommendations:
+export const useFetchPostRecommendations = () => {
+    const {
+      data: postRecommendations,
+      isLoading: isLoadingPostRecommendations,
+      error: errorPostRecommendations,
+    } = api.researchpost.getResearchPostRecommendations.useQuery();
+  
+    return {
+      postRecommendations: postRecommendations || [],
+      isLoadingPostRecommendations,
+      errorPostRecommendations,
+    };
+  };
 
 
 //hook for fetching user's research posts

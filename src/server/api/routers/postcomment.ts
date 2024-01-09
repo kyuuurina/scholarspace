@@ -16,10 +16,17 @@ export const postCommentRouter = router({
     .query(async ({ input, ctx }) => {
       const { post_id } = input;
 
-      // Fetch post comments based on the provided post_id
+      // Fetch post comments based on the provided post_id and include user profile
       const postComments = await ctx.prisma.post_comments.findMany({
         where: {
           post_id,
+        },
+        include: {
+          user: {
+            select: {
+              profile: true,
+            },
+          },
         },
       });
 
@@ -60,17 +67,70 @@ create: protectedProcedure
       });
     }
 
-    // Create a new comment for the associated post
+    // Create a new comment for the associated post and select additional fields
     const newComment = await ctx.prisma.post_comments.create({
       data: {
         value,
         user_id: ctx.user.id,
         post_id,
       },
+      select: {
+        comment_id: true,
+        value: true,
+        created_at: true,
+        user: {
+          select: {
+            profile: {
+              select: {
+                name: true,
+                avatar_url: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     return newComment;
   }),
+
+  //get comments of post
+  getComments: protectedProcedure
+    .input(
+      z.object({
+        post_id: z.string(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const { post_id } = input;
+
+      // Fetch post comments based on the provided post_id
+      const postComments = await ctx.prisma.post_comments.findMany({
+        where: {
+          post_id,
+        },
+        select: {
+          comment_id: true,
+          value: true,
+          created_at: true,
+          user: {
+            select: {
+              profile: {
+                select: {
+                  name: true,
+                  avatar_url: true,
+                },
+              },
+            },
+          },
+        },
+        // orderBy: {
+        //   created_at: "asc", // Order comments by creation date (you can adjust this based on your needs)
+        // },
+      });
+
+      return postComments;
+    }),
 
   // Mutation to update an existing post comment
   update: protectedProcedure

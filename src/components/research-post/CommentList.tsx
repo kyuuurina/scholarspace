@@ -72,7 +72,7 @@ const CommentsList: React.FC<CommentsSectionProps> = ({
       <div className="mx-auto max-w-2xl px-4">
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-lg font-bold text-gray-900 dark:text-white lg:text-2xl">
-            Discussion ({comments.length})
+            Comments ({comments.length})
           </h2>
         </div>
         <div className="flex flex-col justify-between">

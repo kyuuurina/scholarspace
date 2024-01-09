@@ -29,9 +29,17 @@ import ErrorToast from "../toast/ErrorToast";
 type ModalProps = {
   openModal: boolean;
   onClick: () => void;
+  achievement: {
+    achievement_id: string;
+    title: string;
+    received_year: string;
+    description: string | null;
+    user_id: string;
+    isLoading: boolean;
+  };
 };
 
-const EditAchievement: React.FC<ModalProps> = ({ openModal, onClick }) => {
+const EditAchievement: React.FC<ModalProps> = ({ achievement, openModal, onClick }) => {
 
   //const
   const router = useRouter();
@@ -42,7 +50,7 @@ const EditAchievement: React.FC<ModalProps> = ({ openModal, onClick }) => {
   const userId = getCookie("UserID");
 
   //populate form fields 
-  const {title, received_year, description, achievement_id, isLoading} = useFetchAchievement();
+  const {title, received_year, description, achievement_id, isLoading} = achievement;
 
 
 //schema for form validation
