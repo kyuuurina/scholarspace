@@ -513,6 +513,7 @@ model phase {
   start_at            DateTime              @db.Date
   end_at              DateTime?             @db.Date
   project_id          String                @db.Uuid
+  progress            Float                 @default(0)
   project             project               @relation(fields: [project_id], references: [project_id], onDelete: Cascade, onUpdate: NoAction)
   phase_property      phase_property[]
   property_phase_task property_phase_task[]

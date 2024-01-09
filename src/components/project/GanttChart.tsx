@@ -34,7 +34,7 @@ const GanttChart: React.FC<GanttChartProps> = ({ id }) => {
           end: phase.end_at ? new Date(phase.end_at) : new Date(),
           name: phase.name ?? "",
           id: phase.phase_id,
-          progress: 23,
+          progress: phase.progress,
           type: "project",
           hideChildren: false,
           displayOrder: displayCount++,

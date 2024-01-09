@@ -94,6 +94,7 @@ export const taskRouter = router({
 
       let task;
 
+      // if task is done, update end_at date
       if (status === "done") {
         task = await ctx.prisma.task.update({
           where: { id },
@@ -173,6 +174,18 @@ export const taskRouter = router({
         where: { project_id: project.project_id },
         data: { p_score: completionScore },
       });
+
+      // update phase progress
+      const phase = await ctx.prisma.phase.findUnique({
+        where: { id: phase_id },
+      });
+
+      if (phase) {
+        await ctx.prisma.phase.update({
+          where: { id: phase_id },
+          data: { progress: completionRatio },
+        });
+      }
 
       return task;
     }),

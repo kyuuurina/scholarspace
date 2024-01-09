@@ -250,7 +250,7 @@ export const useFetchProjectSummary = (project_id: string) => {
           phase_id: phase.id,
           start_at: phase.start_at,
           end_at: phase.end_at,
-          progress: 0,
+          progress: phase.progress,
           name: phase.name,
           tasks: mappedTasks,
         };
