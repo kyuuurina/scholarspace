@@ -8,6 +8,7 @@ import type { phase } from "@prisma/client";
 import { FiLayout } from "react-icons/fi";
 import { useClickAway } from "@uidotdev/usehooks";
 import PhaseActions from "./PhaseActions";
+import { FiChevronDown } from "react-icons/fi";
 
 type HeaderProps = {
   phases: phase[];
@@ -39,6 +40,9 @@ const Header: React.FC<HeaderProps> = ({
   const [newPhaseNames, setNewPhaseNames] = useState<{ [key: string]: string }>(
     {}
   );
+
+  // states for dropdown
+  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
   const handleContextMenu = (
     event: React.MouseEvent<HTMLLIElement>,
@@ -152,11 +156,11 @@ const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <div className="flex w-full flex-col flex-wrap border-b bg-white p-4 pb-0">
+    <div className="flex w-full flex-wrap items-center justify-between border-b bg-white p-4 pb-0 pr-10">
       {/* Project Header */}
-      <div className="flex flex-row justify-between pb-1">
+      <div className="flex flex-col space-y-2">
         {/* breadcrumb workspace and project */}
-        <div className="flex items-center justify-center rounded-lg border border-gray-200 bg-gray-50 px-3 py-1 text-gray-700">
+        <div className="flex w-fit items-center justify-center rounded-lg border border-gray-200 bg-gray-50 px-3 py-1 text-gray-700">
           <Link href="/workspace">
             <span className="ml-1 flex items-center text-xs hover:underline">
               MYSIGSQRA
@@ -169,21 +173,85 @@ const Header: React.FC<HeaderProps> = ({
             </span>
           </Link>
         </div>
-        {/* add phase button */}
-        <div className="flex justify-end">
-          {isEditing ? (
-            <input
-              type="text"
-              value={newPhaseName}
-              onChange={handlePhaseNameChange}
-              onKeyDown={handleInputKeyPress}
-              onBlur={() => setIsEditing(false)}
-              ref={inputRef}
-              className="mr-2 rounded-md border border-gray-300 p-1"
-            />
-          ) : (
+        {/* Tabs of phases*/}
+        <div>
+          <ul className="hidden text-center text-sm text-gray-800 sm:flex">
+            {phases?.map((phase) => (
+              <React.Fragment key={phase.id}>
+                <li
+                  ref={ref as React.MutableRefObject<HTMLLIElement>}
+                  onContextMenu={(event) => handleContextMenu(event, phase.id)}
+                  className={`rounded-t-md border ${
+                    selectedPhase === phase.id ? "bg-gray-300" : "bg-gray-100"
+                  } relative p-2 px-3 py-1 hover:cursor-pointer hover:bg-gray-50 hover:text-gray-700`}
+                  onClick={() => onSelectPhase(phase.id)}
+                >
+                  {isRenaming[phase.id] ? (
+                    <input
+                      type="text"
+                      value={newPhaseNames[phase.id]}
+                      onChange={(event) =>
+                        handleRenameInputChange(event, phase.id)
+                      }
+                      onKeyDown={(event) =>
+                        handleRenameInputKeyPress(event, phase.id)
+                      }
+                      onBlur={() =>
+                        setIsRenaming((prev) => ({
+                          ...prev,
+                          [phase.id]: false,
+                        }))
+                      }
+                      autoFocus
+                      className="rounded-md border border-gray-300 p-1"
+                    />
+                  ) : (
+                    <div onDoubleClick={() => onClickRenamePhase(phase.id)}>
+                      {phase.name}
+                    </div>
+                  )}
+                  {phaseActionStates[phase.id] && (
+                    <PhaseActions
+                      phase_id={phase.id}
+                      setIsCellActionOpen={(isOpen) =>
+                        setPhaseActionStates((prev) => ({
+                          ...prev,
+                          [phase.id]: isOpen,
+                        }))
+                      }
+                      onClickRename={() => onClickRenamePhase(phase.id)} // Pass the function to trigger renaming mode
+                      onClosePhaseActions={() =>
+                        setPhaseActionStates((prev) => ({
+                          ...prev,
+                          [phase.id]: false,
+                        }))
+                      }
+                    />
+                  )}
+                </li>
+              </React.Fragment>
+            ))}
+          </ul>
+        </div>
+      </div>
+      {/* add phase button */}
+      <div className="flex justify-end">
+        {isEditing ? (
+          <input
+            type="text"
+            value={newPhaseName}
+            onChange={handlePhaseNameChange}
+            onKeyDown={handleInputKeyPress}
+            onBlur={() => {
+              setIsEditing(false), setIsAdding(false);
+            }}
+            ref={inputRef}
+            className="mr-2 rounded-md border border-gray-300 p-1"
+          />
+        ) : (
+          <div className="flex">
             <button
-              className="rounded-md border border-gray-300 bg-gray-200 p-1 hover:bg-gray-400"
+              className="rounded-l-md border border-gray-300 bg-gray-200 p-2 hover:bg-gray-400"
               onClick={() => onClickCreatePhase()}
             >
               <div className="flex items-center">
@@ -191,65 +259,30 @@ const Header: React.FC<HeaderProps> = ({
                 <span className="ml-2 text-xs">Add Phase</span>
               </div>
             </button>
-          )}
-        </div>
-      </div>
-      {/* Tabs of phases*/}
-      <div>
-        <ul className="hidden text-center text-sm text-gray-800 sm:flex">
-          {phases?.map((phase) => (
-            <React.Fragment key={phase.id}>
-              <li
-                ref={ref as React.MutableRefObject<HTMLLIElement>}
-                onContextMenu={(event) => handleContextMenu(event, phase.id)}
-                className={`rounded-t-md border ${
-                  selectedPhase === phase.id ? "bg-gray-300" : "bg-gray-100"
-                } relative p-2 px-3 py-1 hover:cursor-pointer hover:bg-gray-50 hover:text-gray-700`}
-                onClick={() => onSelectPhase(phase.id)}
+            <div>
+              <button
+                className="rounded-r-md border border-gray-300 bg-gray-200 p-2 hover:bg-gray-400"
+                onClick={() => setIsDropdownVisible(!isDropdownVisible)}
               >
-                {isRenaming[phase.id] ? (
-                  <input
-                    type="text"
-                    value={newPhaseNames[phase.id]}
-                    onChange={(event) =>
-                      handleRenameInputChange(event, phase.id)
-                    }
-                    onKeyDown={(event) =>
-                      handleRenameInputKeyPress(event, phase.id)
-                    }
-                    onBlur={() =>
-                      setIsRenaming((prev) => ({ ...prev, [phase.id]: false }))
-                    }
-                    autoFocus
-                    className="rounded-md border border-gray-300 p-1"
-                  />
-                ) : (
-                  <div onDoubleClick={() => onClickRenamePhase(phase.id)}>
-                    {phase.name}
+                <FiChevronDown />
+              </button>
+              {isDropdownVisible && (
+                <div className="absolute right-10 z-20 w-32 rounded-md border border-gray-300 bg-white shadow-lg">
+                  <div
+                    className="cursor-pointer px-4 py-2 hover:bg-gray-100"
+                    onClick={() => {
+                      // Handle "Use Template" click logic here
+                      setIsDropdownVisible(false);
+                    }}
+                  >
+                    <span className="text-xs">Use Template</span>
                   </div>
-                )}
-                {phaseActionStates[phase.id] && (
-                  <PhaseActions
-                    phase_id={phase.id}
-                    setIsCellActionOpen={(isOpen) =>
-                      setPhaseActionStates((prev) => ({
-                        ...prev,
-                        [phase.id]: isOpen,
-                      }))
-                    }
-                    onClickRename={() => onClickRenamePhase(phase.id)} // Pass the function to trigger renaming mode
-                    onClosePhaseActions={() =>
-                      setPhaseActionStates((prev) => ({
-                        ...prev,
-                        [phase.id]: false,
-                      }))
-                    }
-                  />
-                )}
-              </li>
-            </React.Fragment>
-          ))}
-        </ul>
+                  {/* Add more options as needed */}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
