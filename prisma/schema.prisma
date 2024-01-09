@@ -316,6 +316,7 @@ model user {
   follow_follow_follower_idTouser              follow[]               @relation("follow_follower_idTouser")
   follow_follow_following_idTouser             follow[]               @relation("follow_following_idTouser")
   message                                      message[]
+  notification                                 notification[]
   notification_settings                        notification_settings?
   post_comments                                post_comments[]
   post_likes                                   post_likes[]
@@ -646,12 +647,13 @@ model reaction {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model notification_settings {
-  email_enbld      Boolean  @default(true)
-  web_enbld        Boolean  @default(true)
-  types            String[] @default(["TASK_RMND"])
-  user_id          String   @id @unique @db.Uuid
-  task_rmndr_enbld Boolean  @default(true)
-  user             user     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  email_enbld      Boolean        @default(true)
+  web_enbld        Boolean        @default(true)
+  types            String[]       @default(["TASK_RMND"])
+  user_id          String         @id @unique @db.Uuid
+  task_rmndr_enbld Boolean        @default(true)
+  notification     notification[]
+  user             user           @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@schema("public")
 }
@@ -660,6 +662,20 @@ model notification_settings {
 model test {
   id  String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   yes Boolean @default(true)
+
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model notification {
+  id                    String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at            DateTime              @default(now()) @db.Timestamptz(6)
+  user_id               String                @db.Uuid
+  notif_settings_id     String                @db.Uuid
+  message               String
+  type                  String
+  notification_settings notification_settings @relation(fields: [notif_settings_id], references: [user_id], onDelete: Cascade)
+  user                  user                  @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@schema("public")
 }
