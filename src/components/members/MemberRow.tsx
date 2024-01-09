@@ -23,7 +23,7 @@ const MemberRow: React.FC<MemberRowProps> = ({
 }) => {
   const userId = getCookie("UserID");
   const isPersonalOwner = member.memberId === ownerId && isPersonal;
-  console.log(member.memberId, userId);
+  console.log(member.memberIsExternalCollaborator);
 
   return (
     <tr className="bg-white hover:bg-gray-50">
@@ -68,6 +68,49 @@ const MemberRow: React.FC<MemberRowProps> = ({
           />
         )}
       </td>
+      {member.memberIsExternalCollaborator ? (
+        <td className="px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <svg
+                className="h-5 w-5 text-gray-500"
+                aria-hidden="true"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                  clipRule="evenodd"
+                ></path>
+              </svg>
+              <span className="ml-2 text-sm text-gray-400">
+                External Collaborator
+              </span>
+            </div>
+          </div>
+        </td>
+      ) : (
+        <td className="px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <svg
+                className="h-5 w-5 text-gray-500"
+                aria-hidden="true"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <circle cx="10" cy="10" r="10" fill="#6875f5"></circle>
+              </svg>
+              <span className="ml-2 text-sm text-gray-400">
+                Internal Collaborator
+              </span>
+            </div>
+          </div>
+        </td>
+      )}
       <td className="px-6 py-4">
         {member.memberId != userId &&
           !isPersonalOwner && ( // Added the && operator here

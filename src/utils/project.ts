@@ -9,6 +9,7 @@ type Member = {
     avatar_url: string | null;
   };
   project_role: string | null;
+  is_external_collaborator: boolean;
 };
 
 type Project = {
@@ -142,6 +143,7 @@ export const useFetchProjectMembers = () => {
     memberEmail: string | null;
     memberRole: string | null;
     memberAvatarUrl: string | null; // Make it nullable to handle potential null values
+    memberIsExternalCollaborator?: boolean;
   }[] = [];
   const userDropdown: any[] = [];
 
@@ -153,6 +155,7 @@ export const useFetchProjectMembers = () => {
         memberEmail: member.user.email,
         memberRole: member.project_role,
         memberAvatarUrl: member.user.avatar_url,
+        memberIsExternalCollaborator: member.is_external_collaborator,
       });
       userDropdown.push({
         value: member.user?.id,
@@ -168,5 +171,3 @@ export const useFetchProjectMembers = () => {
     isLoading,
   };
 };
-
-

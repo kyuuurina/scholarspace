@@ -4,4 +4,5 @@ export type Member = {
   memberEmail: string | null;
   memberAvatarUrl: string | null;
   memberRole: string | null;
+  memberIsExternalCollaborator?: boolean;
 };

@@ -21,13 +21,9 @@ import ErrorPage from "~/pages/error-page";
 
 // components
 import Layout from "~/components/layout/Layout";
-import Image from "next/image";
 import Head from "~/components/layout/Head";
 import Header from "~/components/workspace/Header";
 import MemberModal from "~/components/members/MemberModal";
-import Card from "~/components/Card";
-import AvatarPlaceholder from "~/components/avatar/AvatarPlaceholder";
-import ScoreChart from "~/components/chart/ScoreChart";
 import LoadingSpinner from "~/components/LoadingSpinner";
 import MemberTable from "~/components/members/MemberTable";
 import SuccessToast from "~/components/toast/SuccessToast";
@@ -213,6 +209,7 @@ const ProjectMember: NextPageWithLayout = () => {
               userWorkspaceRole={project_role}
               isPersonal={false}
               ownerId={null}
+              externalCollab={true}
             />
           </div>
         </div>

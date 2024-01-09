@@ -17,6 +17,7 @@ import TaskDrawer from "./TaskDrawer";
 import type { taskRow } from "~/types/task";
 type TableProps = {
   phase_id: string;
+  searchQuery: string;
 };
 
 const variants = {
@@ -24,7 +25,7 @@ const variants = {
   closed: { x: "100%" },
 };
 
-const Table: React.FC<TableProps> = ({ phase_id }) => {
+const Table: React.FC<TableProps> = ({ phase_id, searchQuery }) => {
   const [isAddColumnVisible, setAddColumnVisible] = useState(false);
   const [editedHeader, setEditedHeader] = useState("");
   const [editingCell, setEditingCell] = useState<{
@@ -82,6 +83,10 @@ const Table: React.FC<TableProps> = ({ phase_id }) => {
       [taskId]: !prevState[taskId],
     }));
   };
+
+  const filteredTasks = tasks.filter((task) =>
+    task?.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div>
@@ -146,7 +151,7 @@ const Table: React.FC<TableProps> = ({ phase_id }) => {
           </tr>
         </thead>
         <tbody>
-          {tasks.map((task, rowIndex) => (
+          {filteredTasks.map((task, rowIndex) => (
             <tr key={task?.id} className="border border-gray-300">
               <td className="whitespace-nowrap border border-gray-300 px-6">
                 <div className="flex items-center">
