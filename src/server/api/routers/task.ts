@@ -44,6 +44,26 @@ export const taskRouter = router({
       return tasks;
     }),
 
+  listByProject: protectedProcedure
+    .input(
+      z.object({
+        project_id: z.string(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const { project_id } = input;
+
+      const tasks = await ctx.prisma.task.findMany({
+        where: {
+          phase: {
+            project_id,
+          },
+        },
+      });
+
+      return tasks;
+    }),
+
   create: protectedProcedure
     .input(
       z.object({

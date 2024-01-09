@@ -26,6 +26,7 @@ import {
 } from "gantt-task-react";
 import "gantt-task-react/dist/index.css";
 import React from "react";
+import { useFetchProjectSummary } from "~/utils/project";
 
 const Project: NextPageWithLayout = () => {
   const id = useRouterId();
@@ -39,6 +40,8 @@ const Project: NextPageWithLayout = () => {
     p_score,
     users,
   } = useFetchProject();
+
+  console.log(useFetchProjectSummary(id));
 
   return (
     <>
