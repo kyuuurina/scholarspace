@@ -324,7 +324,19 @@ export const researchpostRouter = router({
           description: true,
           document: true,
           created_at: true,
-          // summary: true,
+          summary: true,
+          profile: {
+            select: {
+              profile_id: true,
+              user_id: true,
+              name: true,
+              avatar_url: true,
+              about_me: true,
+              research_interest: true,
+              collab_status: true,
+              skills: true,
+            },
+          },
         },
       });
     
