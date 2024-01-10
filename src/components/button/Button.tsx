@@ -20,8 +20,8 @@ const Button: React.FC<ButtonProps> = ({
       type={type}
       className={`${
         style === "primary"
-          ? "mb-2 rounded-lg bg-purple-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-purple-800 dark:bg-purple-600 dark:hover:bg-purple-700"
-          : "mb-2 mr-2 rounded-lg border border-purple-700 px-5 py-2.5 text-center text-sm font-medium text-purple-700 hover:bg-purple-100 dark:border-purple-400 dark:text-purple-400 dark:hover:bg-purple-500 dark:hover:text-white"
+          ? "mb-2 rounded-lg bg-purple-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-purple-800"
+          : "mb-2 rounded-lg border border-purple-700 px-5 py-2.5 text-center text-sm font-medium text-purple-700 hover:bg-purple-100 "
       } ${visible ? "visible" : "invisible"}`}
       onClick={onClick}
     >
@@ -31,4 +31,3 @@ const Button: React.FC<ButtonProps> = ({
 };
 
 export default Button;
-

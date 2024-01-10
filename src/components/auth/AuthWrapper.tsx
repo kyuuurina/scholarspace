@@ -30,7 +30,7 @@ export const AuthWrapper: React.FC<Props> = ({ children, type }) => {
     <>
       <Head title={authTypeToText(type)} />
       <div className="flex">
-        <div className="flex w-96 flex-1 flex-col justify-center rounded-lg bg-white py-12 shadow sm:max-w-md sm:px-6 lg:px-20">
+        <div className="flex w-96 flex-1 flex-col justify-center rounded-lg bg-white px-10 py-12 shadow sm:max-w-md sm:px-6 lg:px-20">
           <div className="mx-auto">
             <div className="flex flex-col items-center justify-center pb-4">
               <Image
