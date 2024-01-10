@@ -113,7 +113,7 @@ const SignUpForm: React.FC = () => {
           className="flex w-full justify-center rounded-lg bg-purple-700 px-3 py-2 text-center text-sm font-medium text-white shadow-md hover:bg-purple-800 focus:outline-none focus:ring-4 focus:ring-purple-300 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900"
         >
           <div className="flex items-center space-x-5 text-white">
-            <span>Sign In</span>
+            <span>Sign Up</span>
             {loading && (
               <MoonLoader
                 color={"#ffff"}
