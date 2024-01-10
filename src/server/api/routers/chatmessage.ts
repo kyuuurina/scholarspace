@@ -60,7 +60,7 @@ export const chatRouter = router({
     .input(z.object({ user_id: z.string() }))
     .query(async ({ input, ctx }) => {
       const { user_id } = input;
-
+  
       // Fetch the chat list for the specified user_id
       const chatList = await ctx.prisma.chat.findMany({
         where: {
@@ -70,11 +70,19 @@ export const chatRouter = router({
           ],
         },
         include: {
-          user_chat_user1_idTouser: true,
-          user_chat_user2_idTouser: true,
+          user_chat_user1_idTouser: {
+            include: {
+              profile: true,
+            },
+          },
+          user_chat_user2_idTouser: {
+            include: {
+              profile: true,
+            },
+          },
         },
       });
-
+  
       return chatList;
     }),
 

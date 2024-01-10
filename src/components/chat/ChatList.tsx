@@ -1,6 +1,28 @@
+//unused file
+
+// src/components/chat/ChatList.tsx
 import React from 'react';
 import { useFetchChatList } from '~/utils/chatmessage';
 import ChatItem from './ChatItem';
+
+interface Profile {
+  profile_id: string;
+  name: string;
+  avatar_url: string | null;
+}
+
+interface UserProfile {
+  id: string;
+  name?: string | null;
+  avatar_url?: string | null;
+  profile?: Profile[];
+}
+
+interface ChatListData {
+  chat_id: bigint;
+  user_chat_user1_idTouser?: UserProfile;
+  user_chat_user2_idTouser?: UserProfile;
+}
 
 interface ChatListProps {
   userId: string;
@@ -21,9 +43,11 @@ const ChatList: React.FC<ChatListProps> = ({ userId }) => {
     <div>
       <h2>Your Chats</h2>
       <ul>
-        {chatList.map((chat) => (
+        {chatList.map((chat: ChatListData) => (
           <li key={chat.chat_id}>
-            <ChatItem chat={chat} />
+            {chat.user_chat_user1_idTouser && (
+              <ChatItem chat={chat} />
+            )}
           </li>
         ))}
       </ul>
@@ -32,53 +56,3 @@ const ChatList: React.FC<ChatListProps> = ({ userId }) => {
 };
 
 export default ChatList;
-// // src/components/ChatList.tsx
-// import React from 'react';
-// import { useFetchChats } from '~/utils/chatmessage';
-
-// interface Chat {
-//   chat_id: bigint;
-//   user1_id: string;
-//   user2_id: string;
-//   created_at: Date;
-// }
-
-// interface ChatListProps {
-//   user2_id: string;
-// }
-
-// const ChatList: React.FC<ChatListProps> = ({ user2_id }) => {
-//   const { chats, isLoadingChats, errorChats } = useFetchChats(user2_id);
-
-//   console.log(user2_id);
-
-//   if (isLoadingChats) {
-//     return <div>Loading...</div>;
-//   }
-
-//   if (errorChats) {
-//     return <div>Error fetching chats: {errorChats.message}</div>;
-//   }
-
-//   // Ensure chats is an array
-//   const chatsArray = Array.isArray(chats) ? (chats as Chat[]) : [];
-
-//   // Render the list of chats
-//   return (
-//     <div>
-//       <h2>Chats</h2>
-//       <ul>
-//         {chatsArray.map((chat) => (
-//           <li key={chat.chat_id.toString()}>
-//             <div>Chat ID: {chat.chat_id.toString()}</div>
-//             <div>User 1 ID: {chat.user1_id}</div>
-//             <div>User 2 ID: {chat.user2_id}</div>
-//             <div>Created At: {chat.created_at.toString()}</div>
-//           </li>
-//         ))}
-//       </ul>
-//     </div>
-//   );
-// };
-
-// export default ChatList;
