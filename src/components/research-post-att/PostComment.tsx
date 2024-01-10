@@ -12,10 +12,11 @@ import { FiSend } from 'react-icons/fi';
 
 interface PostCommentProps {
   post_id: string;
+  onCommentSubmit: (formData: FormValues) => void; 
   refetch: () => void;
 }
 
-type FormValues = { value: string }; // Define FormValues type
+export type FormValues = { value: string }; // Define FormValues type
 
 const PostComment: React.FC<PostCommentProps> = ({ post_id, refetch }) => {
   // Zod schema for form validation
@@ -38,7 +39,7 @@ const PostComment: React.FC<PostCommentProps> = ({ post_id, refetch }) => {
     { post_id: post_id },
     { enabled: !!post_id }
   );
-  
+
     const comments = commentsQuery.data || [];
 
   // Create a new comment
