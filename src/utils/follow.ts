@@ -1,8 +1,7 @@
 import { api } from "./api";
 import {useRouterId} from "./routerId";
 
-export const useFetchFollowers = () => {
-  const id: string = useRouterId();
+export const useFetchFollowers = (id:string) => {
 
   const followers = api.follow.getFollowersList.useQuery(
     {

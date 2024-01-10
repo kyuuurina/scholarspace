@@ -8,7 +8,7 @@ import { z, ZodType } from 'zod';
 
 //button
 import PrimaryButton from '../button/PrimaryButton';
-import { FiSend } from 'react-icons/fi'; 
+import { FiSend } from 'react-icons/fi';
 
 interface PostCommentProps {
   post_id: string;
