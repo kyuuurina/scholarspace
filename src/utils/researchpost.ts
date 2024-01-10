@@ -38,7 +38,7 @@ export const useFetchResearchPost = () => {
 
 //fetch my research posts
 export const useFetchMyResearchPosts = (id:string) => {
-    
+
     console.log('Dari depam',id)
     const myResearchPosts = api.researchpost.getMyPosts.useQuery(
         {

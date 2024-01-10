@@ -10,6 +10,7 @@ import router, { useRouter } from "next/router";
 import { api } from "~/utils/api";
 import { useRouterId } from "~/utils/routerId";
 import LoadingSpinner from "~/components/LoadingSpinner";
+import { useQuery } from "@tanstack/react-query";
 
 // research post components
 import AllFollowingTabs from "~/components/research-post/AllFollowingTabs";
@@ -42,7 +43,15 @@ const Page: NextPageWithLayout = () => {
 
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [currentPostId, setCurrentPostId] = useState<string | null>(null);
-  const [isConfirmationOpen, setIsConfirmationOpen] = useState(false); 
+  const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
+
+
+// query key for refetch
+    const postQueryKey = ['getPost', currentPostId]; // Assuming have a valid post ID
+    const { data: updatedPostData, refetch: refetchPost } = useQuery(
+      postQueryKey,
+      { enabled: false } // Disable automatic fetching on mount
+    );
 
 // Research post recommendation
 const {
@@ -111,7 +120,11 @@ if (errorRecommendedProfiles) {
             ) : (
               postRecommendations.map((post) => (
                 <li key={post.post_id} className="mb-8" style={{ listStyle: 'none' }}>
-                <Post post={post} onEditClick={() => handleEditClick(post.post_id)} />
+                <Post
+                  post={post}
+                  onEditClick={() => handleEditClick(post.post_id)}
+                  refetch={refetchPost}
+                   />
                 </li>
               ))
             )}

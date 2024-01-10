@@ -164,7 +164,7 @@ const Post: React.FC<PostProps> = ({ post, onEditClick, refetch }) => {
     resolver: zodResolver(schema),
   });
 
-  // Fetch task comments
+  // Fetch comments
   const commentsQuery = api.postcomment.list.useQuery(
     { post_id: post.post_id },
     { enabled: !!post.post_id }

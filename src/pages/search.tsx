@@ -9,6 +9,7 @@ import Post from '~/components/research-post/Post';
 import { api } from '~/utils/api';
 import { useFetchSearchResults } from '~/utils/researchpost';
 import BackButton from '~/components/search/BackButton';
+import { useQuery } from "@tanstack/react-query";
 
 //layout
 import Layout from "~/components/layout/Layout";
@@ -38,7 +39,14 @@ const SearchPage: NextPageWithLayout = () => {
 
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [currentPostId, setCurrentPostId] = useState<string | null>(null);
-  const [isConfirmationOpen, setIsConfirmationOpen] = useState(false); 
+  const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
+
+  // query key for refetch
+  const postQueryKey = ['getPost', currentPostId]; // Assuming have a valid post ID
+  const { data: updatedPostData, refetch: refetchPost } = useQuery(
+    postQueryKey,
+    { enabled: false } // Disable automatic fetching on mount
+  );
 
   // Render EditPostForm component
   const handleEditClick = (postId: string) => {
@@ -66,7 +74,11 @@ const SearchPage: NextPageWithLayout = () => {
 
         {searchPostResults.map((post, index) => (
         <div key={post.post_id} className={`mb-12 ${index !== searchPostResults.length - 1 ? 'mb-12' : ''}`}>
-        <Post post={post} onEditClick={() => handleEditClick(post.post_id)} />
+           <Post
+              post={post}
+              onEditClick={() => handleEditClick(post.post_id)}
+              refetch={refetchPost}
+            />
         </div>
       ))}
     </div>

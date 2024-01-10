@@ -9,6 +9,7 @@ import { useSession, useSessionContext } from "@supabase/auth-helpers-react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import toast from "react-hot-toast";
+import { useQuery } from "@tanstack/react-query";
 
 // types
 import type { ReactElement } from "react";
@@ -56,7 +57,14 @@ const FollowingPostPage: NextPageWithLayout = () => {
     //
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [currentPostId, setCurrentPostId] = useState<string | null>(null);
-    const [isConfirmationOpen, setIsConfirmationOpen] = useState(false); 
+    const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
+
+    // query key for refetch
+    const postQueryKey = ['getPost', currentPostId]; // Assuming have a valid post ID
+    const { data: updatedPostData, refetch: refetchPost } = useQuery(
+      postQueryKey,
+      { enabled: false } // Disable automatic fetching on mount
+    );
 
     //profile recommendation
     const {
@@ -105,7 +113,11 @@ const handleEditClick = (postId: string) => {
             ) : (
               FollowingPostLists.followingResearchPosts.map((post) => (
                 <li key={post.post_id} className="mb-8" style={{ listStyle: 'none' }}>
-                  <Post post={post} onEditClick={() => handleEditClick(post.post_id)} />
+                <Post
+                  post={post}
+                  onEditClick={() => handleEditClick(post.post_id)}
+                  refetch={refetchPost}
+                   />
                 </li>
               ))
             )}

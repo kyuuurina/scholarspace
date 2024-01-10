@@ -11,6 +11,7 @@ import router, { useRouter } from 'next/router';
 //utils
 import { useRouterId } from '~/utils/routerId';
 import { useFetchProfile } from '~/utils/profile';
+import { useQuery } from '@tanstack/react-query';
 
 // types
 import type { ReactElement } from 'react';
@@ -48,7 +49,14 @@ const MyPost: NextPageWithLayout = () => {
 
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [currentPostId, setCurrentPostId] = useState<string | null>(null);
-  const [isConfirmationOpen, setIsConfirmationOpen] = useState(false); 
+  const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
+
+  // query key for refetch
+  const postQueryKey = ['getPost', currentPostId]; // Assuming have a valid post ID
+  const { data: updatedPostData, refetch: refetchPost } = useQuery(
+    postQueryKey,
+    { enabled: false } // Disable automatic fetching on mount
+  );
 
 
     // Render EditPostForm component
@@ -64,7 +72,7 @@ const MyPost: NextPageWithLayout = () => {
         <title>{`${name ?? 'User'}'s Posts`}</title>
       </Head>
       <ProfileTabs />
-  
+
       <div className="container mx-auto mt-8">
         <AddNewPostButton className="mb-4" />
         {/* if loading */}
@@ -77,7 +85,7 @@ const MyPost: NextPageWithLayout = () => {
             </p>
           </div>
         )}
-  
+
         {/* if post exist */}
         {myPostLists.myResearchPosts.length > 0 ? (
           <ul className="grid grid-cols-1 gap-8">
@@ -85,7 +93,11 @@ const MyPost: NextPageWithLayout = () => {
               <li key={post.post_id} className="mb-4">
                 {/* Add left and right padding to the Post component */}
                 <div className="p-4 rounded-md">
-                <Post post={post} onEditClick={() => handleEditClick(post.post_id)} />
+                <Post
+                  post={post}
+                  onEditClick={() => handleEditClick(post.post_id)}
+                  refetch={refetchPost}
+                   />
                   {/* <Post post={post} /> */}
                 </div>
               </li>
