@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useSessionContext } from "@supabase/auth-helpers-react";
 import { useUser } from "@supabase/auth-helpers-react";
+import { FiUser } from "react-icons/fi";
 
 import { api } from "~/utils/api";
 import { useFetchProfile } from "~/utils/profile";
@@ -51,7 +52,6 @@ export const SideBar: React.FC<SideBarProps> = ({
     }
   }, [error]);
 
-
   // Check if router.query and router.query.id are defined before accessing their values
   const id = router.query && router.query.id ? router.query.id.toString() : "";
 
@@ -60,6 +60,30 @@ export const SideBar: React.FC<SideBarProps> = ({
   console.log("sidebar router", router.asPath);
   console.log("userId", user?.id);
   // console.log("Profile_ID", profile_id);
+
+  // get profile by user id
+  const profileData = api.profile.getProfileByUserId.useQuery({
+    user_id: user?.id || "",
+  });
+
+  let profileID = null;
+  if (profileData.isLoading) {
+    return (
+      <div
+        className={`min-h-screen transition-all duration-300 ${
+          open
+            ? "translate-x-0 sm:w-56"
+            : "-translate-x-full sm:w-16 sm:translate-x-0"
+        } fixed left-0 top-0 z-40 bg-dark-purple
+      p-4 sm:static sm:flex`}
+        tabIndex={-1}
+      >
+        {" "}
+      </div>
+    );
+  } else {
+    profileID = profileData.data?.profile_id;
+  }
 
   return (
     <>
@@ -120,7 +144,7 @@ export const SideBar: React.FC<SideBarProps> = ({
                   className={`flex items-center space-x-3 rounded-md hover:bg-purple-800 ${
                     open ? "text-purple-accent-2" : "text-purple-accent-2"
                   }`}
-                  href={ `/`}
+                  href={`/`}
                   onClick={toggleSidebar}
                 >
                   <FiHome className="h-6 w-6" />
@@ -137,25 +161,27 @@ export const SideBar: React.FC<SideBarProps> = ({
               </li>
 
               <li className=" rounded-sm">
-                <Link
-                  // href={profileId ? `/manage-profile/${profileId}` : ""}
-                  href={profile_id ? `/manage-profile/${profile_id}` : ""}
-                  className={`flex items-center space-x-3 rounded-md hover:bg-purple-800 ${
-                    open ? "text-purple-accent-2" : "text-purple-accent-2"
-                  }`}
-                  onClick={toggleSidebar}
-                >
-                  <FiActivity className="h-6 w-6" />
-                  <span
-                    className={`transition-all duration-500 ${
-                      open
-                        ? "text-purple-accent-2 opacity-100"
-                        : "sr-only opacity-0"
+                {profileID && (
+                  <Link
+                    // href={profileId ? `/manage-profile/${profileId}` : ""}
+                    href={`/manage-profile/${profileID}`}
+                    className={`flex items-center space-x-3 rounded-md hover:bg-purple-800 ${
+                      open ? "text-purple-accent-2" : "text-purple-accent-2"
                     }`}
+                    onClick={toggleSidebar}
                   >
-                    My Profile
-                  </span>
-                </Link>
+                    <FiUser className="h-6 w-6" />
+                    <span
+                      className={`transition-all duration-500 ${
+                        open
+                          ? "text-purple-accent-2 opacity-100"
+                          : "sr-only opacity-0"
+                      }`}
+                    >
+                      My Profile
+                    </span>
+                  </Link>
+                )}
               </li>
 
               {/* <li className="rounded-sm">
