@@ -24,6 +24,7 @@ const ManageTemplates: NextPageWithLayout = () => {
   const [editedHeader, setEditedHeader] = useState("");
   const [addProperties, setAddProperties] = useState<string[]>([]);
   const [addPhaseName, setAddPhaseName] = useState("Phase Title"); // New state for editable header
+  const [adding, setAdding] = useState(false);
 
   useEffect(() => {
     setSelectedTemplate(templates?.[0] ?? null);
@@ -61,7 +62,12 @@ const ManageTemplates: NextPageWithLayout = () => {
 
   const addTemplate = api.template.create.useMutation();
   const onSubmit = async () => {
+    if (adding) {
+      return;
+    }
+    setAdding(true);
     if (addPhaseName.trim() === "") {
+      setAdding(false);
       return;
     }
     try {
@@ -82,6 +88,7 @@ const ManageTemplates: NextPageWithLayout = () => {
     setAddPhaseName("");
     setAddProperties([]);
     setIsAdding(false);
+    setAdding(false);
     await refetchTemplates();
   };
 
@@ -319,7 +326,9 @@ const ManageTemplates: NextPageWithLayout = () => {
                     name="Save"
                     onClick={() => onSubmit()}
                     disabled={
-                      addPhaseName.trim() === "" || addProperties.length === 0
+                      addPhaseName.trim() === "" ||
+                      addProperties.length === 0 ||
+                      adding
                     }
                   />
                 </div>
