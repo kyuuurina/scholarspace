@@ -14,7 +14,7 @@ const Tabs: React.FC = () => {
         {/* "All tab" */}
         <li className="mr-2 flex-1">
           {/* <Link href={`/home-rwp/${user_id}`}> */}
-          <Link href={`/`}>
+          <Link href={`/${user_id}`}>
             <span
               className={`inline-block p-4 rounded-t-lg hover:text-gray-600 dark:hover:text-gray-300 ${
                 router.asPath === `/`
@@ -30,10 +30,10 @@ const Tabs: React.FC = () => {
         {/* "Following tab" */}
         <li className="mr-2 flex-1">
           {/* <Link href={`/home-rwp/${user_id}/following-post`}> */}
-          <Link href={`/${user_id}`}>
+          <Link href={`//${user_id}`}>
             <span
               className={`inline-block p-4 rounded-t-lg hover:text-gray-600 dark:hover:text-gray-300 ${
-                router.asPath === `/${user_id}`
+                router.asPath === `//${user_id}`
                   ? "text-purple-600 border-b-2 border-purple-600"
                   : "border-transparent"
               }`}

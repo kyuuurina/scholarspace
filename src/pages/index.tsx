@@ -29,7 +29,7 @@ import SearchBaq from "~/components/search/SearchBaq";
 
 const Page: NextPageWithLayout = () => {
   const user = useUser();
-  setCookie("UserID", user?.id);
+  // setCookie("UserID", user?.id);
   const router = useRouter();
 
   const userId = useRouterId();

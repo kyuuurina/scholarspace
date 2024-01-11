@@ -57,7 +57,7 @@ const ProfileTabs: React.FC = () => {
               </span>
             </Link>
           </li>
-          <li role="presentation">
+          {/* <li role="presentation">
             <Link href={`/manage-profile/${profile_id}/likedpost`}>
               <span
                 className={`inline-block rounded-t-lg border-b-2 p-4 ${
@@ -76,7 +76,7 @@ const ProfileTabs: React.FC = () => {
                 Liked Post
               </span>
             </Link>
-          </li>
+          </li> */}
         </ul>
       </div>
     );

@@ -66,8 +66,6 @@ export const SideBar: React.FC<SideBarProps> = ({
   console.log("userId", user?.id);
   // console.log("Profile_ID", profile_id);
 
-
-
   return (
     <>
       <WorkspaceModal
@@ -105,11 +103,29 @@ export const SideBar: React.FC<SideBarProps> = ({
           <IconContext.Provider value={{ className: "text-purple-accent-2" }}>
             <ul className="min-w-full space-y-6 text-sm">
               <li className="rounded-sm">
-                <Link
+                {/* <Link
                   className={`flex items-center space-x-3 rounded-md hover:bg-purple-800 ${
                     open ? "text-purple-accent-2" : "text-purple-accent-2"
                   }`}
                   href={user?.id ? `/home-rwp/${user.id}` : `/`}
+                  onClick={toggleSidebar}
+                >
+                  <FiHome className="h-6 w-6" />
+                  <span
+                    className={`transition-all duration-500 ${
+                      open
+                        ? "text-purple-accent-2 opacity-100"
+                        : "sr-only opacity-0"
+                    }`}
+                  >
+                    Home
+                  </span>
+                </Link> */}
+                <Link
+                  className={`flex items-center space-x-3 rounded-md hover:bg-purple-800 ${
+                    open ? "text-purple-accent-2" : "text-purple-accent-2"
+                  }`}
+                  href={ `/`}
                   onClick={toggleSidebar}
                 >
                   <FiHome className="h-6 w-6" />
@@ -147,7 +163,7 @@ export const SideBar: React.FC<SideBarProps> = ({
                 </Link>
               </li>
 
-              <li className="rounded-sm">
+              {/* <li className="rounded-sm">
                 <Link
                   href="/chat"
                   className={`flex items-center space-x-3 rounded-md hover:bg-purple-800 ${
@@ -166,7 +182,7 @@ export const SideBar: React.FC<SideBarProps> = ({
                     Messages
                   </span>
                 </Link>
-              </li>
+              </li> */}
 
               <li className="rounded-sm">
                 <Link
