@@ -238,6 +238,28 @@ export const profileRouter = router({
 
     return recommendedUsers;
   }),
+
+  // get profile by user id
+  getProfileByUserId: protectedProcedure
+    .input(z.object({ user_id: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const { user_id } = input;
+
+      const profile = await ctx.prisma.profile.findFirst({
+        where: {
+          user_id,
+        },
+      });
+
+      if (!profile) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Profile not found",
+        });
+      }
+
+      return profile;
+    }),
 });
 
 // //Procedure to get recommendations based on shared research interests

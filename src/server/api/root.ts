@@ -3,7 +3,6 @@ import { accountRouter } from "./routers/account";
 import { userRouter } from "./routers/user";
 import { workspaceRouter } from "~/server/api/routers/workspace";
 import { projectRouter } from "./routers/project";
-import { memberRouter } from "~/server/api/routers/member";
 import { researchpostRouter } from "~/server/api/routers/researchpost";
 import { profileRouter } from "./routers/profile";
 import { researchInterestRouter } from "./routers/research-interest";
@@ -30,7 +29,6 @@ import { templateRouter } from "./routers/template";
  */
 export const appRouter = router({
   workspace: workspaceRouter,
-  member: memberRouter,
   account: accountRouter,
   profile: profileRouter,
   reaction: reactionRouter,

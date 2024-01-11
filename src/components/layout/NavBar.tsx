@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
 import { useUser } from "@supabase/auth-helpers-react";
+import { api } from "~/utils/api";
 
 // local components
 import AvatarPlaceholder from "../avatar/AvatarPlaceholder";
@@ -13,7 +14,6 @@ type NavbarProps = {
 
 const NavBar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
   const user = useUser();
-  const avatarUrl = user?.user_metadata?.avatar_url as string;
 
   // constants for overlay
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -64,6 +64,16 @@ const NavBar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
       document.removeEventListener("mousedown", handleClickOutsideNotif);
     };
   }, []);
+
+  // get profile by user id
+  const profileData = api.profile.getProfileByUserId.useQuery({
+    user_id: user?.id || "",
+  });
+
+  let avatarUrl = null;
+  if (profileData.data?.avatar_url) {
+    avatarUrl = `https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/avatar/${profileData.data?.avatar_url}`;
+  }
 
   return (
     <nav className="w-full border-b bg-white">
