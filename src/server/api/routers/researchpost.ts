@@ -36,7 +36,18 @@ async function getInfiniteResearchPosts({
       author: true,
       created_at: true,
       user: {
-        select: { id: true, name: true, avatar_url: true },
+        select: {
+          id: true,
+          name: true,
+          avatar_url: true,
+          profile: {
+            select: {
+              profile_id: true,
+              name:true,
+              avatar_url:true,
+            },
+          },
+        },
       },
     },
   });
@@ -60,6 +71,9 @@ async function getInfiniteResearchPosts({
         description: post.description,
         author: post.author,
         created_at: post.created_at,
+        name:post.user.profile.name,
+        avatar_url:post.user.profile.avatar_url,
+        profile_id:post.user.profile.profile_id,
 
       };
     }),
@@ -82,34 +96,57 @@ export const researchpostRouter = router({
       return post;
     }),
 
-  getMyPosts: protectedProcedure
+    getMyPosts: protectedProcedure
     .input(z.object({ post_id: z.string() }))
     .query(async ({ input, ctx }) => {
-      const myPosts = await ctx.prisma.research_post.findMany({
-        where: {
-          profile_id:input.post_id,  //pass profile_id to router
-        },
-        orderBy: {
-          created_at: 'desc', // Order by created_at in descending order
-        },
-      });
+        const myPosts = await ctx.prisma.research_post.findMany({
+            where: {
+                profile_id: input.post_id,
+            },
+            orderBy: {
+                created_at: 'desc', // Order by created_at in descending order
+            },
+            include: {
+                user: {
+                    select: {
+                        profile: true, // Include the entire profile table
+                    },
+                },
+            },
+        });
 
-      return myPosts;
+        return myPosts.map((post) => {
+            return {
+                post_id: post.post_id,
+                user_id: post.user_id,
+                category: post.category,
+                title: post.title,
+                document: post.document,
+                description: post.description,
+                author: post.author,
+                created_at: post.created_at,
+                user: post.user,
+            };
+        });
     }),
 
-  getFollowingPosts: publicProcedure
-    .input(z.object({ limit: z.number().optional(), cursor: z.string().optional() }))
+    getFollowingPosts: publicProcedure
+    .input(
+      z.object({
+        limit: z.number().optional(),
+        cursor: z.string().optional(),
+      })
+    )
     .query(async ({ input: { limit = 10, cursor }, ctx }) => {
-    // const currentUserId = ctx.session?.user.id;
-      const {user} = ctx;
-
+      const { user } = ctx;
+  
       if (!user) {
         throw new TRPCError({
           code: "UNAUTHORIZED",
           message: "User is not authenticated.",
         });
       }
-
+  
       const followingUsers = await ctx.prisma.follow.findMany({
         where: {
           follower_id: user.id,
@@ -118,18 +155,120 @@ export const researchpostRouter = router({
           following_id: true,
         },
       });
-
+  
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-      const followingUserIds = followingUsers.map((user) => user.following_id)  as string[];
-
-      return await getInfiniteResearchPosts({
-        limit,
-        cursor,
-        ctx,
-        whereClause: { user_id: { in: followingUserIds } },
+      const followingUserIds = followingUsers.map((user) => user.following_id) as string[];
+  
+      const researchPosts = await ctx.prisma.research_post.findMany({
+        take: limit + 1,
+        cursor: cursor ? { post_id: cursor } : undefined,
+        orderBy: [{ created_at: "desc" }, { post_id: "desc" }],
+        where: { user_id: { in: followingUserIds } },
+        select: {
+          post_id: true,
+          user_id: true,
+          category: true,
+          title: true,
+          document: true,
+          author: true,
+          description: true,
+          created_at: true,
+          profile: {
+            select: {
+              profile_id: true,
+              user_id: true,
+              name: true,
+              avatar_url: true,
+            },
+          },
+        },
       });
+  
+      let nextCursor: string | undefined;
+      if (researchPosts.length > limit) {
+        const nextItem = researchPosts.pop();
+        if (nextItem != null) {
+          nextCursor = nextItem.post_id;
+        }
+      }
+  
+      return {
+        researchPosts: researchPosts.map((post: any) => {
+          return {
+            post_id: post.post_id,
+            user_id: post.user_id,
+            category: post.category,
+            title: post.title,
+            document: post.document,
+            description: post.description,
+            author: post.author,
+            created_at: post.created_at,
+            name: post.profile.name,
+            avatar_url: post.profile.avatar_url,
+            profile_id: post.profile.profile_id,
+          };
+        }),
+        nextCursor,
+      };
     }),
 
+
+// Get research posts created by followed users
+getResearchPostsByFollowedUsers: protectedProcedure.query(async ({ ctx }) => {
+  const userId = ctx.user?.id;
+
+  if (!userId) {
+    // Handle unauthenticated user
+    return [];
+  }
+
+  // Get the user's followed users
+  const followedUsers = await ctx.prisma.follow.findMany({
+    where: {
+      follower_id: userId,
+    },
+    select: {
+      following_id: true,
+    },
+  });
+
+  // Extract followed user IDs
+  const followedUserIds = followedUsers.map((user) => user.following_id);
+
+  // Get research posts created by followed users
+  const researchPostsByFollowedUsers = await ctx.prisma.research_post.findMany({
+    where: {
+      user_id: {
+        in: followedUserIds,
+      },
+    },
+    select: {
+      post_id: true,
+      user_id: true,
+      category: true,
+      title: true,
+      author: true,
+      description: true,
+      document: true,
+      created_at: true,
+      summary: true,
+      profile: {
+        select: {
+          profile_id: true,
+          user_id: true,
+          name: true,
+          avatar_url: true,
+          about_me: true,
+          research_interest: true,
+          collab_status: true,
+          skills: true,
+        },
+      },
+    },
+  });
+
+  return researchPostsByFollowedUsers;
+}),
 
   // Helper function to fetch infinite research posts
   create: protectedProcedure

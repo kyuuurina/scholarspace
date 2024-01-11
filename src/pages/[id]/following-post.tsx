@@ -1,14 +1,12 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-
 //auth
 import { useUser } from "@supabase/auth-helpers-react";
 import { useSession, useSessionContext } from "@supabase/auth-helpers-react";
 
-//utils
+//react
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import toast from "react-hot-toast";
+import { useQuery } from "@tanstack/react-query";
 
 // types
 import type { ReactElement } from "react";
@@ -19,6 +17,7 @@ import ErrorPage from "~/pages/error-page";
 
 // utils
 import { useFetchFollowingResearchPosts } from "~/utils/researchpost";
+import { useFetchResearchPostsByFollowedUsers } from "~/utils/researchpost";
 import { api } from "~/utils/api";
 
 // local components
@@ -52,10 +51,16 @@ const FollowingPostPage: NextPageWithLayout = () => {
   const router = useRouter();
   const FollowingPostLists = useFetchFollowingResearchPosts();
 
-  //
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [currentPostId, setCurrentPostId] = useState<string | null>(null);
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
+
+  // query key for refetch
+  const postQueryKey = ['getPost', currentPostId]; // Assuming have a valid post ID
+  const { data: updatedPostData, refetch: refetchPost } = useQuery(
+    postQueryKey,
+    { enabled: false } // Disable automatic fetching on mount
+  );
 
   //profile recommendation
   const {
@@ -64,11 +69,19 @@ const FollowingPostPage: NextPageWithLayout = () => {
     errorRecommendedProfiles,
   } = useFetchRecommendedProfiles(user?.id);
 
+  const {
+    researchPostsByFollowedUsers,
+    isLoadingResearchPostsByFollowedUsers,
+    errorResearchPostsByFollowedUsers,
+  } = useFetchResearchPostsByFollowedUsers();
+
   console.log("Recommended Profiles:", recommendedProfiles);
+  console.log("FOLLOWING", researchPostsByFollowedUsers);
 
   if (errorRecommendedProfiles) {
     return <div>Error fetching recommended profiles</div>;
   }
+
 
   // Check if followingResearchPosts is an array
   if (!Array.isArray(FollowingPostLists.followingResearchPosts)) {
@@ -79,6 +92,8 @@ const FollowingPostPage: NextPageWithLayout = () => {
     );
     return <p>Error: Unable to fetch research posts</p>;
   }
+
+  
 
   // Render EditPostForm component
   const handleEditClick = (postId: string) => {
@@ -96,6 +111,26 @@ const FollowingPostPage: NextPageWithLayout = () => {
           <AllFollowingTabs />
 
           <div className="mt-6">
+            {isLoadingResearchPostsByFollowedUsers ? (
+              <LoadingSpinner />
+            ) : errorResearchPostsByFollowedUsers ? (
+              <p className="text-lg font-medium text-gray-500 text-center mt-8">
+                Error Fetching Research Posts by Followed Users
+              </p>
+            ) : (
+              researchPostsByFollowedUsers.map((post) => (
+                <li key={post.post_id} className="mb-8" style={{ listStyle: 'none' }}>
+                  <Post
+                    post={post}
+                    onEditClick={() => handleEditClick(post.post_id)}
+                    refetch={refetchPost}
+                  />
+                </li>
+              ))
+            )}
+          </div>
+
+          {/* <div className="mt-6">
             {FollowingPostLists.isLoading ? (
               <LoadingSpinner />
             ) : FollowingPostLists.followingResearchPosts.length === 0 ? (
@@ -117,7 +152,7 @@ const FollowingPostPage: NextPageWithLayout = () => {
                 </li>
               ))
             )}
-          </div>
+          </div> */}
         </div>
 
         {/* Suggested Profiles (1/4 width, Rightmost column) */}

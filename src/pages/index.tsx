@@ -60,8 +60,6 @@ const {
   errorPostRecommendations,
 } = useFetchPostRecommendations();
 
-
-
 // Profile recommendation
 const {
   recommendedProfiles,
