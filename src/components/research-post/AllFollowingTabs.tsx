@@ -13,10 +13,6 @@ const Tabs: React.FC = () => {
     return null;
   }
 
-    const userId= useUser();
-
-    const userId= useUser();
-
   return (
     <div className="border-b border-gray-200 text-center text-sm font-medium text-gray-500 dark:border-gray-700 dark:text-gray-400">
       <ul className="-mb-px flex flex-wrap">
