@@ -3,7 +3,6 @@
 
 //auth
 import { useUser } from "@supabase/auth-helpers-react";
-import { useUser } from "@supabase/auth-helpers-react";
 
 //utils
 import React, { ChangeEvent, SetStateAction, useState, useEffect } from "react";
@@ -86,9 +85,7 @@ const ResearchPostsPage: NextPageWithLayout = () => {
   console.log("User:", user);
   // Define state for searchQuery
   const [searchQuery, setSearchQuery] = useState<string>("");
-
-  // Inside your Home component
-  const userId = getCookie("User ID");
+  const userId = user?.id || "";
 
   // Now you can use the userId variable in your component as needed
   console.log("User ID:", userId);

@@ -4,7 +4,6 @@
 //auth
 import { useUser } from "@supabase/auth-helpers-react";
 import { useSession, useSessionContext } from "@supabase/auth-helpers-react";
-import { useUser } from "@supabase/auth-helpers-react";
 
 //utils
 import { useState, useEffect } from "react";
@@ -47,9 +46,9 @@ import ProfileRecommendation from "~/components/profile/ProfileRecommendation";
 import SearchBaq from "~/components/search/SearchBaq";
 
 const FollowingPostPage: NextPageWithLayout = () => {
+  const user = useUser();
   //fetch user id
   const userId = user?.id || "";
-  const user = useUser();
 
   const router = useRouter();
   const FollowingPostLists = useFetchFollowingResearchPosts();
