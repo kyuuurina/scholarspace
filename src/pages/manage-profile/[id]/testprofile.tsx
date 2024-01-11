@@ -11,7 +11,7 @@ const id = useRouterId();
     return (
       <div>
         <h1>Test Page</h1>
-        <FollowersList />
+        {/* <FollowersList /> */}
       </div>
     );
   };
