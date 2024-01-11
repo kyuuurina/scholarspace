@@ -205,7 +205,7 @@ export const SideBar: React.FC<SideBarProps> = ({
                 </Link>
               </li> */}
 
-              <li className="rounded-sm">
+              {/* <li className="rounded-sm">
                 <Link
                   href="/"
                   className={`flex items-center space-x-3 rounded-md hover:bg-purple-800 ${
@@ -223,7 +223,7 @@ export const SideBar: React.FC<SideBarProps> = ({
                     Projects
                   </span>
                 </Link>
-              </li>
+              </li> */}
               <li className="rounded-sm">
                 <Link
                   href="/manage-templates"
