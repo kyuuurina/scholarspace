@@ -4,6 +4,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import SuccessToast from "../toast/SuccessToast";
 import ErrorToast from "../toast/ErrorToast";
+import React from "react";
 
 type InviteUserButtonProps = {
   email: string;
@@ -21,6 +22,8 @@ const InviteUserButton: React.FC<InviteUserButtonProps> = ({
     process.env.NEXT_PUBLIC_SUPABASE_URL || "",
     process.env.NEXT_SUPABASE_SERVICE_ROLE_KEY || ""
   );
+
+  console.log(process.env.NEXT_PUBLIC_SUPABASE_URL);
 
   const inviteUser = async () => {
     setIsLoading(true);

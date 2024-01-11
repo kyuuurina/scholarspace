@@ -3,7 +3,7 @@ import Link from "next/link";
 import { fetchUserWorkspaces } from "~/utils/userWorkspaces";
 import { FiPlusCircle } from "react-icons/fi";
 import Image from "next/image";
-import AvatarPlaceholder from "../AvatarPlaceholder";
+import AvatarPlaceholder from "../avatar/AvatarPlaceholder";
 import { MoonLoader } from "react-spinners";
 
 const WorkspaceDropdown: React.FC<{ onClick: () => void }> = ({ onClick }) => {
@@ -47,18 +47,20 @@ const WorkspaceDropdown: React.FC<{ onClick: () => void }> = ({ onClick }) => {
       >
         <ul className="h-48 overflow-y-auto py-2 text-gray-700">
           {isLoading ? (
-            <MoonLoader
-              color={"#ffff"}
-              loading={true}
-              aria-label="FadeLoader"
-              data-testid="loader"
-              size={20}
-            />
+            <div className="flex items-center justify-center">
+              <MoonLoader
+                color={"#6233D5"}
+                loading={true}
+                aria-label="FadeLoader"
+                data-testid="loader"
+                size={20}
+              />
+            </div>
           ) : (
             workspaceListings.map((workspace) => (
               <li
                 key={workspace.id}
-                className="flex w-full px-5 hover:bg-gray-100"
+                className="flex w-full items-center px-5 hover:bg-gray-100"
               >
                 {workspace.cover_img ? (
                   <Image
@@ -68,14 +70,16 @@ const WorkspaceDropdown: React.FC<{ onClick: () => void }> = ({ onClick }) => {
                     height={50}
                   />
                 ) : (
-                  <AvatarPlaceholder name={workspace.name} />
+                  <div className="h-full w-full">
+                    <AvatarPlaceholder name={workspace.name} />
+                  </div>
                 )}
                 <Link
                   key={workspace.id}
                   className="block overflow-hidden text-clip px-4 py-2"
                   href={`/workspace/${workspace.id}`}
                 >
-                  {workspace.name}
+                  <div className="truncate">{workspace.name}</div>
                 </Link>
               </li>
             ))

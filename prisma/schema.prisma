@@ -9,37 +9,6 @@ datasource db {
   schemas  = ["auth", "public"]
 }
 
-model Profile {
-  id                 String   @id @default(cuid())
-  userId             String
-  name               String
-  avatar             String
-  aboutMe            String
-  skills             String[]
-  achievements       String[]
-  education          String[]
-  researchExperience String[]
-  researchInterest   String[]
-  collabStatus       String[]
-
-  @@schema("public")
-}
-
-model ResearchPosts {
-  id        String   @id @default(cuid())
-  userId    String
-  name      String
-  avatar    String
-  title     String
-  author    String
-  document  String
-  content   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@schema("public")
-}
-
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model audit_log_entries {
   instance_id String?   @db.Uuid
@@ -74,7 +43,7 @@ model flow_state {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model identities {
-  id              String
+  provider_id     String
   user_id         String    @db.Uuid
   identity_data   Json
   provider        String
@@ -82,9 +51,10 @@ model identities {
   created_at      DateTime? @db.Timestamptz(6)
   updated_at      DateTime? @db.Timestamptz(6)
   email           String?   @default(dbgenerated("lower((identity_data ->> 'email'::text))"))
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   users           users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
-  @@id([provider, id])
+  @@unique([provider_id, provider], map: "identities_provider_id_provider_unique")
   @@index([email])
   @@index([user_id])
   @@schema("auth")
@@ -217,6 +187,10 @@ model sessions {
   factor_id      String?          @db.Uuid
   aal            aal_level?
   not_after      DateTime?        @db.Timestamptz(6)
+  refreshed_at   DateTime?        @db.Timestamp(6)
+  user_agent     String?
+  ip             String?          @db.Inet
+  tag            String?
   mfa_amr_claims mfa_amr_claims[]
   refresh_tokens refresh_tokens[]
   users          users            @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
@@ -229,6 +203,7 @@ model sessions {
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
 model sso_domains {
   id              String        @id @db.Uuid
   sso_provider_id String        @db.Uuid
@@ -243,6 +218,7 @@ model sso_domains {
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
 model sso_providers {
   id                String              @id @db.Uuid
   resource_id       String?
@@ -257,6 +233,7 @@ model sso_providers {
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
 model users {
   instance_id                 String?       @db.Uuid
   id                          String        @id @db.Uuid
@@ -300,13 +277,6 @@ model users {
   @@schema("auth")
 }
 
-model research_interests {
-  id   String @id(map: "researchInterests_pkey")
-  name String
-
-  @@schema("public")
-}
-
 model workspace {
   id             String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   created_at     DateTime         @default(now()) @db.Timestamptz(6)
@@ -314,6 +284,9 @@ model workspace {
   description    String
   cover_img      String?
   is_personal    Boolean          @default(false)
+  ownerid        String?
+  grant          grant[]
+  project        project[]
   workspace_user workspace_user[]
 
   @@schema("public")
@@ -322,8 +295,7 @@ model workspace {
 model workspace_user {
   workspaceid     String    @db.Uuid
   userid          String    @db.Uuid
-  workspace_role  String?   @default("Researcher")
-  ownerid         String?
+  workspace_role  String    @default("Researcher")
   is_collaborator Boolean?  @default(false)
   user            user      @relation(fields: [userid], references: [id], onDelete: NoAction, onUpdate: NoAction)
   workspace       workspace @relation(fields: [workspaceid], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -333,11 +305,413 @@ model workspace_user {
 }
 
 model user {
-  id             String           @id @db.Uuid
-  name           String?
-  avatar_url     String?
-  email          String?
-  workspace_user workspace_user[]
+  id                                           String                 @id @db.Uuid
+  name                                         String?
+  avatar_url                                   String?
+  email                                        String?
+  chat_chat_user1_idTouser                     chat[]                 @relation("chat_user1_idTouser")
+  chat_chat_user2_idTouser                     chat[]                 @relation("chat_user2_idTouser")
+  chat_message_chat_message_recipient_idTouser chat_message[]         @relation("chat_message_recipient_idTouser")
+  chat_message_chat_message_sender_idTouser    chat_message[]         @relation("chat_message_sender_idTouser")
+  comment                                      comment[]
+  follow_follow_follower_idTouser              follow[]               @relation("follow_follower_idTouser")
+  follow_follow_following_idTouser             follow[]               @relation("follow_following_idTouser")
+  message                                      message[]
+  notification                                 notification[]
+  notification_settings                        notification_settings?
+  phase_template                               phase_template[]
+  post_comments                                post_comments[]
+  post_likes                                   post_likes[]
+  profile                                      profile[]
+  profile_achievement                          profile_achievement[]
+  profile_education                            profile_education[]
+  profile_experience                           profile_experience[]
+  project_users                                project_users[]
+  reaction                                     reaction[]
+  research_post                                research_post[]
+  task_assignees                               task_assignees[]
+  workspace_user                               workspace_user[]
+
+  @@schema("public")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model chat_message {
+  id                                   String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  sender_id                            String   @db.Uuid
+  content                              String?
+  created_at                           DateTime @default(now()) @db.Timestamptz(6)
+  is_read                              Boolean? @default(false)
+  recipient_id                         String   @db.Uuid
+  user_chat_message_recipient_idTouser user     @relation("chat_message_recipient_idTouser", fields: [recipient_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user_chat_message_sender_idTouser    user     @relation("chat_message_sender_idTouser", fields: [sender_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("public")
+}
+
+model profile {
+  profile_id          String                @id(map: "Profile_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id             String                @db.Uuid
+  name                String
+  avatar_url          String?
+  about_me            String?
+  research_interest   String?
+  collab_status       String?               @default("'Not Open For Collaboration'::text")
+  skills              String?
+  user                user                  @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  profile_achievement profile_achievement[]
+  profile_education   profile_education[]
+  profile_experience  profile_experience[]
+  research_post       research_post[]
+
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model project {
+  project_id    String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  workspace_id  String          @db.Uuid
+  name          String
+  description   String
+  c_score       Int             @default(0) @db.SmallInt
+  p_score       Int             @default(0) @db.SmallInt
+  cover_img     String?
+  grant_id      String?         @db.Uuid
+  progress      Float           @default(0)
+  start_at      DateTime        @default(now()) @db.Timestamptz(6)
+  end_at        DateTime?       @db.Timestamptz(6)
+  phase         phase[]
+  grant         grant?          @relation(fields: [grant_id], references: [id], onDelete: NoAction)
+  workspace     workspace       @relation(fields: [workspace_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  project_users project_users[]
+
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model project_users {
+  user_id                  String  @db.Uuid
+  project_id               String  @db.Uuid
+  project_role             String
+  is_external_collaborator Boolean @default(false)
+  project                  project @relation(fields: [project_id], references: [project_id], onDelete: Cascade, onUpdate: NoAction)
+  user                     user    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([user_id, project_id])
+  @@schema("public")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model research_post {
+  post_id       String          @id(map: "ResearchPosts_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title         String
+  author        String?
+  document      String?
+  description   String?
+  created_at    DateTime        @db.Timestamptz(6)
+  updated_at    DateTime        @default(now())
+  category      String
+  user_id       String          @db.Uuid
+  summary       String?
+  profile_id    String?         @db.Uuid
+  post_comments post_comments[]
+  likes         post_likes[]
+  profile       profile?        @relation(fields: [profile_id], references: [profile_id], onDelete: Cascade)
+  user          user            @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("public")
+}
+
+model post_likes {
+  like_id       String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  post_id       String        @db.Uuid
+  user_id       String        @db.Uuid
+  liked_at      DateTime      @db.Timestamptz(6)
+  likecount     Int?          @default(0)
+  research_post research_post @relation(fields: [post_id], references: [post_id], onDelete: Cascade)
+  user          user          @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([post_id, user_id], map: "unique_user_post_likes")
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model profile_education {
+  education_id String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  school       String
+  start_year   String
+  end_year     String
+  description  String?
+  profile_id   String  @db.Uuid
+  user_id      String  @db.Uuid
+  profile      profile @relation(fields: [profile_id], references: [profile_id], onDelete: Cascade)
+  user         user    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model post_comments {
+  comment_id    String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  value         String        @default("")
+  user_id       String        @db.Uuid
+  post_id       String        @db.Uuid
+  created_at    DateTime?     @db.Timestamptz(6)
+  research_post research_post @relation(fields: [post_id], references: [post_id], onDelete: NoAction, onUpdate: NoAction)
+  user          user          @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model profile_achievement {
+  achievement_id String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id        String  @db.Uuid
+  received_year  String
+  title          String
+  description    String?
+  profile_id     String  @db.Uuid
+  profile        profile @relation(fields: [profile_id], references: [profile_id], onDelete: Cascade)
+  user           user    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@schema("public")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model profile_experience {
+  experience_id String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id       String   @db.Uuid
+  title         String
+  start_year    String
+  end_year      String
+  description   String?
+  profile_id    String?  @db.Uuid
+  profile       profile? @relation(fields: [profile_id], references: [profile_id], onDelete: Cascade)
+  user          user     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model comment {
+  id            String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at    DateTime   @default(now()) @db.Timestamptz(6)
+  value         String
+  task_id       String     @db.Uuid
+  user_id       String     @db.Uuid
+  parent_id     String?    @db.Uuid
+  comment       comment?   @relation("commentTocomment", fields: [parent_id], references: [id], onDelete: Cascade)
+  other_comment comment[]  @relation("commentTocomment")
+  task          task       @relation(fields: [task_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user          user       @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  reaction      reaction[]
+
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model phase {
+  id                  String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                String?
+  start_at            DateTime              @db.Date
+  end_at              DateTime?             @db.Date
+  project_id          String                @db.Uuid
+  progress            Float                 @default(0)
+  project             project               @relation(fields: [project_id], references: [project_id], onDelete: Cascade, onUpdate: NoAction)
+  phase_property      phase_property[]
+  property_phase_task property_phase_task[]
+  task                task[]
+  task_assignees      task_assignees[]
+
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model phase_property {
+  id                  String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                String                @default("name")
+  type                String                @default("text")
+  phase_id            String                @db.Uuid
+  phase               phase                 @relation(fields: [phase_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  property_phase_task property_phase_task[]
+
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model task {
+  id                  String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at          DateTime              @db.Timestamptz(6)
+  name                String                @default("task")
+  description         String?
+  status              String                @default("pending")
+  phase_id            String                @db.Uuid
+  end_at              DateTime?             @db.Timestamptz(6)
+  attachments         String[]
+  deadline            DateTime?             @db.Timestamptz(6)
+  comment             comment[]
+  property_phase_task property_phase_task[]
+  phase               phase                 @relation(fields: [phase_id], references: [id], onDelete: NoAction)
+  task_assignees      task_assignees[]
+
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model property_phase_task {
+  value          String?
+  phase_id       String         @db.Uuid
+  task_id        String         @db.Uuid
+  property_id    String         @db.Uuid
+  index          BigInt
+  phase          phase          @relation(fields: [phase_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  phase_property phase_property @relation(fields: [property_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  task           task           @relation(fields: [task_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([task_id, property_id])
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model task_assignees {
+  task_id     String @db.Uuid
+  assignee_id String @db.Uuid
+  phase_id    String @db.Uuid
+  user        user   @relation(fields: [assignee_id], references: [id], onDelete: NoAction)
+  phase       phase  @relation(fields: [phase_id], references: [id], onDelete: NoAction)
+  task        task   @relation(fields: [task_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([task_id, assignee_id])
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model follow {
+  id                             String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  follower_id                    String @db.Uuid
+  following_id                   String @db.Uuid
+  user_follow_follower_idTouser  user   @relation("follow_follower_idTouser", fields: [follower_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user_follow_following_idTouser user   @relation("follow_following_idTouser", fields: [following_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([follower_id, following_id], map: "unique_user_follow")
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model research_interest {
+  id   String @id(map: "researcg_interest_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name String @unique(map: "researcg_interest_name_key")
+
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model research_skill {
+  id   String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name String @unique
+
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model chat {
+  chat_id                  BigInt    @id @default(autoincrement())
+  user1_id                 String    @db.Uuid
+  user2_id                 String    @db.Uuid
+  created_at               DateTime  @default(now()) @db.Timestamptz(6)
+  user_chat_user1_idTouser user      @relation("chat_user1_idTouser", fields: [user1_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user_chat_user2_idTouser user      @relation("chat_user2_idTouser", fields: [user2_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  message                  message[]
+
+  @@unique([user1_id, user2_id], map: "unique_user_pair")
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model message {
+  message_id BigInt   @id @default(autoincrement())
+  chat_id    BigInt?
+  sender_id  String?  @db.Uuid
+  content    String?
+  timestamp  DateTime @default(now()) @db.Timestamptz(6)
+  chat       chat?    @relation(fields: [chat_id], references: [chat_id], onDelete: NoAction, onUpdate: NoAction)
+  user       user?    @relation(fields: [sender_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model reaction {
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  comment_id String   @db.Uuid
+  user_id    String   @db.Uuid
+  comment    comment  @relation(fields: [comment_id], references: [id], onDelete: Cascade)
+  user       user     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@id([comment_id, user_id])
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model notification_settings {
+  email_enbld      Boolean        @default(true)
+  web_enbld        Boolean        @default(true)
+  types            String[]       @default(["TASK_RMND"])
+  user_id          String         @id @unique @db.Uuid
+  task_rmndr_enbld Boolean        @default(true)
+  notification     notification[]
+  user             user           @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model test {
+  id  String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  yes Boolean @default(true)
+
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model notification {
+  id                    String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at            DateTime              @default(now()) @db.Timestamptz(6)
+  user_id               String                @db.Uuid
+  notif_settings_id     String                @db.Uuid
+  message               String
+  type                  String
+  notification_settings notification_settings @relation(fields: [notif_settings_id], references: [user_id], onDelete: Cascade)
+  user                  user                  @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model grant {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at   DateTime  @default(now()) @db.Timestamptz(6)
+  progress     Float     @default(0)
+  name         String    @default("Grant 1")
+  start_at     DateTime  @default(now()) @db.Timestamptz(6)
+  end_at       DateTime? @db.Timestamptz(6)
+  workspace_id String    @db.Uuid
+  workspace    workspace @relation(fields: [workspace_id], references: [id], onDelete: Cascade)
+  project      project[]
+
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model phase_template {
+  id                        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at                DateTime @default(now()) @db.Timestamptz(6)
+  name                      String   @default("Phase Template Example")
+  phase_template_properties String[] @default(["Property 1"])
+  user_id                   String   @db.Uuid
+  user                      user     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@schema("public")
 }
@@ -369,4 +743,24 @@ enum factor_type {
   webauthn
 
   @@schema("auth")
+}
+
+enum collab_status {
+  Open_For_Collaboration     @map("Open For Collaboration")
+  Not_Open_for_Collaboration @map("Not Open for Collaboration")
+
+  @@schema("public")
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum category {
+  Article
+  Conference_Paper  @map("Conference Paper")
+  Presentation
+  Preprint
+  Research_Proposal @map("Research Proposal")
+  Thesis
+  Others
+
+  @@schema("public")
 }

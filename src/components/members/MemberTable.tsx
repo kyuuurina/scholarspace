@@ -5,6 +5,9 @@ type MemberTableProps = {
   handleRoleChange: (memberId: string, newRole: string) => void;
   handleDeleteMember: (memberId: string) => void;
   userWorkspaceRole: string | null | undefined;
+  isPersonal: boolean | undefined;
+  ownerId?: string | undefined | null;
+  externalCollab?: boolean;
 };
 
 const MemberTable: React.FC<MemberTableProps> = ({
@@ -12,6 +15,9 @@ const MemberTable: React.FC<MemberTableProps> = ({
   handleRoleChange,
   handleDeleteMember,
   userWorkspaceRole,
+  isPersonal,
+  ownerId,
+  externalCollab = false,
 }) => {
   return (
     <table className="w-full text-left text-sm text-gray-500">
@@ -23,21 +29,33 @@ const MemberTable: React.FC<MemberTableProps> = ({
           <th scope="col" className="px-6 py-3">
             Role
           </th>
+          {externalCollab && (
+            <th scope="col" className="px-6 py-3">
+              External Collaborator
+            </th>
+          )}
           <th scope="col" className="px-6 py-3">
             Action
           </th>
         </tr>
       </thead>
       <tbody>
-        {filteredMembers.map((member) => (
-          <MemberRow
-            key={member.memberId}
-            member={member}
-            handleRoleChange={handleRoleChange}
-            handleDeleteMember={handleDeleteMember}
-            userWorkspaceRole={userWorkspaceRole}
-          />
-        ))}
+        {filteredMembers.map(
+          (member) => (
+            console.log(member),
+            (
+              <MemberRow
+                key={member.memberId}
+                member={member}
+                handleRoleChange={handleRoleChange}
+                handleDeleteMember={handleDeleteMember}
+                userWorkspaceRole={userWorkspaceRole}
+                isPersonal={isPersonal}
+                ownerId={ownerId}
+              />
+            )
+          )
+        )}
       </tbody>
     </table>
   );

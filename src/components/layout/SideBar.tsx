@@ -1,27 +1,89 @@
 // React and Next hooks
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import { useSessionContext } from "@supabase/auth-helpers-react";
+import { useUser } from "@supabase/auth-helpers-react";
+import { FiUser } from "react-icons/fi";
+
+import { api } from "~/utils/api";
+import { useFetchProfile } from "~/utils/profile";
+import { useEffect } from "react";
 
 // icons
-import {
-  FiHome,
-  FiActivity,
-  FiMessageCircle,
-  FiBriefcase,
-} from "react-icons/fi";
+import { FiHome, FiActivity, FiBriefcase, FiColumns } from "react-icons/fi";
 import { IconContext } from "react-icons";
 
 // components
 import WorkspaceDropdown from "../workspace/WorkspaceDropdown";
 import WorkspaceModal from "../workspace/WorkspaceModal";
+import { profile } from "console";
 
 type SideBarProps = {
   toggleSidebar: () => void;
   open: boolean;
+  // profileId?: string;
 };
 
-export const SideBar: React.FC<SideBarProps> = ({ toggleSidebar, open }) => {
+export const SideBar: React.FC<SideBarProps> = ({
+  toggleSidebar,
+  open,
+  // profileId,
+}) => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
+
+  // auth objects
+  const user = useUser(); // user object from supabase
+  const router = useRouter();
+  // const session = useSession();
+  useSessionContext();
+  const { supabaseClient } = useSessionContext();
+
+  // id constants
+  // const { user } = session.data?.user; // user object from supabase session
+
+  // Fetch user profile based on the router query
+  const { profile_id, isLoading, error } = useFetchProfile();
+
+  // Check for errors during profile fetch
+  useEffect(() => {
+    if (error) {
+      console.error("Error fetching profile:", error);
+    }
+  }, [error]);
+
+  // Check if router.query and router.query.id are defined before accessing their values
+  const id = router.query && router.query.id ? router.query.id.toString() : "";
+
+  console.log("Sidebar id", id);
+  // console.log("SideBar profileId:", profileId);
+  console.log("sidebar router", router.asPath);
+  console.log("userId", user?.id);
+  console.log("Profile_ID", profile_id);
+
+  // get profile by user id
+  const profileData = api.profile.getProfileByUserId.useQuery({
+    user_id: user?.id || "",
+  });
+
+  let profileID = null;
+  if (profileData.isLoading) {
+    return (
+      <div
+        className={`min-h-screen transition-all duration-300 ${
+          open
+            ? "translate-x-0 sm:w-56"
+            : "-translate-x-full sm:w-16 sm:translate-x-0"
+        } fixed left-0 top-0 z-40 bg-dark-purple
+      p-4 sm:static sm:flex`}
+        tabIndex={-1}
+      >
+        {" "}
+      </div>
+    );
+  } else {
+    profileID = profileData.data?.profile_id;
+  }
 
   return (
     <>
@@ -35,7 +97,7 @@ export const SideBar: React.FC<SideBarProps> = ({ toggleSidebar, open }) => {
             ? "translate-x-0 sm:w-56"
             : "-translate-x-full sm:w-16 sm:translate-x-0"
         } fixed left-0 top-0 z-40 bg-dark-purple
-           p-4 sm:static sm:flex`}
+          p-4 sm:static sm:flex`}
         tabIndex={-1}
       >
         <div className="flex flex-col space-y-6 font-medium">
@@ -60,11 +122,29 @@ export const SideBar: React.FC<SideBarProps> = ({ toggleSidebar, open }) => {
           <IconContext.Provider value={{ className: "text-purple-accent-2" }}>
             <ul className="min-w-full space-y-6 text-sm">
               <li className="rounded-sm">
+                {/* <Link
+                  className={`flex items-center space-x-3 rounded-md hover:bg-purple-800 ${
+                    open ? "text-purple-accent-2" : "text-purple-accent-2"
+                  }`}
+                  href={user?.id ? `/home-rwp/${user.id}` : `/`}
+                  onClick={toggleSidebar}
+                >
+                  <FiHome className="h-6 w-6" />
+                  <span
+                    className={`transition-all duration-500 ${
+                      open
+                        ? "text-purple-accent-2 opacity-100"
+                        : "sr-only opacity-0"
+                    }`}
+                  >
+                    Home
+                  </span>
+                </Link> */}
                 <Link
                   className={`flex items-center space-x-3 rounded-md hover:bg-purple-800 ${
                     open ? "text-purple-accent-2" : "text-purple-accent-2"
                   }`}
-                  href="/"
+                  href={`/`}
                   onClick={toggleSidebar}
                 >
                   <FiHome className="h-6 w-6" />
@@ -79,29 +159,34 @@ export const SideBar: React.FC<SideBarProps> = ({ toggleSidebar, open }) => {
                   </span>
                 </Link>
               </li>
+
               <li className=" rounded-sm">
-                <Link
-                  href="/manage-profile"
-                  className={`flex items-center space-x-3 rounded-md hover:bg-purple-800 ${
-                    open ? "text-purple-accent-2" : "text-purple-accent-2"
-                  }`}
-                  onClick={toggleSidebar}
-                >
-                  <FiActivity className="h-6 w-6" />
-                  <span
-                    className={`transition-all duration-500 ${
-                      open
-                        ? "text-purple-accent-2 opacity-100"
-                        : "sr-only opacity-0"
+                {profileID && (
+                  <Link
+                    // href={profileId ? `/manage-profile/${profileId}` : ""}
+                    href={`/manage-profile/${profileID}`}
+                    className={`flex items-center space-x-3 rounded-md hover:bg-purple-800 ${
+                      open ? "text-purple-accent-2" : "text-purple-accent-2"
                     }`}
+                    onClick={toggleSidebar}
                   >
-                    My Profile
-                  </span>
-                </Link>
+                    <FiUser className="h-6 w-6" />
+                    <span
+                      className={`transition-all duration-500 ${
+                        open
+                          ? "text-purple-accent-2 opacity-100"
+                          : "sr-only opacity-0"
+                      }`}
+                    >
+                      My Profile
+                    </span>
+                  </Link>
+                )}
               </li>
-              <li className="rounded-sm">
+
+              {/* <li className="rounded-sm">
                 <Link
-                  href="/"
+                  href="/chat"
                   className={`flex items-center space-x-3 rounded-md hover:bg-purple-800 ${
                     open ? "text-purple-accent-2" : "text-purple-accent-2"
                   }`}
@@ -118,10 +203,11 @@ export const SideBar: React.FC<SideBarProps> = ({ toggleSidebar, open }) => {
                     Messages
                   </span>
                 </Link>
-              </li>
-              <li className="rounded-sm">
+              </li> */}
+
+              {/* <li className="rounded-sm">
                 <Link
-                  href="/home-rwp/cljdykk4m0008vu6kufa5klp9"
+                  href="/"
                   className={`flex items-center space-x-3 rounded-md hover:bg-purple-800 ${
                     open ? "text-purple-accent-2" : "text-purple-accent-2"
                   }`}
@@ -135,6 +221,25 @@ export const SideBar: React.FC<SideBarProps> = ({ toggleSidebar, open }) => {
                     }`}
                   >
                     Projects
+                  </span>
+                </Link>
+              </li> */}
+              <li className="rounded-sm">
+                <Link
+                  href="/manage-templates"
+                  className={`flex items-center space-x-3 rounded-md hover:bg-purple-800 ${
+                    open ? "text-purple-accent-2" : "text-purple-accent-2"
+                  }`}
+                >
+                  <FiColumns className="h-6 w-6" />
+                  <span
+                    className={`transition-all duration-500 ${
+                      open
+                        ? "text-purple-accent-2 opacity-100"
+                        : "sr-only opacity-0"
+                    }`}
+                  >
+                    Manage Templates
                   </span>
                 </Link>
               </li>

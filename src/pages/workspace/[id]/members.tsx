@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import { FiUserPlus } from "react-icons/fi";
 
 // local components
+import Head from "~/components/layout/Head";
 import Layout from "~/components/layout/Layout";
 import Header from "~/components/workspace/Header";
 import MemberModal from "~/components/members/MemberModal";
@@ -23,7 +24,7 @@ import { useRouterId } from "~/utils/routerId";
 const Members: NextPageWithLayout = () => {
   const router = useRouter();
   const workspaceId = useRouterId();
-  const { name, imgUrl } = useFetchWorkspace();
+  const { name, imgUrl, is_personal, ownerid } = useFetchWorkspace();
   const [modalIsOpen, setModalIsOpen] = useState(false);
 
   // members in the workspace
@@ -58,11 +59,12 @@ const Members: NextPageWithLayout = () => {
     },
   });
 
-  const onSubmit = async (data: { email: string }) => {
+  const onSubmit = async (data: { email: string; role: string }) => {
     try {
       await addMember.mutateAsync({
         workspaceId: workspaceId,
         email: data.email,
+        role: data.role,
       });
     } catch (error) {
       console.error("Failed to add member:", error);
@@ -128,6 +130,7 @@ const Members: NextPageWithLayout = () => {
   return (
     <>
       {/* add member modal */}
+      <Head title={name} />
       <MemberModal
         openModal={modalIsOpen}
         onClose={() => setModalIsOpen(false)}
@@ -136,7 +139,7 @@ const Members: NextPageWithLayout = () => {
       />
 
       <main className="min-h-screen w-full">
-        <Header name={name || ""} imgUrl={imgUrl} />
+        <Header name={name || ""} imgUrl={imgUrl} purpose="workspace" />
         <div className="p-5">
           <div className="relative overflow-x-auto rounded-lg shadow-md">
             {/* search and add member section  */}
@@ -185,6 +188,8 @@ const Members: NextPageWithLayout = () => {
               handleRoleChange={handleRoleChange}
               handleDeleteMember={handleDeleteMember}
               userWorkspaceRole={workspaceRole.data}
+              isPersonal={is_personal}
+              ownerId={ownerid}
             />
           </div>
         </div>

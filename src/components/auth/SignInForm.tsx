@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useSessionContext } from "@supabase/auth-helpers-react";
 
 import { Link } from "~/components/Link";
-import LoadingSpinner from "~/components/LoadingSpinner";
+import { MoonLoader } from "react-spinners";
 import { GoogleButton } from "~/components/auth/GoogleButton";
 import { setCookie } from "cookies-next";
 
@@ -35,11 +35,8 @@ export const SignInForm: React.FC = () => {
       return;
     }
 
-    // invalidate the stored language cookie
-    // this will cause a DB re-fetch of the language preference on the next request
-
     if (data) {
-      void router.push("/");
+      await router.push("/");
     }
   };
 
@@ -82,7 +79,7 @@ export const SignInForm: React.FC = () => {
             Password
           </label>
           <div className="text-sm">
-            <Link href="/auth/forgot">Forgot password?</Link>
+            <Link href="/auth/forgot-password">Forgot password?</Link>
           </div>
         </div>
         <div className="mt-1">
@@ -105,9 +102,20 @@ export const SignInForm: React.FC = () => {
         <button
           type="submit"
           disabled={loading}
-          className="flex w-full justify-center rounded-lg bg-purple-700 px-3 py-2 text-center text-sm font-medium text-white shadow-md hover:bg-purple-800 focus:outline-none focus:ring-4 focus:ring-purple-300 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900"
+          className="flex w-full items-center justify-center rounded-lg bg-purple-700 px-3 py-2 text-center text-sm font-medium  shadow-md hover:bg-purple-800 focus:outline-none focus:ring-4 focus:ring-purple-300"
         >
-          {loading ? <LoadingSpinner /> : "Sign In"}
+          <div className="flex items-center space-x-5 text-white">
+            <span>Sign In</span>
+            {loading && (
+              <MoonLoader
+                color={"#ffff"}
+                loading={true}
+                aria-label="FadeLoader"
+                data-testid="loader"
+                size={20}
+              />
+            )}
+          </div>
         </button>
 
         <GoogleButton type="signin" />

@@ -28,4 +28,28 @@
   select {
     @apply rounded-md border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 shadow-sm focus:outline-none;
   }
+
+  .editable-input {
+    @apply border-none bg-transparent p-0 shadow-none;
+  }
+
+  .fa-icons {
+    @apply text-gray-500 hover:bg-gray-200 hover:text-gray-700;
+  }
+
+  .navigation-loader {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #b7a9c080;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+    z-index: 9999;
+  }
 }

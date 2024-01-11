@@ -17,9 +17,9 @@ export async function middleware(req: NextRequest) {
   if (session) {
     // Check if the user has a profile
     const { data: profileData, error } = await supabase
-      .from("Profile")
+      .from("profile")
       .select()
-      .eq("userId", session.user.id); // Adjust the column names as per your schema
+      .eq("user_id", session.user.id); // Adjust the column names as per your schema
 
     console.log(profileData);
 

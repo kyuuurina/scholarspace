@@ -1,10 +1,11 @@
-//This type is the form data of a research post. This type is used in the ResearchPostForm component for CRUD operations.
-
 type ResearchPostFormData = {
+    category: string;
     title: string;
-    research_type: string;
-    description: string;
+    description: string | null;
     author: string | null;
+    document : string | null;
+    // user_id: string;
+    // created_at: Date;
   };
   
   export type { ResearchPostFormData };

@@ -3,11 +3,18 @@ type ModalProps = {
   onClose: (show: boolean) => void;
   children: React.ReactNode;
   title: string;
+  size?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl";
 };
 
 import { GrClose } from "react-icons/gr";
 
-const Modal: React.FC<ModalProps> = ({ show, onClose, children, title }) => {
+const Modal: React.FC<ModalProps> = ({
+  show,
+  onClose,
+  children,
+  title,
+  size = "lg",
+}) => {
   if (!show) return null;
 
   return (
@@ -30,11 +37,11 @@ const Modal: React.FC<ModalProps> = ({ show, onClose, children, title }) => {
               <GrClose className="h-4 w-4" />
             </button>
           </div>
-          <div className="space-y-4 py-3">{children}</div>
+          <div className="space-y-4 pt-3">{children}</div>
         </div>
       </div>
     </div>
   );
-}
+};
 
 export default Modal;
