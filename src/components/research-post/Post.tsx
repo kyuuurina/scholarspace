@@ -202,68 +202,67 @@ const Post: React.FC<PostProps> = ({ post, onEditClick, refetch }) => {
 
   return (
     <Card title={post.title}>
-      <div className="flex flex-col md:flex-row items-center mb-2 md:mb- relative">
-        <div className="mt-2 flex items-center mb-10 md:mb-4">
+      <div className="flex flex-col md:flex-row items-center mb-4 md:mb- relative">
+        <div className="mt-2 mb-2 mr-2"> {/* Add margin to the right of the category span */}
           <span className={categoryStyles}>{post.category}</span>
         </div>
 
-        <div className="mt-2 flex items-center mb-2 md:mb-4">
+        {isOwner && (
+              <div className="flex items-center ml-auto space-x-2"> {/* Align icons to the right */}
+                <button
+                  onClick={onEditClick}
+                  className="text-blue-500 hover:text-blue-700 focus:outline-none text-xs md:text-sm"
+                >
+                  <FiEdit2 size={18} className="inline-block" />
+                </button>
+                <button
+                  onClick={() => handleDeleteMyPost(post.post_id)}
+                  className="text-red-500 hover:text-red-700 focus:outline-none text-xs md:text-sm"
+                >
+                  <FiTrash2 size={18} className="inline-block" />
+                </button>
+              </div>
+            )}
+        </div>
+
+        <div className="flex items-center mt-2 mb-2"> {/* Add margin to create a gap */}
           <div className="aspect:square h-10 w-10 md:mr-2">
-          {post.profile?.avatar_url ? (
-            <Link href={`/manage-profile/${post.profile.profile_id}`}>
-              <span className="relative inline-block cursor-pointer">
-                <div className="h-10 w-10">
-                  <Image
-                    src={`https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/avatar/${post.profile.avatar_url}`}
-                    alt={post.profile.name}
-                    layout="fill"
-                    objectFit="cover"
-                    className="rounded-full"
-                  />
-                </div>
-                <span className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-800 opacity-50 rounded-full" />
-              </span>
-            </Link>
-          ) : (
-            <ProfileAvatarPlaceholder name={post.profile?.name || 'DefaultName'} shape="circle" />
-          )}
+            {post.profile?.avatar_url ? (
+              <Link href={`/manage-profile/${post.profile.profile_id}`}>
+                <span className="relative inline-block cursor-pointer">
+                  <div className="h-10 w-10">
+                    <Image
+                      src={`https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/avatar/${post.profile.avatar_url}`}
+                      alt={post.profile.name}
+                      layout="fill"
+                      objectFit="cover"
+                      className="rounded-full"
+                    />
+                  </div>
+                  <span className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-800 opacity-50 rounded-full" />
+                </span>
+              </Link>
+            ) : (
+              <AvatarPlaceholder name={post.profile?.name || 'DefaultName'} shape="circle" />
+            )}
           </div>
 
           <div className="flex flex-col items-center md:items-start">
             <div className="mt-2 flex items-center mb-2 md:mb-4">
-              {/* Use next/link for the profile name */}
               <Link href={`/manage-profile/${post.profile?.profile_id || ''}`}>
                 <span className="mt-2 text-black text-sm md:text-base font-semibold cursor-pointer">
                   {post.profile?.name || ''}
                 </span>
               </Link>
             </div>
-
-          {isOwner && (
-            <div className="absolute top-0 right-0 flex items-center mt-2 space-x-2">
-              <button
-                onClick={onEditClick}
-                className="text-blue-500 hover:text-blue-700 focus:outline-none text-xs md:text-sm"
-              >
-                <FiEdit2 size={18} className="inline-block" />
-              </button>
-              <button
-                onClick={() => handleDeleteMyPost(post.post_id)}
-                className="text-red-500 hover:text-red-700 focus:outline-none text-xs md:text-sm"
-              >
-                <FiTrash2 size={18} className="inline-block" />
-              </button>
-            </div>
-          )}
+          </div>
         </div>
-      </div>
-    </div>
 
 
       <div className="mt-2 flex items-center mb-2 md:mb-4">
         <p className="mt-2 text-black text-sm md:text-base">{post.description || 'No description'}</p>
       </div>
-  
+
       <div className="mt-2 flex items-center mb-2 md:mb-4">
         <p className="mt-2 text-gray-500 text-xs md:text-sm">Author: {post.author || ''}</p>
       </div>
