@@ -172,136 +172,128 @@ export const profileRouter = router({
       return updatedProfile;
     }),
 
-  //procedure to get recommendations based on shared research interests
-  getRecommendations: protectedProcedure.query(async ({ ctx }) => {
-    const userId = ctx.user?.id;
 
-    // Get the user's research interests
-    const user = await ctx.prisma.profile.findFirst({
-      where: {
-        user_id: userId,
-      },
-      select: {
-        research_interest: true,
-      },
-    });
+//procedure to get recommendations based on shared research interests and following accounts of user's following
+getRecommendations: protectedProcedure.query(async ({ ctx }) => {
+  const userId = ctx.user?.id;
 
-    if (!user || !user.research_interest) {
-      return [];
-    }
+  // Get the user's research interests
+  const user = await ctx.prisma.profile.findFirst({
+    where: {
+      user_id: userId,
+    },
+    select: {
+      research_interest: true,
+    },
+  });
 
-    const userResearchInterests = user.research_interest
-      .toLowerCase()
-      .split(",");
+  if (!user || !user.research_interest) {
+    return [];
+  }
 
-    // Find other users who share at least 1 similar research interest and are not followed by the current user
-    const followedUsersIds = await ctx.prisma.follow.findMany({
-      where: {
-        follower_id: userId,
-      },
-      select: {
-        following_id: true,
-      },
-    });
+  const userResearchInterests = user.research_interest
+    .toLowerCase()
+    .split(",");
 
-    const recommendedUsers = await ctx.prisma.profile.findMany({
-      where: {
-        user_id: {
-          not: userId, // Exclude the current user
-        },
-        AND: [
-          {
-            OR: userResearchInterests.map((interest) => ({
-              research_interest: {
-                contains: interest.trim(),
-              },
-            })),
-          },
-          {
-            NOT: {
-              user_id: {
-                in: followedUsersIds.map(
-                  (followedUser) => followedUser.following_id
-                ),
-              },
-            },
-          },
-        ],
-      },
-      take: 10, // Limit the number of recommendations
-      select: {
-        user_id: true,
-        profile_id: true,
-        name: true,
-        avatar_url: true,
-      },
-    });
-
-    return recommendedUsers;
-  }),
-
-  // get profile by user id
-  getProfileByUserId: protectedProcedure
-    .input(z.object({ user_id: z.string() }))
-    .query(async ({ input, ctx }) => {
-      const { user_id } = input;
-
-      const profile = await ctx.prisma.profile.findFirst({
-        where: {
-          user_id,
-        },
-      });
-
-      if (!profile) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Profile not found",
-        });
-      }
-
-      return profile;
-    }),
+// Find other users who share at least 1 similar research interest
+const recommendedUsersByInterests = await ctx.prisma.profile.findMany({
+  where: {
+    user_id: {
+      not: userId,
+    },
+    research_interest: {
+      in: userResearchInterests.map((interest) => interest.trim()),
+    },
+  },
+  take: 10,
+  select: {
+    user_id: true,
+    profile_id: true,
+    name: true,
+    avatar_url: true,
+  },
 });
 
-// //Procedure to get recommendations based on shared research interests
-// getRecommendations: protectedProcedure
-// .query(async ({ ctx }) => {
-//   const userId = ctx.user?.id;
+  // Find users who are followed by the user's following accounts but not followed by the user
+  const followingUsersIds = await ctx.prisma.follow.findMany({
+    where: {
+      follower_id: userId,
+    },
+    select: {
+      following_id: true,
+    },
+  });
 
-//   // Get the user's research interests
-//   const user = await ctx.prisma.profile.findFirst({
-//     where: {
-//       user_id: userId,
-//     },
-//     select: {
-//       research_interest: true,
-//     },
-//   });
+  const suggestedUsers = await ctx.prisma.follow.findMany({
+    where: {
+      follower_id: {
+        in: followingUsersIds.map((followedUser) => followedUser.following_id),
+      },
+      following_id: {
+        not: userId,
+      },
+    },
+    take: 10,
+    select: {
+      following_id: true,
+    },
+  });
 
-//   if (!user || !user.research_interest) {
-//     return [];
-//   }
+  const suggestedUserIds = suggestedUsers.map(
+    (suggestedUser) => suggestedUser.following_id
+  );
 
-//   const userResearchInterests = user.research_interest.split(",");
+  // Exclude users who are already in the list based on shared interests
+  const uniqueSuggestedUserIds = suggestedUserIds.filter(
+    (id) => !recommendedUsersByInterests.some((user) => user.user_id === id)
+  );
 
-//   // Find other users who share the same research interests
-//   const recommendedUsers = await ctx.prisma.profile.findMany({
-//     where: {
-//       user_id: {
-//         not: userId, // Exclude the current user
-//       },
-//       research_interest: {
-//         in: userResearchInterests,
-//       },
-//     },
-//     take: 5, // Limit the number of recommendations
-//     select: {
-//       user_id: true,
-//       profile_id: true,
-//       name: true,
-//       avatar_url: true,
-//     },
-//   });
+  // Find the remaining users based on the suggestion criteria
+  const remainingUsers = await ctx.prisma.profile.findMany({
+    where: {
+      user_id: {
+        in: uniqueSuggestedUserIds,
+      },
+    },
+    take: 10,
+    select: {
+      user_id: true,
+      profile_id: true,
+      name: true,
+      avatar_url: true,
+    },
+  });
 
-//   return recommendedUsers;
-// }),
+  // Combine the results from both criteria
+  const recommendedUsers = [...recommendedUsersByInterests, ...remainingUsers];
+
+  return recommendedUsers;
+}),
+
+
+ // get profile by user id
+ getProfileByUserId: protectedProcedure
+ .input(z.object({ user_id: z.string() }))
+ .query(async ({ input, ctx }) => {
+   const { user_id } = input;
+
+   const profile = await ctx.prisma.profile.findFirst({
+     where: {
+       user_id,
+     },
+   });
+
+   if (!profile) {
+     throw new TRPCError({
+       code: "NOT_FOUND",
+       message: "Profile not found",
+     });
+   }
+
+   return profile;
+ }),
+
+
+
+});
+
