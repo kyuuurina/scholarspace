@@ -26,13 +26,13 @@ import { profile } from "console";
 type SideBarProps = {
   toggleSidebar: () => void;
   open: boolean;
-  profileId?: string;
+  // profileId?: string;
 };
 
 export const SideBar: React.FC<SideBarProps> = ({
   toggleSidebar,
   open,
-  profileId,
+  // profileId,
 }) => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
 
@@ -47,7 +47,7 @@ export const SideBar: React.FC<SideBarProps> = ({
   // const { user } = session.data?.user; // user object from supabase session
 
   // Fetch user profile based on the router query
-  const { profile_id, name, avatar_url, isLoading, error } = useFetchProfile();
+  const { profile_id, isLoading, error } = useFetchProfile();
 
   // Check for errors during profile fetch
   useEffect(() => {
@@ -61,10 +61,10 @@ export const SideBar: React.FC<SideBarProps> = ({
   const id = router.query && router.query.id ? router.query.id.toString() : "";
 
   console.log("Sidebar id", id);
-  console.log("SideBar profileId:", profileId);
+  // console.log("SideBar profileId:", profileId);
   console.log("sidebar router", router.asPath);
   console.log("userId", user?.id);
-  // console.log("Profile_ID", profile_id);
+  console.log("Profile_ID", profile_id);
 
   return (
     <>

@@ -51,7 +51,6 @@ export const useFetchProfile = () => {
     };
 };
 
-
 // New export for fetching recommended profiles
 type RecommendedProfile = {
   user_id: string;
