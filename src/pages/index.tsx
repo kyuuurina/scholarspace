@@ -67,7 +67,7 @@ const {
   recommendedProfiles,
   isLoadingRecommendedProfiles,
   errorRecommendedProfiles,
-} = useFetchRecommendedProfiles();
+} = useFetchRecommendedProfiles(user?.id);
 
 const [searchResults, setSearchResults] = useState<string[]>([]);
 const handleSearch = (results: string[]) => {

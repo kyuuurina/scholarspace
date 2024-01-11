@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useUser } from "@supabase/auth-helpers-react";
 
 const Tabs: React.FC = () => {
   const router = useRouter();
@@ -8,13 +9,15 @@ const Tabs: React.FC = () => {
   const user_id =
     router.query && router.query.id ? router.query.id.toString() : "";
 
+    const userId= useUser();
+
   return (
     <div className="text-sm font-medium text-center text-gray-500 border-b border-gray-200 dark:text-gray-400 dark:border-gray-700">
       <ul className="flex flex-wrap -mb-px">
         {/* "All tab" */}
         <li className="mr-2 flex-1">
           {/* <Link href={`/home-rwp/${user_id}`}> */}
-          <Link href={`/${user_id}`}>
+          <Link href={`/`}>
             <span
               className={`inline-block p-4 rounded-t-lg hover:text-gray-600 dark:hover:text-gray-300 ${
                 router.asPath === `/`
@@ -30,10 +33,10 @@ const Tabs: React.FC = () => {
         {/* "Following tab" */}
         <li className="mr-2 flex-1">
           {/* <Link href={`/home-rwp/${user_id}/following-post`}> */}
-          <Link href={`//${user_id}`}>
+          <Link href={userId?.id ? `//${userId?.id}/` : `/`}>
             <span
               className={`inline-block p-4 rounded-t-lg hover:text-gray-600 dark:hover:text-gray-300 ${
-                router.asPath === `//${user_id}`
+                router.asPath === `//${userId?.id?  `//${userId?.id}/` : `/`}`
                   ? "text-purple-600 border-b-2 border-purple-600"
                   : "border-transparent"
               }`}

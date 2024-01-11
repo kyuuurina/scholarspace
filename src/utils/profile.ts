@@ -60,8 +60,8 @@ type RecommendedProfile = {
     avatar_url: string | null;
   };
 
-  export const useFetchRecommendedProfiles = () => {
-    const id: string = useRouterId();
+  export const useFetchRecommendedProfiles = (id:string | undefined) => {
+    // const id: string = useRouterId();
 
     const recommendedProfiles = api.profile.getRecommendations.useQuery<RecommendedProfile[]>(
       undefined, // Pass undefined as input since getRecommendations doesn't require input

@@ -4,6 +4,7 @@
 //auth
 import { getCookie } from "cookies-next";
 import { useSession, useSessionContext } from "@supabase/auth-helpers-react";
+import { useUser } from "@supabase/auth-helpers-react";
 
 //utils
 import { useState, useEffect } from "react";
@@ -50,6 +51,7 @@ const FollowingPostPage: NextPageWithLayout = () => {
 
   //fetch user id
     const userId = getCookie("UserID");
+    const user = useUser();
 
     const router = useRouter();
     const FollowingPostLists = useFetchFollowingResearchPosts();
@@ -71,7 +73,7 @@ const FollowingPostPage: NextPageWithLayout = () => {
       recommendedProfiles,
       isLoadingRecommendedProfiles,
       errorRecommendedProfiles,
-    } = useFetchRecommendedProfiles();
+    } = useFetchRecommendedProfiles(user?.id);
   
     console.log("Recommended Profiles:", recommendedProfiles);
   
