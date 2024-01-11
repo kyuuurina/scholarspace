@@ -174,10 +174,10 @@ const ProfilePage: NextPageWithLayout = () => {
                 <div>
                   <div className="flex space-x-4">
                     <div className="mb-4">
-                      <FollowersList />
+                      {/* <FollowersList /> */}
                     </div>
                     <div className="mb-4">
-                      <FollowingList />
+                      {/* <FollowingList /> */}
                     </div>
                   </div>
                   <div className="mt-4 mb-4">
