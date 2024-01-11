@@ -1,8 +1,9 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
-/* eslint-disable @typescript-eslint/no-misused-promises */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
-//This page should be displayed when user click Home Page
-//atm, it appears on localhost:3000/
+//auth
+import { getCookie } from "cookies-next";
+import { useSession, useSessionContext } from "@supabase/auth-helpers-react";
 
 //utils
 import { useState, useEffect } from "react";
@@ -16,9 +17,14 @@ import type { NextPageWithLayout } from "~/pages/_app";
 // pages
 import ErrorPage from "~/pages/error-page";
 
+// utils
+import { useFetchFollowingResearchPosts } from "~/utils/researchpost";
+import { api } from "~/utils/api";
+
 // local components
 import Layout from "~/components/layout/Layout";
 import Head from "~/components/layout/Head";
+import LoadingSpinner from "~/components/LoadingSpinner";
 import Link from "next/link";
 import Card from "~/components/Card";
 import AvatarPlaceholder from "~/components/avatar/AvatarPlaceholder";
@@ -26,72 +32,111 @@ import Modal from "~/components/modal/Modal";
 
 //research post components
 import AllFollowingTabs from "~/components/research-post/AllFollowingTabs";
-import PostCard from "~/components/research-post/PostCard";
-import { ResearchPostCard } from "~/components/draft/ResearchPostCard";
+import Post from "~/components/research-post/Post";
 import UserProfileCard from "~/components/research-post/UserRecCards";
 import AddNewPostButton from "~/components/research-post/AddNewPostButton";
 import TestModal from "~/components/research-post/AddNewPostModal";
-//import { NewPostModal } from "~/components/draft/NewPostModal";
-//import NewPostForm from "~/components/draft/NewPostForm";
+
+//profile recommendation
+import { useFetchRecommendedProfiles } from "~/utils/profile";
+import ProfileRecommendation from "~/components/profile/ProfileRecommendation";
+
+//search
+import SearchBaq from "~/components/search/SearchBaq";
 
 const FollowingPostPage: NextPageWithLayout = () => {
-  const users = [
-    { id: 1, name: "Ahmad Osama" },
-    { id: 2, name: "Hasbullah " },
-  ];
+  //fetch user id
+  const userId = getCookie("UserID");
 
-  const posts = [
-    {
-      title: "Effects of parental involvement on student behaviour",
-      category: "Conference Paper",
-      author: "National Institutes of Health",
-      description:
-        "This riveting study delves into the intriguing realm of parental involvement and its curious influence on the behavior of young scholars. Join us on an adventure through the labyrinthine corridors of academia as we unravel the enigmatic connection.",
-      timestamp: "November 9, 2023",
-    },
-    {
-      title: "Design Patterns in Software Engineering",
-      category: "Journal Article",
-      author: "Nur Athirah",
-      description:
-        "Due to the increasing research information, knowledge production, development of information technology, and its impact on access to knowledge, the taxonomy of knowledge and information is necessary to manage and use them in the development of science",
-      timestamp: "October 27, 2023",
-    },
-    {
-      title: "Impact of school funding on student achievement",
-      category: "Conference Paper",
-      author: "Dr. Isma Zaini",
-      description:
-        "This is the second post. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      timestamp: "October 27, 2023",
-    },
-  ];
+  const router = useRouter();
+  const FollowingPostLists = useFetchFollowingResearchPosts();
+
+  //
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [currentPostId, setCurrentPostId] = useState<string | null>(null);
+  const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
+
+  //profile recommendation
+  const {
+    recommendedProfiles,
+    isLoadingRecommendedProfiles,
+    errorRecommendedProfiles,
+  } = useFetchRecommendedProfiles();
+
+  console.log("Recommended Profiles:", recommendedProfiles);
+
+  if (errorRecommendedProfiles) {
+    return <div>Error fetching recommended profiles</div>;
+  }
+
+  // Check if followingResearchPosts is an array
+  if (!Array.isArray(FollowingPostLists.followingResearchPosts)) {
+    // Handle the case where it's not an array (you can log an error, show a message, etc.)
+    console.error(
+      "Following research posts data is not an array:",
+      FollowingPostLists.followingResearchPosts
+    );
+    return <p>Error: Unable to fetch research posts</p>;
+  }
+
+  // Render EditPostForm component
+  const handleEditClick = (postId: string) => {
+    setEditModalOpen(true);
+    setCurrentPostId(postId);
+  };
 
   return (
-    <div className="mx-auto max-w-screen-xl p-8">
-      <AddNewPostButton />
-      {/* <h1 className="mb-4 text-3xl font-bold">Research Posts</h1> */}
-      <div className="grid grid-cols-3 gap-6">
-        <div className="col-span-2">
+    <div className="w-full max-w-screen-xl p-8">
+      <div className="mx-auto grid grid-cols-12 gap-6">
+        {/* All Following Tabs (3/4 width) */}
+        <div className="col-span-9">
+          <SearchBaq />
+          <div className="mb-4"></div>
           <AllFollowingTabs />
+
           <div className="mt-6">
-            {/* Render post cards here */}
-            {posts.map((post, index) => (
-              <PostCard
-                key={index}
-                title={post.title}
-                category={post.category}
-                author={post.author}
-                description={post.description}
-                created_at=""
-                // timestamp={post.timestamp}
-              />
-            ))}
+            {FollowingPostLists.isLoading ? (
+              <LoadingSpinner />
+            ) : FollowingPostLists.followingResearchPosts.length === 0 ? (
+              <p className="mt-8 text-center text-lg font-medium text-gray-500">
+                Follow other users to see their research posts!
+              </p>
+            ) : (
+              FollowingPostLists.followingResearchPosts.map((post) => (
+                <li
+                  key={post.post_id}
+                  className="mb-8"
+                  style={{ listStyle: "none" }}
+                >
+                  <Post
+                    post={post}
+                    onEditClick={() => handleEditClick(post.post_id)}
+                  />
+                </li>
+              ))
+            )}
           </div>
         </div>
-        {/* <div className="col-span-1">
-          <UserProfileCard users={users} />
-        </div> */}
+
+        {/* Suggested Profiles (1/4 width, Rightmost column) */}
+        <div className="sticky top-0 col-span-3">
+          <section className="mt-4 rounded border p-4">
+            <h2 className="mb-4 text-xl font-bold">Suggested Profiles</h2>
+            {isLoadingRecommendedProfiles ? (
+              <p>Loading recommended profiles...</p>
+            ) : errorRecommendedProfiles ? (
+              <p>Error fetching recommended profiles</p>
+            ) : (
+              <ul className="list-inside list-none space-y-4">
+                {recommendedProfiles.map((profile) => (
+                  <li key={profile.profile_id}>
+                    <ProfileRecommendation profiles={profile} />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        </div>
       </div>
     </div>
   );
@@ -100,7 +145,7 @@ const FollowingPostPage: NextPageWithLayout = () => {
 FollowingPostPage.getLayout = function getLayout(page: ReactElement) {
   return (
     <Layout>
-      <Head title="Home Page" />
+      <Head title="Following" />
       {page}
     </Layout>
   );
