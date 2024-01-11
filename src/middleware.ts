@@ -45,5 +45,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/home-rwp", "/manage-profile", "/workspace"],
+  matcher: ["/", "/", "/manage-profile", "/workspace"],
 };

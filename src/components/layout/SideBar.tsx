@@ -93,7 +93,7 @@ export const SideBar: React.FC<SideBarProps> = ({
                   className={`flex items-center space-x-3 rounded-md hover:bg-purple-800 ${
                     open ? "text-purple-accent-2" : "text-purple-accent-2"
                   }`}
-                  href={user?.id ? `/home-rwp/${user.id}` : `/`}
+                  href={user?.id ? `/${user.id}` : `/`}
                   onClick={toggleSidebar}
                 >
                   <FiHome className="h-6 w-6" />
