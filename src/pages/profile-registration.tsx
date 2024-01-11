@@ -5,6 +5,8 @@ import { useUser } from "@supabase/auth-helpers-react";
 import { api } from "~/utils/api";
 import { useRouter } from "next/router";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import toast from "react-hot-toast";
+import { TRPCClientError } from "@trpc/client";
 
 import { useForm } from "react-hook-form";
 import { type ZodType, z } from "zod";
@@ -15,7 +17,7 @@ import { useMultistepForm } from "~/utils/useMultistepForm";
 
 // import custom components
 import Button from "~/components/button/Button";
-import SignoutButton from "~/components/auth/SignoutButton";
+import ErrorToast from "~/components/toast/ErrorToast";
 import BasicInfoForm from "~/components/profile-registration/BasicInfoForm";
 import AvatarForm from "~/components/profile-registration/AvatarForm";
 import ManageTasks from "~/components/profile-registration/ManageTasks";
@@ -71,32 +73,29 @@ const SignUp: NextPage = () => {
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    // Check if a card is selected
-    if (!isSelected) {
-      // Show an error message or perform any other actions to prompt the user to select a card
-      console.log("Please select a collabStatus before proceeding!");
-      return;
-    }
-
     if (!isLastStep) return next();
 
-    await createProfileMut.mutateAsync({
-      ...getValues(),
-    });
+    try {
+      await createProfileMut.mutateAsync({
+        ...getValues(),
+      });
+      await router.push("/");
+    } catch (error) {
+      toast.custom(() => {
+        if (error instanceof TRPCClientError) {
+          return <ErrorToast message={error.message} />;
+        } else {
+          // Handle other types of errors or fallback to a default message
+          return <ErrorToast message="An error occurred." />;
+        }
+      });
+    }
 
     if (imageValue && getValues().avatar_url !== null) {
       const { data, error } = await supabase.storage
         .from("avatar")
         .upload(getValues().avatar_url || "", imageValue);
-
-      console.log(error);
-      console.log(data);
-    } else {
-      console.error("Error: avatar_url is null or undefined");
     }
-
-    // Navigate to the new page
-    await router.push("/");
   };
   return (
     <>
