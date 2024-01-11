@@ -16,7 +16,7 @@ const ManageTasks: React.FC = () => {
           Take control of your research endeavors with ScholarSpace.
         </p>
       </div>
-      <div className="absolute bottom-0 left-0 right-0 max-w-[90%]">
+      <div className="absolute bottom-0 left-0 right-0 max-w-[80%]">
         <Image
           src="/manage-tasks-page.png"
           alt="scholarspace page"

@@ -20,8 +20,8 @@ const Button: React.FC<ButtonProps> = ({
       type={type}
       className={`${
         style === "primary"
-          ? "mb-2 rounded-lg bg-purple-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-purple-800"
-          : "mb-2 rounded-lg border border-purple-700 px-5 py-2.5 text-center text-sm font-medium text-purple-700 hover:bg-purple-100 "
+          ? "rounded-lg bg-purple-700 px-5 py-2 text-sm font-medium text-white hover:bg-purple-800"
+          : "rounded-lg border border-purple-700 px-5 py-2 text-center text-sm font-medium text-purple-700 hover:bg-purple-100 "
       } ${visible ? "visible" : "invisible"}`}
       onClick={onClick}
     >

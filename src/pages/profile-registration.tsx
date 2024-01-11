@@ -16,12 +16,10 @@ import { useMultistepForm } from "~/utils/useMultistepForm";
 // import custom components
 import Button from "~/components/button/Button";
 import SignoutButton from "~/components/auth/SignoutButton";
-
-// import { RoleForm } from "~/components/profile-registration/RoleForm";
 import BasicInfoForm from "~/components/profile-registration/BasicInfoForm";
-import ResearchForm from "~/components/profile-registration/ResearchForm";
+import AvatarForm from "~/components/profile-registration/AvatarForm";
 import ManageTasks from "~/components/profile-registration/ManageTasks";
-
+import RoleForm from "~/components/profile-registration/RoleForm";
 import type { FormData } from "~/types/profile";
 
 const INITIAL_DATA: FormData = {
@@ -29,7 +27,7 @@ const INITIAL_DATA: FormData = {
   avatar_url: "",
   about_me: "",
   research_interest: "",
-  collab_status: "Open_For_Collaboration",
+  collab_status: "",
   skills: "",
 };
 
@@ -63,11 +61,8 @@ const SignUp: NextPage = () => {
   const { currentStep, next, back, isFirstStep, isLastStep } = useMultistepForm(
     [
       <BasicInfoForm key={4} register={register} setValue={setValue} />,
-      <ResearchForm
-        key={5}
-        setValue={setValue}
-        setImageValue={setImageValue}
-      />,
+      <AvatarForm key={5} setValue={setValue} setImageValue={setImageValue} />,
+      <RoleForm key={6} setValue={setValue} />,
     ]
   );
 
@@ -101,21 +96,21 @@ const SignUp: NextPage = () => {
     }
 
     // Navigate to the new page
-    void router.push("/");
+    await router.push("/");
   };
   return (
     <>
       {/* layout */}
-      <main className="flex flex-col items-center justify-center lg:flex-row">
-        <div className="relative hidden h-screen select-none flex-col bg-gradient-to-bl from-indigo-100 via-purple-100 to-blue-200 lg:flex lg:w-1/2">
+      <main className="flex min-h-screen flex-col items-center justify-center bg-white lg:flex-row">
+        <div className="relative select-none flex-col overflow-hidden bg-gradient-to-bl from-indigo-100 via-purple-100 to-blue-200 lg:flex lg:w-1/2">
           <ManageTasks />
         </div>
 
         {/* form section  */}
-        <div className="w-full bg-white px-12 py-16 md:min-h-screen md:w-1/2">
+        <div className="w-full bg-white px-12 xl:w-1/2">
           <form onSubmit={onSubmit} autoComplete="off">
             {currentStep}
-            <div className="mb-8 flex flex-col space-y-4 sm:flex-row sm:justify-between sm:space-x-4 sm:space-y-0 lg:mb-16">
+            <div className="mb-8 flex flex-col space-y-4 sm:flex-row sm:justify-end sm:space-x-4 sm:space-y-0 lg:mb-16">
               <Button
                 name="Go Back"
                 onClick={back}
@@ -126,7 +121,6 @@ const SignUp: NextPage = () => {
                 type="submit"
                 name={`${isLastStep ? "Submit" : "Next"}`}
               />
-              <SignoutButton />
             </div>
           </form>
         </div>
