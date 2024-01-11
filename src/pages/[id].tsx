@@ -46,61 +46,62 @@ import ProfileRecommendation from "~/components/profile/ProfileRecommendation";
 //search
 import SearchBaq from "~/components/search/SearchBaq";
 
+
 const FollowingPostPage: NextPageWithLayout = () => {
+
   //fetch user id
-  const userId = getCookie("UserID");
-  const user = useUser();
+    const userId = getCookie("UserID");
+    const user = useUser();
 
-  const router = useRouter();
-  const FollowingPostLists = useFetchFollowingResearchPosts();
+    const router = useRouter();
+    const FollowingPostLists = useFetchFollowingResearchPosts();
 
-  //
-  const [editModalOpen, setEditModalOpen] = useState(false);
-  const [currentPostId, setCurrentPostId] = useState<string | null>(null);
-  const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
+    //
+    const [editModalOpen, setEditModalOpen] = useState(false);
+    const [currentPostId, setCurrentPostId] = useState<string | null>(null);
+    const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
 
-  // query key for refetch
-  const postQueryKey = ["getPost", currentPostId]; // Assuming have a valid post ID
-  const { data: updatedPostData, refetch: refetchPost } = useQuery(
-    postQueryKey,
-    { enabled: false } // Disable automatic fetching on mount
-  );
+    // query key for refetch
+    const postQueryKey = ['getPost', currentPostId]; // Assuming have a valid post ID
+    const { data: updatedPostData, refetch: refetchPost } = useQuery(
+      postQueryKey,
+      { enabled: false } // Disable automatic fetching on mount
+    );
 
-  //profile recommendation
-  const {
-    recommendedProfiles,
-    isLoadingRecommendedProfiles,
-    errorRecommendedProfiles,
-  } = useFetchRecommendedProfiles();
-
-  console.log("Recommended Profiles:", recommendedProfiles);
-
-  if (errorRecommendedProfiles) {
-    return <div>Error fetching recommended profiles</div>;
-  }
+    //profile recommendation
+    const {
+      recommendedProfiles,
+      isLoadingRecommendedProfiles,
+      errorRecommendedProfiles,
+    } = useFetchRecommendedProfiles(user?.id);
+  
+    console.log("Recommended Profiles:", recommendedProfiles);
+  
+    if (errorRecommendedProfiles) {
+      return <div>Error fetching recommended profiles</div>;
+    }
 
   // Check if followingResearchPosts is an array
   if (!Array.isArray(FollowingPostLists.followingResearchPosts)) {
     // Handle the case where it's not an array (you can log an error, show a message, etc.)
-    console.error(
-      "Following research posts data is not an array:",
-      FollowingPostLists.followingResearchPosts
-    );
+    console.error("Following research posts data is not an array:", FollowingPostLists.followingResearchPosts);
     return <p>Error: Unable to fetch research posts</p>;
   }
 
-  // Render EditPostForm component
-  const handleEditClick = (postId: string) => {
-    setEditModalOpen(true);
-    setCurrentPostId(postId);
-  };
+  
+// Render EditPostForm component
+const handleEditClick = (postId: string) => {
+  setEditModalOpen(true);
+  setCurrentPostId(postId);
+};
+
 
   return (
     <div className="w-full max-w-screen-xl p-8">
-      <div className="mx-auto grid grid-cols-12 gap-6">
+      <div className="grid grid-cols-12 gap-6 mx-auto">
         {/* All Following Tabs (3/4 width) */}
         <div className="col-span-9">
-          <SearchBaq />
+        <SearchBaq />
           <div className="mb-4"></div>
           <AllFollowingTabs />
 
@@ -108,37 +109,33 @@ const FollowingPostPage: NextPageWithLayout = () => {
             {FollowingPostLists.isLoading ? (
               <LoadingSpinner />
             ) : FollowingPostLists.followingResearchPosts.length === 0 ? (
-              <p className="mt-8 text-center text-lg font-medium text-gray-500">
+              <p className="text-lg font-medium text-gray-500 text-center mt-8">
                 Follow other users to see their research posts!
               </p>
             ) : (
               FollowingPostLists.followingResearchPosts.map((post) => (
-                <li
-                  key={post.post_id}
-                  className="mb-8"
-                  style={{ listStyle: "none" }}
-                >
-                  <Post
-                    post={post}
-                    onEditClick={() => handleEditClick(post.post_id)}
-                    refetch={refetchPost}
-                  />
+                <li key={post.post_id} className="mb-8" style={{ listStyle: 'none' }}>
+                <Post
+                  post={post}
+                  onEditClick={() => handleEditClick(post.post_id)}
+                  refetch={refetchPost}
+                   />
                 </li>
               ))
             )}
           </div>
         </div>
-
+    
         {/* Suggested Profiles (1/4 width, Rightmost column) */}
-        <div className="sticky top-0 col-span-3">
-          <section className="mt-4 rounded border p-4">
-            <h2 className="mb-4 text-xl font-bold">Suggested Profiles</h2>
+        <div className="col-span-3 sticky top-0">
+          <section className="border rounded p-4 mt-4">
+            <h2 className="text-xl font-bold mb-4">Suggested Profiles</h2>
             {isLoadingRecommendedProfiles ? (
               <p>Loading recommended profiles...</p>
             ) : errorRecommendedProfiles ? (
               <p>Error fetching recommended profiles</p>
             ) : (
-              <ul className="list-inside list-none space-y-4">
+              <ul className="list-none list-inside space-y-4">
                 {recommendedProfiles.map((profile) => (
                   <li key={profile.profile_id}>
                     <ProfileRecommendation profiles={profile} />

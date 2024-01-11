@@ -1,96 +1,99 @@
 //add import in api.ts
 
-import { api } from "./api";
-import { useRouterId } from "./routerId";
+import { api } from './api';
+import { useRouterId } from './routerId';
+
 
 //fetch a user profile based on profile_id from router
 export const useFetchProfile = () => {
-  const id: string = useRouterId();
+    const id: string = useRouterId();
 
-  const profile = api.profile.get.useQuery(
-    {
-      profile_id: id,
-    },
-    {
-      enabled: !!id,
+    const profile = api.profile.get.useQuery(
+        {
+            profile_id: id,
+        },
+        {
+            enabled: !!id,
+        }
+    );
+
+
+    const {
+        profile_id,
+        user_id,
+        avatar_url,
+        name,
+        about_me,
+        skills,
+        research_interest,
+        collab_status,
+    } = profile.data || {};
+
+    const { isLoading, error } = profile;
+
+    let avatarUrl = "";
+    if (avatar_url) {
+      avatarUrl = `https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/avatar/${avatar_url}`;
     }
-  );
 
-  const {
-    profile_id,
-    user_id,
-    avatar_url,
-    name,
-    about_me,
-    skills,
-    research_interest,
-    collab_status,
-  } = profile.data || {};
-
-  const { isLoading, error } = profile;
-
-  let avatarUrl = "";
-  if (avatar_url) {
-    avatarUrl = `https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/avatar/${avatar_url}`;
-  }
-
-  return {
-    avatar_url,
-    name,
-    about_me,
-    skills,
-    research_interest,
-    collab_status,
-    isLoading,
-    error,
-    profile_id,
-    // profile_id: id,
-    user_id,
-  };
+    return {
+        avatar_url,
+        name,
+        about_me,
+        skills,
+        research_interest,
+        collab_status,
+        isLoading,
+        error,
+        profile_id,
+        // profile_id: id,
+        user_id,
+    };
 };
 
 // New export for fetching recommended profiles
 type RecommendedProfile = {
   user_id: string;
-  profile_id: string;
-  name: string;
-  avatar_url: string | null;
-};
-
-export const useFetchRecommendedProfiles = () => {
-  // const id: string = useRouterId();
-
-  const recommendedProfiles = api.profile.getRecommendations.useQuery<
-    RecommendedProfile[]
-  >(
-    undefined // Pass undefined as input since getRecommendations doesn't require input
-  );
-
-  const {
-    data: recommendedProfilesData,
-    isLoading: isLoadingRecommendedProfiles,
-    error: errorRecommendedProfiles,
-  } = recommendedProfiles;
-
-  return {
-    recommendedProfiles: recommendedProfilesData || [],
-    isLoadingRecommendedProfiles,
-    errorRecommendedProfiles,
+    profile_id: string;
+    name: string;
+    avatar_url: string | null;
   };
-};
 
-//to check whether the user is the owner of profile
-export const UseCheckProfile = (userId: string) => {
-  const profileQuery = api.user.get.useQuery({ id: userId });
+  export const useFetchRecommendedProfiles = (id:string | undefined) => {
+    // const id: string = useRouterId();
 
-  const { data: user, isLoading, error } = profileQuery;
+    const recommendedProfiles = api.profile.getRecommendations.useQuery<RecommendedProfile[]>(
+      undefined, // Pass undefined as input since getRecommendations doesn't require input
+      { enabled: !!id }
+    );
 
-  return {
-    user,
-    isLoading,
-    error,
+    const {
+      data: recommendedProfilesData,
+      isLoading: isLoadingRecommendedProfiles,
+      error: errorRecommendedProfiles,
+    } = recommendedProfiles;
+
+    return {
+      recommendedProfiles: recommendedProfilesData || [],
+      isLoadingRecommendedProfiles,
+      errorRecommendedProfiles,
+    };
   };
-};
+
+
+  //to check whether the user is the owner of profile
+  export const UseCheckProfile = (userId: string) => {
+    const profileQuery = api.user.get.useQuery({ id: userId });
+  
+    const { data: user, isLoading, error } = profileQuery;
+  
+    return {
+      user,
+      isLoading,
+      error,
+    };
+  };
+
 
 //Step 2
 
@@ -167,6 +170,8 @@ export const UseCheckProfile = (userId: string) => {
 //     // };
 // };
 
+
+
 // import { api } from './api';
 // import { useRouterId } from './routerId';
 
@@ -226,6 +231,8 @@ export const UseCheckProfile = (userId: string) => {
 //     };
 //     )
 // };
+
+
 
 //new
 
