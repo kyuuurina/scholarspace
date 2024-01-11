@@ -9,7 +9,6 @@ import { useSession, useSessionContext } from "@supabase/auth-helpers-react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import toast from "react-hot-toast";
-import { useUser } from "@supabase/auth-helpers-react";
 
 // types
 import type { ReactElement } from "react";
@@ -47,8 +46,8 @@ import SearchBaq from "~/components/search/SearchBaq";
 
 const FollowingPostPage: NextPageWithLayout = () => {
   //fetch user id
-  const userId = user?.id || "";
   const user = useUser();
+  const userId = user?.id || "";
 
   const router = useRouter();
   const FollowingPostLists = useFetchFollowingResearchPosts();

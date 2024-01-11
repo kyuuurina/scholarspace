@@ -58,6 +58,7 @@ const ProfilePage: NextPageWithLayout = () => {
   //const
   const router = useRouter();
   const { profile_id } = router.query;
+  const user = useUser();
   const userId = user?.id || "";
 
   //const modal states
