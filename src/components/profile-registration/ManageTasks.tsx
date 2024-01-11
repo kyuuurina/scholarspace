@@ -2,9 +2,9 @@ import Image from "next/image";
 
 const ManageTasks: React.FC = () => {
   return (
-    <>
-      <div className="px-8 py-16 text-gray-900">
-        <p className="my-6 text-6xl font-semibold">
+    <div className="relative h-screen">
+      <div className="px-8 text-gray-900">
+        <p className="my-6 text-4xl font-semibold">
           Collaborate on research projects
           <span className="whitespace-nowrap py-2 text-purple-accent-1">
             {" "}
@@ -13,22 +13,20 @@ const ManageTasks: React.FC = () => {
           .
         </p>
         <p className="font-medium">
-          Take control of your research endeavors with ScholarSpace&apos;s
-          &quot;Manage Research Projects,&quot; enabling you to break down
-          tasks, set reminders, and collaborate seamlessly for unparalleled
-          efficiency in your academic pursuits.
+          Take control of your research endeavors with ScholarSpace.
         </p>
       </div>
-      <div>
+      <div className="absolute bottom-0 left-0 right-0 max-w-[80%]">
         <Image
           src="/manage-tasks-page.png"
           alt="scholarspace page"
-          width={790}
-          height={740}
-          className="justify-self-center"
+          layout="responsive"
+          width={800}
+          height={600}
+          objectFit="cover"
         />
       </div>
-    </>
+    </div>
   );
 };
 

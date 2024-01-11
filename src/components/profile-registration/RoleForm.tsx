@@ -1,66 +1,79 @@
-// i want this file
 import { useState } from "react";
+import { type UseFormSetValue } from "react-hook-form";
+import type { FormData } from "~/types/profile";
 
-type RoleData = {
-  collabStatus: string;
+type BasicInfoFormProps = {
+  setValue: UseFormSetValue<FormData>;
 };
 
-type RoleFormProps = {
-  updateFields: (fields: Partial<RoleData>) => void;
-  setIsSelected: (isSelected: boolean) => void;
-};
+const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ setValue }) => {
+  const [selectedStatus, setSelectedStatus] = useState<string>(""); // Track selected status
 
-export function RoleForm({ updateFields, setIsSelected }: RoleFormProps) {
-  const [selectedRole, setSelectedRole] = useState<string>(""); // State to keep track of the selected collabStatus
-
-  const handleCardClick = (collabStatus: string) => {
-    setSelectedRole(collabStatus);
-    updateFields({ collabStatus }); // Update the collabStatus in the parent component when a card is selected
-    setIsSelected(true);
+  const setCollaborationStatus = (newValue: string) => {
+    setValue("collab_status", newValue);
+    setSelectedStatus(newValue); // Update selected status
   };
 
   return (
     <>
       <div className="my-6">
         <div className="flex space-y-3 sm:flex-col">
-          <div
-            className={`block max-w-sm rounded-lg border ${
-              selectedRole === "researcher"
-                ? "border-blue-500"
-                : "border-gray-200"
-            } cursor-pointer bg-white p-6 shadow ${
-              selectedRole === "researcher"
-                ? "bg-blue-50"
-                : "hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700"
-            }`}
-            onClick={() => handleCardClick("researcher")}
-          >
-            <h1 className="mb-2 text-xl font-bold tracking-tight text-gray-900 dark:text-white">
-              I&rsquo;m a researcher
-            </h1>
-            <h2 className="text-lg font-medium text-gray-500 dark:text-white">
-              Experienced Researchers
-            </h2>
-          </div>
-          <div
-            className={`block max-w-sm cursor-pointer rounded-lg border ${
-              selectedRole === "student" ? "border-blue-500" : "border-gray-200"
-            } bg-white p-6 shadow ${
-              selectedRole === "student"
-                ? "bg-blue-50"
-                : "hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700"
-            }`}
-            onClick={() => handleCardClick("student")}
-          >
-            <h1 className="mb-2 text-xl font-bold tracking-tight text-gray-900 dark:text-white">
-              I&rsquo;m a student
-            </h1>
-            <h2 className="text-lg font-medium text-gray-500 dark:text-white">
-              Postgraduate Researchers
-            </h2>
+          <div className="space-y-4">
+            <div className="flex justify-between space-x-5">
+              <div className="w-1/2">
+                <label
+                  htmlFor="research_interest"
+                  className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  Research Collaboration Interest
+                </label>
+                {/* Replace CreatableSingleSelect with two cards */}
+                <div className="flex space-x-3">
+                  <div
+                    className={`block cursor-pointer rounded-lg border p-2 ${
+                      selectedStatus === "Open For Collaboration"
+                        ? "border-purple-accent-1 bg-purple-100"
+                        : "border-gray-200 bg-white"
+                    } p-2 shadow hover:bg-gray-200`}
+                    onClick={() =>
+                      setCollaborationStatus("Open For Collaboration")
+                    }
+                  >
+                    <h5 className="mb-2 text-2xl font-semibold tracking-tight text-gray-900 ">
+                      Open for Collaboration
+                    </h5>
+                    <p className="font-normal text-gray-700 ">
+                      Let other researchers know you are open for collaborating
+                      on research projects.
+                    </p>
+                  </div>
+
+                  <div
+                    className={`block cursor-pointer rounded-lg border p-2 ${
+                      selectedStatus === "Not Open For Collaboration"
+                        ? "border-purple-accent-1 bg-purple-100"
+                        : "border-gray-200 bg-white"
+                    } p-2 shadow hover:bg-gray-200`}
+                    onClick={() =>
+                      setCollaborationStatus("Not Open For Collaboration")
+                    }
+                  >
+                    <h5 className="mb-2 text-2xl font-semibold tracking-tight text-gray-900 ">
+                      Not Open for Collaboration
+                    </h5>
+                    <p className="font-normal text-gray-700 ">
+                      Let other researchers know you are not open for
+                      collaborating on research projects.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </>
   );
-}
+};
+
+export default BasicInfoForm;

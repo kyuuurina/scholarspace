@@ -44,6 +44,26 @@ export const taskRouter = router({
       return tasks;
     }),
 
+  listByProject: protectedProcedure
+    .input(
+      z.object({
+        project_id: z.string(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const { project_id } = input;
+
+      const tasks = await ctx.prisma.task.findMany({
+        where: {
+          phase: {
+            project_id,
+          },
+        },
+      });
+
+      return tasks;
+    }),
+
   create: protectedProcedure
     .input(
       z.object({
@@ -74,6 +94,7 @@ export const taskRouter = router({
 
       let task;
 
+      // if task is done, update end_at date
       if (status === "done") {
         task = await ctx.prisma.task.update({
           where: { id },
@@ -153,6 +174,18 @@ export const taskRouter = router({
         where: { project_id: project.project_id },
         data: { p_score: completionScore },
       });
+
+      // update phase progress
+      const phase = await ctx.prisma.phase.findUnique({
+        where: { id: phase_id },
+      });
+
+      if (phase) {
+        await ctx.prisma.phase.update({
+          where: { id: phase_id },
+          data: { progress: completionRatio },
+        });
+      }
 
       return task;
     }),
@@ -401,6 +434,27 @@ export const taskRouter = router({
         where: { id },
         data: { deadline },
       });
+
+      // get tasks and get the latest deadline
+      const tasks = await ctx.prisma.task.findMany({
+        where: {
+          phase_id: task.phase_id,
+        },
+      });
+
+      const latestDeadline = tasks.reduce((prev, current) =>
+        prev.deadline && current.deadline && prev.deadline > current.deadline
+          ? prev
+          : current
+      );
+
+      // update phase deadline
+      await ctx.prisma.phase.update({
+        where: { id: task.phase_id },
+        data: { end_at: latestDeadline.deadline },
+      });
+
+      console.log(latestDeadline.deadline);
 
       return task;
     }),

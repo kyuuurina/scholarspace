@@ -3,7 +3,6 @@ import { accountRouter } from "./routers/account";
 import { userRouter } from "./routers/user";
 import { workspaceRouter } from "~/server/api/routers/workspace";
 import { projectRouter } from "./routers/project";
-import { memberRouter } from "~/server/api/routers/member";
 import { researchpostRouter } from "~/server/api/routers/researchpost";
 import { profileRouter } from "./routers/profile";
 import { researchInterestRouter } from "./routers/research-interest";
@@ -21,6 +20,8 @@ import { commentRouter } from "./routers/comment";
 import { scoreRouter } from "./routers/score";
 import { reactionRouter } from "./routers/reaction";
 import { notificationsRouter } from "./routers/notifications";
+import { grantRouter } from "./routers/grant";
+import { templateRouter } from "./routers/template";
 
 /**
  * This is the primary router for your server.
@@ -29,7 +30,6 @@ import { notificationsRouter } from "./routers/notifications";
  */
 export const appRouter = router({
   workspace: workspaceRouter,
-  member: memberRouter,
   account: accountRouter,
   profile: profileRouter,
   reaction: reactionRouter,
@@ -50,6 +50,8 @@ export const appRouter = router({
   postcomment: postCommentRouter,
   chat: chatRouter,
   notifications: notificationsRouter,
+  grant: grantRouter,
+  template: templateRouter,
 });
 
 // export type definition of API

@@ -87,16 +87,6 @@ const Phase: NextPageWithLayout = () => {
                     value={searchQuery}
                     onChange={handleSearchChange}
                   />
-                  <div className="flex justify-between space-x-2">
-                    <PrimaryButton
-                      name="Filter"
-                      onClick={() => console.log("filtered")}
-                    />
-                    <PrimaryButton
-                      name="Sort"
-                      onClick={() => console.log("sort")}
-                    />
-                  </div>
                 </div>
                 <div className="overflow-x-auto">
                   <Table phase_id={selectedPhase} searchQuery={searchQuery} />
