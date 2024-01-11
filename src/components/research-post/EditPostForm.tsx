@@ -9,7 +9,6 @@ import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { v4 as uuidv4 } from "uuid";
 import { api } from "~/utils/api";
 import toast from "react-hot-toast";
-import { useUser } from "@supabase/auth-helpers-react";
 
 //utils
 import { useRouterId } from "~/utils/routerId";
