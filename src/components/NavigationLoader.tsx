@@ -1,5 +1,6 @@
 import React from "react";
 import { useRouter } from "next/router";
+import { MoonLoader } from "react-spinners";
 
 const LOADER_THRESHOLD = 250;
 
@@ -38,5 +39,9 @@ export default function NavigationLoader(props: { text?: string }) {
 
   if (!isLoading) return null;
 
-  return <div className="navigation-loader">{text}</div>;
+  return (
+    <div className="navigation-loader">
+      <MoonLoader size={100} color="#6233D5" />
+    </div>
+  );
 }
