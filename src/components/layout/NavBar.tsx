@@ -107,7 +107,7 @@ const NavBar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
 
         <div className="flex items-center gap-x-4 text-white">
           {/* Notifications */}
-          
+
           {/* User Menu  */}
           <div>
             <div className="cursor-pointer" onClick={toggleUserOverlay}>
@@ -131,9 +131,9 @@ const NavBar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
                 className="min-w-44 absolute right-5 z-10 divide-y divide-gray-100 rounded-lg bg-white shadow"
               >
                 <div className="px-4 py-3 text-sm text-gray-900">
-                  <div>{user?.user_metadata?.full_name}</div>
+                  <div>{profileData.data?.name}</div>
                   <div className="truncat font-medium">
-                    {user?.user_metadata?.email}
+                    {user?.user_metadata?.email || user?.email}
                   </div>
                 </div>
                 <ul className="py-2 text-sm text-gray-700">

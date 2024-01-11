@@ -72,6 +72,7 @@ const AvatarForm: React.FC<AvatarFormProps> = ({ setValue, setImageValue }) => {
                 }}
                 type="file"
                 className="hidden"
+                accept="image/*"
               />
             </label>
           </div>
