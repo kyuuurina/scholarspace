@@ -36,4 +36,19 @@
   .fa-icons {
     @apply text-gray-500 hover:bg-gray-200 hover:text-gray-700;
   }
+
+  .navigation-loader {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0006;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+  }
 }

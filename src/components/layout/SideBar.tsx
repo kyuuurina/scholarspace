@@ -1,18 +1,12 @@
 // React and Next hooks
 import { useState } from "react";
 import Link from "next/link";
-import Router, { useRouter } from "next/router";
-import { useSession, useSessionContext } from "@supabase/auth-helpers-react";
+import { useRouter } from "next/router";
+import { useSessionContext } from "@supabase/auth-helpers-react";
 import { useUser } from "@supabase/auth-helpers-react";
 
 // icons
-import {
-  FiHome,
-  FiActivity,
-  FiMessageCircle,
-  FiBriefcase,
-  FiColumns,
-} from "react-icons/fi";
+import { FiHome, FiActivity, FiBriefcase, FiColumns } from "react-icons/fi";
 import { IconContext } from "react-icons";
 
 // components
@@ -126,27 +120,6 @@ export const SideBar: React.FC<SideBarProps> = ({
                     }`}
                   >
                     My Profile
-                  </span>
-                </Link>
-              </li>
-
-              <li className="rounded-sm">
-                <Link
-                  href="/message"
-                  className={`flex items-center space-x-3 rounded-md hover:bg-purple-800 ${
-                    open ? "text-purple-accent-2" : "text-purple-accent-2"
-                  }`}
-                  onClick={toggleSidebar}
-                >
-                  <FiMessageCircle className="h-6 w-6" />
-                  <span
-                    className={`transition-all duration-500 ${
-                      open
-                        ? "text-purple-accent-2 opacity-100"
-                        : "sr-only opacity-0"
-                    }`}
-                  >
-                    Messages
                   </span>
                 </Link>
               </li>
