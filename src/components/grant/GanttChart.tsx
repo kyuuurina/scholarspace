@@ -13,8 +13,6 @@ type GanttChartProps = {
   refetch: () => Promise<void>;
 };
 
-import { useFetchGrantSummary } from "~/utils/grant";
-
 const GanttChart: React.FC<GanttChartProps> = ({ grantSummary, refetch }) => {
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [grantModalIsOpen, setGrantModalIsOpen] = useState(false);
@@ -88,6 +86,26 @@ const GanttChart: React.FC<GanttChartProps> = ({ grantSummary, refetch }) => {
       setSelectedTaskId(null);
     }
   };
+
+  if (!grantSummary.grants || grantSummary.grants.length === 0) {
+    return (
+      <div className="pb-2">
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl font-medium">Grants</h1>
+          <p>No grants available for this workspace.</p>
+          <PrimaryButton
+            name="Add Grant"
+            onClick={() => setGrantModalIsOpen(true)}
+          />
+        </div>
+        <CreateGrantModal
+          openModal={grantModalIsOpen}
+          onClick={() => setGrantModalIsOpen(false)}
+          refetch={refetch}
+        />
+      </div>
+    );
+  }
 
   return (
     <>

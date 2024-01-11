@@ -38,7 +38,6 @@ const Workspace: NextPageWithLayout = () => {
   const workspaceRole = api.workspace.getWorkspaceRole.useQuery({
     workspaceId: workspaceId,
   });
-
   const { grantSummary, refetch } = useFetchGrantSummary(workspaceId);
   console.log(grantSummary);
 
@@ -62,7 +61,9 @@ const Workspace: NextPageWithLayout = () => {
             {/* Left section of workspace dashboard */}
             {/* Projects Section */}
             <div className="w-full md:col-span-8">
-              <GanttChart grantSummary={grantSummary} refetch={refetch} />
+              {grantSummary !== undefined && (
+                <GanttChart grantSummary={grantSummary} refetch={refetch} />
+              )}
               <div className="mb-5 flex items-center justify-between">
                 <h5 className="text-xl font-medium text-gray-900 ">Projects</h5>
                 {workspaceRole.data === "Researcher Admin" && (

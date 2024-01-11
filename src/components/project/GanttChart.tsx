@@ -84,6 +84,17 @@ const GanttChart: React.FC<GanttChartProps> = ({ projectSummary, refetch }) => {
     await router.push(`/project/${id}/phases`);
   };
 
+  if (!projectSummary.phases || projectSummary.phases.length === 0) {
+    return (
+      <div className="pb-2">
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl font-medium">Phases and Tasks</h1>
+          <p>No phases available for this workspace.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <Gantt
       tasks={test}
