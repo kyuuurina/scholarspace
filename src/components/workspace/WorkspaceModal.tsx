@@ -83,7 +83,7 @@ const WorkspaceModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
       onClick();
       reset();
       setImagePlaceholder(null);
-      refetch();
+      await refetch();
       // Navigate to the newly created project dashboard
       await router.push(`/workspace/${response.id}`);
       setIsSubmitting(false);

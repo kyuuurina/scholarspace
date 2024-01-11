@@ -72,11 +72,11 @@ const MemberModal: React.FC<MemberModalProps> = ({
   };
 
   return (
-    <Modal title="Add Member" show={openModal} onClose={onClose}>
+    <Modal size="lg" title="Add Member" show={openModal} onClose={onClose}>
       <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
-        <div>
-          <div className="flex">
-            <div className="flex">
+        <div className="w-full">
+          <div className="flex items-end justify-between space-x-3">
+            <div className="flex w-full space-x-5">
               <div>
                 <label htmlFor="email">Email</label>
                 <input
@@ -96,9 +96,9 @@ const MemberModal: React.FC<MemberModalProps> = ({
               </div>
             </div>
             {errorMessage === "User with this email does not exist." ? (
-              <>
+              <div>
                 <InviteUserButton email={emailValue} onSuccess={resetForm} />
-              </>
+              </div>
             ) : null}
           </div>
           {errorMessage && (
