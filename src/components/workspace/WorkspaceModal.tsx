@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { v4 as uuidv4 } from "uuid";
 import { api } from "~/utils/api";
+import { fetchUserWorkspaces } from "~/utils/userWorkspaces";
 
 // types
 import type { WorkspaceFormData } from "~/types/workspace";
@@ -33,7 +34,7 @@ const WorkspaceModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
   const supabase = useSupabaseClient();
 
   const createWorkspace = api.workspace.create.useMutation();
-
+  const { refetch } = fetchUserWorkspaces();
   // schema for form validation
   const schema: ZodType<WorkspaceFormData> = z.object({
     name: z
@@ -82,7 +83,7 @@ const WorkspaceModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
       onClick();
       reset();
       setImagePlaceholder(null);
-
+      await refetch();
       // Navigate to the newly created project dashboard
       await router.push(`/workspace/${response.id}`);
       setIsSubmitting(false);

@@ -11,7 +11,7 @@ import "~/styles/globals.css";
 import { Inter } from "next/font/google";
 import "@mantine/tiptap/styles.css";
 import { MantineProvider, MantineTheme } from "@mantine/core";
-
+import NavigationLoader from "~/components/NavigationLoader";
 // supabase helpers for authentication and authorization
 import { createPagesBrowserClient } from "@supabase/auth-helpers-nextjs";
 import {
@@ -48,6 +48,7 @@ const MyApp = ({
           initialSession={initialSession as Session}
         >
           <MantineProvider>
+            <NavigationLoader />
             <div className={`${poppins.className}`}>
               {getLayout(<Component {...pageProps} />)}
               <Toaster />

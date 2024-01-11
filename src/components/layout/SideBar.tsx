@@ -1,8 +1,8 @@
 // React and Next hooks
 import { useState } from "react";
 import Link from "next/link";
-import Router, { useRouter } from "next/router";
-import { useSession, useSessionContext } from "@supabase/auth-helpers-react";
+import { useRouter } from "next/router";
+import { useSessionContext } from "@supabase/auth-helpers-react";
 import { useUser } from "@supabase/auth-helpers-react";
 
 import { api } from "~/utils/api";
@@ -10,12 +10,7 @@ import { useFetchProfile } from "~/utils/profile";
 import { useEffect } from "react";
 
 // icons
-import {
-  FiHome,
-  FiActivity,
-  FiMessageCircle,
-  FiBriefcase,
-} from "react-icons/fi";
+import { FiHome, FiActivity, FiBriefcase, FiColumns } from "react-icons/fi";
 import { IconContext } from "react-icons";
 
 // components
@@ -200,6 +195,25 @@ export const SideBar: React.FC<SideBarProps> = ({
                     }`}
                   >
                     Projects
+                  </span>
+                </Link>
+              </li>
+              <li className="rounded-sm">
+                <Link
+                  href="/manage-templates"
+                  className={`flex items-center space-x-3 rounded-md hover:bg-purple-800 ${
+                    open ? "text-purple-accent-2" : "text-purple-accent-2"
+                  }`}
+                >
+                  <FiColumns className="h-6 w-6" />
+                  <span
+                    className={`transition-all duration-500 ${
+                      open
+                        ? "text-purple-accent-2 opacity-100"
+                        : "sr-only opacity-0"
+                    }`}
+                  >
+                    Manage Templates
                   </span>
                 </Link>
               </li>
