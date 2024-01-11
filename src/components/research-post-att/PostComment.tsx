@@ -8,16 +8,17 @@ import { z, ZodType } from 'zod';
 
 //button
 import PrimaryButton from '../button/PrimaryButton';
-import { FiSend } from 'react-icons/fi'; 
+import { FiSend } from 'react-icons/fi';
 
 interface PostCommentProps {
   post_id: string;
-  onCommentSubmit: (commentText: string) => Promise<void>;
+  onCommentSubmit: (formData: FormValues) => void; 
+  refetch: () => void;
 }
 
-type FormValues = { value: string }; // Define FormValues type
+export type FormValues = { value: string }; // Define FormValues type
 
-const PostComment: React.FC<PostCommentProps> = ({ post_id, onCommentSubmit }) => {
+const PostComment: React.FC<PostCommentProps> = ({ post_id, refetch }) => {
   // Zod schema for form validation
   const schema: ZodType<FormValues> = z.object({
     value: z.string().min(3, { message: 'Comment is too short' }),
@@ -27,21 +28,48 @@ const PostComment: React.FC<PostCommentProps> = ({ post_id, onCommentSubmit }) =
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
   });
 
-  // Handle submit for creating a comment
+  // Fetch task comments
+  const commentsQuery = api.postcomment.list.useQuery(
+    { post_id: post_id },
+    { enabled: !!post_id }
+  );
+
+    const comments = commentsQuery.data || [];
+
+  // Create a new comment
+  const addComment = api.postcomment.create.useMutation();
+
   const handleCommentSubmit = async (formData: FormValues) => {
     try {
-      await onCommentSubmit(formData.value); // Pass only the comment text
+      // Create the comment
+      await addComment.mutateAsync({
+        post_id,
+        value: formData.value,
+      });
+      reset();
+      refetch();
+      await commentsQuery.refetch();
     } catch (error) {
-      console.error('Error creating comment:', error);
+      console.error("Error posting comment:", error);
     }
-  };
+  }; 
 
-  const createComment = api.postcomment.create.useMutation(); // Create useMutation here
+  // // Handle submit for creating a comment
+  // const handleCommentSubmit = async (formData: FormValues) => {
+  //   try {
+  //     await onCommentSubmit(formData.value); // Pass only the comment text
+  //   } catch (error) {
+  //     console.error('Error creating comment:', error);
+  //   }
+  // };
+
+  // const createComment = api.postcomment.create.useMutation(); // Create useMutation here
 
   return (
     <div className="mb-1 border-t border-gray-200 bg-white p-4 text-base dark:border-gray-700 dark:bg-gray-900">

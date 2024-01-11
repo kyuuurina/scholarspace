@@ -5,9 +5,11 @@ import { useSession, useSupabaseClient, useUser } from "@supabase/auth-helpers-r
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import SearchPost from '~/components/research-post/SearchPost';
+import Post from '~/components/research-post/Post';
 import { api } from '~/utils/api';
 import { useFetchSearchResults } from '~/utils/researchpost';
 import BackButton from '~/components/search/BackButton';
+import { useQuery } from "@tanstack/react-query";
 
 //layout
 import Layout from "~/components/layout/Layout";
@@ -35,10 +37,28 @@ const SearchPage: NextPageWithLayout = () => {
   // Call the hook directly within the component body
   const { searchPostResults, isLoading, error } = useFetchSearchResults(query);
 
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [currentPostId, setCurrentPostId] = useState<string | null>(null);
+  const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
+
+  // query key for refetch
+  const postQueryKey = ['getPost', currentPostId]; // Assuming have a valid post ID
+  const { data: updatedPostData, refetch: refetchPost } = useQuery(
+    postQueryKey,
+    { enabled: false } // Disable automatic fetching on mount
+  );
+
+  // Render EditPostForm component
+  const handleEditClick = (postId: string) => {
+    setEditModalOpen(true);
+    setCurrentPostId(postId);
+  };
+
   useEffect(() => {
     // Fetch search results when the query changes
     // Avoid calling useFetchSearchResults here
   }, [query]);
+  
 
   return (
     <div className="w-full max-w-screen-xl p-8">
@@ -54,7 +74,11 @@ const SearchPage: NextPageWithLayout = () => {
 
         {searchPostResults.map((post, index) => (
         <div key={post.post_id} className={`mb-12 ${index !== searchPostResults.length - 1 ? 'mb-12' : ''}`}>
-          <SearchPost post={post} />
+           <Post
+              post={post}
+              onEditClick={() => handleEditClick(post.post_id)}
+              refetch={refetchPost}
+            />
         </div>
       ))}
     </div>

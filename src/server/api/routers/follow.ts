@@ -75,31 +75,39 @@ export const followRouter = router({
       return { isFollowing: !!existingFollow }; // Convert to boolean
     }),
 
-  // getfollowerslist
+  // get followers list
   getFollowersList: protectedProcedure
     .input(z.object({ userId: z.string() }))
     .query(async ({ input: { userId }, ctx }) => {
       const followers = await ctx.prisma.follow.findMany({
         where: { following_id: userId },
-        include: { user_follow_follower_idTouser: true },
+        include: {
+          user_follow_follower_idTouser: {
+            include: { profile: true } // Include the profile relation
+          }
+        },
       });
 
       const followersList = followers.map((follow) => follow.user_follow_follower_idTouser);
       return followersList;
     }),
 
-  // getfollowinglist
-  getFollowingList: protectedProcedure
-    .input(z.object({ userId: z.string() }))
-    .query(async ({ input: { userId }, ctx }) => {
-      const following = await ctx.prisma.follow.findMany({
-        where: { follower_id: userId },
-        include: { user_follow_following_idTouser: true },
-      });
+    // get following list
+    getFollowingList: protectedProcedure
+      .input(z.object({ userId: z.string() }))
+      .query(async ({ input: { userId }, ctx }) => {
+        const following = await ctx.prisma.follow.findMany({
+          where: { follower_id: userId },
+          include: {
+            user_follow_following_idTouser: {
+              include: { profile: true } // Include the profile relation
+            }
+          },
+        });
 
-      const followingList = following.map((follow) => follow.user_follow_following_idTouser);
-      return followingList;
-    }),
+        const followingList = following.map((follow) => follow.user_follow_following_idTouser);
+        return followingList;
+      }),
 
   // procedure to remove follower
   removeFollower: protectedProcedure

@@ -28,6 +28,7 @@ export const profileRouter = router({
     return true;
   }),
 
+
   // Procedure to get a user's profile
   get: protectedProcedure
     .input(z.object({ profile_id: z.string() }))

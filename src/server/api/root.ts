@@ -13,6 +13,7 @@ import { achievementRouter } from "./routers/achievement";
 import { followRouter } from "./routers/follow";
 import { likeRouter } from "./routers/postlike";
 import { postCommentRouter } from "./routers/postcomment";
+import { chatRouter} from "./routers/chatmessage";
 import { phaseRouter } from "./routers/phase";
 import { taskRouter } from "./routers/task";
 import { commentRouter } from "./routers/comment";
@@ -47,6 +48,7 @@ export const appRouter = router({
   follow: followRouter,
   postlike: likeRouter,
   postcomment: postCommentRouter,
+  chat: chatRouter,
   notifications: notificationsRouter,
   grant: grantRouter,
   template: templateRouter,

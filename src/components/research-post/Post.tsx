@@ -7,11 +7,15 @@ import { FiEdit2, FiTrash2, FiMessageSquare, FiHeart } from 'react-icons/fi';
 import Card from '../Card';
 import AvatarPlaceholder from '../avatar/AvatarPlaceholder';
 import ProfileAvatarPlaceholder from '../avatar/ProfileAvatar';
-import PostComment from '../research-post-att/PostComment'; // Import the PostComment component
 // import CommentsList from './CommentList'; // Import the CommentList component
+import { useForm } from 'react-hook-form';
 import CommentList from '../research-post-att/PostCommentList';
+import PostComment, { FormValues as CommentFormValues } from '../research-post-att/PostComment';
 import PostCommentList from '../research-post-att/PostCommentList';
 import Link from 'next/link';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z, ZodType } from 'zod';
+import { useQuery } from '@tanstack/react-query';
 
 import router, { useRouter } from 'next/router';
 
@@ -62,8 +66,10 @@ interface PostProps {
     created_at: Date;
     comments?: Comment[];
     profile?: Profile | null;
+
   };
   onEditClick: () => void;
+  refetch: () => void;
 }
 
 const getCategoryStyles = (category: string) => {
@@ -87,7 +93,7 @@ const getCategoryStyles = (category: string) => {
   }
 };
 
-const Post: React.FC<PostProps> = ({ post, onEditClick }) => {
+const Post: React.FC<PostProps> = ({ post, onEditClick, refetch }) => {
   // Get user id and check profile
   const userId = getCookie('UserID') as string;
   const { user } = UseCheckProfile(userId);
@@ -98,6 +104,8 @@ const Post: React.FC<PostProps> = ({ post, onEditClick }) => {
   const { users, isLoading, error } = useFetchUsers();
   const associatedUser = users.find((user) => user.userId === post.user_id);
   const userName = associatedUser?.userName || 'DefaultName';
+
+
 
   // Delete post
   const deleteMyPost = api.researchpost.delete.useMutation({
@@ -127,6 +135,7 @@ const Post: React.FC<PostProps> = ({ post, onEditClick }) => {
 
     const [documentLoading, setDocumentLoading] = useState(true);
 
+
   // Like
   const categoryStyles = getCategoryStyles(post.category);
   const [liked, setLiked] = useState(false);
@@ -141,51 +150,45 @@ const Post: React.FC<PostProps> = ({ post, onEditClick }) => {
     }
   };
 
-  // // Function to handle deletion of a comment
-  // const handleDeleteComment = async (commentId: string) => {
-  //   try {
-  //     // Implement the logic to delete the comment using your API
-  //     await api.postcomment.delete.useMutation({ comment_id: commentId });
-  //     console.log('Deleting comment:', commentId);
-  //   } catch (error) {
-  //     console.error('Error deleting comment:', error);
-  //   }
-  // };
-
-
-  const handleCommentSubmit = async (commentText: string) => {
-    try {
-      // Execute the mutation by calling the mutate function
-      const createdComment = await createCommentMutation.mutateAsync({
-        value: commentText,
-        post_id: post.post_id,
-      });
-  
-      // Handle success
-      console.log('Comment created successfully:', createdComment);
-  
-      // You may want to reload the page or update the comment list
-      // depending on your application logic
-      // router.reload();
-      toast.custom(() => <SuccessToast message="Comment created successfully" />);
-    } catch (error) {
-      console.error('Error creating comment:', error);
-      const errorMessage = error instanceof Error ? error.message : 'An error occurred';
-      toast.custom(() => <ErrorToast message={errorMessage} />);
-    }
-  };
-  
-  // Set up the useMutation hook outside the function
-  const createCommentMutation = api.postcomment.create.useMutation({
-    onSuccess: () => {
-      // You can handle the success logic here if needed
-    },
-    onError: (error) => {
-      // You can handle the error logic here if needed
-      console.error('Error in createCommentMutation:', error);
-    },
+  const schema: ZodType<CommentFormValues> = z.object({
+    value: z.string().min(3, { message: 'Comment is too short' }),
   });
 
+  // React-hook-form setup
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<CommentFormValues>({
+    resolver: zodResolver(schema),
+  });
+
+  // Fetch comments
+  const commentsQuery = api.postcomment.list.useQuery(
+    { post_id: post.post_id },
+    { enabled: !!post.post_id }
+  );
+
+    const comments = commentsQuery.data || [];
+
+  // Create a new comment
+  const addComment = api.postcomment.create.useMutation();
+
+  const handleCommentSubmit = async (formData: CommentFormValues) => {
+    try {
+      // Create the comment
+      await addComment.mutateAsync({
+        post_id: post.post_id,
+        value: formData.value,
+      });
+      reset();
+      refetch();
+      await commentsQuery.refetch();
+    } catch (error) {
+      console.error("Error posting comment:", error);
+    }
+  };
 
   // State for toggling comment list visibility
   const [showCommentList, setShowCommentList] = useState(false);
@@ -199,68 +202,67 @@ const Post: React.FC<PostProps> = ({ post, onEditClick }) => {
 
   return (
     <Card title={post.title}>
-      <div className="flex flex-col md:flex-row items-center mb-2 md:mb- relative">
-        <div className="mt-2 flex items-center mb-10 md:mb-4">
+      <div className="flex flex-col md:flex-row items-center mb-4 md:mb- relative">
+        <div className="mt-2 mb-2 mr-2"> {/* Add margin to the right of the category span */}
           <span className={categoryStyles}>{post.category}</span>
         </div>
 
-        <div className="mt-2 flex items-center mb-2 md:mb-4">
+        {isOwner && (
+              <div className="flex items-center ml-auto space-x-2"> {/* Align icons to the right */}
+                <button
+                  onClick={onEditClick}
+                  className="text-blue-500 hover:text-blue-700 focus:outline-none text-xs md:text-sm"
+                >
+                  <FiEdit2 size={18} className="inline-block" />
+                </button>
+                <button
+                  onClick={() => handleDeleteMyPost(post.post_id)}
+                  className="text-red-500 hover:text-red-700 focus:outline-none text-xs md:text-sm"
+                >
+                  <FiTrash2 size={18} className="inline-block" />
+                </button>
+              </div>
+            )}
+        </div>
+
+        <div className="flex items-center mt-2 mb-2"> {/* Add margin to create a gap */}
           <div className="aspect:square h-10 w-10 md:mr-2">
-          {post.profile?.avatar_url ? (
-            <Link href={`/manage-profile/${post.profile.profile_id}`}>
-              <span className="relative inline-block cursor-pointer">
-                <div className="h-10 w-10">
-                  <Image
-                    src={`https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/avatar/${post.profile.avatar_url}`}
-                    alt={post.profile.name}
-                    layout="fill"
-                    objectFit="cover"
-                    className="rounded-full"
-                  />
-                </div>
-                <span className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-800 opacity-50 rounded-full" />
-              </span>
-            </Link>
-          ) : (
-            <ProfileAvatarPlaceholder name={post.profile?.name || 'DefaultName'} shape="circle" />
-          )}
+            {post.profile?.avatar_url ? (
+              <Link href={`/manage-profile/${post.profile.profile_id}`}>
+                <span className="relative inline-block cursor-pointer">
+                  <div className="h-10 w-10">
+                    <Image
+                      src={`https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/avatar/${post.profile.avatar_url}`}
+                      alt={post.profile.name}
+                      layout="fill"
+                      objectFit="cover"
+                      className="rounded-full"
+                    />
+                  </div>
+                  <span className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-800 opacity-50 rounded-full" />
+                </span>
+              </Link>
+            ) : (
+              <AvatarPlaceholder name={post.profile?.name || 'DefaultName'} shape="circle" />
+            )}
           </div>
 
           <div className="flex flex-col items-center md:items-start">
             <div className="mt-2 flex items-center mb-2 md:mb-4">
-              {/* Use next/link for the profile name */}
               <Link href={`/manage-profile/${post.profile?.profile_id || ''}`}>
                 <span className="mt-2 text-black text-sm md:text-base font-semibold cursor-pointer">
                   {post.profile?.name || ''}
                 </span>
               </Link>
             </div>
-
-          {isOwner && (
-            <div className="absolute top-0 right-0 flex items-center mt-2 space-x-2">
-              <button
-                onClick={onEditClick}
-                className="text-blue-500 hover:text-blue-700 focus:outline-none text-xs md:text-sm"
-              >
-                <FiEdit2 size={18} className="inline-block" />
-              </button>
-              <button
-                onClick={() => handleDeleteMyPost(post.post_id)}
-                className="text-red-500 hover:text-red-700 focus:outline-none text-xs md:text-sm"
-              >
-                <FiTrash2 size={18} className="inline-block" />
-              </button>
-            </div>
-          )}
+          </div>
         </div>
-      </div>
-    </div>
 
 
       <div className="mt-2 flex items-center mb-2 md:mb-4">
         <p className="mt-2 text-black text-sm md:text-base">{post.description || 'No description'}</p>
       </div>
-  
+
       <div className="mt-2 flex items-center mb-2 md:mb-4">
         <p className="mt-2 text-gray-500 text-xs md:text-sm">Author: {post.author || ''}</p>
       </div>
@@ -323,11 +325,18 @@ const Post: React.FC<PostProps> = ({ post, onEditClick }) => {
   
       <div className="mt-4">
         {/* Display comment creation form */}
-        <PostComment post_id={post.post_id} onCommentSubmit={handleCommentSubmit} />
+        <PostComment 
+              post_id={post.post_id} 
+              onCommentSubmit={handleCommentSubmit}
+              refetch={async () => { await commentsQuery.refetch();}}
+            />
       </div>
   
       <div className="mt-4">
-        <PostCommentList post_id={post.post_id} />
+      <PostCommentList
+        post_id={post.post_id}
+        refetch={async () => { await commentsQuery.refetch();}}
+      />
       </div>
     </Card>
   );

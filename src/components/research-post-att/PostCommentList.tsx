@@ -34,14 +34,22 @@ interface Comment {
 
 interface PostCommentListProps {
   post_id: string;
+  refetch: () => void;
 }
 
-const PostCommentList: React.FC<PostCommentListProps> = ({ post_id }) => {
+const PostCommentList: React.FC<PostCommentListProps> = ({ post_id, refetch }) => {
   const queryClient = useQueryClient();
 
   const { comments, isLoading, error } = fetchComments(post_id);
   const [showCommentList, setShowCommentList] = useState(false);
   const [deleteCommentId, setDeleteCommentId] = useState<string | null>(null);
+
+
+    //
+      const commentsQuery = api.postcomment.list.useQuery(
+    { post_id: post_id },
+    { enabled: !!post_id }
+  );
 
     // Get user id and check profile
     const userId = getCookie('UserID') as string;
@@ -52,29 +60,32 @@ const PostCommentList: React.FC<PostCommentListProps> = ({ post_id }) => {
       return user && user.id === commentUserId;
     };
 
-  // Delete comment mutation
-  const deleteCommentMutation = api.postcomment.delete.useMutation({
-    onSuccess: () => {
-      toast.custom(() => <SuccessToast message="Comment successfully deleted" />);
-      // Comment row is deleted from UI immediately; no need to reset the comment id
-    },
-    onError: (deleteError) => {
-      console.error('Failed to delete comment:', deleteError);
-      toast.custom(() => <ErrorToast message="Failed to delete comment" />);
-    },
-    onSettled: () => {
+// Delete comment mutation
+const deleteCommentMutation = api.postcomment.delete.useMutation({
+  onSuccess: () => {
+    toast.custom(() => <SuccessToast message="Comment successfully deleted" />);
+    // Comment row is deleted from UI immediately; no need to reset the comment id
+  },
+  onError: (deleteError) => {
+    console.error('Failed to delete comment:', deleteError);
+    toast.custom(() => <ErrorToast message="Failed to delete comment" />);
+  },
+  onSettled: async () => {
+    try {
       // Refetch the comments after deletion
-      queryClient
-        .invalidateQueries(['comments', post_id])
-        .then(() => {
-          setDeleteCommentId(null);
-        })
-        .catch((error) => {
-          console.error('Error during comment refetch:', error);
-          // Handle the error as needed
-        });
-    },
-  });
+      await commentsQuery.refetch();
+      setDeleteCommentId(null);
+      // Use the refetch function directly if available
+      if (refetch && typeof refetch === 'function') {
+        // eslint-disable-next-line @typescript-eslint/await-thenable
+        await refetch();
+      }
+    } catch (error) {
+      console.error('Error during comment refetch:', error);
+    }
+  },
+});
+
 
   // Function to handle comment deletion
   const handleDeleteComment = (commentId: string) => {
@@ -131,10 +142,10 @@ const PostCommentList: React.FC<PostCommentListProps> = ({ post_id }) => {
                         <Link href={`/manage-profile/${profile.profile_id}`}>
                           <span className="relative inline-block cursor-pointer">
                             <Image
-                              src={`/${profile.avatar_url}`}
+                              src={`https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/avatar/${profile.avatar_url}`}
                               alt={`Profile Avatar - ${profile.name}`}
-                              width={80}
-                              height={80}
+                              width={30}
+                              height={30}
                               className="rounded-full"
                             />
                             <span className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-800 opacity-50 rounded-full" />

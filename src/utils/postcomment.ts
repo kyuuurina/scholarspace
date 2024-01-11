@@ -1,7 +1,10 @@
 import { api } from './api';
+import { useQuery } from '@tanstack/react-query';
 
 // Fetch comments based on post_id
 export const fetchComments = (post_id: string) => {
+
+  
   const comments = api.postcomment.list.useQuery(
     {
       post_id: post_id,
