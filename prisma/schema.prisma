@@ -458,7 +458,7 @@ model post_comments {
   user_id       String        @db.Uuid
   post_id       String        @db.Uuid
   created_at    DateTime?     @db.Timestamptz(6)
-  research_post research_post @relation(fields: [post_id], references: [post_id], onDelete: NoAction, onUpdate: NoAction)
+  research_post research_post @relation(fields: [post_id], references: [post_id], onDelete: Cascade)
   user          user          @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@schema("public")
