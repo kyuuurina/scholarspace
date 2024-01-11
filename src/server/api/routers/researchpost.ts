@@ -447,21 +447,20 @@ getResearchPostsByFollowedUsers: protectedProcedure.query(async ({ ctx }) => {
     
       const userResearchInterests = user.research_interest.toLowerCase().split(",");
     
-      // Find research posts with at least 1 similar research interest
+      // Combine conditions using OR
       const recommendedResearchPosts = await ctx.prisma.research_post.findMany({
         where: {
           user_id: {
             not: userId,
           },
           OR: userResearchInterests.map((interest) => ({
-            profile: {
-              research_interest: {
-                contains: interest.trim(),
-              },
-            },
+            OR: [
+              { title: { contains: interest.trim(), mode: 'insensitive'} },
+              { profile: { research_interest: { contains: interest.trim().toLowerCase() } } },
+            ],
           })),
         },
-        take: 10, // Limit the number of recommendations
+        // take: 10, // Limit the number of recommendations
         select: {
           post_id: true,
           user_id: true,
@@ -486,8 +485,8 @@ getResearchPostsByFollowedUsers: protectedProcedure.query(async ({ ctx }) => {
           },
         },
       });
-    
       return recommendedResearchPosts;
     }),
+
 
 });
