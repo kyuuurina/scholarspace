@@ -51,6 +51,7 @@ const SignoutButton: React.FC = () => {
 
 export default SignoutButton;
 
+
 // import router from "next/router";
 // import toast from "react-hot-toast";
 // import { useSessionContext } from "@supabase/auth-helpers-react";

@@ -1,3 +1,6 @@
+// AddNewPostModal.tsx 
+// to do - success toast/error toast
+
 // AddNewPostModal.tsx
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -26,10 +29,13 @@ type ModalProps = {
 };
 
 const AddNewPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
+  // document variables
   const [documentPlaceholder, setdocumentPlaceholder] = useState<string | null>(null);
   const [documentValue, setdocumentValue] = useState<File | null | undefined>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const docpostId: string = uuidv4();
+
+
   const router = useRouter();
   const user = useUser();
   const supabase = useSupabaseClient();
@@ -88,11 +94,30 @@ const AddNewPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
         console.log(data);
       }
 
+      // Read the document content
+      //const documentContent = await readFileContent(documentValue);
+
+      // Summarize the document content using Hugging Face Inference
+      //const summary = await summarizeText(documentContent);
+
+      // // Create the research post with the summary
+      // const response = await createResearchPost.mutateAsync({
+      //   category: formData.category as "Article" | "Conference_Paper" | "Presentation" | "Preprint" | "Research_Proposal" | "Thesis" | "Others",
+      //   title: formData.title,
+      //   description: formData.description,
+      //   //description: summary, // Set the description to the generated summary
+      //   author: formData.author,
+      //   document: formData.document,
+      // });
+
+
       const response = await createResearchPost.mutateAsync({
         profile_id,
         ...formData,
       });
 
+      onClick();
+      // Reset form and state
       onClick();
       reset();
       setdocumentPlaceholder(null);
@@ -148,6 +173,22 @@ const AddNewPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
               <option value="Idea">Idea</option>
             </select>
             {errors.category && <FormErrorMessage text={errors.category.message} />}
+            <select
+              id="category"
+              className="block w-full"
+              {...register("category", { required: true })}
+            >
+              <option value="Article">Article</option>
+              <option value="Conference Paper">Conference Paper</option>
+              <option value="Presentation">Presentation</option>
+              <option value="Preprint">Preprint</option>
+              <option value="Research Proposal">Research Proposal</option>
+              <option value="Thesis">Thesis</option>
+              <option value="Idea">Idea</option>
+            </select>
+            {errors.category && (
+              <FormErrorMessage text={errors.category.message} />
+            )}
           </div>
 
           <div>
@@ -208,7 +249,7 @@ const AddNewPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
                 <input
                   type="file"
                   className="hidden"
-                  accept="image/doc, image/docx, image/pdf"
+                  accept="image/doc, image/docx, image/pdf" // Define file types accepted
                   onChange={(e) => {
                     void handleOnChange(e);
                   }}

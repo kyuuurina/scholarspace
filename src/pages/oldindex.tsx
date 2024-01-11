@@ -132,13 +132,13 @@ const ResearchPostsPage: NextPageWithLayout = () => {
                   category={post.category}
                   author={post.author}
                   description={post.description}
-                  timestamp={post.timestamp}
+                  created_at={post.timestamp}
                 />
               ))}
             </div>
           </div>
           <div className="col-span-1">
-            <UserProfileCard users={users} />
+            {/* <UserProfileCard users={users} /> */}
           </div>
         </div>
       </div>

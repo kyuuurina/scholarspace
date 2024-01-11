@@ -23,6 +23,8 @@ const InviteUserButton: React.FC<InviteUserButtonProps> = ({
     process.env.NEXT_SUPABASE_SERVICE_ROLE_KEY || ""
   );
 
+  console.log(process.env.NEXT_PUBLIC_SUPABASE_URL);
+
   const inviteUser = async () => {
     setIsLoading(true);
     const { error } = await supabase.auth.admin.inviteUserByEmail(email);

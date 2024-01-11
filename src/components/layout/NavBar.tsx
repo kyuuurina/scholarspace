@@ -181,8 +181,11 @@ const NavBar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
                   <li className="px-5 py-3 hover:bg-gray-100">
                     <p>Manage Account</p>
                   </li>
-                  <li className="px-5 py-3 hover:bg-gray-100">
-                    <p>Settings</p>
+                  <li
+                    className="px-5 py-3 hover:bg-gray-100"
+                    onClick={() => setIsUserOverlayVisible(false)}
+                  >
+                    <Link href="/settings">Settings</Link>
                   </li>
                 </ul>
                 <SignoutButton />

@@ -2,8 +2,8 @@ import { api } from "./api";
 import { useRouterId } from "./routerId";
 
 type Member = {
-  userid: string;
   user: {
+    id: string;
     name: string | null;
     email: string | null;
     avatar_url: string | null;
@@ -23,7 +23,7 @@ export const useFetchWorkspace = () => {
     }
   );
 
-  const { name, description, cover_img, is_personal, ownerid } =
+  const { name, description, cover_img, is_personal, ownerid, users } =
     workspace.data || {};
 
   const { isLoading, error } = workspace;
@@ -42,6 +42,7 @@ export const useFetchWorkspace = () => {
     is_personal,
     imgUrl,
     ownerid,
+    users,
   };
 };
 
@@ -71,7 +72,7 @@ export const useFetchWorkspaceMembers = () => {
   if (members.data) {
     members.data.forEach((member: Member) => {
       workspaceMembers.push({
-        memberId: member.userid,
+        memberId: member.user?.id,
         memberName: member.user?.name,
         memberEmail: member.user.email,
         memberRole: member.workspace_role,

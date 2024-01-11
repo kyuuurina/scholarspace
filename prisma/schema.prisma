@@ -642,16 +642,14 @@ model message {
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model notification {
-  id                    String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  created_at            DateTime              @default(now()) @db.Timestamptz(6)
-  user_id               String                @db.Uuid
-  notif_settings_id     String                @db.Uuid
-  message               String
-  type                  String
-  notification_settings notification_settings @relation(fields: [notif_settings_id], references: [user_id], onDelete: Cascade)
-  user                  user                  @relation(fields: [user_id], references: [id], onDelete: Cascade)
+model reaction {
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  comment_id String   @db.Uuid
+  user_id    String   @db.Uuid
+  comment    comment  @relation(fields: [comment_id], references: [id], onDelete: Cascade)
+  user       user     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
+  @@id([comment_id, user_id])
   @@schema("public")
 }
 
@@ -669,21 +667,23 @@ model notification_settings {
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model reaction {
-  created_at DateTime @default(now()) @db.Timestamptz(6)
-  comment_id String   @db.Uuid
-  user_id    String   @db.Uuid
-  comment    comment  @relation(fields: [comment_id], references: [id], onDelete: Cascade)
-  user       user     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+model test {
+  id  String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  yes Boolean @default(true)
 
-  @@id([comment_id, user_id])
   @@schema("public")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model test {
-  id  String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  yes Boolean @default(true)
+model notification {
+  id                    String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at            DateTime              @default(now()) @db.Timestamptz(6)
+  user_id               String                @db.Uuid
+  notif_settings_id     String                @db.Uuid
+  message               String
+  type                  String
+  notification_settings notification_settings @relation(fields: [notif_settings_id], references: [user_id], onDelete: Cascade)
+  user                  user                  @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@schema("public")
 }
