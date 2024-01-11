@@ -381,11 +381,12 @@ getResearchPostsByFollowedUsers: protectedProcedure.query(async ({ ctx }) => {
       return { success: true };
     }),
 
+    //search research post function
     search: publicProcedure
     .input(
-        z.object({
-            query: z.string(),
-        })
+      z.object({
+        query: z.string(),
+      })
     )
     .query(async ({ input, ctx }) => {
       const researchPosts = await ctx.prisma.research_post.findMany({
@@ -409,13 +410,20 @@ getResearchPostsByFollowedUsers: protectedProcedure.query(async ({ ctx }) => {
         include: {
           user: {
             include: {
-              profile: true, // Include the profile information in the result
+              // profile: true, // Include the profile information in the result
+              profile: {
+                select: {
+                  profile_id: true,
+                  name: true,
+                  avatar_url: true,
+                },
+              },
             },
           },
         },
       });
-    
-      console.log("researchPostsearch:", researchPosts);
+
+      console.log("searchPost:", researchPosts);
       return researchPosts;
     }),
 
