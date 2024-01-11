@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
 //auth
-import { getCookie } from "cookies-next";
+import { useUser } from "@supabase/auth-helpers-react";
 import { useSession, useSessionContext } from "@supabase/auth-helpers-react";
 
 //utils
@@ -47,7 +47,7 @@ import SearchBaq from "~/components/search/SearchBaq";
 
 const FollowingPostPage: NextPageWithLayout = () => {
   //fetch user id
-  const userId = getCookie("UserID");
+  const userId = user?.id || "";
   const user = useUser();
 
   const router = useRouter();

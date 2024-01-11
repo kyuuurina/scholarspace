@@ -2,7 +2,7 @@ import type { Member } from "~/types/member";
 import Image from "next/image";
 import AvatarPlaceholder from "~/components/avatar/AvatarPlaceholder";
 import Select from "~/components/Select";
-import { getCookie } from "cookies-next";
+import { useUser } from "@supabase/auth-helpers-react";
 
 type MemberRowProps = {
   member: Member;
@@ -21,9 +21,9 @@ const MemberRow: React.FC<MemberRowProps> = ({
   isPersonal,
   ownerId,
 }) => {
-  const userId = getCookie("UserID");
   const isPersonalOwner = member.memberId === ownerId && isPersonal;
-  console.log(member.memberIsExternalCollaborator);
+  const user = useUser();
+  const userId = user?.id || "";
 
   return (
     <tr className="bg-white hover:bg-gray-50">

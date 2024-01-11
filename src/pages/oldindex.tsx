@@ -2,7 +2,7 @@
 //atm, it appears on localhost:3000/home-rwp
 
 //auth
-import { getCookie } from "cookies-next";
+import { useUser } from "@supabase/auth-helpers-react";
 import { useUser } from "@supabase/auth-helpers-react";
 
 //utils
@@ -25,7 +25,7 @@ import Card from "~/components/Card";
 import AvatarPlaceholder from "~/components/avatar/AvatarPlaceholder";
 import Modal from "~/components/modal/Modal";
 
-//search 
+//search
 import SearchBar from "~/components/profile/SearchBar";
 
 //research post components
@@ -38,7 +38,6 @@ import TestModal from "~/components/research-post/AddNewPostModal";
 //import { NewPostModal } from "~/components/draft/NewPostModal";
 //import NewPostForm from "~/components/draft/NewPostForm";
 
-
 const ResearchPostsPage: NextPageWithLayout = () => {
   const users = [
     { id: 1, name: "Ahmad Osama" },
@@ -50,99 +49,103 @@ const ResearchPostsPage: NextPageWithLayout = () => {
       title: "Taxonomy in Design Patterns",
       category: "Conference Paper",
       author: "Dr. Ismail",
-      description: "This is the first post. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+      description:
+        "This is the first post. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
       timestamp: "November 1, 2023",
     },
     {
       title: "Design Patterns in Software Engineering",
       category: "Journal Article",
       author: "Nur Athirah",
-      description: "This is the second post. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+      description:
+        "This is the second post. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
       timestamp: "October 27, 2023",
     },
     {
       title: "Impact of school funding on student achievement",
       category: "Conference Paper",
       author: "Dr. Isma Zaini",
-      description: "This is the second post. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+      description:
+        "This is the second post. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
       timestamp: "October 27, 2023",
     },
     {
-      title: "The effects of social and emotional learning on student well-being",
+      title:
+        "The effects of social and emotional learning on student well-being",
       category: "Journal Article",
       author: "Dr. Ismail",
-      description: "This is the first post. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+      description:
+        "This is the first post. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
       timestamp: "October 20, 2023",
     },
-
   ];
-  
-    const router = useRouter();
-    const user = useUser();
 
-    console.log("User:", user);
-    // Define state for searchQuery
-    const [searchQuery, setSearchQuery] = useState<string>("");
+  const router = useRouter();
+  const user = useUser();
 
-    // Inside your Home component
-    const userId = getCookie("User ID");
+  console.log("User:", user);
+  // Define state for searchQuery
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
-    // Now you can use the userId variable in your component as needed
-    console.log("User ID:", userId);
+  // Inside your Home component
+  const userId = getCookie("User ID");
 
-    // Handler for search query change
-    const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
+  // Now you can use the userId variable in your component as needed
+  console.log("User ID:", userId);
+
+  // Handler for search query change
+  const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value);
-    };
-  
-    // Handler for search form submission
-    const handleSearchSubmit = async () => {
-      // Perform the search with the current searchQuery value
-      console.log("Searching...:", searchQuery);
+  };
 
-      // Use try-catch to handle any errors during navigation
-      try {
-        await router.push(`/search-results?q=${searchQuery}`);
-      } catch (error) {
-        console.error("Error :", error);
-      }
-    };
+  // Handler for search form submission
+  const handleSearchSubmit = async () => {
+    // Perform the search with the current searchQuery value
+    console.log("Searching...:", searchQuery);
 
-    return (
-      <div className="mx-auto max-w-screen-xl p-8">
-        <div className="mb-4">
-          <SearchBar
-            searchQuery={searchQuery}
-            onSearchChange={handleSearchChange}
-            onSearchSubmit={handleSearchSubmit}
-          />
+    // Use try-catch to handle any errors during navigation
+    try {
+      await router.push(`/search-results?q=${searchQuery}`);
+    } catch (error) {
+      console.error("Error :", error);
+    }
+  };
+
+  return (
+    <div className="mx-auto max-w-screen-xl p-8">
+      <div className="mb-4">
+        <SearchBar
+          searchQuery={searchQuery}
+          onSearchChange={handleSearchChange}
+          onSearchSubmit={handleSearchSubmit}
+        />
+      </div>
+      <div className="mb-4">
+        <AddNewPostButton />
+      </div>
+      <div className="grid grid-cols-3 gap-6">
+        <div className="col-span-2">
+          <AllFollowingTabs />
+          <div className="mt-6">
+            {/* Render post cards here */}
+            {posts.map((post, index) => (
+              <PostCard
+                key={index}
+                title={post.title}
+                category={post.category}
+                author={post.author}
+                description={post.description}
+                created_at={post.timestamp}
+              />
+            ))}
+          </div>
         </div>
-        <div className="mb-4">
-            <AddNewPostButton />
-          </div>
-        <div className="grid grid-cols-3 gap-6">
-          <div className="col-span-2">
-            <AllFollowingTabs />
-            <div className="mt-6">
-              {/* Render post cards here */}
-              {posts.map((post, index) => (
-                <PostCard
-                  key={index}
-                  title={post.title}
-                  category={post.category}
-                  author={post.author}
-                  description={post.description}
-                  created_at={post.timestamp}
-                />
-              ))}
-            </div>
-          </div>
-          <div className="col-span-1">
-            {/* <UserProfileCard users={users} /> */}
-          </div>
+        <div className="col-span-1">
+          {/* <UserProfileCard users={users} /> */}
         </div>
       </div>
-    );
+    </div>
+  );
 };
 
 ResearchPostsPage.getLayout = function getLayout(page: ReactElement) {

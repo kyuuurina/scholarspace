@@ -12,7 +12,6 @@ import { api } from "~/utils/api";
 import { useRouterId } from "~/utils/routerId";
 import toast from "react-hot-toast";
 import React from "react";
-import { getCookie } from "cookies-next";
 
 // types
 import type { ExperienceFormData } from "~/types/profile";
@@ -49,7 +48,7 @@ const EditExperience: React.FC<ModalProps> = ({ experience, openModal, onClick }
   const user = useUser();
   const profile_id = useRouterId();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const userId = getCookie("UserID");
+  const userId = user?.id || "";
 
   //populate form fields 
   const {experience_id, title, start_year, end_year, description, isLoading} = experience;

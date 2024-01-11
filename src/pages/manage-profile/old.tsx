@@ -1,48 +1,51 @@
 //to-do: add PageLoader
 
-import React from 'react';
-import {useState, useEffect} from 'react';
+import React from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
-import {api} from "~/utils/api";
+import { api } from "~/utils/api";
 import { type ZodType, z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
-import { getCookie } from "cookies-next";
-import Image from 'next/image';
-import Link from 'next/link';
+import { useUser } from "@supabase/auth-helpers-react";
+import Image from "next/image";
+import Link from "next/link";
 
 //utils
 import { useRouterId } from "~/utils/routerId";
 import { useFetchProfile } from "~/utils/profile";
-import { useFetchEducation } from '~/utils/education';
-import { useFetchExperience } from '~/utils/experience';
-import { useFetchAchievement } from '~/utils/achievement';
+import { useFetchEducation } from "~/utils/education";
+import { useFetchExperience } from "~/utils/experience";
+import { useFetchAchievement } from "~/utils/achievement";
 
 // types
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "~/pages/_app";
-import type { ProfileFormData, EducationFormData, AchievementFormData, ExperienceFormData } from '~/types/profile';
+import type {
+  ProfileFormData,
+  EducationFormData,
+  AchievementFormData,
+  ExperienceFormData,
+} from "~/types/profile";
 
 //local components
 import Layout from "~/components/layout/Layout";
-import Head from 'next/head';
+import Head from "next/head";
 import FormErrorMessage from "~/components/FormErrorMessage";
 import PageLoader from "~/components/layout/PageLoader";
 import ErrorPage from "~/pages/error-page";
 import LoadingSpinner from "~/components/LoadingSpinner";
 import PrimaryButton from "~/components/button/PrimaryButton";
 import AvatarPlaceholder from "~/components/avatar/AvatarPlaceholder";
-import { FaEdit } from 'react-icons/fa';
+import { FaEdit } from "react-icons/fa";
 //import { DeleteProfileDetails } from "~/components/workspace/DeleteProfileDetails";
 import SuccessToast from "~/components/toast/SuccessToast";
 import ErrorToast from "~/components/toast/ErrorToast";
 import Header from "~/components/workspace/Header";
 
-
-
 //profile components
-import ProfileTabs from '~/components/profile/ProfileTabs';
+import ProfileTabs from "~/components/profile/ProfileTabs";
 import UserProfileForm from "~/components/profile/UserProfileForm";
 import EducationForm from "~/components/profile/EducationForm";
 import EducationCard from "~/components/profile/EducationCard";
@@ -51,13 +54,11 @@ import ExperienceForm from "~/components/profile/ExperienceForm";
 import AchievementForm from "~/components/profile/AchievementForm";
 // import AchievementCard from "~/components/profile/AchievementCard";
 
-
 const ProfilePage: NextPageWithLayout = () => {
-
   //const
   const router = useRouter();
   const { profile_id } = router.query;
-  const userId = getCookie("UserID");
+  const userId = user?.id || "";
 
   //const modal states
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -65,18 +66,22 @@ const ProfilePage: NextPageWithLayout = () => {
   const [isExperienceModalOpen, setIsExperienceModalOpen] = useState(false);
   const [isAchievementModalOpen, setIsAchievementModalOpen] = useState(true);
 
-
-
   //custom hooks
   //fetch profile data
-  const {name, about_me, skills,research_interest, collab_status, isLoading} = useFetchProfile();
+  const {
+    name,
+    about_me,
+    skills,
+    research_interest,
+    collab_status,
+    isLoading,
+  } = useFetchProfile();
   const profile = useFetchProfile();
   const education = useFetchEducation();
   const experience = useFetchExperience();
   const achievement = useFetchAchievement();
   // const { title, start_year, end_date, description, isLoading} = useFetchExperience();
   // const { title, received_year, description, isLoading} = useFetchAchievement();
-
 
   const schema: ZodType<ProfileFormData> = z.object({
     avatar_url: z.string().nullable(),
@@ -89,7 +94,9 @@ const ProfilePage: NextPageWithLayout = () => {
 
   const updateProfile = api.profile.updateProfile.useMutation({
     onSuccess: () => {
-      toast.custom(() => <SuccessToast message="Profile successfully updated" />);
+      toast.custom(() => (
+        <SuccessToast message="Profile successfully updated" />
+      ));
       router.reload();
     },
     onError: () => {
@@ -106,13 +113,13 @@ const ProfilePage: NextPageWithLayout = () => {
     formState: { errors, isDirty },
   } = useForm<ProfileFormData>({
     resolver: zodResolver(schema),
-    defaultValues :{
+    defaultValues: {
       name: name,
       about_me: about_me,
       skills: skills,
       research_interest: research_interest,
       collab_status: collab_status,
-    }
+    },
   });
 
   //set form value to profile data
@@ -157,34 +164,34 @@ const ProfilePage: NextPageWithLayout = () => {
   //   return <div>Loading...</div>;
   // }
 
-  const handleEditClick = () => {setIsEditModalOpen(true);};
-  const handleEducationClick = () => {setIsEducationModalOpen(true);}
+  const handleEditClick = () => {
+    setIsEditModalOpen(true);
+  };
+  const handleEducationClick = () => {
+    setIsEducationModalOpen(true);
+  };
 
   return (
     <>
       {/* <Head title="Profile" /> */}
       {/* <PageLoader isLoading={isLoading} errorMsg={error?.message}> */}
-        <ProfileTabs />
+      <ProfileTabs />
 
-        <main className="min-h-screen w-full">
+      <main className="min-h-screen w-full">
         <div className="p-5">
           {/* Profile section  */}
           <div className="grid gap-y-5">
-
-          {/* User Profile Card */}
-          <section className="mt-2 w-3/4 mx-auto rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
-              <div className="flex justify-between items-center">
-                <h3 className="font-semibold text-2xl">
-                  Profile
-                </h3>
+            {/* User Profile Card */}
+            <section className="mx-auto mt-2 w-3/4 rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
+              <div className="flex items-center justify-between">
+                <h3 className="text-2xl font-semibold">Profile</h3>
                 {/* UserProfileCard component */}
-                    {/* <UserProfileCard profile={{ profile_id, name, about_me, skills, research_interest, collab_status }} /> */}
+                {/* <UserProfileCard profile={{ profile_id, name, about_me, skills, research_interest, collab_status }} /> */}
                 {/* <UserProfileCard profile={{updateProfile}} /> */}
                 {/* Edit button */}
                 <button onClick={handleEditClick} className="flex items-center">
                   Edit <FaEdit className="ml-2" />
                 </button>
-
               </div>
               <div>
                 {/* map profile array and pass project object to profile card  */}
@@ -198,28 +205,22 @@ const ProfilePage: NextPageWithLayout = () => {
 
           {/* Education section  */}
           <div className="grid gap-y-5">
-          <section className="mt-2 w-3/4 mx-auto rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
-            <h3 className="font-semibold text-2xl">
-              Education
-            </h3>
-          </section>
+            <section className="mx-auto mt-2 w-3/4 rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
+              <h3 className="text-2xl font-semibold">Education</h3>
+            </section>
           </div>
 
           {/* Experience section  */}
           <div className="grid gap-y-5">
-            <section className="mt-2 w-3/4 mx-auto rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
-              <h3 className="font-semibold text-2xl">
-                Research Experience
-              </h3>
+            <section className="mx-auto mt-2 w-3/4 rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
+              <h3 className="text-2xl font-semibold">Research Experience</h3>
             </section>
           </div>
 
           {/* Achievement section  */}
           <div className="grid gap-y-5">
-            <section className="mt-2 w-3/4 mx-auto rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
-              <h3 className="font-semibold text-2xl">
-                Achievement
-              </h3>
+            <section className="mx-auto mt-2 w-3/4 rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
+              <h3 className="text-2xl font-semibold">Achievement</h3>
             </section>
           </div>
         </div>
@@ -238,14 +239,11 @@ ProfilePage.getLayout = function getLayout(page: ReactElement) {
 
 export default ProfilePage;
 
-
-
 // return (
 //   <>
 //     {/* <Head title={name} /> */}
 //     {/* <PageLoader isLoading={isLoading} errorMsg={error?.message}> */}
 //       <ProfileTabs />
-
 
 //     {/* UserProfileForm modal */}
 //     {isEditModalOpen && (
@@ -277,14 +275,14 @@ export default ProfilePage;
 //         openModal={isAchievementModalOpen}
 //         onClick={() => setIsAchievementModalOpen(false)}
 //       />
-//     )}      
+//     )}
 //     {/* </PageLoader> */}
 //   </>
 // );
 // };
 
-
-          {/* <section className="mt-2 w-full rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
+{
+  /* <section className="mt-2 w-full rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
               <form
                 className="space-y-6"
                 autoComplete="off"
@@ -341,6 +339,5 @@ export default ProfilePage;
                   </button>
                 </div>
               </form>
-            </section> */}
-
-
+            </section> */
+}

@@ -32,6 +32,7 @@ export const SignInForm: React.FC = () => {
 
     if (error) {
       setErrorMessage(error.message);
+      setLoading(false);
       return;
     }
 

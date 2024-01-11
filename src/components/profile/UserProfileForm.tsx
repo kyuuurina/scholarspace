@@ -1,4 +1,3 @@
-
 //backup on 14-11-2023 UserProfileForm.tsx
 
 //Form to edit NAME, ABOUT ME, SKILLS, RESEARCH INTEREST & COLLAB STATUS
@@ -8,13 +7,11 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import { type ZodType, z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { v4 as uuidv4 } from "uuid";
+import { useUser } from "@supabase/auth-helpers-react";
 import { api } from "~/utils/api";
 import { useRouterId } from "~/utils/routerId";
 import toast from "react-hot-toast";
 import React from "react";
-import { getCookie } from "cookies-next";
 
 // types
 import type { ProfileFormData } from "~/types/profile";
@@ -24,7 +21,6 @@ import { useFetchProfile } from "~/utils/profile";
 
 // local components
 import FormErrorMessage from "../FormErrorMessage";
-import ProfileModal from "../draft/ProfileModal";
 import PrimaryButton from "../button/PrimaryButton";
 import Modal from "../modal/Modal";
 import SuccessToast from "../toast/SuccessToast";
@@ -49,21 +45,27 @@ type ModalProps = {
 };
 
 const UserProfileForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
-
   //const
   const router = useRouter();
   // const  profile_id  = router.query;
   const user = useUser();
   const profile_id = useRouterId();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const userId = getCookie("UserID");
+  const userId = user?.id || "";
 
   //custom hooks
   //populate form fields with Profile details
-  const {avatar_url, name, about_me, skills,research_interest, collab_status, isLoading} = useFetchProfile();
+  const {
+    avatar_url,
+    name,
+    about_me,
+    skills,
+    research_interest,
+    collab_status,
+    isLoading,
+  } = useFetchProfile();
 
-
-//schema for form validation
+  //schema for form validation
   const schema: ZodType<ProfileFormData> = z.object({
     avatar_url: z.string().nullable(),
     name: z.string(),
@@ -73,42 +75,43 @@ const UserProfileForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
     collab_status: z.string(),
   });
 
-    //react-hook-form
-    const {
-      register,
-      handleSubmit,
-      setValue,
-      reset,
-      formState: { errors, isDirty },
-    } = useForm<ProfileFormData>({
-      resolver: zodResolver(schema),
-      defaultValues :{
-        avatar_url: avatar_url,
-        name: name,
-        about_me: about_me,
-        skills: skills,
-        research_interest: research_interest,
-        collab_status: collab_status,
-      }
-    });
+  //react-hook-form
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    reset,
+    formState: { errors, isDirty },
+  } = useForm<ProfileFormData>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      avatar_url: avatar_url,
+      name: name,
+      about_me: about_me,
+      skills: skills,
+      research_interest: research_interest,
+      collab_status: collab_status,
+    },
+  });
 
-    //set form value to profile data
-    useEffect(() => {
-      if (!isLoading) {
-        setValue("avatar_url", avatar_url || "");
-        setValue("name", name || "");
-        setValue("about_me", about_me || "");
-        setValue("skills", skills || "");
-        setValue("research_interest", research_interest || "");
-        setValue("collab_status", collab_status || "");
-
-      }
-    }, [isLoading, setValue]);
+  //set form value to profile data
+  useEffect(() => {
+    if (!isLoading) {
+      setValue("avatar_url", avatar_url || "");
+      setValue("name", name || "");
+      setValue("about_me", about_me || "");
+      setValue("skills", skills || "");
+      setValue("research_interest", research_interest || "");
+      setValue("collab_status", collab_status || "");
+    }
+  }, [isLoading, setValue]);
 
   //toast
   const updateProfile = api.profile.updateProfile.useMutation({
     onSuccess: () => {
-      toast.custom(() => <SuccessToast message="Profile successfully updated" />);
+      toast.custom(() => (
+        <SuccessToast message="Profile successfully updated" />
+      ));
       router.reload();
     },
     onError: () => {
@@ -134,7 +137,7 @@ const UserProfileForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
   // handle cancel
   const handleCancel = () => {
     reset({
-      avatar_url: avatar_url ||"" ,
+      avatar_url: avatar_url || "",
       name: name || "",
       about_me: about_me || "",
       skills: skills || "",
@@ -143,7 +146,9 @@ const UserProfileForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
     });
   };
 
-  const handleEditClick = () => {setIsEditModalOpen(true);};
+  const handleEditClick = () => {
+    setIsEditModalOpen(true);
+  };
 
   return (
     <div>
@@ -167,15 +172,12 @@ const UserProfileForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
             >
               Avatar
             </label>
-            <input
-              className="w-full"
-              {...register("avatar_url")}
-            />
+            <input className="w-full" {...register("avatar_url")} />
             {errors.avatar_url && (
               <FormErrorMessage text={errors.avatar_url.message} />
             )}
           </div>
-  
+
           <div>
             <label
               htmlFor="name"
@@ -186,7 +188,7 @@ const UserProfileForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
             <input className="w-full" {...register("name")} />
             {errors.name && <FormErrorMessage text={errors.name.message} />}
           </div>
-  
+
           <div>
             <label
               htmlFor="description"
@@ -203,7 +205,7 @@ const UserProfileForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
               <FormErrorMessage text={errors.about_me.message} />
             )}
           </div>
-  
+
           <div>
             <label
               htmlFor="skills"
@@ -216,11 +218,9 @@ const UserProfileForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
               className="block w-full"
               {...register("skills", { required: false })}
             />
-            {errors.skills && (
-              <FormErrorMessage text={errors.skills.message} />
-            )}
+            {errors.skills && <FormErrorMessage text={errors.skills.message} />}
           </div>
-  
+
           <div>
             <label
               htmlFor="research_interest"
@@ -234,12 +234,10 @@ const UserProfileForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
               {...register("research_interest", { required: false })}
             />
             {errors.research_interest && (
-              <FormErrorMessage
-                text={errors.research_interest.message}
-              />
+              <FormErrorMessage text={errors.research_interest.message} />
             )}
           </div>
-  
+
           <div>
             <label
               htmlFor="collab_status"
@@ -260,28 +258,26 @@ const UserProfileForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
               </option>
             </select>
             {errors.collab_status && (
-              <FormErrorMessage
-                text={errors.collab_status.message}
-              />
+              <FormErrorMessage text={errors.collab_status.message} />
             )}
           </div>
-        {/* Buttons container with justify-end */}
-        <div className="flex justify-end gap-4">
-          {/* Save button */}
-          <PrimaryButton name="Save" type="submit" />
+          {/* Buttons container with justify-end */}
+          <div className="flex justify-end gap-4">
+            {/* Save button */}
+            <PrimaryButton name="Save" type="submit" />
 
-          {/* Cancel button */}
-          <button
-            type="button"
-            className="bg-gray-400 hover:bg-gray-500 text-gray-800 font-bold py-2 px-4 rounded-lg inline-flex items-center"
-            onClick={() => {
-              onClick();
-              handleCancel();
-            }}
-          >
-            Cancel
-          </button>
-        </div>
+            {/* Cancel button */}
+            <button
+              type="button"
+              className="inline-flex items-center rounded-lg bg-gray-400 px-4 py-2 font-bold text-gray-800 hover:bg-gray-500"
+              onClick={() => {
+                onClick();
+                handleCancel();
+              }}
+            >
+              Cancel
+            </button>
+          </div>
         </form>
       </Modal>
     </div>

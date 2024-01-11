@@ -1,6 +1,3 @@
-
-
-
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
@@ -12,8 +9,6 @@ import { api } from "~/utils/api";
 import { useRouterId } from "~/utils/routerId";
 import toast from "react-hot-toast";
 import React from "react";
-import { getCookie } from "cookies-next";
-
 // types
 import type { EducationFormData } from "~/types/profile";
 
@@ -41,21 +36,24 @@ type ModalProps = {
   };
 };
 
-const EditEducation: React.FC<ModalProps> = ({ education, openModal, onClick }) => {
-
+const EditEducation: React.FC<ModalProps> = ({
+  education,
+  openModal,
+  onClick,
+}) => {
   //const
   const router = useRouter();
   // const  profile_id  = router.query;
   const user = useUser();
   const profile_id = useRouterId();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const userId = getCookie("UserID");
+  const userId = user?.id || "";
 
   //populate form fields
-  const {education_id, school, start_year, end_year, description, isLoading} = education;
+  const { education_id, school, start_year, end_year, description, isLoading } =
+    education;
 
-
-//schema for form validation
+  //schema for form validation
   const schema: ZodType<EducationFormData> = z.object({
     school: z.string().min(1, { message: "Title is required" }),
     start_year: z.string().min(1, { message: "Start Year is required" }),
@@ -63,38 +61,39 @@ const EditEducation: React.FC<ModalProps> = ({ education, openModal, onClick }) 
     description: z.string().nullable(),
   });
 
-    //react-hook-form
-    const {
-      register,
-      handleSubmit,
-      setValue,
-      reset,
-      formState: { errors, isDirty },
-    } = useForm<EducationFormData>({
-      resolver: zodResolver(schema),
-      defaultValues :{
-        school,
-        start_year,
-        end_year,
-        description,
-      }
-    });
+  //react-hook-form
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    reset,
+    formState: { errors, isDirty },
+  } = useForm<EducationFormData>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      school,
+      start_year,
+      end_year,
+      description,
+    },
+  });
 
-    //set form value to profile data
-    useEffect(() => {
-      if (!isLoading) {
-        setValue("school", school || "");
-        setValue("start_year", start_year || "");
-        setValue("end_year", end_year || "");
-        setValue("description", description || "");
-
-      }
-    }, [isLoading, setValue]);
+  //set form value to profile data
+  useEffect(() => {
+    if (!isLoading) {
+      setValue("school", school || "");
+      setValue("start_year", start_year || "");
+      setValue("end_year", end_year || "");
+      setValue("description", description || "");
+    }
+  }, [isLoading, setValue]);
 
   //toast
   const updateEducation = api.education.updateEducation.useMutation({
     onSuccess: () => {
-      toast.custom(() => <SuccessToast message="Education successfully updated" />);
+      toast.custom(() => (
+        <SuccessToast message="Education successfully updated" />
+      ));
       router.reload();
     },
     onError: () => {
@@ -106,7 +105,7 @@ const EditEducation: React.FC<ModalProps> = ({ education, openModal, onClick }) 
   const handleUpdateEducation = async (formData: EducationFormData) => {
     try {
       await updateEducation.mutateAsync({
-        education_id, 
+        education_id,
         ...formData,
       });
       console.log(formData);
@@ -126,7 +125,9 @@ const EditEducation: React.FC<ModalProps> = ({ education, openModal, onClick }) 
     });
   };
 
-  const handleEditClick = () => {setIsEditModalOpen(true);};
+  const handleEditClick = () => {
+    setIsEditModalOpen(true);
+  };
 
   return (
     <div>
@@ -159,7 +160,7 @@ const EditEducation: React.FC<ModalProps> = ({ education, openModal, onClick }) 
           </div>
 
           <div className="flex gap-4">
-            <div className="flex flex-col flex-grow">
+            <div className="flex flex-grow flex-col">
               <label
                 htmlFor="start_year"
                 className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
@@ -176,7 +177,7 @@ const EditEducation: React.FC<ModalProps> = ({ education, openModal, onClick }) 
               )}
             </div>
 
-            <div className="flex flex-col flex-grow">
+            <div className="flex flex-grow flex-col">
               <label
                 htmlFor="end_year"
                 className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
@@ -211,24 +212,23 @@ const EditEducation: React.FC<ModalProps> = ({ education, openModal, onClick }) 
             )}
           </div>
 
+          {/* Buttons container with justify-end */}
+          <div className="flex justify-end gap-4">
+            {/* Save button */}
+            <PrimaryButton name="Save" type="submit" />
 
-        {/* Buttons container with justify-end */}
-        <div className="flex justify-end gap-4">
-          {/* Save button */}
-          <PrimaryButton name="Save" type="submit" />
-
-          {/* Cancel button */}
-          <button
-            type="button"
-            className="bg-gray-400 hover:bg-gray-500 text-gray-800 font-bold py-2 px-4 rounded-lg inline-flex items-center"
-            onClick={() => {
-              onClick();
-              handleCancel();
-            }}
-          >
-            Cancel
-          </button>
-        </div>
+            {/* Cancel button */}
+            <button
+              type="button"
+              className="inline-flex items-center rounded-lg bg-gray-400 px-4 py-2 font-bold text-gray-800 hover:bg-gray-500"
+              onClick={() => {
+                onClick();
+                handleCancel();
+              }}
+            >
+              Cancel
+            </button>
+          </div>
         </form>
       </Modal>
     </div>
