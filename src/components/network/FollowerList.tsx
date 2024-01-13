@@ -18,6 +18,7 @@ interface FollowerListProps {
 const FollowerList: React.FC<FollowerListProps> = ({ profiles }) => {
 
     const [isModalOpen, setModalOpen] = useState(false);
+    console.log("pengikutku", profiles);
 
     const openModal = () => {
     setModalOpen(true);
