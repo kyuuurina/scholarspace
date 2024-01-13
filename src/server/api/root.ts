@@ -22,6 +22,7 @@ import { reactionRouter } from "./routers/reaction";
 import { notificationsRouter } from "./routers/notifications";
 import { grantRouter } from "./routers/grant";
 import { templateRouter } from "./routers/template";
+import { searchRouter } from "./routers/search";
 
 /**
  * This is the primary router for your server.
@@ -52,6 +53,7 @@ export const appRouter = router({
   notifications: notificationsRouter,
   grant: grantRouter,
   template: templateRouter,
+  search: searchRouter,
 });
 
 // export type definition of API
