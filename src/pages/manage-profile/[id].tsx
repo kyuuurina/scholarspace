@@ -168,7 +168,7 @@ const ProfilePage: NextPageWithLayout = () => {
                   )}
                 </div>
 
-                <h3 className="mb-4 text-2xl font-semibold" style={{ marginLeft: "1rem", marginRight: "30rem"}}>
+                <h3 className="mb-4 text-2xl font-semibold" style={{ marginLeft: "1rem", marginRight: "50rem"}}>
                   {`${name ?? "User"}'s Profile`}
                 </h3>
     
