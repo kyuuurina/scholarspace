@@ -85,13 +85,16 @@ const AddNewPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
 
       if (documentValue && user) {
         formData.document = docpostId;
-        const fileUrl = `/${docpostId}`;
+        // const fileUrl = `/${docpostId}`;
+        const fileUrl = `https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/post-files-upload/${docpostId}`;
         const { data, error } = await supabase.storage
           .from("post-files-upload")
           .upload(fileUrl, documentValue);
 
         console.log(error);
         console.log(data);
+
+        setdocumentPlaceholder(fileUrl);
       }
 
       // Read the document content

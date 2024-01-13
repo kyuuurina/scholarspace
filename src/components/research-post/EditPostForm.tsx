@@ -39,6 +39,9 @@ const EditPostForm: React.FC<ModalProps> = ({
   const router = useRouter();
   const user = useUser();
   const profile_id = useRouterId();
+  const supabase = useSupabaseClient();
+
+
   // const  profile_id  = router.query;
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const userId = user?.id || "";
@@ -58,6 +61,9 @@ const EditPostForm: React.FC<ModalProps> = ({
     null
   );
   const docpostId: string = uuidv4();
+
+  //
+  const documentBaseUrl = ""
 
   //schema for form validation
   const schema: ZodType<ResearchPostFormData> = z.object({
@@ -112,10 +118,12 @@ const EditPostForm: React.FC<ModalProps> = ({
     }
   }, [document]);
 
+  console.log("documentPlaceholder:", documentPlaceholder);
+
   //toast
   const updatePost = api.researchpost.update.useMutation({
     onSuccess: () => {
-      toast.custom(() => <SuccessToast message="Post successfully updated" />);
+      // toast.custom(() => <SuccessToast message="Post successfully updated" />);
       router.reload();
     },
     onError: () => {
@@ -123,15 +131,35 @@ const EditPostForm: React.FC<ModalProps> = ({
     },
   });
 
-  //handlers
   const handleUpdatePost = async (formData: ResearchPostFormData) => {
     try {
       if (post_id) {
+        // If a new document is selected, upload it
+        if (documentValue && user) {
+          formData.document = docpostId;
+          const fileUrl = `/${docpostId}`;
+          const { data, error } = await supabase.storage
+            .from("post-files-upload")
+            .upload(fileUrl, documentValue);
+  
+          console.log(error);
+          console.log(data);
+  
+          setdocumentPlaceholder(fileUrl);
+        }
+  
+        // Update the post with the new form data
         await updatePost.mutateAsync({
           post_id,
           ...formData,
         });
-        console.log(formData);
+  
+        if (isDirty) {
+          // Display success message only if the form has been modified
+          toast.custom(() => <SuccessToast message="Post successfully updated" />);
+        }
+  
+        router.reload();
       } else {
         // Handle the case where post_id is undefined
         console.error("post_id is undefined");
@@ -139,6 +167,7 @@ const EditPostForm: React.FC<ModalProps> = ({
     } catch (error) {
       // Handle any errors
       console.error(error);
+      toast.custom(() => <ErrorToast message="Error updating post" />);
     }
   };
 
@@ -147,14 +176,14 @@ const EditPostForm: React.FC<ModalProps> = ({
       if (!e.target.files) return;
       const file = e.target.files[0];
       const reader = new FileReader();
-
+  
       if (file) {
         reader.readAsDataURL(file);
         reader.onloadend = () => {
           const displayDocument = reader.result as string;
           setdocumentPlaceholder(displayDocument);
         };
-
+  
         setDocumentValue(file);
       }
     } catch (error) {
@@ -276,11 +305,10 @@ const EditPostForm: React.FC<ModalProps> = ({
             <div className="flex w-full items-center justify-center">
               <label className="h-25 relative flex w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 ">
                 {documentPlaceholder ? (
-                  <Image
+                  <img
                     src={documentPlaceholder}
-                    alt="post documents"
-                    style={{ objectFit: "contain" }}
-                    fill
+                    alt={documentPlaceholder}
+                    style={{ objectFit: "contain", width: "100%", height: "200px" }}
                   />
                 ) : (
                   <div className="flex flex-col items-center justify-center pb-6 pt-5">
@@ -289,7 +317,7 @@ const EditPostForm: React.FC<ModalProps> = ({
                       aria-hidden="true"
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
-                      viewBox="0 0 20 10"
+                      viewBox="0 0 20 16"
                     >
                       <path
                         stroke="currentColor"

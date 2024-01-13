@@ -11,8 +11,7 @@ import ProfileAvatarPlaceholder from "../avatar/ProfileAvatar";
 import { useForm } from "react-hook-form";
 import CommentList from "../research-post-att/PostCommentList";
 import PostComment, {
-  FormValues as CommentFormValues,
-} from "../research-post-att/PostComment";
+FormValues as CommentFormValues,} from "../research-post-att/PostComment";
 import PostCommentList from "../research-post-att/PostCommentList";
 import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -129,9 +128,9 @@ const Post: React.FC<PostProps> = ({ post, onEditClick, refetch }) => {
 
   // Document Storage
   const fileUrl = post.document
-    ? `https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/post-files-upload/${post.document}`
-    : null;
-
+  ? `https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/post-files-upload/${post.document}`
+  : null;
+  
   const [documentLoading, setDocumentLoading] = useState(true);
 
   // Like
