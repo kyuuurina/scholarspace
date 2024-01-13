@@ -163,16 +163,6 @@ const AddNewPostModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
             <label htmlFor="category" className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
               Category
             </label>
-            <select id="category" className="block w-full" {...register("category", { required: true })}>
-              <option value="Article">Article</option>
-              <option value="Conference Paper">Conference Paper</option>
-              <option value="Presentation">Presentation</option>
-              <option value="Preprint">Preprint</option>
-              <option value="Research Proposal">Research Proposal</option>
-              <option value="Thesis">Thesis</option>
-              <option value="Idea">Idea</option>
-            </select>
-            {errors.category && <FormErrorMessage text={errors.category.message} />}
             <select
               id="category"
               className="block w-full"
