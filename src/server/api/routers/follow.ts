@@ -134,4 +134,14 @@ getFollowersList: protectedProcedure
       return { success: true };
     }),
 
+  // procedure to get followers count
+  getFollowersCount: protectedProcedure
+    .input(z.object({ userId: z.string() }))
+    .query(async ({ input: { userId }, ctx }) => {
+      const followersCount = await ctx.prisma.follow.count({
+        where: { following_id: userId },
+      });
+      return { followersCount };
+    }),
+
 });

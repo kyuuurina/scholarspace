@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ScrollableModal from "./ScrollableModal";
 import AvatarPlaceholder from "../avatar/AvatarPlaceholder";
 import Image from "next/image";
@@ -23,6 +23,9 @@ interface FollowerListProps {
 const FollowerList: React.FC<FollowerListProps> = ({ profiles }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const user = useUser();
+  const { data: followerCount, refetch: refetchFollowerCount } = api.follow.getFollowersCount.useQuery({
+    userId: user?.id || "", // Provide the userId for which you want to get followers count
+  });
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -36,13 +39,13 @@ const FollowerList: React.FC<FollowerListProps> = ({ profiles }) => {
 
   const handleRemove = async (profileId: string) => {
     try {
-      // Assuming you have access to the userId of the follower to remove
       const userIdToRemove = profileId;
-
-      // Call the removeFollower mutation
       await removeFollower.mutateAsync({ userId: userIdToRemove });
 
       console.log(`Remove follower with profileId: ${profileId}`);
+
+      // Manually trigger a refetch of followers count
+      await refetchFollowerCount();
     } catch (error) {
       console.error("Error removing follower:", error);
       // Handle error as needed
@@ -51,41 +54,41 @@ const FollowerList: React.FC<FollowerListProps> = ({ profiles }) => {
 
   return (
     <div>
-      {profiles && profiles.length === 0 ? (
-        <p>No Followers.</p>
-      ) : (
-        <div>
-          <button onClick={openModal}>Followers</button>
-          <ScrollableModal show={isModalOpen} onClose={closeModal} title="Followers">
-            <ul>
-              {profiles.map((profile, index) => (
-                <li key={profile.profile_id} className="flex items-center justify-between space-x-2 mb-2">
-                  <div className="flex items-center space-x-2">
-                    {profile.avatar_url ? (
-                      <Image
-                        src={`https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/avatar/${profile.avatar_url}`}
-                        alt={`Avatar of ${profile.name}`}
-                        width={40}
-                        height={40}
-                        className="rounded-full"
-                      />
-                    ) : (
-                      <AvatarPlaceholder name={profile.name} />
-                    )}
-                    <p>{profile.name}</p>
-                  </div>
-                  {user && (
-                    <button onClick={() => handleRemove(profile.profile_id)} className="text-red-500">
-                      Remove
-                    </button>
+      <button onClick={openModal}>
+        {followerCount ? followerCount.followersCount.toString() + " Followers" : "Followers"}
+      </button>
+      <ScrollableModal show={isModalOpen} onClose={closeModal} title="Followers">
+        {profiles && profiles.length === 0 ? (
+          <p>No Followers.</p>
+        ) : (
+          <ul>
+            {profiles.map((profile, index) => (
+              <li key={profile.profile_id} className="flex items-center justify-between space-x-2 mb-2">
+                <div className="flex items-center space-x-2">
+                  {profile.avatar_url ? (
+                    <Image
+                      src={`https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/avatar/${profile.avatar_url}`}
+                      alt={`Avatar of ${profile.name}`}
+                      width={40}
+                      height={40}
+                      className="rounded-full"
+                    />
+                  ) : (
+                    <AvatarPlaceholder name={profile.name} />
                   )}
-                  {/* Include other profile details as needed */}
-                </li>
-              ))}
-            </ul>
-          </ScrollableModal>
-        </div>
-      )}
+                  <p>{profile.name}</p>
+                </div>
+                {user && (
+                  <button onClick={() => handleRemove(profile.profile_id)} className="text-red-500">
+                    Remove
+                  </button>
+                )}
+                {/* Include other profile details as needed */}
+              </li>
+            ))}
+          </ul>
+        )}
+      </ScrollableModal>
     </div>
   );
 };
