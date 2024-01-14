@@ -75,22 +75,22 @@ export const followRouter = router({
       return { isFollowing: !!existingFollow }; // Convert to boolean
     }),
 
-  // get followers list
-  getFollowersList: protectedProcedure
-    .input(z.object({ userId: z.string() }))
-    .query(async ({ input: { userId }, ctx }) => {
-      const followers = await ctx.prisma.follow.findMany({
-        where: { following_id: userId },
-        include: {
-          user_follow_follower_idTouser: {
-            include: { profile: true } // Include the profile relation
-          }
-        },
-      });
+// get followers list
+getFollowersList: protectedProcedure
+  .input(z.object({ userId: z.string() }))
+  .query(async ({ input: { userId }, ctx }) => {
+    const followers = await ctx.prisma.follow.findMany({
+      where: { following_id: userId },
+      include: {
+        user_follow_follower_idTouser: {
+          include: { profile: true } // Include the profile relation
+        }
+      },
+    });
 
-      const followersList = followers.map((follow) => follow.user_follow_follower_idTouser);
-      return followersList;
-    }),
+    const followersList = followers.map((follow) => follow.user_follow_follower_idTouser.profile);
+    return followersList;
+  }),
 
     // get following list
     getFollowingList: protectedProcedure

@@ -65,7 +65,7 @@ import AchievementCard from "~/components/profile/AchievementCard";
 import FollowButton from "~/components/network/FollowButton";
 import Button from "~/components/button/Button";
 import FollowListModal from "~/components/network/FollowListModal";
-import FollowersList from "~/components/network/FollowerList";
+import FollowerList from "~/components/network/FollowerList";
 import FollowingList from "~/components/network/FollowingList";
 
 
@@ -81,38 +81,24 @@ const ProfilePage: NextPageWithLayout = () => {
     profile_id: profileId, // pass the id to router.query
   });
 
+
   const userId = user?.id;
+
+  const test = api.follow.getFollowersList.useQuery({
+    userId: userId ?? "", // Use the nullish coalescing operator to provide a default value
+  });
 
   const { user: uuser } = UseCheckProfile(userId ?? "");
   const isOwner = user && user.id === Profile.data?.user_id; // check if the logged in user matches Profile user
   const isNotOwner = !user || (user && user.id !== Profile.data?.user_id); //not owner
 
-  const {
-    avatar_url,
-    name,
-    about_me,
-    skills,
-    research_interest,
-    collab_status,
-    isLoading,
-    user_id,
-  } = useFetchProfile();
-  // const { educations: educationsData, isLoading: isLoadingEducations } = useFetchEducation();
-  const {
-    educations,
-    isLoading: EducationLoading,
-    error: EducationError,
-  } = useFetchEducation();
-  const {
-    achievements,
-    isLoading: AchievementLoading,
-    error: AchievementError,
-  } = useFetchAchievement();
-  const {
-    experiences,
-    isLoading: ExperienceLoading,
-    error: ExperienceError,
-  } = useFetchExperience();
+  const { avatar_url, name, about_me, skills, research_interest, collab_status, isLoading, user_id,} = useFetchProfile();
+  const { educations, isLoading: EducationLoading, error: EducationError,} = useFetchEducation();
+  const { achievements, isLoading: AchievementLoading, error: AchievementError,} = useFetchAchievement();
+  const { experiences, isLoading: ExperienceLoading, error: ExperienceError,} = useFetchExperience();
+  const { followersData, followersLoading, followersError } = useFetchFollowers(profileId);
+
+  const flattenedFollowersData = followersData?.flat() || [];
 
   // const myEducationLists = useFetchTry();
   // console.log("myEducationLists:", myEducationLists);
@@ -121,6 +107,7 @@ const ProfilePage: NextPageWithLayout = () => {
   // const followers = api.follow.getFollowersList.useQuery({
   //   userId: profileId, // pass the user's id
   // });
+
 
   // const following = api.follow.getFollowingList.useQuery({
   //   userId: profileId, // pass the user's id
@@ -196,7 +183,16 @@ const ProfilePage: NextPageWithLayout = () => {
                 </div>
                 <div>
                   <div className="flex space-x-4">
-                    <div className="mb-4">{/* <FollowersList /> */}</div>
+                  <div className="flex space-x-4">
+                  <div className="mb-4">
+                    {followersData ? (
+                      <FollowerList profiles={flattenedFollowersData} />
+                    ) : (
+                      <p>Loading followers...</p>
+                    )}
+                  </div>
+                  <div className="mb-4">{/* <FollowingList /> */}</div>
+                </div>
                     <div className="mb-4">{/* <FollowingList /> */}</div>
                   </div>
                   <div className="mb-4 mt-4">

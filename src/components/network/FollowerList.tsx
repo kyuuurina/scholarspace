@@ -1,130 +1,93 @@
-// FollowerList.tsx
-
-import React from "react";
-import AvatarPlaceholder from "../avatar/AvatarPlaceholder";
-import { useFetchFollowers } from "~/utils/follow";
+import React, { useState } from "react";
 import ScrollableModal from "./ScrollableModal";
-import { useState } from "react";
+import AvatarPlaceholder from "../avatar/AvatarPlaceholder";
+import Image from "next/image";
+import { useUser } from "@supabase/auth-helpers-react";
+import { api } from "~/utils/api";
+
+interface Profile {
+  profile_id: string;
+  user_id: string;
+  name: string;
+  avatar_url: string | null;
+  about_me: string | null;
+  research_interest: string | null;
+  collab_status: string | null;
+  skills: string | null;
+}
 
 interface FollowerListProps {
-  profiles: {
-    profile_id: string;
-    user_id: string;
-    name: string;
-    avatar_url: string | null;
-  }[];
+  profiles: Profile[];
 }
 
 const FollowerList: React.FC<FollowerListProps> = ({ profiles }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const user = useUser();
 
-    const [isModalOpen, setModalOpen] = useState(false);
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
 
-    const openModal = () => {
-    setModalOpen(true);
-    };
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
 
-    const closeModal = () => {
-    setModalOpen(false);
-    };
+  const removeFollower = api.follow.removeFollower.useMutation();
 
-  // Use profiles instead of fetching data using useFetchFollowers
+  const handleRemove = async (profileId: string) => {
+    try {
+      // Assuming you have access to the userId of the follower to remove
+      const userIdToRemove = profileId;
+
+      // Call the removeFollower mutation
+      await removeFollower.mutateAsync({ userId: userIdToRemove });
+
+      console.log(`Remove follower with profileId: ${profileId}`);
+    } catch (error) {
+      console.error("Error removing follower:", error);
+      // Handle error as needed
+    }
+  };
 
   return (
-    <ScrollableModal show={isModalOpen}  onClose={closeModal} title="Followers">
-      {profiles.length === 0 ? (
+    <div>
+      {profiles && profiles.length === 0 ? (
         <p>No Followers.</p>
       ) : (
-        <ul>
-          {profiles.map((follower) => (
-            <li key={follower.profile_id} className="flex items-center space-x-2 p-4">
-              <div className="aspect:square h-10 w-10 cursor-pointer">
-                <AvatarPlaceholder
-                  name={follower.name || "Unknown"}
-                  shape="circle"
-                />
-              </div>
-              <div className="ml-2">
-                <span className="cursor-pointer inline-block max-w-full sm:max-w-[150px] overflow-hidden whitespace-nowrap overflow-ellipsis">
-                  {follower.name || "Unknown"}
-                </span>
-              </div>
-            </li>
-          ))}
-        </ul>
+        <div>
+          <button onClick={openModal}>Followers</button>
+          <ScrollableModal show={isModalOpen} onClose={closeModal} title="Followers">
+            <ul>
+              {profiles.map((profile, index) => (
+                <li key={profile.profile_id} className="flex items-center justify-between space-x-2 mb-2">
+                  <div className="flex items-center space-x-2">
+                    {profile.avatar_url ? (
+                      <Image
+                        src={`https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/avatar/${profile.avatar_url}`}
+                        alt={`Avatar of ${profile.name}`}
+                        width={40}
+                        height={40}
+                        className="rounded-full"
+                      />
+                    ) : (
+                      <AvatarPlaceholder name={profile.name} />
+                    )}
+                    <p>{profile.name}</p>
+                  </div>
+                  {user && (
+                    <button onClick={() => handleRemove(profile.profile_id)} className="text-red-500">
+                      Remove
+                    </button>
+                  )}
+                  {/* Include other profile details as needed */}
+                </li>
+              ))}
+            </ul>
+          </ScrollableModal>
+        </div>
       )}
-    </ScrollableModal>
+    </div>
   );
 };
 
 export default FollowerList;
-
-
-
-// import React, { useState } from "react";
-// import AvatarPlaceholder from "../avatar/AvatarPlaceholder";
-// import { useFetchFollowers } from "~/utils/follow";
-// import ScrollableModal from "./ScrollableModal";
-
-// const FollowersList: React.FC = () => {
-//   const { followers, isLoading, error } = useFetchFollowers();
-//   const [isModalOpen, setModalOpen] = useState(false);
-
-//   console.log("pengikut", followers);
-
-//   if (isLoading) {
-//     return <div>Loading...</div>;
-//   }
-
-//   if (error) {
-//     return <div>Error loading followers</div>;
-//   }
-
-//   const openModal = () => {
-//     setModalOpen(true);
-//   };
-
-//   const closeModal = () => {
-//     setModalOpen(false);
-//   };
-
-//   return (
-//     <div>
-//       <button
-//         onClick={openModal}
-//         className="rounded-full px-4 py-2 bg-purple-800 text-white hover:bg-purple-600 transition-colors duration-300"
-//       >
-//         Followers
-//       </button>
-//       <ScrollableModal
-//         show={isModalOpen}
-//         onClose={closeModal}
-//         title="Followers"
-//       >
-//         {followers.length === 0 ? (
-//           <p>No Followers.</p>
-//         ) : (
-//           <ul>
-//             {followers.map((follower) => (
-//               <li key={follower.id} className="flex items-center space-x-2 p-4">
-//                 <div className="aspect:square h-10 w-10 cursor-pointer">
-//                   <AvatarPlaceholder
-//                     name={follower.name || "Unknown"}
-//                     shape="circle"
-//                   />
-//                 </div>
-//                 <div className="ml-2">
-//                   <span className="cursor-pointer inline-block max-w-full sm:max-w-[150px] overflow-hidden whitespace-nowrap overflow-ellipsis">
-//                     {follower.name || "Unknown"}
-//                   </span>
-//                 </div>
-//               </li>
-//             ))}
-//           </ul>
-//         )}
-//       </ScrollableModal>
-//     </div>
-//   );
-// };
-
-// export default FollowersList;
-

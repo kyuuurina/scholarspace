@@ -1,23 +1,30 @@
 import { api } from "./api";
 import {useRouterId} from "./routerId";
 
-export const useFetchFollowers = (id:string) => {
+interface Profile {
+  profile_id: string;
+  user_id: string;
+  name: string;
+  avatar_url: string | null;
+  about_me: string | null;
+  research_interest: string | null;
+  collab_status: string | null;
+  skills: string | null;
+}
 
-  const followers = api.follow.getFollowersList.useQuery(
-    {
-      userId: id,
-    },
-    {
-      enabled: !!id,
-    }
-  );
-
-  const { data, isLoading, error } = followers;
+export const useFetchFollowers = (userId: string) => {
+  const {
+    data: followersData,
+    isLoading: followersLoading,
+    error: followersError,
+  } = api.follow.getFollowersList.useQuery({
+    userId,
+  });
 
   return {
-    followers: data || [],
-    isLoading,
-    error,
+    followersData: followersData || [], // Assuming the structure of the response
+    followersLoading,
+    followersError,
   };
 };
 
