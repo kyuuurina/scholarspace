@@ -173,7 +173,7 @@ export const profileRouter = router({
     }),
 
 
-//procedure to get recommendations based on shared research interests and following accounts of user's following
+// Procedure to get recommendations based on shared research interests and following accounts of user's following
 getRecommendations: protectedProcedure.query(async ({ ctx }) => {
   const userId = ctx.user?.id;
 
@@ -187,19 +187,91 @@ getRecommendations: protectedProcedure.query(async ({ ctx }) => {
     },
   });
 
+  // Check if the user has specified research interests
   if (!user || !user.research_interest) {
-    return [];
+    // Get the users already followed by the new user
+    const userFollowingIds = await ctx.prisma.follow.findMany({
+      where: {
+        follower_id: userId,
+      },
+      select: {
+        following_id: true,
+      },
+    });
+
+    // Return default recommendations for new users excluding those already followed
+    const defaultRecommendationsWithCollab = await ctx.prisma.profile.findMany({
+      where: {
+        user_id: {
+          not: userId,
+          notIn: [
+            ...userFollowingIds.map((followedUser) => followedUser.following_id),
+            // Exclude users already followed by the new user
+          ],
+        },
+        collab_status: "Open For Collaboration", // Include only users with this collab status
+      },
+      take: 10, // Adjust the number of default recommendations as needed
+      select: {
+        user_id: true,
+        profile_id: true,
+        name: true,
+        avatar_url: true,
+      },
+    });
+
+    // Check if there are enough users with "Open For Collaboration" status
+    if (defaultRecommendationsWithCollab.length >= 10) {
+      return defaultRecommendationsWithCollab;
+    }
+
+    // If not enough, fetch additional users without "Open For Collaboration" status
+    const remainingDefaultRecommendations = await ctx.prisma.profile.findMany({
+      where: {
+        user_id: {
+          not: userId,
+          notIn: [
+            ...userFollowingIds.map((followedUser) => followedUser.following_id),
+            // Exclude users already followed by the new user
+          ],
+        },
+      },
+      take: 10 - defaultRecommendationsWithCollab.length, // Fill the remaining slots
+      select: {
+        user_id: true,
+        profile_id: true,
+        name: true,
+        avatar_url: true,
+      },
+    });
+
+    return [...defaultRecommendationsWithCollab, ...remainingDefaultRecommendations];
   }
 
-  const userResearchInterests = user.research_interest
-    .toLowerCase()
-    .split(",");
+// Continue with the existing logic for users with specified research interests
+const userResearchInterests = user.research_interest
+  .toLowerCase()
+  .split(",");
+
+// Get the users already followed by the new user
+const userFollowingIds = await ctx.prisma.follow.findMany({
+  where: {
+    follower_id: userId,
+  },
+  select: {
+    following_id: true,
+  },
+});
 
 // Find other users who share at least 1 similar research interest
 const recommendedUsersByInterests = await ctx.prisma.profile.findMany({
   where: {
     user_id: {
       not: userId,
+      notIn: [
+        ...userFollowingIds.map((followedUser) => followedUser.following_id),
+        // Exclude users already followed by the new user
+      ],
     },
     research_interest: {
       in: userResearchInterests.map((interest) => interest.trim()),
@@ -214,55 +286,56 @@ const recommendedUsersByInterests = await ctx.prisma.profile.findMany({
   },
 });
 
-  // Find users who are followed by the user's following accounts but not followed by the user
-  const followingUsersIds = await ctx.prisma.follow.findMany({
-    where: {
-      follower_id: userId,
-    },
-    select: {
-      following_id: true,
-    },
-  });
+// Find users who are followed by the user's following accounts but not followed by the user
+const followingUsersIds = await ctx.prisma.follow.findMany({
+  where: {
+    follower_id: userId,
+  },
+  select: {
+    following_id: true,
+  },
+});
 
-  const suggestedUsers = await ctx.prisma.follow.findMany({
-    where: {
-      follower_id: {
-        in: followingUsersIds.map((followedUser) => followedUser.following_id),
-      },
-      following_id: {
-        not: userId,
-      },
+const suggestedUsers = await ctx.prisma.follow.findMany({
+  where: {
+    follower_id: {
+      in: followingUsersIds.map((followedUser) => followedUser.following_id),
     },
-    take: 10,
-    select: {
-      following_id: true,
+    following_id: {
+      not: userId,
     },
-  });
+  },
+  take: 10,
+  select: {
+    following_id: true,
+  },
+});
 
-  const suggestedUserIds = suggestedUsers.map(
-    (suggestedUser) => suggestedUser.following_id
-  );
+const suggestedUserIds = suggestedUsers.map(
+  (suggestedUser) => suggestedUser.following_id
+);
 
-  // Exclude users who are already in the list based on shared interests
-  const uniqueSuggestedUserIds = suggestedUserIds.filter(
-    (id) => !recommendedUsersByInterests.some((user) => user.user_id === id)
-  );
+// Exclude users who are already in the list based on shared interests
+const uniqueSuggestedUserIds = suggestedUserIds.filter(
+  (id) => !recommendedUsersByInterests.some((user) => user.user_id === id)
+);
 
-  // Find the remaining users based on the suggestion criteria
-  const remainingUsers = await ctx.prisma.profile.findMany({
-    where: {
-      user_id: {
-        in: uniqueSuggestedUserIds,
-      },
+// Find the remaining users based on the suggestion criteria
+const remainingUsers = await ctx.prisma.profile.findMany({
+  where: {
+    user_id: {
+      in: uniqueSuggestedUserIds,
     },
-    take: 10,
-    select: {
-      user_id: true,
-      profile_id: true,
-      name: true,
-      avatar_url: true,
-    },
-  });
+  },
+  take: 10,
+  select: {
+    user_id: true,
+    profile_id: true,
+    name: true,
+    avatar_url: true,
+  },
+});
+
 
   // Combine the results from both criteria
   const recommendedUsers = [...recommendedUsersByInterests, ...remainingUsers];
