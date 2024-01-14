@@ -217,6 +217,7 @@ const UserProfileForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
               id="skills"
               className="block w-full"
               {...register("skills", { required: false })}
+              placeholder="Type your skills separated by commas (e.g.: Ms Words, Ms Excel)"
             />
             {errors.skills && <FormErrorMessage text={errors.skills.message} />}
           </div>
@@ -232,6 +233,7 @@ const UserProfileForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
               id="research_interest"
               className="block w-full"
               {...register("research_interest", { required: false })}
+              placeholder="Type your research interests separated by commas (e.g.: Epidemiology, Ecotourism)"
             />
             {errors.research_interest && (
               <FormErrorMessage text={errors.research_interest.message} />
