@@ -1,118 +1,71 @@
 import React, { useState } from "react";
-import AvatarPlaceholder from "../avatar/AvatarPlaceholder";
-import { useFetchFollowing } from "~/utils/follow";
 import ScrollableModal from "./ScrollableModal";
+import AvatarPlaceholder from "../avatar/AvatarPlaceholder";
+import Image from "next/image";
+import { useUser } from "@supabase/auth-helpers-react";
+import { api } from "~/utils/api";
 
-const FollowingList: React.FC = () => {
-  const { following, isLoading, error } = useFetchFollowing();
-  const [isModalOpen, setModalOpen] = useState(false);
+interface Profile {
+  profile_id: string;
+  user_id: string;
+  name: string;
+  avatar_url: string | null;
+  about_me: string | null;
+  research_interest: string | null;
+  collab_status: string | null;
+  skills: string | null;
+}
 
-  console.log("mengikut", following);
+interface FollowingListProps {
+  profiles: Profile[];
+}
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error loading followers</div>;
-  }
+const FollowingList: React.FC<FollowingListProps> = ({ profiles }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const user = useUser();
 
   const openModal = () => {
-    setModalOpen(true);
+    setIsModalOpen(true);
   };
 
   const closeModal = () => {
-    setModalOpen(false);
+    setIsModalOpen(false);
   };
+
 
   return (
     <div>
-      <button
-        onClick={openModal}
-        className="rounded-full px-4 py-2 bg-purple-800 text-white hover:bg-purple-600 transition-colors duration-300"
-      >
-        Following
-      </button>
-      <ScrollableModal
-        show={isModalOpen}
-        onClose={closeModal}
-        title="Following"
-      >
-        {following.length === 0 ? (
-          <p>No following account</p>
-        ) : (
-          <ul>
-            {following.map((following) => (
-              <li
-                key={following.id}
-                className="flex items-center space-x-2 p-4"
-              >
-                <div className="aspect:square h-10 w-10 cursor-pointer">
-                  <AvatarPlaceholder
-                    name={following.name || "Unknown"}
-                    shape="circle"
-                  />
-                </div>
-                <div className="ml-2">
-                  <span className="cursor-pointer inline-block max-w-full sm:max-w-[150px] overflow-hidden whitespace-nowrap overflow-ellipsis">
-                    {following.name || "Unknown"}
-                  </span>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </ScrollableModal>
+      {profiles && profiles.length === 0 ? (
+        <p>No Following.</p>
+      ) : (
+        <div>
+          <button onClick={openModal}>Following</button>
+          <ScrollableModal show={isModalOpen} onClose={closeModal} title="Following">
+            <ul>
+              {profiles.map((profile, index) => (
+                <li key={profile.profile_id} className="flex items-center justify-between space-x-2 mb-2">
+                  <div className="flex items-center space-x-2">
+                    {profile.avatar_url ? (
+                      <Image
+                        src={`https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/avatar/${profile.avatar_url}`}
+                        alt={`Avatar of ${profile.name}`}
+                        width={40}
+                        height={40}
+                        className="rounded-full"
+                      />
+                    ) : (
+                      <AvatarPlaceholder name={profile.name} />
+                    )}
+                    <p>{profile.name}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </ScrollableModal>
+        </div>
+      )}
     </div>
   );
 };
 
 export default FollowingList;
-
-//   return (
-//     <div>
-//       <button
-//         onClick={openModal}
-//         className="rounded-full px-4 py-2 bg-purple-800 text-white hover:bg-purple-600 transition-colors duration-300"
-//       >
-//         Following
-//       </button>
-//       <ScrollableModal
-//         show={isModalOpen}
-//         onClose={closeModal}
-//         title="Following"
-//       >
-//         {following.length === 0 ? (
-//           <p>No following account</p>
-//         ) : (
-//           <ul>
-//             {following.map((following) => (
-//               <li
-//                 key={following.id}
-//                 className="flex items-center space-x-2 p-4"
-//               >
-//                 <Link href={`/manage-profile/${following.profile_id}`}>
-//                   <div className="aspect:square h-10 w-10 cursor-pointer">
-//                     <AvatarPlaceholder
-//                       name={following.name || "Unknown"}
-//                       shape="circle"
-//                     />
-//                   </div>
-//                 </Link>
-//                 <div className="ml-2">
-//                   <Link href={`/manage-profile/${following.profile_id}`}>
-//                     <span className="cursor-pointer inline-block max-w-full sm:max-w-[150px] overflow-hidden whitespace-nowrap overflow-ellipsis">
-//                       {following.name || "Unknown"}
-//                     </span>
-//                   </Link>
-//                 </div>
-//               </li>
-//             ))}
-//           </ul>
-//         )}
-//       </ScrollableModal>
-//     </div>
-//   );
-// };
-
-// export default FollowingList;

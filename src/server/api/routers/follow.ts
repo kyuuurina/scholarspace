@@ -92,8 +92,8 @@ getFollowersList: protectedProcedure
     return followersList;
   }),
 
-    // get following list
-    getFollowingList: protectedProcedure
+  // get following list
+  getFollowingList: protectedProcedure
       .input(z.object({ userId: z.string() }))
       .query(async ({ input: { userId }, ctx }) => {
         const following = await ctx.prisma.follow.findMany({
