@@ -1,20 +1,19 @@
-import React, { useState } from 'react';
-import { fetchComments } from '~/utils/postcomment';
-import AvatarPlaceholder from '../avatar/AvatarPlaceholder';
-import { FiEdit2, FiTrash2 } from 'react-icons/fi';
-import Image from 'next/image';
-import Link from 'next/link';
-import SuccessToast from '../toast/SuccessToast';
-import ErrorToast from '../toast/ErrorToast';
-import toast from 'react-hot-toast';
-import { api } from '~/utils/api';
-import ConfirmationDialog from '../ConfirmationDialog';
-import { useQuery, useQueryClient} from '@tanstack/react-query';
-
+import React, { useState } from "react";
+import { fetchComments } from "~/utils/postcomment";
+import AvatarPlaceholder from "../avatar/AvatarPlaceholder";
+import { FiEdit2, FiTrash2 } from "react-icons/fi";
+import Image from "next/image";
+import Link from "next/link";
+import SuccessToast from "../toast/SuccessToast";
+import ErrorToast from "../toast/ErrorToast";
+import toast from "react-hot-toast";
+import { api } from "~/utils/api";
+import ConfirmationDialog from "../ConfirmationDialog";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 //auth
-import { getCookie } from 'cookies-next';
-import { UseCheckProfile } from '~/utils/profile';
+import { useUser } from "@supabase/auth-helpers-react";
+import { UseCheckProfile } from "~/utils/profile";
 
 interface UserProfile {
   name: string;
@@ -37,55 +36,58 @@ interface PostCommentListProps {
   refetch: () => void;
 }
 
-const PostCommentList: React.FC<PostCommentListProps> = ({ post_id, refetch }) => {
+const PostCommentList: React.FC<PostCommentListProps> = ({
+  post_id,
+  refetch,
+}) => {
   const queryClient = useQueryClient();
 
   const { comments, isLoading, error } = fetchComments(post_id);
   const [showCommentList, setShowCommentList] = useState(false);
   const [deleteCommentId, setDeleteCommentId] = useState<string | null>(null);
 
-
-    //
-      const commentsQuery = api.postcomment.list.useQuery(
+  //
+  const commentsQuery = api.postcomment.list.useQuery(
     { post_id: post_id },
     { enabled: !!post_id }
   );
 
-    // Get user id and check profile
-    const userId = getCookie('UserID') as string;
-    const { user } = UseCheckProfile(userId);
-  
-    // Check if the user is the owner of a specific comment
-    const isCommentOwner = (commentUserId: string) => {
-      return user && user.id === commentUserId;
-    };
+  // Get user id and check profile
+  const user = useUser();
+  const userId = user?.id || "";
 
-// Delete comment mutation
-const deleteCommentMutation = api.postcomment.delete.useMutation({
-  onSuccess: () => {
-    toast.custom(() => <SuccessToast message="Comment successfully deleted" />);
-    // Comment row is deleted from UI immediately; no need to reset the comment id
-  },
-  onError: (deleteError) => {
-    console.error('Failed to delete comment:', deleteError);
-    toast.custom(() => <ErrorToast message="Failed to delete comment" />);
-  },
-  onSettled: async () => {
-    try {
-      // Refetch the comments after deletion
-      await commentsQuery.refetch();
-      setDeleteCommentId(null);
-      // Use the refetch function directly if available
-      if (refetch && typeof refetch === 'function') {
-        // eslint-disable-next-line @typescript-eslint/await-thenable
-        await refetch();
+  // Check if the user is the owner of a specific comment
+  const isCommentOwner = (commentUserId: string) => {
+    return user && user.id === commentUserId;
+  };
+
+  // Delete comment mutation
+  const deleteCommentMutation = api.postcomment.delete.useMutation({
+    onSuccess: () => {
+      toast.custom(() => (
+        <SuccessToast message="Comment successfully deleted" />
+      ));
+      // Comment row is deleted from UI immediately; no need to reset the comment id
+    },
+    onError: (deleteError) => {
+      console.error("Failed to delete comment:", deleteError);
+      toast.custom(() => <ErrorToast message="Failed to delete comment" />);
+    },
+    onSettled: async () => {
+      try {
+        // Refetch the comments after deletion
+        await commentsQuery.refetch();
+        setDeleteCommentId(null);
+        // Use the refetch function directly if available
+        if (refetch && typeof refetch === "function") {
+          // eslint-disable-next-line @typescript-eslint/await-thenable
+          await refetch();
+        }
+      } catch (error) {
+        console.error("Error during comment refetch:", error);
       }
-    } catch (error) {
-      console.error('Error during comment refetch:', error);
-    }
-  },
-});
-
+    },
+  });
 
   // Function to handle comment deletion
   const handleDeleteComment = (commentId: string) => {
@@ -98,9 +100,11 @@ const deleteCommentMutation = api.postcomment.delete.useMutation({
     if (deleteCommentId !== null) {
       try {
         // Perform the comment deletion using the mutation
-        await deleteCommentMutation.mutateAsync({ comment_id: deleteCommentId });
+        await deleteCommentMutation.mutateAsync({
+          comment_id: deleteCommentId,
+        });
       } catch (error) {
-        console.error('Error deleting comment:', error);
+        console.error("Error deleting comment:", error);
       } finally {
         // Reset the deleteCommentId after deletion
         setDeleteCommentId(null);
@@ -115,27 +119,39 @@ const deleteCommentMutation = api.postcomment.delete.useMutation({
 
   if (error) {
     // Convert the error message to a string
-    const errorMessage = error.message ? error.message.toString() : 'An error occurred';
+    const errorMessage = error.message
+      ? error.message.toString()
+      : "An error occurred";
     return <div>Error: {errorMessage}</div>;
   }
 
   return (
     <div>
       <div
-        className="cursor-pointer text-purple-800 hover:text-purple-900 focus:outline-none text-xs md:text-sm"
+        className="cursor-pointer text-xs text-purple-800 hover:text-purple-900 focus:outline-none md:text-sm"
         onClick={() => setShowCommentList((prev) => !prev)}
       >
-        {showCommentList ? 'Hide' : 'Show'} Comment Section
+        {showCommentList ? "Hide" : "Show"} Comment Section
       </div>
 
       {showCommentList && (
         <div>
           {comments.length > 0 ? (
             comments.map((comment, index) => (
-              <div key={comment.comment_id} className={`mb-4 ${index !== comments.length - 1 ? 'border-b border-gray-300' : ''}`}>
+              <div
+                key={comment.comment_id}
+                className={`mb-4 ${
+                  index !== comments.length - 1
+                    ? "border-b border-gray-300"
+                    : ""
+                }`}
+              >
                 {/* Render comment details */}
                 {comment.user.profile.map((profile) => (
-                  <div key={profile.user_id} className="flex items-center justify-between mt-4 mb-4">
+                  <div
+                    key={profile.user_id}
+                    className="mb-4 mt-4 flex items-center justify-between"
+                  >
                     <div className="mr-4">
                       {profile.avatar_url ? (
                         // Use next/image for images
@@ -148,16 +164,16 @@ const deleteCommentMutation = api.postcomment.delete.useMutation({
                               height={30}
                               className="rounded-full"
                             />
-                            <span className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-800 opacity-50 rounded-full" />
+                            <span className="absolute inset-0 rounded-full bg-gradient-to-b from-transparent to-gray-800 opacity-50" />
                           </span>
                         </Link>
                       ) : (
                         <AvatarPlaceholder name={profile.name} shape="circle" />
                       )}
                     </div>
-                    <div className="flex flex-col flex-grow">
+                    <div className="flex flex-grow flex-col">
                       <Link href={`/manage-profile/${profile.profile_id}`}>
-                        <span className="font-semibold cursor-pointer max-w-full sm:max-w-[150px] overflow-hidden whitespace-nowrap overflow-ellipsis">
+                        <span className="max-w-full cursor-pointer overflow-hidden overflow-ellipsis whitespace-nowrap font-semibold sm:max-w-[150px]">
                           {profile.name}
                         </span>
                       </Link>
@@ -166,12 +182,17 @@ const deleteCommentMutation = api.postcomment.delete.useMutation({
                     {user && isCommentOwner(profile.user_id) && (
                       <div className="flex items-center space-x-2">
                         {/* Edit icon */}
-                        <FiEdit2 size={18} className="cursor-pointer text-gray-500 hover:text-gray-700" />
+                        <FiEdit2
+                          size={18}
+                          className="cursor-pointer text-gray-500 hover:text-gray-700"
+                        />
                         {/* Delete icon with onClick handler */}
                         <FiTrash2
                           size={18}
                           className="cursor-pointer text-gray-500 hover:text-gray-700"
-                          onClick={() => handleDeleteComment(comment.comment_id)}
+                          onClick={() =>
+                            handleDeleteComment(comment.comment_id)
+                          }
                         />
                       </div>
                     )}
@@ -196,8 +217,6 @@ const deleteCommentMutation = api.postcomment.delete.useMutation({
 };
 
 export default PostCommentList;
-
-
 
 // interface CommentListProps {
 //   comments: Comment[]; // Pass the array of comments as a prop
@@ -259,4 +278,3 @@ export default PostCommentList;
 // };
 
 // export default CommentList;
-

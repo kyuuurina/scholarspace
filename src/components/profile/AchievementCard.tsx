@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaEdit, FaTrash } from 'react-icons/fa';
+import { FaEdit, FaTrash } from "react-icons/fa";
 import EditAchievement from "./EditAchievement";
 import { api } from "~/utils/api";
 import SuccessToast from "../toast/SuccessToast";
@@ -7,9 +7,7 @@ import ErrorToast from "../toast/ErrorToast";
 import toast from "react-hot-toast";
 import Router from "next/router";
 import ConfirmationDialog from "../ConfirmationDialog";
-
-// Auth
-import { getCookie } from "cookies-next";
+import { useUser } from "@supabase/auth-helpers-react";
 
 // Utils
 import { UseCheckProfile } from "~/utils/profile";
@@ -26,14 +24,17 @@ type AchievementCardProps = {
   isLastItem?: boolean;
 };
 
-const AchievementCard: React.FC<AchievementCardProps> = ({ achievement, isLastItem = false }) => {
+const AchievementCard: React.FC<AchievementCardProps> = ({
+  achievement,
+  isLastItem = false,
+}) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false); // New state for confirmation dialog
 
-  const userId = getCookie("UserID") as string;
-  const { user } = UseCheckProfile(userId);
+  const user = useUser();
+  const userId = user?.id || "";
 
-  const isOwner = user && user.id === achievement.user_id;
+  const isOwner = user && userId === achievement.user_id;
 
   const handleEditClick = () => {
     setIsEditModalOpen(true);
@@ -42,14 +43,15 @@ const AchievementCard: React.FC<AchievementCardProps> = ({ achievement, isLastIt
   //handleDelete
   const deleteAchievement = api.achievement.deleteAchievement.useMutation({
     onSuccess: () => {
-      toast.custom(() => <SuccessToast message="Achievement successfully deleted" />);
+      toast.custom(() => (
+        <SuccessToast message="Achievement successfully deleted" />
+      ));
     },
   });
 
   const handleDeleteAchievement = (achievement_id: string) => {
     setIsConfirmationOpen(true); // Show confirmation dialog
   };
-  
 
   const confirmDelete = async () => {
     try {
@@ -70,13 +72,16 @@ const AchievementCard: React.FC<AchievementCardProps> = ({ achievement, isLastIt
   };
 
   return (
-    <div className={`mb-4 ${isLastItem ? '' : 'border-b border-gray-300 pb-4'}`}>
+    <div
+      className={`mb-4 ${isLastItem ? "" : "border-b border-gray-300 pb-4"}`}
+    >
       {achievement ? ( // Check if there is an achievement
-        <div className="flex justify-between items-center">
+        <div className="flex items-center justify-between">
           {/* Achievement details */}
           <div>
             <p className="text-sm text-gray-600">
-              <span className="font-semibold">Year:</span> {achievement.received_year}
+              <span className="font-semibold">Year:</span>{" "}
+              {achievement.received_year}
             </p>
             <p className="text-sm text-gray-600">
               <span className="font-semibold">Title:</span> {achievement.title}
@@ -91,16 +96,24 @@ const AchievementCard: React.FC<AchievementCardProps> = ({ achievement, isLastIt
           <div className="flex items-center space-x-4">
             {/* Edit button */}
             {isOwner && (
-            <button onClick={handleEditClick} className="text-blue-500 hover:underline">
-              Edit <FaEdit className="inline ml-1" />
-            </button>
+              <button
+                onClick={handleEditClick}
+                className="text-blue-500 hover:underline"
+              >
+                Edit <FaEdit className="ml-1 inline" />
+              </button>
             )}
 
             {/* Delete button */}
             {isOwner && (
-            <button onClick={() => handleDeleteAchievement(achievement.achievement_id)} className="text-red-500 hover:underline">
-              Delete <FaTrash className="inline ml-1" />
-            </button>
+              <button
+                onClick={() =>
+                  handleDeleteAchievement(achievement.achievement_id)
+                }
+                className="text-red-500 hover:underline"
+              >
+                Delete <FaTrash className="ml-1 inline" />
+              </button>
             )}
           </div>
         </div>

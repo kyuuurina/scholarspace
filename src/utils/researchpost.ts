@@ -58,7 +58,7 @@ export const useFetchMyResearchPosts = (id: string) => {
 };
 
 //fetch following posts
-export const useFetchFollowingResearchPosts = (limit = 20, cursor?: string) => {
+export const useFetchFollowingResearchPosts = (limit = 30, cursor?: string) => {
   const followingResearchPosts = api.researchpost.getFollowingPosts.useQuery(
     {
       limit,
@@ -112,6 +112,22 @@ export const useFetchPostRecommendations = () => {
     postRecommendations: postRecommendations || [],
     isLoadingPostRecommendations,
     errorPostRecommendations,
+  };
+};
+
+
+// Fetch research posts created by followed users
+export const useFetchResearchPostsByFollowedUsers = () => {
+  const {
+    data: researchPostsByFollowedUsers,
+    isLoading: isLoadingResearchPostsByFollowedUsers,
+    error: errorResearchPostsByFollowedUsers,
+  } = api.researchpost.getResearchPostsByFollowedUsers.useQuery();
+
+  return {
+    researchPostsByFollowedUsers: researchPostsByFollowedUsers || [],
+    isLoadingResearchPostsByFollowedUsers,
+    errorResearchPostsByFollowedUsers,
   };
 };
 

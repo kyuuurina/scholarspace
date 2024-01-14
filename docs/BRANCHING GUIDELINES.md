@@ -20,22 +20,26 @@
    ```
 
 ## Adding Your Feature Changes to Develop
+1. Pull the branch you want to merge into `develop` branch.
+```
+git pull origin --no-ff <user-story-code>/<initials>
+```
 
-1. Merge your feature branch into the `develop` branch:
+2. Merge your feature branch into the `develop` branch:
    ```shell
    git checkout develop
    git pull origin develop
    git merge --no-ff <user-story-code>/<initials>
    ```
 
-2. Resolve any conflicts that may arise during the merge process.
+3. Resolve any conflicts that may arise during the merge process.
 
-3. Push the changes to the `develop` branch:
+4. Push the changes to the `develop` branch:
    ```shell
    git push origin develop
    ```
 
-4. Create a pull request from the `develop` branch to the `main` branch.
+5. Create a pull request from the `develop` branch to the `main` branch.
 
 ## Pushing Development to Production
 
