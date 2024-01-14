@@ -105,7 +105,7 @@ getFollowersList: protectedProcedure
           },
         });
 
-        const followingList = following.map((follow) => follow.user_follow_following_idTouser);
+        const followingList = following.map((follow) => follow.user_follow_following_idTouser.profile);
         return followingList;
       }),
 

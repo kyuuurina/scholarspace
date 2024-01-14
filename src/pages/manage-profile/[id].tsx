@@ -174,13 +174,12 @@ const ProfilePage: NextPageWithLayout = () => {
                       <p>Loading followers...</p>
                     )}
                   </div>
-
                   <div className="mb-4">
-                    {/* {followingData ? (
+                    {followingData ? (
                       <FollowingList profiles={flattenedFollowingData} />
                     ) : (
-                      <p>Loading following profiles...</p>
-                    )} */}
+                      <p>Loading following...</p>
+                    )}
                   </div>
                   </div>
                   <div className="mb-4 mt-4">
