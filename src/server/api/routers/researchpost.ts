@@ -427,68 +427,162 @@ getResearchPostsByFollowedUsers: protectedProcedure.query(async ({ ctx }) => {
       return researchPosts;
     }),
 
- //recommendations:
-getResearchPostRecommendations: protectedProcedure.query(async ({ ctx }) => {
-  const userId = ctx.user?.id;
-
-  // Get the user's research interests
-  const user = await ctx.prisma.profile.findFirst({
-    where: {
-      user_id: userId,
-    },
-    select: {
-      research_interest: true,
-    },
-  });
-
-  if (!user || !user.research_interest) {
-    return [];
-  }
-
-  const userResearchInterests = user.research_interest.toLowerCase().split(",");
-
-  // Combine conditions using OR
-  const recommendedResearchPosts = await ctx.prisma.research_post.findMany({
-    where: {
-      user_id: {
-        not: userId,
-      },
-      OR: userResearchInterests.map((interest) => ({
-        OR: [
-          { title: { contains: interest.trim(), mode: 'insensitive' } },
-          { profile: { research_interest: { contains: interest.trim().toLowerCase() } } },
-        ],
-      })),
-    },
-    orderBy: { created_at: 'desc' }, // Order by created_at in descending order
-    // take: 10, // Limit the number of recommendations
-    select: {
-      post_id: true,
-      user_id: true,
-      category: true,
-      title: true,
-      author: true,
-      description: true,
-      document: true,
-      created_at: true,
-      summary: true,
-      profile: {
-        select: {
-          profile_id: true,
-          user_id: true,
-          name: true,
-          avatar_url: true,
-          about_me: true,
-          research_interest: true,
-          collab_status: true,
-          skills: true,
+    getResearchPostRecommendations: protectedProcedure.query(async ({ ctx }) => {
+      const userId = ctx.user?.id;
+    
+      // Get the user's research interests
+      const user = await ctx.prisma.profile.findFirst({
+        where: {
+          user_id: userId,
         },
-      },
-    },
-  });
+        select: {
+          research_interest: true,
+        },
+      });
+    
+      if (!user || !user.research_interest) {
+        // Handle the case where the user has no specified research interests
+        // Provide default recommendations or other strategies
+        const defaultRecommendations = await ctx.prisma.research_post.findMany({
+          orderBy: { created_at: 'desc' },
+          take: 10, // Limit the number of recommendations
+          select: {
+            post_id: true,
+            user_id: true,
+            category: true,
+            title: true,
+            author: true,
+            description: true,
+            document: true,
+            created_at: true,
+            summary: true,
+            profile: {
+              select: {
+                profile_id: true,
+                user_id: true,
+                name: true,
+                avatar_url: true,
+                about_me: true,
+                research_interest: true,
+                collab_status: true,
+                skills: true,
+              },
+            },
+          },
+        });
+    
+        return defaultRecommendations;
+      }
+    
+      // Continue with the existing logic for users with specified research interests
+    
+      const userResearchInterests = user.research_interest.toLowerCase().split(",");
+    
+      // Combine conditions using OR
+      const recommendedResearchPosts = await ctx.prisma.research_post.findMany({
+        where: {
+          user_id: {
+            not: userId,
+          },
+          OR: userResearchInterests.map((interest) => ({
+            OR: [
+              { title: { contains: interest.trim(), mode: 'insensitive' } },
+              { profile: { research_interest: { contains: interest.trim().toLowerCase() } } },
+            ],
+          })),
+        },
+        orderBy: { created_at: 'desc' }, // Order by created_at in descending order
+        // take: 10, // Limit the number of recommendations
+        select: {
+          post_id: true,
+          user_id: true,
+          category: true,
+          title: true,
+          author: true,
+          description: true,
+          document: true,
+          created_at: true,
+          summary: true,
+          profile: {
+            select: {
+              profile_id: true,
+              user_id: true,
+              name: true,
+              avatar_url: true,
+              about_me: true,
+              research_interest: true,
+              collab_status: true,
+              skills: true,
+            },
+          },
+        },
+      });
+    
+      return recommendedResearchPosts;
+    }),
 
-  return recommendedResearchPosts;
-}),
 
+//old recommendation
+// getResearchPostRecommendations: protectedProcedure.query(async ({ ctx }) => {
+//   const userId = ctx.user?.id;
+
+//   // Get the user's research interests
+//   const user = await ctx.prisma.profile.findFirst({
+//     where: {
+//       user_id: userId,
+//     },
+//     select: {
+//       research_interest: true,
+//     },
+//   });
+
+//   if (!user || !user.research_interest) {
+//     return [];
+//   }
+
+//   const userResearchInterests = user.research_interest.toLowerCase().split(",");
+
+//   // Combine conditions using OR
+//   const recommendedResearchPosts = await ctx.prisma.research_post.findMany({
+//     where: {
+//       user_id: {
+//         not: userId,
+//       },
+//       OR: userResearchInterests.map((interest) => ({
+//         OR: [
+//           { title: { contains: interest.trim(), mode: 'insensitive' } },
+//           { profile: { research_interest: { contains: interest.trim().toLowerCase() } } },
+//         ],
+//       })),
+//     },
+//     orderBy: { created_at: 'desc' }, // Order by created_at in descending order
+//     // take: 10, // Limit the number of recommendations
+//     select: {
+//       post_id: true,
+//       user_id: true,
+//       category: true,
+//       title: true,
+//       author: true,
+//       description: true,
+//       document: true,
+//       created_at: true,
+//       summary: true,
+//       profile: {
+//         select: {
+//           profile_id: true,
+//           user_id: true,
+//           name: true,
+//           avatar_url: true,
+//           about_me: true,
+//           research_interest: true,
+//           collab_status: true,
+//           skills: true,
+//         },
+//       },
+//     },
+//   });
+
+//   return recommendedResearchPosts;
+// }),
 
 });
