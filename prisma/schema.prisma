@@ -357,7 +357,7 @@ model profile {
   avatar_url          String?
   about_me            String?
   research_interest   String?
-  collab_status       String?               @default("'Not Open For Collaboration'::text")
+  collab_status       String?               @default("Not Open For Collaboration")
   skills              String?
   user                user                  @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   profile_achievement profile_achievement[]
