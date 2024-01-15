@@ -454,8 +454,6 @@ export const taskRouter = router({
         data: { end_at: latestDeadline.deadline },
       });
 
-      console.log(latestDeadline.deadline);
-
       return task;
     }),
 

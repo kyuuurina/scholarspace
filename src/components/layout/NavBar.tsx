@@ -3,6 +3,12 @@ import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
 import { useUser } from "@supabase/auth-helpers-react";
 import { api } from "~/utils/api";
+import {
+  KnockFeedProvider,
+  NotificationIconButton,
+  NotificationFeedPopover,
+} from "@knocklabs/react-notification-feed";
+import "@knocklabs/react-notification-feed/dist/index.css";
 
 // local components
 import AvatarPlaceholder from "../avatar/AvatarPlaceholder";
@@ -13,13 +19,13 @@ type NavbarProps = {
 };
 
 const NavBar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const notifButtonRef = useRef(null);
   const user = useUser();
 
   // constants for overlay
   const overlayRef = useRef<HTMLDivElement>(null);
-  const notifOverlayRef = useRef<HTMLDivElement>(null);
   const [isUserOverlayVisible, setIsUserOverlayVisible] = useState(false);
-  const [isNotifOverlayVisible, setIsNotifOverlayVisible] = useState(false);
 
   // logic for user overlay
   const toggleUserOverlay = () => {
@@ -40,28 +46,6 @@ const NavBar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutsideUser);
-    };
-  }, []);
-
-  // logic for notification overlay
-  const toggleNotifOverlay = () => {
-    setIsNotifOverlayVisible(!isNotifOverlayVisible);
-  };
-
-  const handleClickOutsideNotif = (event: MouseEvent) => {
-    if (
-      notifOverlayRef.current &&
-      !notifOverlayRef.current.contains(event.target as Node)
-    ) {
-      setIsNotifOverlayVisible(false);
-    }
-  };
-
-  useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutsideNotif);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutsideNotif);
     };
   }, []);
 
@@ -107,7 +91,23 @@ const NavBar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
 
         <div className="flex items-center gap-x-4 text-white">
           {/* Notifications */}
-
+          <KnockFeedProvider
+            apiKey={process.env.KNOCK_PUBLIC_API_KEY || ""}
+            feedId={process.env.KNOCK_FEED_ID || ""}
+            userId={user?.id || ""}
+          >
+            <>
+              <NotificationIconButton
+                ref={notifButtonRef}
+                onClick={() => setIsVisible(!isVisible)}
+              />
+              <NotificationFeedPopover
+                buttonRef={notifButtonRef}
+                isVisible={isVisible}
+                onClose={() => setIsVisible(false)}
+              />
+            </>
+          </KnockFeedProvider>
           {/* User Menu  */}
           <div>
             <div className="cursor-pointer" onClick={toggleUserOverlay}>

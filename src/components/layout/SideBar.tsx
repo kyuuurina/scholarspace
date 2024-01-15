@@ -4,14 +4,13 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useSessionContext } from "@supabase/auth-helpers-react";
 import { useUser } from "@supabase/auth-helpers-react";
-import { FiUser } from "react-icons/fi";
 
 import { api } from "~/utils/api";
 import { useFetchProfile } from "~/utils/profile";
 import { useEffect } from "react";
 
 // icons
-import { FiHome, FiActivity, FiBriefcase, FiColumns } from "react-icons/fi";
+import { FiHome, FiUser, FiSettings, FiColumns } from "react-icons/fi";
 import { IconContext } from "react-icons";
 
 // components
@@ -204,26 +203,6 @@ export const SideBar: React.FC<SideBarProps> = ({
                   </span>
                 </Link>
               </li> */}
-
-              {/* <li className="rounded-sm">
-                <Link
-                  href="/"
-                  className={`flex items-center space-x-3 rounded-md hover:bg-purple-800 ${
-                    open ? "text-purple-accent-2" : "text-purple-accent-2"
-                  }`}
-                >
-                  <FiBriefcase className="h-6 w-6" />
-                  <span
-                    className={`transition-all duration-500 ${
-                      open
-                        ? "text-purple-accent-2 opacity-100"
-                        : "sr-only opacity-0"
-                    }`}
-                  >
-                    Projects
-                  </span>
-                </Link>
-              </li> */}
               <li className="rounded-sm">
                 <Link
                   href="/manage-templates"
@@ -240,6 +219,25 @@ export const SideBar: React.FC<SideBarProps> = ({
                     }`}
                   >
                     Manage Templates
+                  </span>
+                </Link>
+              </li>
+              <li className="rounded-sm">
+                <Link
+                  href="/settings"
+                  className={`flex items-center space-x-3 rounded-md hover:bg-purple-800 ${
+                    open ? "text-purple-accent-2" : "text-purple-accent-2"
+                  }`}
+                >
+                  <FiSettings className="h-6 w-6" />
+                  <span
+                    className={`transition-all duration-500 ${
+                      open
+                        ? "text-purple-accent-2 opacity-100"
+                        : "sr-only opacity-0"
+                    }`}
+                  >
+                    Settings
                   </span>
                 </Link>
               </li>

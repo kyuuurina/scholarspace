@@ -2,51 +2,48 @@ import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "~/pages/_app";
 import Head from "~/components/layout/Head";
 import Layout from "~/components/layout/Layout";
-import React, { useState } from "react";
+import React from "react";
 import NotificationsCard from "~/components/settings/NotificationsCard";
-import { NextApiRequest, NextApiResponse } from "next";
-
-type Email = {
-  id: string;
-};
+import { Knock } from "@knocklabs/node";
+import { useUser } from "@supabase/auth-helpers-react";
+import { api } from "~/utils/api";
 
 const Settings: NextPageWithLayout = () => {
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+  const user = useUser();
 
-  const handleSendEmail = async () => {
-    try {
-      setLoading(true);
-      setError(null);
+  const knockClient = new Knock(process.env.KNOCK_SECRET_API_KEY || "");
+  const { data, refetch } = api.notifications.getSettings.useQuery();
 
-      // Make your API request here
-      const response: Response = await fetch("/api/send"); // Update with your API route
-      // const data = response;
-
-      if (!response.ok) {
-        throw new Error(response.statusText);
-      }
-
-      console.log("Email sent successfully", response);
-    } catch (err) {
-      setError((err as Error).message);
-    } finally {
-      setLoading(false);
-    }
+  const handleNotifClick = async () => {
+    await knockClient.notify("new-workout", {
+      actor: user?.id || "",
+      recipients: [user?.id || ""],
+      data: {
+        task: {
+          value: "Task 1",
+        },
+        variableKey: "Preview data value",
+        isWebEnabled: data?.web_enbld,
+        isEmailEnabled: data?.email_enbld,
+      },
+    });
   };
 
+  const refetchSettings = async () => {
+    await refetch();
+  };
   return (
     <div className="w-full max-w-screen-xl p-8">
       <h1 className="truncate pb-4 text-2xl font-bold sm:text-4xl">Settings</h1>
+      {data && <NotificationsCard notifWeb={data} refetch={refetchSettings} />}
       <button
-        onClick={handleSendEmail}
-        disabled={loading}
-        className="rounded bg-blue-500 px-4 py-2 text-white"
+        onClick={async () => {
+          await handleNotifClick();
+        }}
+        className="m-2 rounded-md border border-purple-accent-2 p-4 hover:bg-purple-accent-2 hover:text-white"
       >
-        {loading ? "Sending..." : "Send Test Email"}
+        Click me to send a notif
       </button>
-      {error && <div className="mt-2 text-red-500">{error}</div>}
-      <NotificationsCard />
     </div>
   );
 };
@@ -54,7 +51,7 @@ const Settings: NextPageWithLayout = () => {
 Settings.getLayout = function getLayout(page: ReactElement) {
   return (
     <>
-      <Head title="Main Page" />
+      <Head title="Settings" />
       <Layout>{page}</Layout>
     </>
   );
