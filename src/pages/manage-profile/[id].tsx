@@ -11,6 +11,7 @@ import toast from "react-hot-toast";
 import Link from "next/link";
 import { FaPlus } from "react-icons/fa";
 import { useUser } from "@supabase/auth-helpers-react";
+import Image from "next/image";
 
 // Auth
 
