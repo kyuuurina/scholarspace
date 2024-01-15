@@ -11,6 +11,7 @@ import toast from "react-hot-toast";
 import Link from "next/link";
 import { FaPlus } from "react-icons/fa";
 import { useUser } from "@supabase/auth-helpers-react";
+import Image from "next/image";
 
 // Auth
 
@@ -123,19 +124,25 @@ const ProfilePage: NextPageWithLayout = () => {
           <div className="grid gap-y-5">
             {/* User Profile Card */}
             <section className="mx-auto mt-2 w-3/4 rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
-              <div className="flex items-center justify-between">
-                {/* <div className="relative w-20 h-20">
-                  <Image
-                    src={`https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/avatar/${avatar_url}`}
-                    alt="User Avatar"
-                    layout="fill"
-                    objectFit="cover"
-                    className="rounded-full"
-                  />
-                </div> */}
-                <h3 className="mb-4 text-2xl font-semibold">{`${
-                  name ?? "User"
-                }'s Profile`}</h3>
+            <div className="flex items-center">
+                <div className="relative w-20 h-20">
+                  {avatar_url ? (
+                    <Image
+                      src={`https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/avatar/${avatar_url}`}
+                      alt="User Avatar"
+                      layout="fill"
+                      objectFit="cover"
+                      className="rounded-full"
+                    />
+                  ) : (
+                    <AvatarPlaceholder name={name || ""} shape="circle" />
+                  )}
+                </div>
+
+                <h3 className="mb-4 text-2xl font-semibold" style={{ marginLeft: "1rem", marginRight: "50rem"}}>
+                  {`${name ?? "User"}'s Profile`}
+                </h3>
+    
                 <div>
                   {isOwner && (
                     <button
