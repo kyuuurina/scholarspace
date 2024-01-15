@@ -131,6 +131,22 @@ export const useFetchResearchPostsByFollowedUsers = () => {
   };
 };
 
+
+export const useFetchLikedPost = (id: string) => {
+  const {
+    data: myLikedPosts,
+    isLoading: isLoadingLikedpost,
+    error: errorLikedpost,
+  } = api.researchpost.getLikedPostsByUser.useQuery();
+
+
+  return {
+      myLikedPosts: myLikedPosts || [],
+      isLoadingLikedpost,
+      errorLikedpost,
+  };
+};
+
 //hook for fetching user's research posts
 // export const useFetchUserResearchPosts = (userId: string) => {
 //     const userResearchPosts = api.researchpost.getMyPosts.useQuery(

@@ -28,8 +28,7 @@ import { useRouterId } from "./routerId";
 
 // };
 
-export const useFetchLikedPost = () => {
-    const id: string = useRouterId();
+export const useFetchLikedPost = (id: string) => {
 
     const likedpost = api.postlike.getMyLikedPosts.useQuery(
         {
@@ -51,6 +50,8 @@ export const useFetchLikedPost = () => {
         error,
     };
 };
+
+
 
 
 

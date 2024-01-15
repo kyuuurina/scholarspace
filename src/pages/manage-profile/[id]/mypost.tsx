@@ -34,7 +34,6 @@ import Post from '~/components/research-post/Post';
 import Head from 'next/head';
 import EditPostForm from '~/components/research-post/EditPostForm';
 
-import toast from 'react-hot-toast';
 
 const MyPost: NextPageWithLayout = () => {
   const profile_id = useRouterId();
