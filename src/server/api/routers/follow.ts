@@ -109,30 +109,32 @@ getFollowersList: protectedProcedure
         return followingList;
       }),
 
-  // procedure to remove follower
-  removeFollower: protectedProcedure
-    .input(z.object({ userId: z.string() }))
-    .mutation(async ({ input: { userId }, ctx }) => {
-      const { user } = ctx;
+// procedure to remove follower
+removeFollower: protectedProcedure
+  .input(z.object({ userId: z.string() }))
+  .mutation(async ({ input: { userId }, ctx }) => {
+    const { user } = ctx;
 
-      if (!user) {
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "User not authenticated",
-        });
-      }
-
-      await ctx.prisma.follow.delete({
-        where: {
-          follower_id_following_id: {
-            follower_id: user.id,
-            following_id: userId,
-          },
-        },
+    // Check user authentication
+    if (!user) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "User not authenticated",
       });
+    }
 
-      return { success: true };
-    }),
+    // Delete the follow record
+    await ctx.prisma.follow.delete({
+      where: {
+        follower_id_following_id: {
+          follower_id: userId, // Use the correct field (follower_id) from the follow table
+          following_id: user.id, // Use the correct ID passed to the mutation
+        },
+      },
+    });
+
+    return { success: true };
+  }),
 
 // procedure to get followers count
 getFollowersCount: protectedProcedure

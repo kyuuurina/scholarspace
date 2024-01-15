@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import ScrollableModal from "./ScrollableModal";
@@ -25,14 +25,28 @@ interface FollowerListProps {
 
 const FollowerList: React.FC<FollowerListProps> = ({ profiles }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [followerProfiles, setFollowerProfiles] = useState<Profile[]>(profiles); // State to store follower profiles
   const user = useUser();
   const router = useRouter();
 
   const profileId = useRouterId();
 
   const { data: followerCount, refetch: refetchFollowerCount } = api.follow.getFollowersCount.useQuery({
-    userId: profileId || "", // Use the profileId of the user being viewed
+    userId: profileId || "",
   });
+
+  const { data: fetchedProfiles, refetch: refetchFollowerProfiles } = api.follow.getFollowersList.useQuery({
+    userId: profileId || "",
+  });
+
+  // Update follower profiles state when new data is fetched
+  useEffect(() => {
+    if (fetchedProfiles) {
+      // Flatten the 2D array to a 1D array
+      const flatProfiles = fetchedProfiles.flat();
+      setFollowerProfiles(flatProfiles);
+    }
+  }, [fetchedProfiles]);
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -44,30 +58,33 @@ const FollowerList: React.FC<FollowerListProps> = ({ profiles }) => {
 
   const removeFollower = api.follow.removeFollower.useMutation();
 
-  const handleRemove = async (profileId: string) => {
+  const handleRemove = async (userId: string) => {
     try {
-      const userIdToRemove = profileId;
+      const userIdToRemove = userId;
       await removeFollower.mutateAsync({ userId: userIdToRemove });
 
-      console.log(`Remove follower with profileId: ${profileId}`);
+      console.log(`Remove follower with userId: ${userId}`);
 
       // Manually trigger a refetch of followers count
       await refetchFollowerCount();
+
+      // Manually trigger a refetch of follower profiles
+      await refetchFollowerProfiles();
     } catch (error) {
       console.error("Error removing follower:", error);
       // Handle error as needed
     }
   };
 
-// Close the modal when navigating to the profile page
-const handleProfileLinkClick = async (profileId: string) => {
-  closeModal();
-  try {
-    await router.push(`/manage-profile/${profileId}`);
-  } catch (error) {
-    console.error("Error navigating to profile page:", error);
-  }
-};
+  // Close the modal when navigating to the profile page
+  const handleProfileLinkClick = async (profileId: string) => {
+    closeModal();
+    try {
+      await router.push(`/manage-profile/${profileId}`);
+    } catch (error) {
+      console.error("Error navigating to profile page:", error);
+    }
+  };
 
   return (
     <div>
@@ -75,11 +92,11 @@ const handleProfileLinkClick = async (profileId: string) => {
         {followerCount ? followerCount.followersCount.toString() + " Followers" : "Followers"}
       </button>
       <ScrollableModal show={isModalOpen} onClose={closeModal} title="Followers">
-        {profiles && profiles.length === 0 ? (
+        {followerProfiles && followerProfiles.length === 0 ? (
           <p>No Followers.</p>
         ) : (
           <ul>
-            {profiles.map((profile, index) => (
+            {followerProfiles.map((profile, index) => (
               <li key={profile.profile_id} className="flex items-center justify-between space-x-2 mb-2">
                 <div className="flex items-center space-x-2">
                   <div className="aspect-w-1 aspect-h-1 h-10 w-10">
@@ -113,7 +130,7 @@ const handleProfileLinkClick = async (profileId: string) => {
                   </p>
                 </div>
                 {user && (
-                  <button onClick={() => handleRemove(profile.profile_id)} className="text-red-500">
+                  <button onClick={() => handleRemove(profile.user_id)} className="text-red-500">
                     Remove
                   </button>
                 )}
