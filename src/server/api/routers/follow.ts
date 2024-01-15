@@ -134,8 +134,8 @@ getFollowersList: protectedProcedure
       return { success: true };
     }),
 
-  // procedure to get followers count
-  getFollowersCount: protectedProcedure
+// procedure to get followers count
+getFollowersCount: protectedProcedure
     .input(z.object({ userId: z.string() }))
     .query(async ({ input: { userId }, ctx }) => {
       const followersCount = await ctx.prisma.follow.count({
@@ -143,5 +143,15 @@ getFollowersList: protectedProcedure
       });
       return { followersCount };
     }),
+
+// procedure to get following count
+getFollowingCount: protectedProcedure
+.input(z.object({ userId: z.string() }))
+.query(async ({ input: { userId }, ctx }) => {
+  const followingCount = await ctx.prisma.follow.count({
+    where: { follower_id: userId },
+  });
+  return { followingCount };
+}),
 
 });
