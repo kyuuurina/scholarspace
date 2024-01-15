@@ -9,7 +9,6 @@ import { api } from "~/utils/api";
 import { useRouterId } from "~/utils/routerId";
 import toast from "react-hot-toast";
 import React from "react";
-import { getCookie } from "cookies-next";
 
 // types
 import type { ProfileFormData } from "~/types/profile";
@@ -29,59 +28,71 @@ import ErrorToast from "../toast/ErrorToast";
 type ModalProps = {
   openModal: boolean;
   onClick: () => void;
+  achievement: {
+    achievement_id: string;
+    title: string;
+    received_year: string;
+    description: string | null;
+    user_id: string;
+    isLoading: boolean;
+  };
 };
 
-const EditAchievement: React.FC<ModalProps> = ({ openModal, onClick }) => {
-
+const EditAchievement: React.FC<ModalProps> = ({
+  achievement,
+  openModal,
+  onClick,
+}) => {
   //const
   const router = useRouter();
   // const  profile_id  = router.query;
   const user = useUser();
   const profile_id = useRouterId();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const userId = getCookie("UserID");
+  const userId = user?.id || "";
 
-  //populate form fields 
-  const {title, received_year, description, achievement_id, isLoading} = useFetchAchievement();
+  //populate form fields
+  const { title, received_year, description, achievement_id, isLoading } =
+    achievement;
 
-
-//schema for form validation
+  //schema for form validation
   const schema: ZodType<AchievementFormData> = z.object({
     title: z.string().min(1, { message: "Title is required" }),
     received_year: z.string().min(1, { message: "Year is required" }),
     description: z.string().nullable(),
   });
 
-    //react-hook-form
-    const {
-      register,
-      handleSubmit,
-      setValue,
-      reset,
-      formState: { errors, isDirty },
-    } = useForm<AchievementFormData>({
-      resolver: zodResolver(schema),
-      defaultValues :{
-        title: title,
-        received_year: received_year,
-        description: description,
-      }
-    });
+  //react-hook-form
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    reset,
+    formState: { errors, isDirty },
+  } = useForm<AchievementFormData>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      title: title,
+      received_year: received_year,
+      description: description,
+    },
+  });
 
-    //set form value to profile data
-    useEffect(() => {
-      if (!isLoading) {
-        setValue("title", title || "");
-        setValue("received_year", received_year || "");
-        setValue("description", description || "");
-
-      }
-    }, [isLoading, setValue]);
+  //set form value to profile data
+  useEffect(() => {
+    if (!isLoading) {
+      setValue("title", title || "");
+      setValue("received_year", received_year || "");
+      setValue("description", description || "");
+    }
+  }, [isLoading, setValue]);
 
   //toast
   const updateAchievement = api.achievement.updateAchievement.useMutation({
     onSuccess: () => {
-      toast.custom(() => <SuccessToast message="Achievement successfully updated" />);
+      toast.custom(() => (
+        <SuccessToast message="Achievement successfully updated" />
+      ));
       router.reload();
     },
     onError: () => {
@@ -114,7 +125,9 @@ const EditAchievement: React.FC<ModalProps> = ({ openModal, onClick }) => {
     });
   };
 
-  const handleEditClick = () => {setIsEditModalOpen(true);};
+  const handleEditClick = () => {
+    setIsEditModalOpen(true);
+  };
 
   return (
     <div>
@@ -146,7 +159,6 @@ const EditAchievement: React.FC<ModalProps> = ({ openModal, onClick }) => {
             {errors.title && <FormErrorMessage text={errors.title.message} />}
           </div>
 
-
           <div>
             <label
               htmlFor="received_year"
@@ -159,7 +171,9 @@ const EditAchievement: React.FC<ModalProps> = ({ openModal, onClick }) => {
               className="block w-full"
               {...register("received_year", { required: true })}
             />
-            {errors.received_year && <FormErrorMessage text={errors.received_year.message} />}
+            {errors.received_year && (
+              <FormErrorMessage text={errors.received_year.message} />
+            )}
           </div>
 
           <div>
@@ -179,23 +193,23 @@ const EditAchievement: React.FC<ModalProps> = ({ openModal, onClick }) => {
             )}
           </div>
 
-        {/* Buttons container with justify-end */}
-        <div className="flex justify-end gap-4">
-          {/* Save button */}
-          <PrimaryButton name="Save" type="submit" />
+          {/* Buttons container with justify-end */}
+          <div className="flex justify-end gap-4">
+            {/* Save button */}
+            <PrimaryButton name="Save" type="submit" />
 
-          {/* Cancel button */}
-          <button
-            type="button"
-            className="bg-gray-400 hover:bg-gray-500 text-gray-800 font-bold py-2 px-4 rounded-lg inline-flex items-center"
-            onClick={() => {
-              onClick();
-              handleCancel();
-            }}
-          >
-            Cancel
-          </button>
-        </div>
+            {/* Cancel button */}
+            <button
+              type="button"
+              className="inline-flex items-center rounded-lg bg-gray-400 px-4 py-2 font-bold text-gray-800 hover:bg-gray-500"
+              onClick={() => {
+                onClick();
+                handleCancel();
+              }}
+            >
+              Cancel
+            </button>
+          </div>
         </form>
       </Modal>
     </div>

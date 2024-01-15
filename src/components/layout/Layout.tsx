@@ -26,7 +26,7 @@ export default function Layout({ children }: LayoutProps) {
   return (
     <>
       <div className="flex min-h-screen">
-        <SideBar open={open} toggleSidebar={handleToggle} profileId={profileId}/>
+        <SideBar open={open} toggleSidebar={handleToggle} />
         <div className="w-full">
           <NavBar toggleSidebar={handleToggle} />
           {children}

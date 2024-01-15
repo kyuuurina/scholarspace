@@ -12,14 +12,11 @@ import { api } from "~/utils/api";
 import { useRouterId } from "~/utils/routerId";
 import toast from "react-hot-toast";
 import React from "react";
-import { getCookie } from "cookies-next";
 
 // types
-import type { EducationFormData } from "~/types/profile";
 import type { ExperienceFormData } from "~/types/profile";
 
 //utils
-import { useFetchEducation } from "~/utils/education";
 import { useFetchExperience } from "~/utils/experience";
 
 // local components
@@ -32,9 +29,18 @@ import ErrorToast from "../toast/ErrorToast";
 type ModalProps = {
   openModal: boolean;
   onClick: () => void;
+  experience: {
+    experience_id: string;
+    title: string;
+    start_year: string;
+    end_year: string;
+    description: string | null;
+    user_id: string;
+    isLoading: boolean;
+  };
 };
 
-const EditExperience: React.FC<ModalProps> = ({ openModal, onClick }) => {
+const EditExperience: React.FC<ModalProps> = ({ experience, openModal, onClick }) => {
 
   //const
   const router = useRouter();
@@ -42,10 +48,10 @@ const EditExperience: React.FC<ModalProps> = ({ openModal, onClick }) => {
   const user = useUser();
   const profile_id = useRouterId();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const userId = getCookie("UserID");
+  const userId = user?.id || "";
 
   //populate form fields 
-  const {experience_id, title, start_year, end_year, description, isLoading} = useFetchExperience();
+  const {experience_id, title, start_year, end_year, description, isLoading} = experience;
 
   //schema for form validation
   const schema: ZodType<ExperienceFormData> = z.object({

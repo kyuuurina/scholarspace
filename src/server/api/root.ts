@@ -3,7 +3,6 @@ import { accountRouter } from "./routers/account";
 import { userRouter } from "./routers/user";
 import { workspaceRouter } from "~/server/api/routers/workspace";
 import { projectRouter } from "./routers/project";
-import { memberRouter } from "~/server/api/routers/member";
 import { researchpostRouter } from "~/server/api/routers/researchpost";
 import { profileRouter } from "./routers/profile";
 import { researchInterestRouter } from "./routers/research-interest";
@@ -14,12 +13,16 @@ import { achievementRouter } from "./routers/achievement";
 import { followRouter } from "./routers/follow";
 import { likeRouter } from "./routers/postlike";
 import { postCommentRouter } from "./routers/postcomment";
+import { chatRouter} from "./routers/chatmessage";
 import { phaseRouter } from "./routers/phase";
 import { taskRouter } from "./routers/task";
 import { commentRouter } from "./routers/comment";
 import { scoreRouter } from "./routers/score";
 import { reactionRouter } from "./routers/reaction";
 import { notificationsRouter } from "./routers/notifications";
+import { grantRouter } from "./routers/grant";
+import { templateRouter } from "./routers/template";
+import { searchRouter } from "./routers/search";
 
 /**
  * This is the primary router for your server.
@@ -28,7 +31,6 @@ import { notificationsRouter } from "./routers/notifications";
  */
 export const appRouter = router({
   workspace: workspaceRouter,
-  member: memberRouter,
   account: accountRouter,
   profile: profileRouter,
   reaction: reactionRouter,
@@ -47,7 +49,11 @@ export const appRouter = router({
   follow: followRouter,
   postlike: likeRouter,
   postcomment: postCommentRouter,
+  chat: chatRouter,
   notifications: notificationsRouter,
+  grant: grantRouter,
+  template: templateRouter,
+  search: searchRouter,
 });
 
 // export type definition of API

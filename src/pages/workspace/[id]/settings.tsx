@@ -5,7 +5,7 @@ import { api } from "~/utils/api";
 import { type ZodType, z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
-import { getCookie } from "cookies-next";
+import { useUser } from "@supabase/auth-helpers-react";
 import { useFetchWorkspace } from "~/utils/workspace";
 
 // types
@@ -28,12 +28,13 @@ import { useGetWorkspaceRole } from "~/utils/userWorkspaces";
 
 const Settings: NextPageWithLayout = () => {
   // constants
+  const user = useUser();
   const userWorkspaceRole = useGetWorkspaceRole();
   const router = useRouter();
   const { id } = router.query;
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [leaveModalIsOpen, setLeaveModalIsOpen] = useState(false);
-  const userId = getCookie("UserID");
+  const userId = user?.id || "";
 
   const {
     name,

@@ -11,7 +11,6 @@ import "~/styles/globals.css";
 import { Inter } from "next/font/google";
 import "@mantine/tiptap/styles.css";
 import { MantineProvider, MantineTheme } from "@mantine/core";
-
 // supabase helpers for authentication and authorization
 import { createPagesBrowserClient } from "@supabase/auth-helpers-nextjs";
 import {

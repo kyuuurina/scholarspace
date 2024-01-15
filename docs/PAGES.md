@@ -17,7 +17,7 @@ Welcome to the documentation for the pages. In this guide, you'll find detailed 
 
 ```js
 import type { NextPageWithLayout } from "~/pages/_app";
-import Layout from "~/components/layout";
+import Layout from "~/components/layout/Layout";
 ```
 3. Create a new component and export it as a NextPageWithLayout.
 

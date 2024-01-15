@@ -1,5 +1,5 @@
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { GoogleIcon } from "~/components/auth/GoogleIcon";
+import { FcGoogle } from "react-icons/fc";
 
 type Props = {
   type: "signin" | "signup";
@@ -20,9 +20,9 @@ export const GoogleButton: React.FC<Props> = ({ type }) => {
       type="button"
       onClick={handleGoogleSignUp}
     >
-      <div className="flex gap-2">
-        <GoogleIcon className="w-4" />
-        {type === "signup" ? "signUpGoogle" : "signInGoogle"}
+      <div className="flex items-center gap-2">
+        <FcGoogle />
+        {type === "signup" ? "Sign up with Google" : "Sign In with Google"}
       </div>
     </button>
   );

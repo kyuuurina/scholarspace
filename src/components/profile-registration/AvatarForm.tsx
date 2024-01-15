@@ -5,6 +5,7 @@ import { useUser } from "@supabase/auth-helpers-react";
 import Image from "next/image";
 import { useState } from "react";
 import { FaRegUserCircle } from "react-icons/fa";
+import { FiXCircle } from "react-icons/fi";
 
 type AvatarFormProps = {
   setValue: UseFormSetValue<FormData>;
@@ -44,9 +45,9 @@ const AvatarForm: React.FC<AvatarFormProps> = ({ setValue, setImageValue }) => {
   return (
     <div className="my-6">
       <div className="space-y-4">
-        <label>
-          <p className="mb-2">Upload your avatar here</p>
-          <div className="flex h-40 w-40 items-center justify-center rounded-full border border-gray-300 bg-gray-100">
+        <label className=" h-60 w-60 flex-col items-center justify-center rounded-full bg-gray-50 ">
+          <p className="mb-5">Upload your avatar here</p>
+          <div className="h-fit w-fit cursor-pointer rounded-full border border-gray-300 hover:bg-gray-100">
             {imagePlaceholder ? (
               <Image
                 src={imagePlaceholder}
@@ -54,20 +55,36 @@ const AvatarForm: React.FC<AvatarFormProps> = ({ setValue, setImageValue }) => {
                 className="rounded-full"
                 width={160}
                 height={160}
+                style={{
+                  borderRadius: "50%",
+                  overflow: "hidden",
+                  width: 100,
+                  height: 100,
+                }}
               />
             ) : (
               <FaRegUserCircle size={100} className="text-gray-300" />
             )}
-            <input
-              type="file"
-              className="hidden"
-              accept="image/png, image/jpeg, image/jpg"
-              onChange={(e) => {
-                void handleOnChange(e);
-              }}
-            />
+            <label>
+              <input
+                onChange={(e) => {
+                  handleOnChange(e);
+                }}
+                type="file"
+                className="hidden"
+                accept="image/*"
+              />
+            </label>
           </div>
         </label>
+        {imagePlaceholder ? (
+          <button
+            className="flex items-center justify-start space-x-2 rounded-md p-1 text-red-700 hover:bg-red-100"
+            onClick={() => setImagePlaceholder(null)}
+          >
+            <FiXCircle /> <span>Remove</span>
+          </button>
+        ) : null}
       </div>
     </div>
   );

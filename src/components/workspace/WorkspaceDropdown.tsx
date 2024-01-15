@@ -60,7 +60,7 @@ const WorkspaceDropdown: React.FC<{ onClick: () => void }> = ({ onClick }) => {
             workspaceListings.map((workspace) => (
               <li
                 key={workspace.id}
-                className="flex w-full px-5 hover:bg-gray-100"
+                className="flex w-full items-center px-5 hover:bg-gray-100"
               >
                 {workspace.cover_img ? (
                   <Image
@@ -70,7 +70,9 @@ const WorkspaceDropdown: React.FC<{ onClick: () => void }> = ({ onClick }) => {
                     height={50}
                   />
                 ) : (
-                  <AvatarPlaceholder name={workspace.name} />
+                  <div className="h-full w-full">
+                    <AvatarPlaceholder name={workspace.name} />
+                  </div>
                 )}
                 <Link
                   key={workspace.id}
