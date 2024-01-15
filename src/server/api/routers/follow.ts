@@ -75,25 +75,25 @@ export const followRouter = router({
       return { isFollowing: !!existingFollow }; // Convert to boolean
     }),
 
-  // get followers list
-  getFollowersList: protectedProcedure
-    .input(z.object({ userId: z.string() }))
-    .query(async ({ input: { userId }, ctx }) => {
-      const followers = await ctx.prisma.follow.findMany({
-        where: { following_id: userId },
-        include: {
-          user_follow_follower_idTouser: {
-            include: { profile: true } // Include the profile relation
-          }
-        },
-      });
+// get followers list
+getFollowersList: protectedProcedure
+  .input(z.object({ userId: z.string() }))
+  .query(async ({ input: { userId }, ctx }) => {
+    const followers = await ctx.prisma.follow.findMany({
+      where: { following_id: userId },
+      include: {
+        user_follow_follower_idTouser: {
+          include: { profile: true } // Include the profile relation
+        }
+      },
+    });
 
-      const followersList = followers.map((follow) => follow.user_follow_follower_idTouser);
-      return followersList;
-    }),
+    const followersList = followers.map((follow) => follow.user_follow_follower_idTouser.profile);
+    return followersList;
+  }),
 
-    // get following list
-    getFollowingList: protectedProcedure
+  // get following list
+  getFollowingList: protectedProcedure
       .input(z.object({ userId: z.string() }))
       .query(async ({ input: { userId }, ctx }) => {
         const following = await ctx.prisma.follow.findMany({
@@ -105,33 +105,55 @@ export const followRouter = router({
           },
         });
 
-        const followingList = following.map((follow) => follow.user_follow_following_idTouser);
+        const followingList = following.map((follow) => follow.user_follow_following_idTouser.profile);
         return followingList;
       }),
 
-  // procedure to remove follower
-  removeFollower: protectedProcedure
-    .input(z.object({ userId: z.string() }))
-    .mutation(async ({ input: { userId }, ctx }) => {
-      const { user } = ctx;
+// procedure to remove follower
+removeFollower: protectedProcedure
+  .input(z.object({ userId: z.string() }))
+  .mutation(async ({ input: { userId }, ctx }) => {
+    const { user } = ctx;
 
-      if (!user) {
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "User not authenticated",
-        });
-      }
-
-      await ctx.prisma.follow.delete({
-        where: {
-          follower_id_following_id: {
-            follower_id: user.id,
-            following_id: userId,
-          },
-        },
+    // Check user authentication
+    if (!user) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "User not authenticated",
       });
+    }
 
-      return { success: true };
+    // Delete the follow record
+    await ctx.prisma.follow.delete({
+      where: {
+        follower_id_following_id: {
+          follower_id: userId, // Use the correct field (follower_id) from the follow table
+          following_id: user.id, // Use the correct ID passed to the mutation
+        },
+      },
+    });
+
+    return { success: true };
+  }),
+
+// procedure to get followers count
+getFollowersCount: protectedProcedure
+    .input(z.object({ userId: z.string() }))
+    .query(async ({ input: { userId }, ctx }) => {
+      const followersCount = await ctx.prisma.follow.count({
+        where: { following_id: userId },
+      });
+      return { followersCount };
     }),
+
+// procedure to get following count
+getFollowingCount: protectedProcedure
+.input(z.object({ userId: z.string() }))
+.query(async ({ input: { userId }, ctx }) => {
+  const followingCount = await ctx.prisma.follow.count({
+    where: { follower_id: userId },
+  });
+  return { followingCount };
+}),
 
 });

@@ -3,7 +3,7 @@
 import React, { useState, useRef } from "react";
 import Image from "next/image";
 import { MoonLoader } from "react-spinners";
-import { FiEdit2, FiTrash2, FiMessageSquare, FiHeart } from "react-icons/fi";
+import { FiEdit2, FiTrash2, FiMessageSquare} from "react-icons/fi";
 import Card from "../Card";
 import AvatarPlaceholder from "../avatar/AvatarPlaceholder";
 import ProfileAvatarPlaceholder from "../avatar/ProfileAvatar";
@@ -25,6 +25,7 @@ import router, { useRouter } from "next/router";
 import SuccessToast from "../toast/SuccessToast";
 import ErrorToast from "../toast/ErrorToast";
 import toast from "react-hot-toast";
+import LikeButton from "../research-post/LikeButton";
 
 // Auth
 import { useUser } from "@supabase/auth-helpers-react";
@@ -133,20 +134,7 @@ const Post: React.FC<PostProps> = ({ post, onEditClick, refetch }) => {
     : null;
 
   const [documentLoading, setDocumentLoading] = useState(true);
-
-  // Like
   const categoryStyles = getCategoryStyles(post.category);
-  const [liked, setLiked] = useState(false);
-  const toggleLike = api.postlike.toggleLike.useMutation();
-
-  const handleLikeClick = async () => {
-    try {
-      const likeCount = await toggleLike.mutate({ post_id: post.post_id });
-      setLiked((prevLiked) => !prevLiked);
-    } catch (error) {
-      console.error("Error toggling like:", error);
-    }
-  };
 
   const schema: ZodType<CommentFormValues> = z.object({
     value: z.string().min(3, { message: "Comment is too short" }),
@@ -318,18 +306,9 @@ const Post: React.FC<PostProps> = ({ post, onEditClick, refetch }) => {
           <FiMessageSquare size={18} className="mr-1 inline-block md:mr-2" />
           Comment
         </button>
-        <button
-          onClick={handleLikeClick}
-          className="flex items-center text-xs text-gray-500 hover:text-gray-700 focus:outline-none md:text-sm"
-        >
-          <FiHeart
-            size={18}
-            className={`mr-1 inline-block md:mr-2 ${
-              liked ? "fill-red-500 text-red-500" : ""
-            }`}
-          />
-          Like
-        </button>
+      </div>
+      <div className="mb-2 mt-2 flex items-center md:mb-4">
+        <LikeButton postId={post.post_id} />
       </div>
 
       <div className="mt-4">

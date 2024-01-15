@@ -1,5 +1,4 @@
 // to-do: add PageLoader
-// this file contains dummy data for Education, Research Experience, and Achievement
 
 import React from "react";
 import { useState } from "react";
@@ -9,7 +8,6 @@ import { api } from "~/utils/api";
 import { type ZodType, z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
-import Image from "next/image";
 import Link from "next/link";
 import { FaPlus } from "react-icons/fa";
 import { useUser } from "@supabase/auth-helpers-react";
@@ -65,7 +63,7 @@ import AchievementCard from "~/components/profile/AchievementCard";
 import FollowButton from "~/components/network/FollowButton";
 import Button from "~/components/button/Button";
 import FollowListModal from "~/components/network/FollowListModal";
-import FollowersList from "~/components/network/FollowerList";
+import FollowerList from "~/components/network/FollowerList";
 import FollowingList from "~/components/network/FollowingList";
 
 
@@ -74,6 +72,8 @@ const ProfilePage: NextPageWithLayout = () => {
   const { id } = router.query; // query id
   const user = useUser();
 
+  const userId = user?.id;
+
   const profileId = useRouterId();
 
   // get user profile
@@ -81,50 +81,20 @@ const ProfilePage: NextPageWithLayout = () => {
     profile_id: profileId, // pass the id to router.query
   });
 
-  const userId = user?.id;
-
   const { user: uuser } = UseCheckProfile(userId ?? "");
   const isOwner = user && user.id === Profile.data?.user_id; // check if the logged in user matches Profile user
   const isNotOwner = !user || (user && user.id !== Profile.data?.user_id); //not owner
 
-  const {
-    avatar_url,
-    name,
-    about_me,
-    skills,
-    research_interest,
-    collab_status,
-    isLoading,
-    user_id,
-  } = useFetchProfile();
-  // const { educations: educationsData, isLoading: isLoadingEducations } = useFetchEducation();
-  const {
-    educations,
-    isLoading: EducationLoading,
-    error: EducationError,
-  } = useFetchEducation();
-  const {
-    achievements,
-    isLoading: AchievementLoading,
-    error: AchievementError,
-  } = useFetchAchievement();
-  const {
-    experiences,
-    isLoading: ExperienceLoading,
-    error: ExperienceError,
-  } = useFetchExperience();
+  const { avatar_url, name, about_me, skills, research_interest, collab_status, isLoading, user_id,} = useFetchProfile();
+  const { educations, isLoading: EducationLoading, error: EducationError,} = useFetchEducation();
+  const { achievements, isLoading: AchievementLoading, error: AchievementError,} = useFetchAchievement();
+  const { experiences, isLoading: ExperienceLoading, error: ExperienceError,} = useFetchExperience();
+  const { followersData, followersLoading, followersError } = useFetchFollowers(profileId);
+  const { followingData, followingLoading, followingError } = useFetchFollowing(profileId);
 
-  // const myEducationLists = useFetchTry();
-  // console.log("myEducationLists:", myEducationLists);
+  const flattenedFollowersData = followersData?.flat() || [];
+  const flattenedFollowingData = followingData?.flat() || [];
 
-  // Fetch Followers and Following data
-  // const followers = api.follow.getFollowersList.useQuery({
-  //   userId: profileId, // pass the user's id
-  // });
-
-  // const following = api.follow.getFollowingList.useQuery({
-  //   userId: profileId, // pass the user's id
-  // });
 
   // const modal states
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -202,8 +172,21 @@ const ProfilePage: NextPageWithLayout = () => {
                 </div>
                 <div>
                   <div className="flex space-x-4">
-                    <div className="mb-4">{/* <FollowersList /> */}</div>
-                    <div className="mb-4">{/* <FollowingList /> */}</div>
+
+                  <div className="mb-4">
+                    {followersData ? (
+                      <FollowerList profiles={flattenedFollowersData} />
+                    ) : (
+                      <p>Loading followers...</p>
+                    )}
+                  </div>
+                  <div className="mb-4">
+                    {followingData ? (
+                      <FollowingList profiles={flattenedFollowingData} />
+                    ) : (
+                      <p>Loading following...</p>
+                    )}
+                  </div>
                   </div>
                   <div className="mb-4 mt-4">
                     <p className="text-sm text-gray-600">
