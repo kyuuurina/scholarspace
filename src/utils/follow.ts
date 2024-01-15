@@ -1,5 +1,6 @@
 import { api } from "./api";
 import {useRouterId} from "./routerId";
+import {useQuery, useQueryClient} from "@tanstack/react-query";
 
 interface Profile {
   profile_id: string;
@@ -45,32 +46,34 @@ export const useFetchFollowing = (userId: string) => {
   };
 };
 
-// export const useFetchFollowing = () => {
-//   const id: string = useRouterId();
 
-//   const following = api.follow.getFollowingList.useQuery(
+
+// export const useFetchFollowStatus = (userId: string) => {
+//   const followStatus = api.follow.getFollowStatus.useQuery(
 //     {
-//       userId: id,
+//       userId,
 //     },
 //     {
-//       enabled: !!id,
+//       enabled: !!userId,
 //     }
 //   );
 
-//   const { data, isLoading, error } = following;
+//   const { data, isLoading, error } = followStatus;
 
 //   return {
-//     following: data || [],
+//     isFollowing: data?.isFollowing || false,
 //     isLoading,
 //     error,
 //   };
 // };
 
+
 export const useFetchFollowStatus = (userId: string) => {
-  const followStatus = api.follow.getFollowStatus.useQuery(
-    {
-      userId,
-    },
+  const queryClient = useQueryClient();
+
+  const followStatus = useQuery(
+    ['getFollowStatus', userId], // The query key
+    () => api.follow.getFollowStatus.useQuery({ userId }),
     {
       enabled: !!userId,
     }
@@ -78,13 +81,21 @@ export const useFetchFollowStatus = (userId: string) => {
 
   const { data, isLoading, error } = followStatus;
 
+  const refetch = async () => {
+    try {
+      await queryClient.invalidateQueries(['getFollowStatus', userId]);
+    } catch (error) {
+      console.error('Error refetching follow status:', error);
+    }
+  };
+
   return {
-    isFollowing: data?.isFollowing || false,
+    isFollowing: data?.data?.isFollowing || false,
     isLoading,
     error,
+    refetch,
   };
 };
-
 
 
 
