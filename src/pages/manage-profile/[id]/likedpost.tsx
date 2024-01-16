@@ -36,7 +36,7 @@ import Post from '~/components/research-post/Post';
 import EditPostForm from '~/components/research-post/EditPostForm';
 
 
-const MyPost: NextPageWithLayout = () => {
+const LikedPost: NextPageWithLayout = () => {
   const profile_id = useRouterId();
   console.log("Front call",profile_id)
   const LikedPost = useFetchLikedPost(profile_id);
@@ -127,7 +127,7 @@ const MyPost: NextPageWithLayout = () => {
 };
 
 
-MyPost.getLayout = function getLayout(page: ReactElement) {
+LikedPost.getLayout = function getLayout(page: ReactElement) {
   return (
     <>
       <Layout>{page}</Layout>
@@ -135,4 +135,4 @@ MyPost.getLayout = function getLayout(page: ReactElement) {
   );
 };
 
-export default MyPost;
+export default LikedPost;
