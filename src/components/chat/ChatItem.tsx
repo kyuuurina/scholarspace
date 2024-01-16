@@ -2,6 +2,7 @@
 import React from 'react';
 import Link from 'next/link';
 import AvatarPlaceholder from '../avatar/AvatarPlaceholder';
+import Image from 'next/image';
 
 interface Profile {
   profile_id: string;
@@ -33,21 +34,33 @@ const ChatItem: React.FC<ChatItemProps> = ({ chat }) => {
   const user1 = chat.user_chat_user1_idTouser;
 
   return (
-    <div className="hover:bg-gray-100 transition duration-300 ease-in-out"> {/* Add this div with the "flex items-center" classes */}
-      {/* <p>Chat ID: {chat.chat_id.toString()}</p> */}
-
+    <div className="hover:bg-gray-100 transition duration-300 ease-in-out">
       {user1 && (
-        <div className="flex items-center"> {/* Add this div with the "flex items-center" classes */}
-          {/* <p>User 1: </p> */}
+        <div className="flex items-center">
           <div>
             {user1.profile && user1.profile.map(profile => (
-              <div key={profile.profile_id} className="flex items-center mb-2"> {/* Add this div with the "flex items-center mb-2" classes */}
+              <div key={profile.profile_id} className="flex items-center mb-2">
                 <Link href={`/manage-profile/${profile.profile_id}`}>
                   <div className="aspect:square h-10 w-10 cursor-pointer">
-                    <AvatarPlaceholder name={profile.name} shape="circle" />
+                    {profile.avatar_url ? (
+                      <span className="relative inline-block cursor-pointer">
+                        <div className="h-10 w-10">
+                          <Image
+                            src={`https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/avatar/${profile.avatar_url}`}
+                            alt={profile.name}
+                            layout="fill"
+                            objectFit="cover"
+                            className="rounded-full"
+                          />
+                        </div>
+                        <span className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-800 opacity-50 rounded-full" />
+                      </span>
+                    ) : (
+                      <AvatarPlaceholder name={profile.name} shape="circle" />
+                    )}
                   </div>
                 </Link>
-                <div className="ml-2 font-bold"> {/* Add this div with the "ml-2 font-bold" classes */}
+                <div className="ml-2 font-bold">
                   <Link href={`/manage-profile/${profile.profile_id}`}>
                     <span className="cursor-pointer inline-block max-w-full sm:max-w-[150px] overflow-hidden whitespace-nowrap overflow-ellipsis">
                       {profile.name}
