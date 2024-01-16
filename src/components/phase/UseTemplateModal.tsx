@@ -17,6 +17,7 @@ const TemplateModal: React.FC<TemplateModalProps> = ({ show, onClose }) => {
   const { data: templates } = api.template.list.useQuery();
   const [selectedTemplate, setSelectedTemplate] =
     useState<phase_template | null>(null);
+  const [adding, setAdding] = useState(false);
 
   useEffect(() => {
     setSelectedTemplate(templates?.[0] ?? null);
@@ -25,6 +26,8 @@ const TemplateModal: React.FC<TemplateModalProps> = ({ show, onClose }) => {
   const createPhase = api.phase.createWithTemplate.useMutation();
 
   const handleCreatePhase = async () => {
+    if (adding) return;
+    setAdding(true);
     if (!selectedTemplate) return;
 
     const phase = await createPhase.mutateAsync({
@@ -36,6 +39,7 @@ const TemplateModal: React.FC<TemplateModalProps> = ({ show, onClose }) => {
       onClose();
       router.reload();
     }
+    setAdding(false);
   };
 
   return (

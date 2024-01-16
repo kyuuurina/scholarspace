@@ -3,6 +3,7 @@ import type { taskRow } from "~/types/task";
 import { useState, useEffect } from "react";
 import { useFetchTasksWithProperties } from "~/utils/task";
 import { set } from "zod";
+import MoonLoader from "react-spinners/MoonLoader";
 
 type StatusBadgeProps = {
   task?: taskRow;
@@ -92,14 +93,17 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({
 
   return (
     <div style={{ position: "relative" }}>
-      <span
-        className={`badge cursor-pointer rounded-md p-2 text-xs ${getStatusBadgeClassName(
+      <div
+        className={`badge flex w-fit cursor-pointer items-center space-x-5 rounded-md p-2 text-xs ${getStatusBadgeClassName(
           task?.status || status || ""
         )}`}
         onClick={() => setDropdownOpen(!isDropdownOpen)}
       >
         {task ? task.status : status}
-      </span>
+        {updateStatusTask.isLoading && (
+          <MoonLoader size={10} color={"#000000"} loading={true} />
+        )}
+      </div>
       {isDropdownOpen && renderStatusDropdown()}
     </div>
   );

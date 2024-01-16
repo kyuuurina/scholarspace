@@ -216,7 +216,11 @@ const WorkspaceModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
             </div>
           </div>
 
-          <PrimaryButton name="Create Workspace" type="submit" />
+          <PrimaryButton
+            name="Create Workspace"
+            type="submit"
+            disabled={isSubmitting}
+          />
         </form>
       </Modal>
     </div>

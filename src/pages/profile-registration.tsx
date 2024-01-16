@@ -63,8 +63,8 @@ const SignUp: NextPage = () => {
   const { currentStep, next, back, isFirstStep, isLastStep } = useMultistepForm(
     [
       <BasicInfoForm key={4} register={register} setValue={setValue} />,
-      <AvatarForm key={5} setValue={setValue} setImageValue={setImageValue} />,
       <RoleForm key={6} setValue={setValue} />,
+      <AvatarForm key={5} setValue={setValue} setImageValue={setImageValue} />,
     ]
   );
 
@@ -79,7 +79,7 @@ const SignUp: NextPage = () => {
       await createProfileMut.mutateAsync({
         ...getValues(),
       });
-      await router.push("/");
+      void router.push("/");
     } catch (error) {
       toast.custom(() => {
         if (error instanceof TRPCClientError) {
@@ -119,6 +119,7 @@ const SignUp: NextPage = () => {
               <Button
                 type="submit"
                 name={`${isLastStep ? "Submit" : "Next"}`}
+                isLoading={createProfileMut.isLoading}
               />
             </div>
           </form>

@@ -88,8 +88,7 @@ const ProjectSettings: NextPageWithLayout = () => {
         project_id,
         ...formData,
       });
-    } catch (error) {
-    }
+    } catch (error) {}
   };
 
   const handleCancel = () => {
@@ -233,7 +232,7 @@ const ProjectSettings: NextPageWithLayout = () => {
                           ? "bg-purple-accent-1 hover:bg-purple-accent-2"
                           : "bg-gray-200"
                       } rounded-sm px-3 py-2 text-center text-sm font-medium text-white focus:outline-none`}
-                      disabled={!isDirty}
+                      disabled={!isDirty || updateProject.isLoading}
                     >
                       Save
                     </button>

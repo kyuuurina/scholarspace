@@ -255,7 +255,7 @@ const Settings: NextPageWithLayout = () => {
                         ? "bg-purple-accent-1 hover:bg-purple-accent-2"
                         : "bg-gray-200"
                     } rounded-sm px-3 py-2 text-center text-sm font-medium text-white focus:outline-none`}
-                    disabled={!isDirty}
+                    disabled={!isDirty || updateWorkspace.isLoading}
                   >
                     Save
                   </button>
