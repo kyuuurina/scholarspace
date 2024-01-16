@@ -18,6 +18,7 @@ import NonNullableDatePicker from "./NonNullableDatePicker";
 import NullableDatePicker from "./NullableDatePicker";
 import TaskAssignees from "./TaskAssignees";
 import TaskProperty from "./TaskProperty";
+import SetReminder from "./SetReminder";
 
 type TaskDrawerProps = {
   task: taskRow;
@@ -105,7 +106,7 @@ const TaskDrawer: React.FC<TaskDrawerProps> = ({ task, onClose, refetch }) => {
             {/* Comments Section */}
             {task && <CommentsSection task_id={task?.id} refetch={refetch} />}
           </div>
-          <div className="space-y-4">
+          <div className="col-span-1 grid space-y-4">
             <div>
               <label className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
                 Status
@@ -143,6 +144,8 @@ const TaskDrawer: React.FC<TaskDrawerProps> = ({ task, onClose, refetch }) => {
                 refetch={refetch}
               />
             </div>
+            {/* set task reminder */}
+            <SetReminder refetch={refetch} />
             {/* render properties input fields */}
             {task?.properties.map((property) => (
               <TaskProperty
