@@ -39,7 +39,6 @@ const Workspace: NextPageWithLayout = () => {
     workspaceId: workspaceId,
   });
   const { grantSummary, refetch } = useFetchGrantSummary(workspaceId);
-  console.log(grantSummary);
 
   return (
     <>

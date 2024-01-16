@@ -47,7 +47,6 @@ const ManageTemplates: NextPageWithLayout = () => {
         const newProperties = [...prevProperties, editedHeader.trim()];
         setEditedHeader(""); // Reset the input field
         setIsAddColumnVisible(false);
-        console.log(newProperties);
         return newProperties; // Return the updated state
       });
     }

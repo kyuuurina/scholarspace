@@ -98,8 +98,6 @@ export const projectRouter = router({
       };
     }),
 
-    
-
   create: protectedProcedure
     .input(
       z.object({
@@ -248,11 +246,8 @@ export const projectRouter = router({
         },
       });
 
-      console.log(projectUser);
-
       // if user is not researcher admin, throw error
       if (projectUser?.project_role !== "Researcher Admin") {
-        console.log(projectUser?.project_role);
         throw new TRPCError({
           code: "UNAUTHORIZED",
           message: "You are not authorized to delete this project",
@@ -281,7 +276,7 @@ export const projectRouter = router({
           },
         },
       });
-      // delete all property phase 
+      // delete all property phase
       await ctx.prisma.phase_property.deleteMany({
         where: {
           phase: {

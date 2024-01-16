@@ -27,6 +27,10 @@ const config = {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "",
     NEXT_SUPABASE_SERVICE_ROLE_KEY:
       process.env.NEXT_SUPABASE_SERVICE_ROLE_KEY || "",
+    KNOCK_SECRET_API_KEY: process.env.KNOCK_SECRET_API_KEY || "",
+    KNOCK_PUBLIC_API_KEY: process.env.KNOCK_PUBLIC_API_KEY || "",
+    KNOCK_FEED_ID: process.env.KNOCK_FEED_ID || "",
   },
 };
+
 export default config;
