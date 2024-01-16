@@ -26,11 +26,7 @@ type TaskDrawerProps = {
   refetch: () => void;
 };
 
-const TaskDrawer: React.FC<TaskDrawerProps> = ({
-  task,
-  onClose,
-  refetch,
-}) => {
+const TaskDrawer: React.FC<TaskDrawerProps> = ({ task, onClose, refetch }) => {
   const [taskStatus, setTaskStatus] = useState("pending");
 
   const handleContentClick = (
@@ -39,7 +35,6 @@ const TaskDrawer: React.FC<TaskDrawerProps> = ({
     // Prevent the click event from reaching the parent div
     event?.stopPropagation();
   };
-
 
   // date
   const [startDate, setStartDate] = useState<Date | undefined>(
@@ -137,12 +132,17 @@ const TaskDrawer: React.FC<TaskDrawerProps> = ({
               }}
               label="Deadline"
             />
-            <TaskAssignees
-              task_id={task?.id}
-              assignees={task?.assignees}
-              phase_id={task?.phase_id}
-              refetch={refetch}
-            />
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-900">
+                Assignees
+              </label>
+              <TaskAssignees
+                task_id={task?.id}
+                assignees={task?.assignees}
+                phase_id={task?.phase_id}
+                refetch={refetch}
+              />
+            </div>
             {/* render properties input fields */}
             {task?.properties.map((property) => (
               <TaskProperty
