@@ -29,7 +29,6 @@ import ProfileTabs from '~/components/profile/ProfileTabs';
 import Head from 'next/head';
 
 import { useRouter } from 'next/router';
-import { useFetchResearchPost } from '~/utils/researchpost';
 import { useFetchLikedPost } from '~/utils/researchpost';
 import { FaExclamationCircle } from 'react-icons/fa';
 import Post from '~/components/research-post/Post';
@@ -64,6 +63,10 @@ const LikedPost: NextPageWithLayout = () => {
       setCurrentPostId(postId);
     };
 
+    if (LikedPost.isLoadingLikedpost) {
+      return <LoadingSpinner />;
+    }
+
 
   return (
     <>
@@ -73,8 +76,7 @@ const LikedPost: NextPageWithLayout = () => {
       <ProfileTabs />
 
       <div className="container mx-auto mt-8">
-        {/* if loading */}
-        {LikedPost. isLoadingLikedpost && <LoadingSpinner />}
+        {/* if error*/}
         {LikedPost.errorLikedpost && (
           <div className="flex flex-col items-center justify-center h-50vh">
             <FaExclamationCircle className="text-gray-500 text-4xl mb-4" />

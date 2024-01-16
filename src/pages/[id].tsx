@@ -26,10 +26,7 @@ import { api } from "~/utils/api";
 import Layout from "~/components/layout/Layout";
 import Head from "~/components/layout/Head";
 import LoadingSpinner from "~/components/LoadingSpinner";
-import Link from "next/link";
-import Card from "~/components/Card";
-import AvatarPlaceholder from "~/components/avatar/AvatarPlaceholder";
-import Modal from "~/components/modal/Modal";
+
 
 //research post components
 import AllFollowingTabs from "~/components/research-post/AllFollowingTabs";
@@ -94,6 +91,10 @@ const FollowingPostPage: NextPageWithLayout = () => {
     setCurrentPostId(postId);
   };
 
+  if (FollowingPostLists.isLoading) {
+    return <LoadingSpinner />;
+  }
+
   return (
     <div className="w-full max-w-screen-xl p-8">
       <div className="mx-auto grid grid-cols-12 gap-6">
@@ -104,9 +105,8 @@ const FollowingPostPage: NextPageWithLayout = () => {
           <AllFollowingTabs />
 
           <div className="mt-6">
-            {FollowingPostLists.isLoading ? (
-              <LoadingSpinner />
-            ) : FollowingPostLists.followingResearchPosts.length === 0 ? (
+            {
+              FollowingPostLists.followingResearchPosts.length === 0 ? (
               <p className="mt-8 text-center text-lg font-medium text-gray-500">
                 Follow other users to see their research posts!
               </p>

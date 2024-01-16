@@ -16,6 +16,7 @@ import Layout from "~/components/layout/Layout";
 import type { NextPageWithLayout } from "~/pages/_app";
 import Head from "~/components/layout/Head";
 import type { ReactElement } from "react";
+import LoadingSpinner from "~/components/LoadingSpinner";
 
 interface Post {
   post_id: string;
@@ -69,6 +70,10 @@ const SearchPage: NextPageWithLayout = () => {
     // Avoid calling useFetchSearchResults here
   }, [query]);
 
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
   return (
     <div className="w-full max-w-screen-xl p-8">
       <BackButton> Go Back</BackButton>
@@ -76,12 +81,11 @@ const SearchPage: NextPageWithLayout = () => {
 
       {/* Search Results Section */}
       <h1 className="text-2xl font-bold mb-4">Search Results for &quot;{query}&quot;</h1>
-      {isLoading && <p>Loading...</p>}
       {error && <p>Error fetching search results</p>}
 
       {combinedResults.length === 0 && !isLoading && !error && (
         <p>No matching results found.</p>
-      )}     
+      )}
 
       {/* Toggles Section */}
       <div className="mb-4 flex items-center space-x-4 mt-4">

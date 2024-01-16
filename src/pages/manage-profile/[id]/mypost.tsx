@@ -58,12 +58,15 @@ const MyPost: NextPageWithLayout = () => {
   );
 
 
-    // Render EditPostForm component
-    const handleEditClick = (postId: string) => {
+  // Render EditPostForm component
+  const handleEditClick = (postId: string) => {
       setEditModalOpen(true);
       setCurrentPostId(postId);
     };
 
+  if (myPostLists.isLoading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <>
@@ -74,8 +77,7 @@ const MyPost: NextPageWithLayout = () => {
 
       <div className="container mx-auto mt-8">
         <AddNewPostButton className="mb-4" />
-        {/* if loading */}
-        {myPostLists.isLoading && <LoadingSpinner />}
+        {/* if error*/}
         {myPostLists.error && (
           <div className="flex flex-col items-center justify-center h-50vh">
             <FaExclamationCircle className="text-gray-500 text-4xl mb-4" />

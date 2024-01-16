@@ -24,8 +24,10 @@ import { useFetchRecommendedProfiles } from "~/utils/profile";
 
 
 // search components
-// import SearchBar from "~/components/search/SearchBar";
 import SearchBaq from "~/components/search/SearchBaq";
+
+//pages
+import ErrorPage from "~/pages/error-page";
 
 const Page: NextPageWithLayout = () => {
   const user = useUser();
@@ -90,14 +92,15 @@ if (errorRecommendedProfiles) {
 }
 
 
-
 // Render EditPostForm component
   const handleEditClick = (postId: string) => {
     setEditModalOpen(true);
     setCurrentPostId(postId);
   };
 
-
+  if (isLoadingPostRecommendations) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <div className="w-full max-w-screen-xl p-8">
@@ -109,9 +112,7 @@ if (errorRecommendedProfiles) {
           <AllFollowingTabs />
 
           <div className="mt-6">
-            {isLoadingPostRecommendations ? (
-              <LoadingSpinner />
-            ) : errorPostRecommendations ? (
+            {errorPostRecommendations ? (
               <p className="text-lg font-medium text-gray-500 text-center mt-8">
                 Error Fetching Post Recommendations
               </p>
@@ -122,7 +123,7 @@ if (errorRecommendedProfiles) {
                   post={post}
                   onEditClick={() => handleEditClick(post.post_id)}
                   refetch={refetchPost}
-                   />
+                  />
                 </li>
               ))
             )}
