@@ -12,7 +12,9 @@ const Settings: NextPageWithLayout = () => {
   const user = useUser();
 
   const knockClient = new Knock(process.env.KNOCK_SECRET_API_KEY || "");
-  const { data, refetch } = api.notifications.getSettings.useQuery();
+  const { data, refetch } = api.notifications.getSettings.useQuery({
+    user_id: user?.id || "",
+  });
 
   const handleNotifClick = async () => {
     await knockClient.notify("new-workout", {
