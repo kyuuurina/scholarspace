@@ -4,6 +4,8 @@ import { useRouterId } from "~/utils/routerId";
 import toast from "react-hot-toast";
 import ErrorToast from "../toast/ErrorToast";
 import { TRPCClientError } from "@trpc/client";
+import { MoonLoader } from "react-spinners";
+import { useState } from "react";
 
 type CellProps = {
   phase_id: string;
@@ -21,11 +23,16 @@ const PhaseActions: React.FC<CellProps> = ({
   const deletePhase = api.phase.deletePhase.useMutation();
   const router = useRouter();
   const projectId = useRouterId();
+
+  const [isDeleteLoading, setIsDeleteLoading] = useState(false);
+
   const handleRename = () => {
     onClosePhaseActions();
     onClickRename(); // Call the function to trigger renaming mode
   };
   const handleDelete = async () => {
+    if (isDeleteLoading) return;
+    setIsDeleteLoading(true);
     try {
       await deletePhase.mutateAsync(
         { id: phase_id, project_id: projectId },
@@ -47,6 +54,7 @@ const PhaseActions: React.FC<CellProps> = ({
         }
       });
     }
+    setIsDeleteLoading(false);
   };
 
   return (
@@ -66,6 +74,11 @@ const PhaseActions: React.FC<CellProps> = ({
         className="relative inline-flex w-full items-center border-b border-gray-200 px-2 py-1 text-sm font-medium hover:bg-gray-100 hover:text-blue-700 focus:z-10 "
         onClick={handleDelete}
       >
+        {isDeleteLoading && (
+          <div className="absolute left-0 top-0 flex h-full w-full items-center justify-center bg-white opacity-50">
+            <MoonLoader size={20} color={"#1f2937"} />
+          </div>
+        )}
         Delete
       </button>
     </div>
