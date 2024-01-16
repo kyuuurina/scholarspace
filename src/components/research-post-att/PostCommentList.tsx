@@ -181,11 +181,6 @@ const PostCommentList: React.FC<PostCommentListProps> = ({
                     </div>
                     {user && isCommentOwner(profile.user_id) && (
                       <div className="flex items-center space-x-2">
-                        {/* Edit icon */}
-                        <FiEdit2
-                          size={18}
-                          className="cursor-pointer text-gray-500 hover:text-gray-700"
-                        />
                         {/* Delete icon with onClick handler */}
                         <FiTrash2
                           size={18}
