@@ -6,9 +6,8 @@ import { router, protectedProcedure, publicProcedure } from "~/server/api/trpc";
 import { Prisma, PrismaClient } from "@prisma/client";
 
 
-// Step 1 - create new server router
-export const searchRouter = router({
 
+export const searchRouter = router({
 //search research post function
 searchPost: publicProcedure
     .input(
@@ -72,10 +71,12 @@ searchPost: publicProcedure
         profile_id: true,
         name: true,
         avatar_url: true,
+        collab_status: true,
       },
     });
 
     console.log("searchProfile:", profiles);
     return profiles;
   }),
+
 });
