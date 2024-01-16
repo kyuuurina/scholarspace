@@ -96,180 +96,6 @@ export const researchpostRouter = router({
       return post;
     }),
 
-    getMyPosts: protectedProcedure
-    .input(z.object({ post_id: z.string() }))
-    .query(async ({ input, ctx }) => {
-        const myPosts = await ctx.prisma.research_post.findMany({
-            where: {
-                profile_id: input.post_id,
-            },
-            orderBy: {
-                created_at: 'desc', // Order by created_at in descending order
-            },
-            include: {
-                user: {
-                    select: {
-                        profile: true, // Include the entire profile table
-                    },
-                },
-            },
-        });
-
-        return myPosts.map((post) => {
-            return {
-                post_id: post.post_id,
-                user_id: post.user_id,
-                category: post.category,
-                title: post.title,
-                document: post.document,
-                description: post.description,
-                author: post.author,
-                created_at: post.created_at,
-                user: post.user,
-            };
-        });
-    }),
-
-    getFollowingPosts: publicProcedure
-    .input(
-      z.object({
-        limit: z.number().optional(),
-        cursor: z.string().optional(),
-      })
-    )
-    .query(async ({ input: { limit = 10, cursor }, ctx }) => {
-      const { user } = ctx;
-  
-      if (!user) {
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "User is not authenticated.",
-        });
-      }
-  
-      const followingUsers = await ctx.prisma.follow.findMany({
-        where: {
-          follower_id: user.id,
-        },
-        select: {
-          following_id: true,
-        },
-      });
-  
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-      const followingUserIds = followingUsers.map((user) => user.following_id) as string[];
-  
-      const researchPosts = await ctx.prisma.research_post.findMany({
-        take: limit + 1,
-        cursor: cursor ? { post_id: cursor } : undefined,
-        orderBy: [{ created_at: "desc" }, { post_id: "desc" }],
-        where: { user_id: { in: followingUserIds } },
-        select: {
-          post_id: true,
-          user_id: true,
-          category: true,
-          title: true,
-          document: true,
-          author: true,
-          description: true,
-          created_at: true,
-          profile: {
-            select: {
-              profile_id: true,
-              user_id: true,
-              name: true,
-              avatar_url: true,
-            },
-          },
-        },
-      });
-  
-      let nextCursor: string | undefined;
-      if (researchPosts.length > limit) {
-        const nextItem = researchPosts.pop();
-        if (nextItem != null) {
-          nextCursor = nextItem.post_id;
-        }
-      }
-  
-      return {
-        researchPosts: researchPosts.map((post: any) => {
-          return {
-            post_id: post.post_id,
-            user_id: post.user_id,
-            category: post.category,
-            title: post.title,
-            document: post.document,
-            description: post.description,
-            author: post.author,
-            created_at: post.created_at,
-            name: post.profile.name,
-            avatar_url: post.profile.avatar_url,
-            profile_id: post.profile.profile_id,
-          };
-        }),
-        nextCursor,
-      };
-    }),
-
-
-// Get research posts created by followed users
-getResearchPostsByFollowedUsers: protectedProcedure.query(async ({ ctx }) => {
-  const userId = ctx.user?.id;
-
-  if (!userId) {
-    // Handle unauthenticated user
-    return [];
-  }
-
-  // Get the user's followed users
-  const followedUsers = await ctx.prisma.follow.findMany({
-    where: {
-      follower_id: userId,
-    },
-    select: {
-      following_id: true,
-    },
-  });
-
-  // Extract followed user IDs
-  const followedUserIds = followedUsers.map((user) => user.following_id);
-
-  // Get research posts created by followed users
-  const researchPostsByFollowedUsers = await ctx.prisma.research_post.findMany({
-    where: {
-      user_id: {
-        in: followedUserIds,
-      },
-    },
-    select: {
-      post_id: true,
-      user_id: true,
-      category: true,
-      title: true,
-      author: true,
-      description: true,
-      document: true,
-      created_at: true,
-      summary: true,
-      profile: {
-        select: {
-          profile_id: true,
-          user_id: true,
-          name: true,
-          avatar_url: true,
-          about_me: true,
-          research_interest: true,
-          collab_status: true,
-          skills: true,
-        },
-      },
-    },
-  });
-
-  return researchPostsByFollowedUsers;
-}),
-
   // Helper function to fetch infinite research posts
   create: protectedProcedure
     .input(
@@ -291,6 +117,8 @@ getResearchPostsByFollowedUsers: protectedProcedure.query(async ({ ctx }) => {
           created_at: new Date(),
         },
       });
+
+
 
     //   .mutation(async ({ input, ctx }) => {
     //     const post = await ctx.prisma.research_post.create({
@@ -381,87 +209,200 @@ getResearchPostsByFollowedUsers: protectedProcedure.query(async ({ ctx }) => {
       return { success: true };
     }),
 
-    //search research post function
-    search: publicProcedure
+
+getMyPosts: protectedProcedure
+    .input(z.object({ post_id: z.string() }))
+    .query(async ({ input, ctx }) => {
+        const myPosts = await ctx.prisma.research_post.findMany({
+            where: {
+                profile_id: input.post_id,
+            },
+            orderBy: {
+                created_at: 'desc', // Order by created_at in descending order
+            },
+            include: {
+                user: {
+                    select: {
+                        profile: true, // Include the entire profile table
+                    },
+                },
+            },
+        });
+
+        return myPosts.map((post) => {
+            return {
+                post_id: post.post_id,
+                user_id: post.user_id,
+                category: post.category,
+                title: post.title,
+                document: post.document,
+                description: post.description,
+                author: post.author,
+                created_at: post.created_at,
+                user: post.user,
+            };
+        });
+    }),
+
+getFollowingPosts: publicProcedure
     .input(
       z.object({
-        query: z.string(),
+        limit: z.number().optional(),
+        cursor: z.string().optional(),
       })
     )
-    .query(async ({ input, ctx }) => {
-      const researchPosts = await ctx.prisma.research_post.findMany({
+    .query(async ({ input: { limit = 10, cursor }, ctx }) => {
+      const { user } = ctx;
+  
+      if (!user) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "User is not authenticated.",
+        });
+      }
+  
+      const followingUsers = await ctx.prisma.follow.findMany({
         where: {
-          OR: [
-            { title: { contains: input.query, mode: 'insensitive' } },
-            { author: { contains: input.query, mode: 'insensitive' } },
-            { category: { contains: input.query, mode: 'insensitive' } },
-            {
-              user: {
-                profile: {
-                  some: {
-                    name: { contains: input.query, mode: 'insensitive' },
-                  },
-                },
-              },
-            },
-          ],
+          follower_id: user.id,
         },
-        orderBy: { created_at: 'desc' },
-        include: {
-          user: {
-            include: {
-              // profile: true, // Include the profile information in the result
-              profile: {
-                select: {
-                  profile_id: true,
-                  name: true,
-                  avatar_url: true,
-                },
-              },
+        select: {
+          following_id: true,
+        },
+      });
+  
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+      const followingUserIds = followingUsers.map((user) => user.following_id) as string[];
+  
+      const researchPosts = await ctx.prisma.research_post.findMany({
+        take: limit + 1,
+        cursor: cursor ? { post_id: cursor } : undefined,
+        orderBy: [{ created_at: "desc" }, { post_id: "desc" }],
+        where: { user_id: { in: followingUserIds } },
+        select: {
+          post_id: true,
+          user_id: true,
+          category: true,
+          title: true,
+          document: true,
+          author: true,
+          description: true,
+          created_at: true,
+          profile: {
+            select: {
+              profile_id: true,
+              user_id: true,
+              name: true,
+              avatar_url: true,
             },
           },
         },
       });
-
-      console.log("searchPost:", researchPosts);
-      return researchPosts;
+  
+      let nextCursor: string | undefined;
+      if (researchPosts.length > limit) {
+        const nextItem = researchPosts.pop();
+        if (nextItem != null) {
+          nextCursor = nextItem.post_id;
+        }
+      }
+  
+      return {
+        researchPosts: researchPosts.map((post: any) => {
+          return {
+            post_id: post.post_id,
+            user_id: post.user_id,
+            category: post.category,
+            title: post.title,
+            document: post.document,
+            description: post.description,
+            author: post.author,
+            created_at: post.created_at,
+            name: post.profile.name,
+            avatar_url: post.profile.avatar_url,
+            profile_id: post.profile.profile_id,
+          };
+        }),
+        nextCursor,
+      };
     }),
 
- //recommendations:
-getResearchPostRecommendations: protectedProcedure.query(async ({ ctx }) => {
+// Get research posts liked by the user
+getLikedPostsByUser: protectedProcedure.query(async ({ ctx }) => {
   const userId = ctx.user?.id;
 
-  // Get the user's research interests
-  const user = await ctx.prisma.profile.findFirst({
+  if (!userId) {
+    // Handle unauthenticated user
+    return [];
+  }
+
+  // Get the user's liked posts
+  const likedPosts = await ctx.prisma.post_likes.findMany({
     where: {
       user_id: userId,
     },
     select: {
-      research_interest: true,
+      post_id: true,
     },
   });
 
-  if (!user || !user.research_interest) {
+  // Extract post IDs
+  const likedPostIds = likedPosts.map((post) => post.post_id);
+
+  // Get research posts liked by the user
+  const likedResearchPosts = await ctx.prisma.research_post.findMany({
+    where: {
+      post_id: {
+        in: likedPostIds,
+      },
+    },
+    include: {
+      user: {
+        include: {
+          profile: {
+            select: {
+              profile_id: true,
+              name: true,
+              avatar_url: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  return likedResearchPosts;
+}),
+
+
+// Get research posts created by followed users
+getResearchPostsByFollowedUsers: protectedProcedure.query(async ({ ctx }) => {
+  const userId = ctx.user?.id;
+
+  if (!userId) {
+    // Handle unauthenticated user
     return [];
   }
 
-  const userResearchInterests = user.research_interest.toLowerCase().split(",");
+  // Get the user's followed users
+  const followedUsers = await ctx.prisma.follow.findMany({
+    where: {
+      follower_id: userId,
+    },
+    select: {
+      following_id: true,
+    },
+  });
 
-  // Combine conditions using OR
-  const recommendedResearchPosts = await ctx.prisma.research_post.findMany({
+  // Extract followed user IDs
+  const followedUserIds = followedUsers.map((user) => user.following_id);
+
+  // Get research posts created by followed users
+  const researchPostsByFollowedUsers = await ctx.prisma.research_post.findMany({
     where: {
       user_id: {
-        not: userId,
+        in: followedUserIds,
       },
-      OR: userResearchInterests.map((interest) => ({
-        OR: [
-          { title: { contains: interest.trim(), mode: 'insensitive' } },
-          { profile: { research_interest: { contains: interest.trim().toLowerCase() } } },
-        ],
-      })),
     },
-    orderBy: { created_at: 'desc' }, // Order by created_at in descending order
-    // take: 10, // Limit the number of recommendations
     select: {
       post_id: true,
       user_id: true,
@@ -487,8 +428,164 @@ getResearchPostRecommendations: protectedProcedure.query(async ({ ctx }) => {
     },
   });
 
-  return recommendedResearchPosts;
+  return researchPostsByFollowedUsers;
 }),
 
+
+getResearchPostRecommendations: protectedProcedure.query(async ({ ctx }) => {
+      const userId = ctx.user?.id;
+    
+      // Get the user's research interests
+      const user = await ctx.prisma.profile.findFirst({
+        where: {
+          user_id: userId,
+        },
+        select: {
+          research_interest: true,
+        },
+      });
+    
+      if (!user || !user.research_interest) {
+        // Handle the case where the user has no specified research interests
+        // Provide default recommendations or other strategies
+        const defaultRecommendations = await ctx.prisma.research_post.findMany({
+          orderBy: { created_at: 'desc' },
+          take: 10, // Limit the number of recommendations
+          select: {
+            post_id: true,
+            user_id: true,
+            category: true,
+            title: true,
+            author: true,
+            description: true,
+            document: true,
+            created_at: true,
+            summary: true,
+            profile: {
+              select: {
+                profile_id: true,
+                user_id: true,
+                name: true,
+                avatar_url: true,
+                about_me: true,
+                research_interest: true,
+                collab_status: true,
+                skills: true,
+              },
+            },
+          },
+        });
+
+        return defaultRecommendations;
+      }
+
+      // Continue with the existing logic for users with specified research interests
+      const userResearchInterests = user.research_interest.toLowerCase().split(",");
+
+      // Combine conditions using OR
+      const recommendedResearchPosts = await ctx.prisma.research_post.findMany({
+        where: {
+          user_id: {
+            not: userId,
+          },
+          OR: userResearchInterests.map((interest) => ({
+            OR: [
+              { title: { contains: interest.trim(), mode: 'insensitive' } },
+              { profile: { research_interest: { contains: interest.trim().toLowerCase() } } },
+            ],
+          })),
+        },
+        orderBy: { created_at: 'desc' }, // Order by created_at in descending order
+        // take: 10, // Limit the number of recommendations
+        select: {
+          post_id: true,
+          user_id: true,
+          category: true,
+          title: true,
+          author: true,
+          description: true,
+          document: true,
+          created_at: true,
+          summary: true,
+          profile: {
+            select: {
+              profile_id: true,
+              user_id: true,
+              name: true,
+              avatar_url: true,
+              about_me: true,
+              research_interest: true,
+              collab_status: true,
+              skills: true,
+            },
+          },
+        },
+      });
+
+      return recommendedResearchPosts;
+    }),
+
+//old recommendation
+// getResearchPostRecommendations: protectedProcedure.query(async ({ ctx }) => {
+//   const userId = ctx.user?.id;
+
+//   // Get the user's research interests
+//   const user = await ctx.prisma.profile.findFirst({
+//     where: {
+//       user_id: userId,
+//     },
+//     select: {
+//       research_interest: true,
+//     },
+//   });
+
+//   if (!user || !user.research_interest) {
+//     return [];
+//   }
+
+//   const userResearchInterests = user.research_interest.toLowerCase().split(",");
+
+//   // Combine conditions using OR
+//   const recommendedResearchPosts = await ctx.prisma.research_post.findMany({
+//     where: {
+//       user_id: {
+//         not: userId,
+//       },
+//       OR: userResearchInterests.map((interest) => ({
+//         OR: [
+//           { title: { contains: interest.trim(), mode: 'insensitive' } },
+//           { profile: { research_interest: { contains: interest.trim().toLowerCase() } } },
+//         ],
+//       })),
+//     },
+//     orderBy: { created_at: 'desc' }, // Order by created_at in descending order
+//     // take: 10, // Limit the number of recommendations
+//     select: {
+//       post_id: true,
+//       user_id: true,
+//       category: true,
+//       title: true,
+//       author: true,
+//       description: true,
+//       document: true,
+//       created_at: true,
+//       summary: true,
+//       profile: {
+//         select: {
+//           profile_id: true,
+//           user_id: true,
+//           name: true,
+//           avatar_url: true,
+//           about_me: true,
+//           research_interest: true,
+//           collab_status: true,
+//           skills: true,
+//         },
+//       },
+//     },
+//   });
+
+//   return recommendedResearchPosts;
+// }),
 
 });

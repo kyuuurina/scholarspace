@@ -101,7 +101,6 @@ const Settings: NextPageWithLayout = () => {
         id: id as string,
         ...formData,
       });
-      console.log(formData);
     } catch (error) {
       // Handle any errors
       console.error(error);

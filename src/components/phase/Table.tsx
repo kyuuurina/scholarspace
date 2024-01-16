@@ -13,6 +13,7 @@ import StatusBadge from "./StatusBadge";
 import Avatar from "../avatar/avatar";
 import EditableRow from "./EditableRow";
 import TaskDrawer from "./TaskDrawer";
+import TaskAssignees from "./TaskAssignees";
 
 import type { taskRow } from "~/types/task";
 type TableProps = {
@@ -196,13 +197,12 @@ const Table: React.FC<TableProps> = ({ phase_id, searchQuery }) => {
               </td>
               <td className="whitespace-nowrap border border-gray-300 px-6 py-2">
                 {/* iterate over tasks assignees */}
-                {task?.assignees?.map((assignee) => (
-                  <Avatar
-                    key={assignee.id}
-                    avatar_url={assignee.avatar_url}
-                    email={assignee.email}
-                  />
-                ))}
+                <TaskAssignees
+                  task_id={task?.id}
+                  assignees={task?.assignees}
+                  phase_id={phase_id}
+                  refetch={refetch}
+                />
               </td>
               {/* iterate properties and render column, */}
               {propertiesQuery?.data?.map((property, columnIndex) => {

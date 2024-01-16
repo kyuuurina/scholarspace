@@ -80,26 +80,6 @@ export const useFetchFollowingResearchPosts = (limit = 30, cursor?: string) => {
   };
 };
 
-//search post
-export const useFetchSearchResults = (query: string) => {
-  const searchPostResults = api.researchpost.search.useQuery(
-    {
-      query,
-    },
-    {
-      enabled: !!query,
-    }
-  );
-
-  const { data, isLoading, error } = searchPostResults;
-
-  return {
-    searchPostResults: data || [],
-    isLoading,
-    error,
-  };
-};
-
 //fetch recommendations:
 export const useFetchPostRecommendations = () => {
   const {
@@ -128,6 +108,22 @@ export const useFetchResearchPostsByFollowedUsers = () => {
     researchPostsByFollowedUsers: researchPostsByFollowedUsers || [],
     isLoadingResearchPostsByFollowedUsers,
     errorResearchPostsByFollowedUsers,
+  };
+};
+
+
+export const useFetchLikedPost = (id: string) => {
+  const {
+    data: myLikedPosts,
+    isLoading: isLoadingLikedpost,
+    error: errorLikedpost,
+  } = api.researchpost.getLikedPostsByUser.useQuery();
+
+
+  return {
+      myLikedPosts: myLikedPosts || [],
+      isLoadingLikedpost,
+      errorLikedpost,
   };
 };
 

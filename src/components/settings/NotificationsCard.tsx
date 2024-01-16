@@ -4,6 +4,17 @@ import Card from "../Card";
 import { api } from "~/utils/api";
 import { useState, useEffect } from "react";
 
+type data =
+  | {
+      email_enbld: boolean;
+      web_enbld: boolean;
+      types: string[];
+      user_id: string;
+      task_rmndr_enbld: boolean;
+    }
+  | null
+  | undefined;
+
 type notificationOptions = {
   title: string;
   subtitle: string;
@@ -12,7 +23,12 @@ type notificationOptions = {
   checked: boolean;
 };
 
-const NotificationsCard: React.FC = () => {
+type notifCardProps = {
+  notifWeb: data;
+  refetch: () => Promise<void>;
+};
+
+const NotificationsCard: React.FC<notifCardProps> = ({ notifWeb, refetch }) => {
   const [notificationChannels, setNotificationChannels] = useState<
     notificationOptions[]
   >([]);
@@ -21,10 +37,8 @@ const NotificationsCard: React.FC = () => {
     notificationOptions[]
   >([]);
 
-  const notifWeb = api.notifications.getSettings.useQuery();
-
   useEffect(() => {
-    if (notifWeb.data) {
+    if (notifWeb) {
       // Update the notificationChannels array based on the new data
       setNotificationChannels([
         {
@@ -32,33 +46,33 @@ const NotificationsCard: React.FC = () => {
           subtitle: "Get notified on your browser.",
           onCheck: async () => {
             await handleUpdateWeb(true);
-            await notifWeb.refetch();
+            await refetch();
           },
           onUncheck: async () => {
             await handleUpdateWeb(false);
-            await notifWeb.refetch();
+            await refetch();
           },
-          checked: notifWeb.data.web_enbld,
+          checked: notifWeb.web_enbld,
         },
         {
           title: "Enable Email Notifications",
           subtitle: "Get notified on your email.",
           onCheck: async () => {
             await handleUpdateEmail(true);
-            await notifWeb.refetch();
+            await refetch();
           },
           onUncheck: async () => {
             await handleUpdateEmail(false);
-            await notifWeb.refetch();
+            await refetch();
           },
-          checked: notifWeb.data.email_enbld,
+          checked: notifWeb.email_enbld,
         },
       ]);
     }
-  }, [notifWeb.data]);
+  }, [notifWeb]);
 
   useEffect(() => {
-    if (notifWeb.data) {
+    if (notifWeb) {
       // Update the notificationChannels array based on the new data
       setNotificationTypes([
         {
@@ -66,19 +80,19 @@ const NotificationsCard: React.FC = () => {
           subtitle: "Get notified on tasks before they are due.",
           onCheck: async () => {
             await handleUpdateTaskReminder(true);
-            await notifWeb.refetch();
+            await refetch();
           },
           onUncheck: async () => {
             await handleUpdateTaskReminder(false);
-            await notifWeb.refetch();
+            await refetch();
           },
-          checked: notifWeb.data.task_rmndr_enbld,
+          checked: notifWeb.task_rmndr_enbld,
         },
       ]);
     }
-  }, [notifWeb.data]);
+  }, [notifWeb]);
 
-  console.log(notifWeb.data);
+  console.log(notifWeb);
 
   const updateWebEnabled = api.notifications.updateWebEnbld.useMutation();
   const handleUpdateWeb = async (enabled: boolean) => {

@@ -93,6 +93,17 @@ toggleLike: protectedProcedure
     }
   }),
 
+  getPostLikeCount: protectedProcedure
+  .input(z.object({ post_id: z.string() }))
+  .query(async ({ input, ctx }) => {
+    const likeCount = await ctx.prisma.post_likes.count({
+      where: {
+        post_id: input.post_id,
+      },
+    });
+    return likeCount;
+  }),
+
   //new like
   createPostLike: protectedProcedure
   .input(z.object({

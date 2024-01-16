@@ -74,8 +74,7 @@ const WorkspaceModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
           .from("workspace-covers")
           .upload(fileUrl, imageValue);
 
-        console.log(error);
-        console.log(data);
+  
       }
       const response = await createWorkspace.mutateAsync({
         ...formData,
