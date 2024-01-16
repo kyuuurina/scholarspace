@@ -432,53 +432,7 @@ getResearchPostsByFollowedUsers: protectedProcedure.query(async ({ ctx }) => {
 }),
 
 
- //search research post function
-search: publicProcedure
-    .input(
-      z.object({
-        query: z.string(),
-      })
-    )
-    .query(async ({ input, ctx }) => {
-      const researchPosts = await ctx.prisma.research_post.findMany({
-        where: {
-          OR: [
-            { title: { contains: input.query, mode: 'insensitive' } },
-            { author: { contains: input.query, mode: 'insensitive' } },
-            { category: { contains: input.query, mode: 'insensitive' } },
-            {
-              user: {
-                profile: {
-                  some: {
-                    name: { contains: input.query, mode: 'insensitive' },
-                  },
-                },
-              },
-            },
-          ],
-        },
-        orderBy: { created_at: 'desc' },
-        include: {
-          user: {
-            include: {
-              // profile: true, // Include the profile information in the result
-              profile: {
-                select: {
-                  profile_id: true,
-                  name: true,
-                  avatar_url: true,
-                },
-              },
-            },
-          },
-        },
-      });
-
-      console.log("searchPost:", researchPosts);
-      return researchPosts;
-    }),
-
-    getResearchPostRecommendations: protectedProcedure.query(async ({ ctx }) => {
+getResearchPostRecommendations: protectedProcedure.query(async ({ ctx }) => {
       const userId = ctx.user?.id;
     
       // Get the user's research interests
@@ -521,14 +475,13 @@ search: publicProcedure
             },
           },
         });
-    
+
         return defaultRecommendations;
       }
-    
+
       // Continue with the existing logic for users with specified research interests
-    
       const userResearchInterests = user.research_interest.toLowerCase().split(",");
-    
+
       // Combine conditions using OR
       const recommendedResearchPosts = await ctx.prisma.research_post.findMany({
         where: {
@@ -568,12 +521,9 @@ search: publicProcedure
           },
         },
       });
-    
+
       return recommendedResearchPosts;
     }),
-
-    
-
 
 //old recommendation
 // getResearchPostRecommendations: protectedProcedure.query(async ({ ctx }) => {
