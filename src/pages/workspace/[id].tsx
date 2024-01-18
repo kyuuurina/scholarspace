@@ -1,5 +1,5 @@
 // utils
-import { useFetchWorkspace, useFetchWorkspaceMembers } from "~/utils/workspace";
+import { useFetchWorkspace } from "~/utils/workspace";
 import { useRouterId } from "~/utils/routerId";
 import { useFetchWorkspaceProjects } from "~/utils/project";
 import { useFetchGrantSummary } from "~/utils/grant";
@@ -7,24 +7,30 @@ import { useFetchGrantSummary } from "~/utils/grant";
 // types
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "~/pages/_app";
+
+// libraries
+import { useState } from "react";
 import { api } from "~/utils/api";
+import dynamic from "next/dynamic";
 
 // local components
 import Layout from "~/components/layout/Layout";
+
 import Head from "~/components/layout/Head";
 import PrimaryButton from "~/components/button/PrimaryButton";
 import ProjectCard from "~/components/project/ProjectCard";
 import ScoreChart from "~/components/chart/ScoreChart";
 import Card from "~/components/Card";
 import Header from "~/components/workspace/Header";
-import AvatarPlaceholder from "~/components/avatar/AvatarPlaceholder";
 import CreateProjectModal from "~/components/project/CreateProjectModal";
 import CreateGrantModal from "~/components/grant/create-grant-form";
 import PageLoader from "~/components/layout/PageLoader";
 import MembersCard from "~/components/members/MembersCard";
-import GanttChart from "~/components/grant/GanttChart";
 
-import { useState } from "react";
+const GanttChart = dynamic(() => import("~/components/grant/GanttChart"), {
+  loading: () => <div>Loading GanttChart...</div>, 
+  ssr: false, 
+});
 
 const Workspace: NextPageWithLayout = () => {
   const { name, description, isLoading, error, imgUrl, users } =

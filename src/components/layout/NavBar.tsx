@@ -50,14 +50,14 @@ const NavBar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
   }, []);
 
   // get profile by user id
-  const profileData = api.profile.getProfileByUserId.useQuery({
-    user_id: user?.id || "",
-  });
+  // const profileData = api.profile.getProfileByUserId.useQuery({
+  //   user_id: user?.id || "",
+  // });
 
-  let avatarUrl = null;
-  if (profileData.data?.avatar_url) {
-    avatarUrl = `https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/avatar/${profileData.data?.avatar_url}`;
-  }
+  // let avatarUrl = null;
+  // if (profileData.data?.avatar_url) {
+  //   avatarUrl = `https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/avatar/${profileData.data?.avatar_url}`;
+  // }
 
   return (
     <nav className="w-full border-b bg-white">
@@ -111,7 +111,7 @@ const NavBar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
           {/* User Menu  */}
           <div>
             <div className="cursor-pointer" onClick={toggleUserOverlay}>
-              {avatarUrl ? (
+              {/* {avatarUrl ? (
                 <Image
                   src={avatarUrl}
                   width={32}
@@ -122,7 +122,7 @@ const NavBar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
                 <div className="h-9 w-9">
                   <AvatarPlaceholder name="Khairina Atiqah" />
                 </div>
-              )}
+              )} */}
             </div>
             {/* Display user information */}
             {isUserOverlayVisible && (
@@ -131,7 +131,7 @@ const NavBar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
                 className="min-w-44 absolute right-5 z-10 divide-y divide-gray-100 rounded-lg bg-white shadow"
               >
                 <div className="px-4 py-3 text-sm text-gray-900">
-                  <div>{profileData.data?.name}</div>
+                  {/* <div>{profileData.data?.name}</div> */}
                   <div className="truncat font-medium">
                     {user?.user_metadata?.email || user?.email}
                   </div>

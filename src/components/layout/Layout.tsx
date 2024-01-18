@@ -13,27 +13,22 @@ type LayoutProps = {
 export default function Layout({ children }: LayoutProps) {
   const user = useUser();
   const [open, setOpen] = useState(false);
+
   const handleToggle = () => {
     setOpen(!open);
   };
 
-  // get profile by user id
-  const { data: profileData } = api.profile.getProfileByUserId.useQuery({
-    user_id: user?.id || "",
-  });
-
-  // get user data
-  const { data: userData } = api.user.get.useQuery({
-    id: user?.id || "",
-  });
+  const { data: profileData } = api.profile.getByContext.useQuery();
+  const { data: userData } = api.user.get.useQuery();
 
   useEffect(() => {
     const fetchData = async () => {
       if (user) {
         const knockClient = new Knock(process.env.KNOCK_SECRET_API_KEY);
+
         await knockClient.users.identify(user.id, {
           name: profileData?.name,
-          email: userData?.email ?? "",
+          email: userData?.email,
         });
       }
     };
@@ -41,22 +36,14 @@ export default function Layout({ children }: LayoutProps) {
     void fetchData();
   }, [user]);
 
-  if (!user || !profileData || !userData) {
-    return (
-      <div className="flex min-h-screen">
-        <SideBar open={open} toggleSidebar={handleToggle} />
-        <div className="w-full">
-          <NavBar toggleSidebar={handleToggle} />
-          {children}
-        </div>
-      </div>
-    );
-  }
-
   return (
     <>
       <div className="flex min-h-screen">
-        <SideBar open={open} toggleSidebar={handleToggle} />
+        <SideBar
+          open={open}
+          toggleSidebar={handleToggle}
+          profileId={profileData?.profile_id}
+        />
         <div className="w-full">
           <NavBar toggleSidebar={handleToggle} />
           {children}
