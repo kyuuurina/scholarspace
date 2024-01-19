@@ -36,6 +36,10 @@ export default function Layout({ children }: LayoutProps) {
     void fetchData();
   }, [user]);
 
+  if (!user || !profileData || !userData) {
+    return null;
+  }
+
   return (
     <>
       <div className="flex min-h-screen">
@@ -45,7 +49,7 @@ export default function Layout({ children }: LayoutProps) {
           profileId={profileData?.profile_id}
         />
         <div className="w-full">
-          <NavBar toggleSidebar={handleToggle} />
+          <NavBar toggleSidebar={handleToggle} profile={profileData} />
           {children}
         </div>
       </div>

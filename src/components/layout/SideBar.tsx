@@ -1,13 +1,21 @@
 // React and Next hooks
 import { useState } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 
 // icons
 import { FiHome, FiUser, FiMenu, FiSettings, FiColumns } from "react-icons/fi";
 
-// components
-import WorkspaceDropdown from "../workspace/WorkspaceDropdown";
-import WorkspaceModal from "../workspace/WorkspaceModal";
+const WorkspaceDropdown = dynamic(
+  () => import("../workspace/WorkspaceDropdown"),
+  {
+    loading: () => null,
+  }
+);
+
+const WorkspaceModal = dynamic(() => import("../workspace/WorkspaceModal"), {
+  loading: () => null,
+});
 
 type SideBarProps = {
   toggleSidebar: () => void;
@@ -37,7 +45,7 @@ export const SideBar: React.FC<SideBarProps> = ({
       </div>
     );
   }
-  
+
   return (
     <>
       <WorkspaceModal
@@ -55,9 +63,10 @@ export const SideBar: React.FC<SideBarProps> = ({
       >
         <div className="flex flex-col space-y-6 font-medium">
           <div className="flex cursor-pointer items-center">
-            <span onClick={toggleSidebar}>
-              <FiMenu className="h-6 w-6 text-purple-accent-2" />
-            </span>
+            <FiMenu
+              className="h-6 w-6 text-purple-accent-2"
+              onClick={toggleSidebar}
+            />
           </div>
           <ul className="min-w-full space-y-6 text-sm">
             <li className="rounded-sm">
