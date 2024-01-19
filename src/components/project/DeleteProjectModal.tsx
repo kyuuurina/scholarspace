@@ -9,7 +9,7 @@ import { DeleteButton } from "../button/DeleteButton";
 import SuccessToast from "../toast/SuccessToast";
 import ErrorToast from "../toast/ErrorToast";
 
-import { useFetchProject } from "~/utils/project";
+// import { useFetchProject } from "~/utils/project";
 
 type ModalProps = {
   openModal: boolean;
@@ -26,7 +26,7 @@ const DeleteProjectModal: React.FC<ModalProps> = ({
 }) => {
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
-  const { workspace_id } = useFetchProject();
+  // const { workspace_id } = useFetchProject();
 
   const { mutateAsync: deleteProject } = api.project.delete.useMutation();
 
@@ -44,7 +44,7 @@ const DeleteProjectModal: React.FC<ModalProps> = ({
     } finally {
       setIsDeleting(false);
       // go to workspace dashboard
-      void router.push(`/workspace/${workspace_id ?? "/"}`);
+      // void router.push(`/workspace/${workspace_id ?? "/"}`);
       toast.custom(() => <SuccessToast message="Project deleted" />);
     }
   };

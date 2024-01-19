@@ -1,7 +1,6 @@
 // utils
 import { useRouterId } from "~/utils/routerId";
 import { useRouter } from "next/router";
-import { useFetchProject } from "~/utils/project";
 
 // import phases type from prisma client
 
@@ -25,7 +24,12 @@ const Phase: NextPageWithLayout = () => {
   // get project id from router
   const id = useRouterId();
   const router = useRouter();
-  const { name } = useFetchProject();
+
+  const {
+    data: project,
+    isLoading: projectIsLoading,
+    error: projectError,
+  } = api.project.get.useQuery({ project_id: id }, { enabled: !!id });
 
   // get phases from api
   const {
@@ -66,7 +70,7 @@ const Phase: NextPageWithLayout = () => {
 
   return (
     <>
-      <Head title={name} />
+      <Head title={project?.name ? `${project.name} - Phase` : "Phase"} />
       <PageLoader isLoading={isLoading} errorMsg={error?.message}>
         <main className="flex flex-col">
           {/* render header */}
@@ -74,6 +78,7 @@ const Phase: NextPageWithLayout = () => {
             phases={safePhases}
             onSelectPhase={handleSelectPhase}
             selectedPhase={selectedPhase}
+            name={project?.name || "Project"}
           />
           {/* selected phase section */}
           <section className="p-2">
