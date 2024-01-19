@@ -20,23 +20,23 @@
 //   p_score: number; // Make it nullable to handle potential null values
 // };
 
-// export type ProjectSummary = {
-//   project_name: string; // Assuming a project has an ID
-//   phases: {
-//     phase_id: string;
-//     start_at: Date;
-//     end_at: Date | null;
-//     progress: number;
-//     name: string | null;
-//     tasks: {
-//       task_id: string;
-//       start_at: Date;
-//       end_at: Date | null;
-//       name: string | null;
-//       phase_id: string;
-//     }[];
-//   }[];
-// };
+export type ProjectSummary = {
+  project_name: string; // Assuming a project has an ID
+  phases: {
+    phase_id: string;
+    start_at: Date;
+    end_at: Date | null;
+    progress: number;
+    name: string | null;
+    tasks: {
+      task_id: string;
+      start_at: Date;
+      end_at: Date | null;
+      name: string | null;
+      phase_id: string;
+    }[];
+  }[];
+};
 // export const useFetchProject = () => {
 //   const id: string = useRouterId();
 

@@ -3,7 +3,6 @@ import Select, { type MultiValue } from "react-select";
 import { api } from "~/utils/api";
 import Avatar from "../avatar/avatar";
 import type { user } from "@prisma/client";
-import { useFetchProjectMembers } from "~/utils/project";
 import { MoonLoader } from "react-spinners";
 import toast from "react-hot-toast";
 import ErrorToast from "../toast/ErrorToast";
@@ -23,8 +22,29 @@ const TaskAssignees: React.FC<TaskAssigneesProps> = ({
   refetch,
 }) => {
   // fetch project members
-  const { userDropdown } = useFetchProjectMembers();
   // update assignees based on selected options
+  const userDropdown = [
+    {
+      value: "1",
+      label: "Person 1",
+    },
+    {
+      value: "2",
+      label: "Person 2",
+    },
+    {
+      value: "3",
+      label: "Person 3",
+    },
+    {
+      value: "4",
+      label: "Person 4",
+    },
+    {
+      value: "5",
+      label: "Person 5",
+    },
+  ];
   const updateAssignees = api.task.updateAssignees.useMutation();
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [selectedOptions, setSelectedOptions] = useState<

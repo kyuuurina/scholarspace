@@ -1,6 +1,6 @@
 // utils
 import { useRouterId } from "~/utils/routerId";
-import { useFetchWorkspaceProjects } from "~/utils/project";
+// import { useFetchWorkspaceProjects } from "~/utils/project";
 import { useFetchGrantSummary } from "~/utils/grant";
 
 // types
@@ -35,7 +35,7 @@ const ProjectCard = dynamic(() => import("~/components/project/ProjectCard"), {
 });
 
 const Workspace: NextPageWithLayout = () => {
-  const projects = useFetchWorkspaceProjects();
+  // const projects = useFetchWorkspaceProjects();
   const workspaceId = useRouterId();
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [grantModalIsOpen, setGrantModalIsOpen] = useState(false);
@@ -97,9 +97,6 @@ const Workspace: NextPageWithLayout = () => {
               </div>
               <div className="grid max-w-max gap-5 md:grid-cols-2">
                 {/* map projects array and pass project object to project card  */}
-                {projects?.map((project) => (
-                  <ProjectCard key={project.project_id} project={project} />
-                ))}
               </div>
             </div>
             {/* Right section of workspace dashboard */}

@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useFetchProject } from "~/utils/project";
 import { useRouterId } from "../../utils/routerId";
 import React, { useState, useRef } from "react";
 import { api } from "~/utils/api";
@@ -15,16 +14,17 @@ type HeaderProps = {
   phases: phase[];
   onSelectPhase: (phaseId: string) => void;
   selectedPhase: string;
+  name: string;
 };
 
 const Header: React.FC<HeaderProps> = ({
   phases,
   onSelectPhase,
   selectedPhase,
+  name,
 }) => {
   const router = useRouter();
   const id = useRouterId();
-  const { name } = useFetchProject();
 
   // states for isAdding button
   const [isAdding, setIsAdding] = useState(false);
