@@ -320,7 +320,7 @@ model user {
   phase_template                               phase_template[]
   post_comments                                post_comments[]
   post_likes                                   post_likes[]
-  profile                                      profile?
+  profile                                      profile[]
   profile_achievement                          profile_achievement[]
   profile_education                            profile_education[]
   profile_experience                           profile_experience[]
@@ -350,7 +350,7 @@ model chat_message {
 
 model profile {
   profile_id          String                @id(map: "Profile_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  user_id             String                @unique @db.Uuid
+  user_id             String                @db.Uuid
   name                String
   avatar_url          String?
   about_me            String?
