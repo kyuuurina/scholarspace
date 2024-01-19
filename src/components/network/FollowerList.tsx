@@ -44,7 +44,7 @@ const FollowerList: React.FC<FollowerListProps> = ({ profiles }) => {
     if (fetchedProfiles) {
       // Flatten the 2D array to a 1D array
       const flatProfiles = fetchedProfiles.flat();
-      setFollowerProfiles(flatProfiles);
+      // setFollowerProfiles(flatProfiles);
     }
   }, [fetchedProfiles]);
 

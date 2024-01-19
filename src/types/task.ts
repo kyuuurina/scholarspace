@@ -7,14 +7,14 @@ type taskRow =
       description: string | null;
       created_at: Date;
       status: string;
-      assignees:
-        | {
-            id: string;
-            name: string | null;
-            avatar_url: string | null;
-            email: string | null;
-          }[]
-        | undefined;
+      // assignees:
+      //   | {
+      //       id: string;
+      //       name: string | null;
+      //       avatar_url: string | null;
+      //       email: string | null;
+      //     }[]
+      //   | undefined;
       phase_id: string;
       end_at: Date | null;
       deadline: Date | null;
