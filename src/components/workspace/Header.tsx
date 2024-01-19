@@ -18,6 +18,8 @@ const Header: React.FC<HeaderProps> = ({
 }) => {
   const router = useRouter();
   const id = router.query && router.query.id ? router.query.id.toString() : "";
+
+  console.log(BASE_WORKSPACE_COVER_URL, "/", imgUrl);
   return (
     <div className="flex w-full flex-wrap justify-between border-b bg-white px-5 py-2 sm:py-5">
       <Link

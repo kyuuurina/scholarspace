@@ -168,7 +168,16 @@ export const workspaceRouter = router({
           workspaceid: id,
         },
         include: {
-          user: true,
+          user: {
+            include: {
+              profile: {
+                select: {
+                  name: true,
+                  avatar_url: true,
+                },
+              },
+            },
+          },
         },
       });
 

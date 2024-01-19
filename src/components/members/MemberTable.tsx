@@ -1,7 +1,8 @@
-import type { Member } from "~/types/member";
+import type { WorkspaceMember } from "~/types/member";
+
 import MemberRow from "./MemberRow";
 type MemberTableProps = {
-  filteredMembers: Member[];
+  filteredMembers: WorkspaceMember[] | undefined;
   handleRoleChange: (memberId: string, newRole: string) => void;
   handleDeleteMember: (memberId: string) => void;
   userWorkspaceRole: string | null | undefined;
@@ -19,6 +20,9 @@ const MemberTable: React.FC<MemberTableProps> = ({
   ownerId,
   externalCollab = false,
 }) => {
+  if (!filteredMembers) {
+    return null;
+  }
   return (
     <table className="w-full text-left text-sm text-gray-500">
       <thead className="bg-gray-50 text-xs uppercase text-gray-700">
@@ -45,7 +49,7 @@ const MemberTable: React.FC<MemberTableProps> = ({
             console.log(member),
             (
               <MemberRow
-                key={member.memberId}
+                key={member?.userid}
                 member={member}
                 handleRoleChange={handleRoleChange}
                 handleDeleteMember={handleDeleteMember}

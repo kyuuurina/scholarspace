@@ -1,11 +1,11 @@
-import type { Member } from "~/types/member";
+import type { WorkspaceMember } from "~/types/member";
 import Image from "next/image";
 import AvatarPlaceholder from "~/components/avatar/AvatarPlaceholder";
 import Select from "~/components/Select";
 import { useUser } from "@supabase/auth-helpers-react";
 
 type MemberRowProps = {
-  member: Member;
+  member: WorkspaceMember;
   handleRoleChange: (memberId: string, newRole: string) => void;
   handleDeleteMember: (memberId: string) => void;
   userWorkspaceRole: string | null | undefined;
@@ -21,16 +21,20 @@ const MemberRow: React.FC<MemberRowProps> = ({
   isPersonal,
   ownerId,
 }) => {
-  const isPersonalOwner = member.memberId === ownerId && isPersonal;
+  const isPersonalOwner = member?.user.id === ownerId && isPersonal;
   const user = useUser();
   const userId = user?.id || "";
+
+  if (!member) {
+    return null;
+  }
 
   return (
     <tr className="bg-white hover:bg-gray-50">
       <td className="flex items-center whitespace-nowrap px-6 py-4 font-medium text-gray-900">
-        {member.memberAvatarUrl ? (
+        {member?.user.profile?.avatar_url ? (
           <Image
-            src={member.memberAvatarUrl || ""}
+            src={member?.user.profile?.avatar_url}
             alt="Jese image"
             width={40}
             height={40}
@@ -38,37 +42,39 @@ const MemberRow: React.FC<MemberRowProps> = ({
           />
         ) : (
           <div className="h-10 w-10 rounded-full">
-            <AvatarPlaceholder name={member.memberEmail || ""} />
+            <AvatarPlaceholder name={member?.user.email} />
           </div>
         )}
         <div className="pl-3">
-          <div className="text-base font-semibold">{member.memberName}</div>
-          <div className="font-normal text-gray-500">{member.memberEmail}</div>
+          <div className="text-base font-semibold">
+            {member?.user.profile?.name}
+          </div>
+          <div className="font-normal text-gray-500">{member?.user.email}</div>
         </div>
       </td>
       <td className="px-6 py-4">
         {userWorkspaceRole === "Researcher Admin" &&
         !isPersonalOwner &&
-        member.memberRole ? (
+        member?.workspace_role ? (
           <Select
-            initialValue={member.memberRole}
+            initialValue={member?.workspace_role}
             onValueChange={(newRole) =>
-              handleRoleChange(member.memberId, newRole)
+              handleRoleChange(member?.userid, newRole)
             }
             options={["Researcher", "Researcher Admin", "Student"]}
           />
         ) : (
           <Select
-            initialValue={member.memberRole!} // added non-null assertion operator
+            initialValue={member?.workspace_role} // added non-null assertion operator
             onValueChange={(newRole) =>
-              handleRoleChange(member.memberId, newRole)
+              handleRoleChange(member.userid, newRole)
             }
             disabled={true}
             options={["Researcher", "Researcher Admin", "Student"]}
           />
         )}
       </td>
-      {member.memberIsExternalCollaborator ? (
+      {member.is_collaborator ? (
         <td className="px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
@@ -112,7 +118,7 @@ const MemberRow: React.FC<MemberRowProps> = ({
         </td>
       )}
       <td className="px-6 py-4">
-        {member.memberId != userId &&
+        {member.userid != userId &&
           !isPersonalOwner && ( // Added the && operator here
             <button
               type="button"
@@ -125,12 +131,12 @@ const MemberRow: React.FC<MemberRowProps> = ({
         `}
               onClick={() => {
                 if (userWorkspaceRole === "Researcher Admin") {
-                  handleDeleteMember(member.memberId);
+                  handleDeleteMember(member.userid);
                 }
               }}
               disabled={
                 userWorkspaceRole !== "Researcher Admin" ||
-                member.memberId === userId
+                member.userid === userId
               }
             >
               Remove user

@@ -1,5 +1,4 @@
 // utils
-import { useFetchWorkspace } from "~/utils/workspace";
 import { useRouterId } from "~/utils/routerId";
 import { useFetchWorkspaceProjects } from "~/utils/project";
 import { useFetchGrantSummary } from "~/utils/grant";
