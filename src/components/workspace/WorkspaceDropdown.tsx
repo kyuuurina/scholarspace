@@ -1,15 +1,21 @@
 import { useState } from "react";
 import Link from "next/link";
-import { fetchUserWorkspaces } from "~/utils/userWorkspaces";
 import { FiPlusCircle } from "react-icons/fi";
 import Image from "next/image";
 import AvatarPlaceholder from "../avatar/AvatarPlaceholder";
 import { MoonLoader } from "react-spinners";
+import { TbSwitchHorizontal } from "react-icons/tb";
+import { api } from "~/utils/api";
+import { BASE_WORKSPACE_COVER_URL } from "~/utils/supabase-storage";
 
 const WorkspaceDropdown: React.FC<{ onClick: () => void }> = ({ onClick }) => {
   const [workspaceMenu, setWorkspaceMenu] = useState(false);
+  const { data: workspaceListings, isLoading } =
+    api.workspace.listUserWorkspaces.useQuery();
 
-  const { workspaceListings, isLoading } = fetchUserWorkspaces();
+  if (!workspaceListings) {
+    return null;
+  }
 
   const handleToggleWorkspace = () => {
     setWorkspaceMenu(!workspaceMenu);
@@ -18,26 +24,14 @@ const WorkspaceDropdown: React.FC<{ onClick: () => void }> = ({ onClick }) => {
   return (
     <div>
       <button
-        className="inline-flex w-44 items-center rounded-md bg-purple-accent-1 px-4 py-2.5 text-center text-xs font-medium text-white hover:bg-purple-accent-2"
+        className="inline-flex w-44 items-center rounded-md bg-purple-accent-1 px-4 py-2.5 text-center text-xs font-medium hover:bg-purple-accent-2"
         type="button"
         onClick={handleToggleWorkspace}
       >
-        <span className="mr-2">Switch Workspace</span>
-        <svg
-          className="ml-2 h-4 w-4"
-          aria-hidden="true"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M19 9l-7 7-7-7"
-          ></path>
-        </svg>
+        <div className="flex w-full items-center justify-between space-x-2 text-white">
+          <span>Switch Workspace</span>
+          <TbSwitchHorizontal className="h-4 w-4" />
+        </div>
       </button>
 
       <div
@@ -59,27 +53,31 @@ const WorkspaceDropdown: React.FC<{ onClick: () => void }> = ({ onClick }) => {
           ) : (
             workspaceListings.map((workspace) => (
               <li
-                key={workspace.id}
-                className="flex w-full items-center px-5 hover:bg-gray-100"
+                key={workspace.workspaceid}
+                className="flex w-full items-center px-4 hover:bg-gray-100"
               >
-                {workspace.cover_img ? (
+                {workspace.workspace.cover_img ? (
                   <Image
-                    src={`https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/workspace-covers/${workspace.cover_img}`}
-                    alt={workspace?.name || ""}
-                    width={50}
-                    height={50}
+                    src={`${BASE_WORKSPACE_COVER_URL}${workspace.workspace.cover_img}`}
+                    alt={workspace.workspace.name || ""}
+                    width={40}
+                    height={40}
+                    loading="lazy"
                   />
                 ) : (
-                  <div className="h-full w-full">
-                    <AvatarPlaceholder name={workspace.name} />
+                  <div className="h-7 w-10">
+                    <AvatarPlaceholder
+                      name={workspace.workspace.name}
+                      shape="square"
+                    />
                   </div>
                 )}
                 <Link
-                  key={workspace.id}
+                  key={workspace.workspaceid}
                   className="block overflow-hidden text-clip px-4 py-2"
-                  href={`/workspace/${workspace.id}`}
+                  href={`/workspace/${workspace.workspaceid}`}
                 >
-                  <div className="truncate">{workspace.name}</div>
+                  <div className="truncate">{workspace.workspace.name}</div>
                 </Link>
               </li>
             ))

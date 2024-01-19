@@ -52,6 +52,11 @@ export const workspaceRouter = router({
       include: {
         workspace: true,
       },
+      orderBy: {
+        workspace: {
+          created_at: "desc",
+        },
+      },
     });
     return workspaces;
   }),
