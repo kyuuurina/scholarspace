@@ -7,6 +7,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { v4 as uuidv4 } from "uuid";
 import { api } from "~/utils/api";
+import toast from "react-hot-toast";
+import { TRPCClientError } from "@trpc/client";
 
 // types
 import type { WorkspaceFormData } from "~/types/workspace";
@@ -15,6 +17,7 @@ import type { WorkspaceFormData } from "~/types/workspace";
 import FormErrorMessage from "../FormErrorMessage";
 import Modal from "../modal/Modal";
 import PrimaryButton from "../button/PrimaryButton";
+import ErrorToast from "../toast/ErrorToast";
 
 type ModalProps = {
   openModal: boolean;
@@ -81,11 +84,17 @@ const WorkspaceModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
       await refetch();
       // Navigate to the newly created project dashboard
       await router.push(`/workspace/${response.id}`);
-      setIsSubmitting(false);
     } catch (error) {
-      // Handle any errors
-      console.error(error);
+      toast.custom(() => {
+        if (error instanceof TRPCClientError) {
+          return <ErrorToast message={error.message} />;
+        } else {
+          // Handle other types of errors or fallback to a default message
+          return <ErrorToast message="An error occurred." />;
+        }
+      });
     }
+    setIsSubmitting(false);
   };
 
   // handler for onChange input for image upload
