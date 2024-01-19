@@ -3,10 +3,11 @@ import HeaderButton from "./HeaderButton";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { BASE_WORKSPACE_COVER_URL } from "~/utils/supabase-storage";
 
 type HeaderProps = {
   name: string;
-  imgUrl: string;
+  imgUrl: string | null;
   purpose?: "workspace" | "project";
 };
 
@@ -23,18 +24,21 @@ const Header: React.FC<HeaderProps> = ({
         href={`/${purpose}/${id}`}
         className="flex max-w-[70%] items-center gap-x-3"
       >
-        {imgUrl !== "" ? (
+        {imgUrl !== null ? (
           <div className="relative h-12 w-12">
-            <Image src={imgUrl} fill style={{ objectFit: "contain" }} alt="" />
+            <Image
+              src={`${BASE_WORKSPACE_COVER_URL}/${imgUrl}`}
+              fill
+              style={{ objectFit: "contain" }}
+              alt=""
+            />
           </div>
         ) : (
           <div className="h-12 w-12">
             <AvatarPlaceholder name={name || "SS"} shape="square" />
           </div>
         )}
-        <h1 className="truncate text-2xl font-bold sm:text-4xl">
-          {name}
-        </h1>
+        <h1 className="truncate text-2xl font-bold sm:text-4xl">{name}</h1>
       </Link>
       <div className="flex items-center gap-x-2">
         {/* if purpose is project */}

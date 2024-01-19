@@ -15,10 +15,8 @@ import dynamic from "next/dynamic";
 
 // local components
 import Layout from "~/components/layout/Layout";
-
 import Head from "~/components/layout/Head";
 import PrimaryButton from "~/components/button/PrimaryButton";
-import ProjectCard from "~/components/project/ProjectCard";
 import ScoreChart from "~/components/chart/ScoreChart";
 import Card from "~/components/Card";
 import Header from "~/components/workspace/Header";
@@ -28,13 +26,16 @@ import PageLoader from "~/components/layout/PageLoader";
 import MembersCard from "~/components/members/MembersCard";
 
 const GanttChart = dynamic(() => import("~/components/grant/GanttChart"), {
-  loading: () => <div>Loading GanttChart...</div>, 
-  ssr: false, 
+  loading: () => null,
+  ssr: false,
+});
+
+const ProjectCard = dynamic(() => import("~/components/project/ProjectCard"), {
+  loading: () => null,
+  ssr: false,
 });
 
 const Workspace: NextPageWithLayout = () => {
-  const { name, description, isLoading, error, imgUrl, users } =
-    useFetchWorkspace();
   const projects = useFetchWorkspaceProjects();
   const workspaceId = useRouterId();
   const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -46,9 +47,20 @@ const Workspace: NextPageWithLayout = () => {
   });
   const { grantSummary, refetch } = useFetchGrantSummary(workspaceId);
 
+  // fetch workspace details
+  const {
+    data: workspace,
+    isLoading,
+    error,
+  } = api.workspace.get.useQuery({ id: workspaceId });
+
+  if (!workspace) return null;
+
+  console.log(workspace);
+
   return (
     <>
-      <Head title={name} />
+      <Head title={workspace.name} />
       <CreateProjectModal
         openModal={modalIsOpen}
         onClick={() => setModalIsOpen(false)}
@@ -61,7 +73,11 @@ const Workspace: NextPageWithLayout = () => {
       <PageLoader isLoading={isLoading} errorMsg={error?.message}>
         <main className="flex flex-col">
           {/* Workspace header */}
-          <Header name={name || ""} imgUrl={imgUrl} purpose="workspace" />
+          <Header
+            name={workspace.name}
+            imgUrl={workspace.cover_img}
+            purpose="workspace"
+          />
           <div className="grid p-5 md:grid-cols-12 md:gap-x-5">
             {/* Left section of workspace dashboard */}
             {/* Projects Section */}
@@ -91,10 +107,14 @@ const Workspace: NextPageWithLayout = () => {
             <div className="grid w-full gap-y-2 py-5 md:col-span-4 md:py-1">
               <Card title={"About"}>
                 <p className="line-clamp-5 text-sm text-gray-900">
-                  {description}
+                  {workspace.description}
                 </p>
               </Card>
-              <MembersCard id={workspaceId} name={"workspace"} users={users} />
+              <MembersCard
+                id={workspaceId}
+                name={"workspace"}
+                users={workspace.workspace_user}
+              />
               <Card title={"Collaborative Score"} center>
                 <ScoreChart name="Collaborative" score={90} />
               </Card>

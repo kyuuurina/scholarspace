@@ -11,6 +11,13 @@ export const workspaceRouter = router({
         where: {
           id: input.id,
         },
+        include: {
+          workspace_user: {
+            include: {
+              user: true,
+            },
+          },
+        },
       });
 
       if (!workspace) {
@@ -21,26 +28,7 @@ export const workspaceRouter = router({
         });
       }
 
-      const workspaceUsers = await ctx.prisma.workspace_user.findMany({
-        where: {
-          workspaceid: workspace.id,
-        },
-        include: {
-          user: true,
-        },
-      });
-
-      const users = await Promise.all(
-        workspaceUsers.map((workspaceUser) =>
-          ctx.prisma.user.findUnique({
-            where: {
-              id: workspaceUser.userid,
-            },
-          })
-        )
-      );
-
-      return { ...workspace, users };
+      return workspace;
     }),
 
   listUserWorkspaces: protectedProcedure.query(async ({ ctx }) => {
