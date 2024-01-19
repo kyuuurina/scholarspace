@@ -147,48 +147,39 @@ const PostCommentList: React.FC<PostCommentListProps> = ({
                 }`}
               >
                 {/* Render comment details */}
-                <div
-                  key={comment.user.profile?.user_id}
-                  className="mb-4 mt-4 flex items-center justify-between"
-                >
-                  <div className="mr-4">
-                    {comment.user.profile?.avatar_url ? (
-                      // Use next/image for images
-                      <Link
-                        href={`/manage-profile/${comment.user.profile?.profile_id}`}
-                      >
-                        <span className="relative inline-block cursor-pointer">
-                          <Image
-                            src={`https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/avatar/${comment.user.profile?.avatar_url}`}
-                            alt={`Profile Avatar - ${comment.user.profile?.name}`}
-                            width={30}
-                            height={30}
-                            className="rounded-full"
-                          />
-                          <span className="absolute inset-0 rounded-full bg-gradient-to-b from-transparent to-gray-800 opacity-50" />
+                {comment.user.profile.map((profile) => (
+                  <div
+                    key={profile.user_id}
+                    className="mb-4 mt-4 flex items-center justify-between"
+                  >
+                    <div className="mr-4">
+                      {profile.avatar_url ? (
+                        // Use next/image for images
+                        <Link href={`/manage-profile/${profile.profile_id}`}>
+                          <span className="relative inline-block cursor-pointer">
+                            <Image
+                              src={`https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/avatar/${profile.avatar_url}`}
+                              alt={`Profile Avatar - ${profile.name}`}
+                              width={30}
+                              height={30}
+                              className="rounded-full"
+                            />
+                            <span className="absolute inset-0 rounded-full bg-gradient-to-b from-transparent to-gray-800 opacity-50" />
+                          </span>
+                        </Link>
+                      ) : (
+                        <AvatarPlaceholder name={profile.name} shape="circle" />
+                      )}
+                    </div>
+                    <div className="flex flex-grow flex-col">
+                      <Link href={`/manage-profile/${profile.profile_id}`}>
+                        <span className="max-w-full cursor-pointer overflow-hidden overflow-ellipsis whitespace-nowrap font-semibold sm:max-w-[150px]">
+                          {profile.name}
                         </span>
                       </Link>
-                    ) : (
-                      <AvatarPlaceholder
-                        name={comment.user.profile?.name || ""}
-                        shape="circle"
-                      />
-                    )}
-                  </div>
-                  <div className="flex flex-grow flex-col">
-                    <Link
-                      href={`/manage-profile/${
-                        comment.user.profile?.profile_id || ""
-                      }`}
-                    >
-                      <span className="max-w-full cursor-pointer overflow-hidden overflow-ellipsis whitespace-nowrap font-semibold sm:max-w-[150px]">
-                        {comment.user.profile?.name}
-                      </span>
-                    </Link>
-                    <p className="mt-1">{comment.value}</p>
-                  </div>
-                  {user &&
-                    isCommentOwner(comment.user.profile?.user_id || "") && (
+                      <p className="mt-1">{comment.value}</p>
+                    </div>
+                    {user && isCommentOwner(profile.user_id) && (
                       <div className="flex items-center space-x-2">
                         {/* Delete icon with onClick handler */}
                         <FiTrash2
@@ -200,7 +191,8 @@ const PostCommentList: React.FC<PostCommentListProps> = ({
                         />
                       </div>
                     )}
-                </div>
+                  </div>
+                ))}
               </div>
             ))
           ) : (

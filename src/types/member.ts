@@ -16,3 +16,12 @@ export type WorkspaceMember =
       is_collaborator: boolean | null;
     })
   | undefined;
+
+export type Member = {
+  memberId: string;
+  memberName: string | null;
+  memberEmail: string | null;
+  memberAvatarUrl: string | null;
+  memberRole: string | null;
+  memberIsExternalCollaborator?: boolean;
+};
