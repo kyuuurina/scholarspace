@@ -85,13 +85,13 @@ const TaskAssignees: React.FC<TaskAssigneesProps> = ({
           className="flex cursor-pointer flex-row space-x-3"
           onClick={() => setIsSelectOpen(!isSelectOpen)}
         >
-          {isUpdating ? (
+          {/* {isUpdating ? (
             <MoonLoader size={20} />
           ) : (
             assignees.map((assignee) => (
-              <Avatar key={assignee.id} user={assignee} />
+              <Avatar key={assignee.id} profile={assignee} />
             ))
-          )}
+          )} */}
         </div>
       ) : (
         <button onClick={() => setIsSelectOpen(!isSelectOpen)}>

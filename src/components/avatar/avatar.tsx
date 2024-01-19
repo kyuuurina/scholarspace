@@ -1,14 +1,14 @@
 import Image from "next/image";
 import AvatarPlaceholder from "./AvatarPlaceholder";
-import type { user } from "@prisma/client";
+import type { profile } from "@prisma/client";
 
 type AvatarProps = {
-  user?: user | null;
+  profile?: profile | null;
   avatar_url?: string | null;
   email?: string | null;
 };
 
-const Avatar: React.FC<AvatarProps> = ({ user, avatar_url, email }) => {
+const Avatar: React.FC<AvatarProps> = ({ profile, avatar_url, email }) => {
   if (avatar_url) {
     if (email) {
       return (
@@ -25,7 +25,7 @@ const Avatar: React.FC<AvatarProps> = ({ user, avatar_url, email }) => {
       return (
         <Image
           src={avatar_url}
-          alt={user?.name || email || "Avatar"}
+          alt={profile?.name || "Avatar"}
           width={32}
           height={32}
           className="rounded-full"
@@ -33,11 +33,11 @@ const Avatar: React.FC<AvatarProps> = ({ user, avatar_url, email }) => {
       );
     }
   } else {
-    if (user?.avatar_url) {
+    if (profile?.avatar_url) {
       return (
         <Image
-          key={user.avatar_url}
-          src={user.avatar_url}
+          key={profile.avatar_url}
+          src={profile.avatar_url}
           alt="avatar"
           width={30}
           height={30}
@@ -46,8 +46,8 @@ const Avatar: React.FC<AvatarProps> = ({ user, avatar_url, email }) => {
       );
     } else {
       return (
-        <div key={user?.avatar_url} className="w-8 rounded-full">
-          <AvatarPlaceholder name={user?.email || "SS"} />
+        <div key={profile?.avatar_url} className="w-8 rounded-full">
+          <AvatarPlaceholder name={profile?.name || "SS"} />
         </div>
       );
     }

@@ -197,12 +197,12 @@ const Table: React.FC<TableProps> = ({ phase_id, searchQuery }) => {
               </td>
               <td className="whitespace-nowrap border border-gray-300 px-6 py-2">
                 {/* iterate over tasks assignees */}
-                <TaskAssignees
+                {/* <TaskAssignees
                   task_id={task?.id}
                   assignees={task?.assignees}
                   phase_id={phase_id}
                   refetch={refetch}
-                />
+                /> */}
               </td>
               {/* iterate properties and render column, */}
               {propertiesQuery?.data?.map((property, columnIndex) => {
