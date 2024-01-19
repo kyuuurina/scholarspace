@@ -1,9 +1,9 @@
 //unused file
 
 // src/components/chat/ChatList.tsx
-import React from 'react';
-import { useFetchChatList } from '~/utils/chatmessage';
-import ChatItem from './ChatItem';
+import React from "react";
+import { useFetchChatList } from "~/utils/chatmessage";
+import ChatItem from "./ChatItem";
 
 interface Profile {
   profile_id: string;
@@ -29,7 +29,8 @@ interface ChatListProps {
 }
 
 const ChatList: React.FC<ChatListProps> = ({ userId }) => {
-  const { chatList, isLoadingChatList, errorChatList } = useFetchChatList(userId);
+  const { chatList, isLoadingChatList, errorChatList } =
+    useFetchChatList(userId);
 
   if (isLoadingChatList) {
     return <div>Loading...</div>;
@@ -42,15 +43,7 @@ const ChatList: React.FC<ChatListProps> = ({ userId }) => {
   return (
     <div>
       <h2>Your Chats</h2>
-      <ul>
-        {chatList.map((chat: ChatListData) => (
-          <li key={chat.chat_id}>
-            {chat.user_chat_user1_idTouser && (
-              <ChatItem chat={chat} />
-            )}
-          </li>
-        ))}
-      </ul>
+      <ul>test</ul>
     </div>
   );
 };
