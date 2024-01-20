@@ -37,8 +37,8 @@ export const chatRouter = router({
       return chat;
     }),
 
-    // Procedure to get the chat list for a user
-    getChatList: protectedProcedure
+// Procedure to get the chat list for a user
+getChatList: protectedProcedure
     .input(z.object({ user_id: z.string() }))
     .query(async ({ input, ctx }) => {
       const { user_id } = input;
@@ -87,6 +87,70 @@ getChatMessages: protectedProcedure
       return messages;
     }),
 
+    sendMessage: protectedProcedure
+    .input(
+      z.object({
+        chat_id: z.number(),
+        content: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { chat_id, content } = input;
+      const currentUserId = ctx.user?.id;
+  
+      // Check if the current user is in user1 or user2 for the given chat_id
+      const chat = await ctx.prisma.chat.findUnique({
+        where: { chat_id },
+      });
+  
+      if (!chat) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Chat not found.",
+        });
+      }
+  
+      const isUser1 = chat.user1_id === currentUserId;
+      const isUser2 = chat.user2_id === currentUserId;
+  
+      if (!isUser1 && !isUser2) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You are not part of this chat.",
+        });
+      }
+  
+      // Send the message with the appropriate sender_id
+      const sender_id = currentUserId;
+      const message = await ctx.prisma.message.create({
+        data: {
+          chat_id,
+          sender_id,
+          content,
+        },
+      });
+  
+      // Return the created message with selected fields
+      return ctx.prisma.message.findUnique({
+        where: {
+          message_id: message.message_id,
+        },
+        select: {
+          message_id: true,
+          chat_id: true,
+          sender_id: true,
+          content: true,
+          timestamp: true,
+          user: {
+            select: {
+              // Select necessary user fields
+            },
+          },
+        },
+      });
+    }),
+
+});
 
   // Procedure to get messages for a specific chat
   // getChatMessages: protectedProcedure
@@ -103,10 +167,6 @@ getChatMessages: protectedProcedure
   //     return messages;
   //   }),
 
-
-
-
-});
 
   // Procedure to send a message in a chat
   // sendMessage: protectedProcedure

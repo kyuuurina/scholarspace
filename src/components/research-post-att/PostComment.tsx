@@ -34,7 +34,7 @@ const PostComment: React.FC<PostCommentProps> = ({ post_id, refetch }) => {
     resolver: zodResolver(schema),
   });
 
-  // Fetch task comments
+  // Fetch post comments
   const commentsQuery = api.postcomment.list.useQuery(
     { post_id: post_id },
     { enabled: !!post_id }
@@ -58,18 +58,7 @@ const PostComment: React.FC<PostCommentProps> = ({ post_id, refetch }) => {
     } catch (error) {
       console.error("Error posting comment:", error);
     }
-  }; 
-
-  // // Handle submit for creating a comment
-  // const handleCommentSubmit = async (formData: FormValues) => {
-  //   try {
-  //     await onCommentSubmit(formData.value); // Pass only the comment text
-  //   } catch (error) {
-  //     console.error('Error creating comment:', error);
-  //   }
-  // };
-
-  // const createComment = api.postcomment.create.useMutation(); // Create useMutation here
+  };
 
   return (
     <div className="mb-1 border-t border-gray-200 bg-white p-4 text-base dark:border-gray-700 dark:bg-gray-900">

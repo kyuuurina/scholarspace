@@ -1,4 +1,5 @@
 // add import in api.ts
+import { useQuery } from '@tanstack/react-query';
 import { api } from './api';
 
 // Fetch the chat list for a specific user

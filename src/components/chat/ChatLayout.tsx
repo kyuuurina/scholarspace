@@ -73,6 +73,7 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({ chatList, selectedChatId, onCha
     // Handle sending the message, e.g., call an API to send the message
   };
 
+
   return (
     <div className="flex h-full">
       {/* Left Pane Wrapper */}
@@ -127,7 +128,7 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({ chatList, selectedChatId, onCha
               ))}
 
               {/* Input Section */}
-              <MessageInputSection onSend={handleSendMessage} />
+              {/* <MessageInputSection chatId={selectedChatId || 0} refetch={customRefetch} /> */}
             </div>
           </div>
         {/* )} */}
