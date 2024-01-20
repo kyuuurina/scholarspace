@@ -37,24 +37,6 @@ export const chatRouter = router({
       return chat;
     }),
 
-
-  // getChatList: protectedProcedure
-  // .query(async ({ ctx }) => {
-  //   const userId = ctx.user?.id;
-
-  //   // Fetch chat list for the logged-in user (user2)
-  //   const chatList = await ctx.prisma.chat.findMany({
-  //     where: { user2_id: userId },
-  //     orderBy: { created_at: "desc" }, // Order by creation time, descending
-  //     include: {
-  //       user_chat_user1_idTouser: { select: { name: true, avatar_url: true } },
-  //       user_chat_user2_idTouser: { select: { name: true, avatar_url: true } },
-  //     },
-  //   });
-
-  //   return chatList;
-  // }),
-
     // Procedure to get the chat list for a user
     getChatList: protectedProcedure
     .input(z.object({ user_id: z.string() }))
@@ -85,6 +67,26 @@ export const chatRouter = router({
   
       return chatList;
     }),
+
+//get messages associated to the chat_id
+getChatMessages: protectedProcedure
+    .input(z.object({ chat_id: z.number() }))
+    .query(async ({ input, ctx }) => {
+      const { chat_id } = input;
+
+      const messages = await ctx.prisma.message.findMany({
+        where: { chat_id },
+        include: {
+          user: true,
+        },
+        orderBy: {
+          timestamp: 'asc',
+        },
+      });
+
+      return messages;
+    }),
+
 
   // Procedure to get messages for a specific chat
   // getChatMessages: protectedProcedure

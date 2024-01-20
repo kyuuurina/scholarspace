@@ -20,3 +20,23 @@ export const useFetchChatList = (userId: string) => {
     errorChatList,
   };
 };
+
+// Fetch messages for a specific chat
+export const useFetchChatMessages = (chatId: number) => {
+  const chatMessages = api.chat.getChatMessages.useQuery(
+    {
+      chat_id: chatId,
+    },
+    {
+      enabled: !!chatId,
+    }
+  );
+
+  const { data: chatMessagesData, isLoading: isLoadingChatMessages, error: errorChatMessages } = chatMessages;
+
+  return {
+    chatMessages: chatMessagesData || [],
+    isLoadingChatMessages,
+    errorChatMessages,
+  };
+};
