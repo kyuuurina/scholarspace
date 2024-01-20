@@ -11,7 +11,7 @@ import { useFetchProfile } from "~/utils/profile";
 import { useEffect } from "react";
 
 // icons
-import { FiHome, FiActivity, FiBriefcase, FiColumns } from "react-icons/fi";
+import { FiHome, FiActivity, FiBriefcase, FiColumns, FiMessageCircle } from "react-icons/fi";
 import { IconContext } from "react-icons";
 
 // components
@@ -184,7 +184,7 @@ export const SideBar: React.FC<SideBarProps> = ({
                 )}
               </li>
 
-              {/* <li className="rounded-sm">
+              <li className="rounded-sm">
                 <Link
                   href="/chat"
                   className={`flex items-center space-x-3 rounded-md hover:bg-purple-800 ${
@@ -203,7 +203,7 @@ export const SideBar: React.FC<SideBarProps> = ({
                     Messages
                   </span>
                 </Link>
-              </li> */}
+              </li>
 
               {/* <li className="rounded-sm">
                 <Link
