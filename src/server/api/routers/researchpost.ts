@@ -237,7 +237,7 @@ export const researchpostRouter = router({
           description: post.description,
           author: post.author,
           created_at: post.created_at,
-          profile: post.user?.profile, // Access the profile data through the user field
+          profile: post.user,
         };
       });
     }),

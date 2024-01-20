@@ -24,9 +24,6 @@ import Layout from '~/components/layout/Layout';
 import PageLoader from '~/components/layout/PageLoader';
 import LoadingSpinner from '~/components/LoadingSpinner';
 import { FaEdit, FaExclamationCircle } from 'react-icons/fa';
-import SuccessToast from "~/components/toast/SuccessToast";
-import ErrorToast from "~/components/toast/ErrorToast";
-import ConfirmationDialog from '~/components/ConfirmationDialog';
 
 //profile components
 import ProfileTabs from '~/components/profile/ProfileTabs';
