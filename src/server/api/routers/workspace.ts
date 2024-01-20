@@ -31,6 +31,31 @@ export const workspaceRouter = router({
       return workspace;
     }),
 
+  getWorkspaceRole: protectedProcedure
+    .input(
+      z.object({
+        workspaceId: z.string(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const authUser = await ctx.prisma.workspace_user.findUnique({
+        where: {
+          workspaceid_userid: {
+            workspaceid: input.workspaceId,
+            userid: ctx.user.id,
+          },
+        },
+      });
+
+      if (!authUser) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "You are not a member of this workspace.",
+        });
+      }
+      return authUser?.workspace_role;
+    }),
+
   listUserWorkspaces: protectedProcedure.query(async ({ ctx }) => {
     const userid = ctx.user.id;
     const workspaces = await ctx.prisma.workspace_user.findMany({
@@ -48,6 +73,28 @@ export const workspaceRouter = router({
     });
     return workspaces;
   }),
+
+  listWorkspaceMembers: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const { id } = input;
+
+      const members = await ctx.prisma.workspace_user.findMany({
+        where: {
+          workspaceid: id,
+        },
+        include: {
+          user: true,
+        },
+        orderBy: {
+          user: {
+            name: "desc",
+          },
+        },
+      });
+
+      return members;
+    }),
 
   create: protectedProcedure
     .input(
@@ -89,6 +136,7 @@ export const workspaceRouter = router({
     )
     .mutation(async ({ input, ctx }) => {
       const { id, name, description, cover_img } = input;
+
       // throw error if user is not admin
       const authUser = await ctx.prisma.workspace_user.findUnique({
         where: {
@@ -158,32 +206,6 @@ export const workspaceRouter = router({
       return { success: true };
     }),
 
-  listWorkspaceMembers: protectedProcedure
-    .input(z.object({ id: z.string() }))
-    .query(async ({ input, ctx }) => {
-      const { id } = input;
-
-      const members = await ctx.prisma.workspace_user.findMany({
-        where: {
-          workspaceid: id,
-        },
-        include: {
-          user: {
-            include: {
-              profile: {
-                select: {
-                  name: true,
-                  avatar_url: true,
-                },
-              },
-            },
-          },
-        },
-      });
-
-      return members;
-    }),
-
   addWorkspaceMember: protectedProcedure
     .input(
       z.object({
@@ -210,6 +232,8 @@ export const workspaceRouter = router({
       }
 
       try {
+
+        // create workspace user relation
         const workspaceUser = await ctx.prisma.workspace_user.create({
           data: {
             workspaceid: workspaceId,
@@ -408,24 +432,6 @@ export const workspaceRouter = router({
       });
 
       return workspaceUser;
-    }),
-
-  getWorkspaceRole: protectedProcedure
-    .input(
-      z.object({
-        workspaceId: z.string(),
-      })
-    )
-    .query(async ({ ctx, input }) => {
-      const authUser = await ctx.prisma.workspace_user.findUnique({
-        where: {
-          workspaceid_userid: {
-            workspaceid: input.workspaceId,
-            userid: ctx.user.id,
-          },
-        },
-      });
-      return authUser?.workspace_role;
     }),
 
   leave: protectedProcedure

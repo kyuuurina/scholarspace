@@ -1,14 +1,8 @@
+import type { user } from "@prisma/client";
+
 export type WorkspaceMember =
   | ({
-      user: {
-        profile: {
-          name: string;
-          avatar_url: string | null;
-        } | null;
-      } & {
-        id: string;
-        email: string;
-      };
+      user: user;
     } & {
       workspaceid: string;
       userid: string;

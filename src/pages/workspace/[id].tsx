@@ -55,8 +55,6 @@ const Workspace: NextPageWithLayout = () => {
 
   if (!workspace) return null;
 
-  console.log(workspace);
-
   return (
     <>
       <Head title={workspace.name} />

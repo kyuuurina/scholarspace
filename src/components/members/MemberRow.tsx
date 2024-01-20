@@ -3,6 +3,8 @@ import Image from "next/image";
 import AvatarPlaceholder from "~/components/avatar/AvatarPlaceholder";
 import Select from "~/components/Select";
 import { useUser } from "@supabase/auth-helpers-react";
+import { BASE_AVATAR_URL } from "~/utils/supabase-storage";
+import { FiSearch } from "react-icons/fi";
 
 type MemberRowProps = {
   member: WorkspaceMember;
@@ -29,16 +31,19 @@ const MemberRow: React.FC<MemberRowProps> = ({
     return null;
   }
 
+  console.log(member);
+
   return (
     <tr className="bg-white hover:bg-gray-50">
       <td className="flex items-center whitespace-nowrap px-6 py-4 font-medium text-gray-900">
-        {member?.user.profile?.avatar_url ? (
+        {member?.user.has_avatar ? (
           <Image
-            src={member?.user.profile?.avatar_url}
-            alt="Jese image"
+            src={`${BASE_AVATAR_URL}/${member?.user.id}`}
+            alt={member?.user.email}
             width={40}
             height={40}
             className="h-10 w-10 rounded-full"
+            loading="lazy"
           />
         ) : (
           <div className="h-10 w-10 rounded-full">
@@ -46,9 +51,7 @@ const MemberRow: React.FC<MemberRowProps> = ({
           </div>
         )}
         <div className="pl-3">
-          <div className="text-base font-semibold">
-            {member?.user.profile?.name}
-          </div>
+          <div className="text-base font-semibold">{member?.user?.name}</div>
           <div className="font-normal text-gray-500">{member?.user.email}</div>
         </div>
       </td>
@@ -78,19 +81,7 @@ const MemberRow: React.FC<MemberRowProps> = ({
         <td className="px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <svg
-                className="h-5 w-5 text-gray-500"
-                aria-hidden="true"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                  clipRule="evenodd"
-                ></path>
-              </svg>
+              <FiSearch className="text-gray=500 h-6 w-6" />
               <span className="ml-2 text-sm text-gray-400">
                 External Collaborator
               </span>
