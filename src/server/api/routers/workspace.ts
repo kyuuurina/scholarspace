@@ -239,7 +239,6 @@ export const workspaceRouter = router({
             workspaceid: workspaceId,
             userid: user.id,
             workspace_role: role,
-            is_collaborator: true,
           },
         });
 

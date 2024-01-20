@@ -25,7 +25,6 @@ import type { NextPageWithLayout } from "~/pages/_app";
 // utils
 import { api } from "~/utils/api";
 import { useRouterId } from "~/utils/routerId";
-import PageLoader from "~/components/layout/PageLoader";
 import Link from "next/link";
 import { TRPCClientError } from "@trpc/client";
 
@@ -38,13 +37,10 @@ const Members: NextPageWithLayout = () => {
   });
   const [modalIsOpen, setModalIsOpen] = useState(false);
 
-  const {
-    data: workspaceMembers,
-    isLoading,
-    error,
-  } = api.workspace.listWorkspaceMembers.useQuery({
-    id: workspaceId,
-  });
+  const { data: workspaceMembers, isLoading } =
+    api.workspace.listWorkspaceMembers.useQuery({
+      id: workspaceId,
+    });
 
   // search bar functions
   const [searchQuery, setSearchQuery] = useState("");
@@ -60,11 +56,18 @@ const Members: NextPageWithLayout = () => {
     );
   });
 
+  // useEffect filtered members when refetch is called and workspaceMembers is updated
+  useEffect(() => {
+    if (workspaceMembers) {
+      filteredMembers;
+    }
+  }, [workspaceMembers]);
+
   // add member
   const addMember = api.workspace.addWorkspaceMember.useMutation({
-    onSuccess: async () => {
+    onSuccess: () => {
       toast.custom(() => <SuccessToast message="Member added" />);
-      await refetch();
+      router.reload();
       setModalIsOpen(false);
     },
   });
@@ -99,9 +102,6 @@ const Members: NextPageWithLayout = () => {
     onSuccess: () => {
       toast.custom(() => <SuccessToast message="Role updated" />);
     },
-    onError: (error) => {
-      toast.custom(() => <ErrorToast message={error.message} />);
-    },
   });
   const handleRoleChange = (memberId: string, newRole: string) => {
     updateRole
@@ -122,6 +122,7 @@ const Members: NextPageWithLayout = () => {
             return <ErrorToast message="An error occurred." />;
           }
         });
+        router.reload();
       });
   };
 
@@ -158,21 +159,26 @@ const Members: NextPageWithLayout = () => {
     workspaceId: workspaceId,
   });
 
+  if (isLoading || !workspaceMembers) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <MoonLoader color="#7C3AED" />
+      </div>
+    );
+  }
   if (!workspace) {
     return (
       <>
-        <h1 className="text-4xl font-bold">Workspace not found</h1>
-        <Link href="/">
-          <p className="py-2 text-dark-purple hover:underline">
-            Go back to Home page
-          </p>
-        </Link>
+        <main className="flex min-h-screen w-full flex-col items-center justify-center">
+          <h1 className="text-4xl font-bold">Workspace not found</h1>
+          <Link href="/">
+            <p className="py-2 text-dark-purple hover:underline">
+              Go back to Home page
+            </p>
+          </Link>
+        </main>
       </>
     );
-  }
-
-  if (isLoading) {
-    <MoonLoader size={100} color="#6233D5" />;
   }
 
   return (
@@ -186,59 +192,54 @@ const Members: NextPageWithLayout = () => {
         addMemberError={addMemberErrorMsg}
       />
 
-      <PageLoader
-        isLoading={isLoading || !workspaceMembers}
-        errorMsg={error?.message}
-      >
-        <main className="min-h-screen w-full">
-          <Header
-            name={workspace?.name}
-            imgUrl={workspace?.cover_img}
-            purpose="workspace"
-          />
-          <div className="p-5">
-            <div className="relative overflow-x-auto rounded-lg shadow-md">
-              {/* search and add member section  */}
-              <div className="flex items-center bg-white px-4 py-4">
-                <label className="sr-only">Search</label>
-                <div className="relative mr-4">
-                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                    <FiSearch />
-                  </div>
-                  <input
-                    type="text"
-                    className="block w-80 rounded-lg border border-gray-300 bg-gray-50 p-2 pl-10 text-sm text-gray-900 "
-                    placeholder="Search for users"
-                    value={searchQuery}
-                    onChange={handleSearch}
-                  />
+      <main className="min-h-screen w-full">
+        <Header
+          name={workspace?.name}
+          imgUrl={workspace?.cover_img}
+          purpose="workspace"
+        />
+        <div className="p-5">
+          <div className="relative overflow-x-auto rounded-lg shadow-md">
+            {/* search and add member section  */}
+            <div className="flex items-center bg-white px-4 py-4">
+              <label className="sr-only">Search</label>
+              <div className="relative mr-4">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                  <FiSearch />
                 </div>
-                {workspaceRole.data === "Researcher Admin" && (
-                  <button
-                    onClick={() => {
-                      setModalIsOpen(true);
-                    }}
-                    className="flex items-center justify-between rounded-lg bg-purple-700 px-3 py-2 text-center text-sm font-medium text-white hover:bg-purple-800 "
-                  >
-                    <FiUserPlus className="mr-2" />
-                    Add Member
-                  </button>
-                )}
+                <input
+                  type="text"
+                  className="block w-80 rounded-lg border border-gray-300 bg-gray-50 p-2 pl-10 text-sm text-gray-900 "
+                  placeholder="Search for users"
+                  value={searchQuery}
+                  onChange={handleSearch}
+                />
               </div>
-
-              {/* member table  */}
-              <MemberTable
-                filteredMembers={filteredMembers}
-                handleRoleChange={handleRoleChange}
-                handleDeleteMember={handleDeleteMember}
-                userWorkspaceRole={workspaceRole.data}
-                isPersonal={workspace?.is_personal}
-                ownerId={workspace?.ownerid}
-              />
+              {workspaceRole.data === "Researcher Admin" && (
+                <button
+                  onClick={() => {
+                    setModalIsOpen(true);
+                  }}
+                  className="flex items-center justify-between rounded-lg bg-purple-700 px-3 py-2 text-center text-sm font-medium text-white hover:bg-purple-800 "
+                >
+                  <FiUserPlus className="mr-2" />
+                  Add Member
+                </button>
+              )}
             </div>
+
+            {/* member table  */}
+            <MemberTable
+              filteredMembers={filteredMembers}
+              handleRoleChange={handleRoleChange}
+              handleDeleteMember={handleDeleteMember}
+              userWorkspaceRole={workspaceRole.data}
+              isPersonal={workspace?.is_personal}
+              ownerId={workspace?.ownerid}
+            />
           </div>
-        </main>
-      </PageLoader>
+        </div>
+      </main>
     </>
   );
 };

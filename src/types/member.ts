@@ -7,7 +7,6 @@ export type WorkspaceMember =
       workspaceid: string;
       userid: string;
       workspace_role: string;
-      is_collaborator: boolean | null;
     })
   | undefined;
 

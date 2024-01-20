@@ -293,12 +293,11 @@ model workspace {
 }
 
 model workspace_user {
-  workspaceid     String    @db.Uuid
-  userid          String    @db.Uuid
-  workspace_role  String    @default("Researcher")
-  is_collaborator Boolean?  @default(false)
-  user            user      @relation(fields: [userid], references: [id], onDelete: Cascade)
-  workspace       workspace @relation(fields: [workspaceid], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  workspaceid    String    @db.Uuid
+  userid         String    @db.Uuid
+  workspace_role String    @default("Researcher")
+  user           user      @relation(fields: [userid], references: [id], onDelete: Cascade)
+  workspace      workspace @relation(fields: [workspaceid], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@id([workspaceid, userid])
   @@schema("public")

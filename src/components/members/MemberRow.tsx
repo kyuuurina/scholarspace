@@ -31,7 +31,6 @@ const MemberRow: React.FC<MemberRowProps> = ({
     return null;
   }
 
-  console.log(member);
 
   return (
     <tr className="bg-white hover:bg-gray-50">
@@ -77,37 +76,6 @@ const MemberRow: React.FC<MemberRowProps> = ({
           />
         )}
       </td>
-      {member.is_collaborator ? (
-        <td className="px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <FiSearch className="text-gray=500 h-6 w-6" />
-              <span className="ml-2 text-sm text-gray-400">
-                External Collaborator
-              </span>
-            </div>
-          </div>
-        </td>
-      ) : (
-        <td className="px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <svg
-                className="h-5 w-5 text-gray-500"
-                aria-hidden="true"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <circle cx="10" cy="10" r="10" fill="#6875f5"></circle>
-              </svg>
-              <span className="ml-2 text-sm text-gray-400">
-                Internal Collaborator
-              </span>
-            </div>
-          </div>
-        </td>
-      )}
       <td className="px-6 py-4">
         {member.userid != userId &&
           !isPersonalOwner && ( // Added the && operator here

@@ -6,6 +6,9 @@ import toast from "react-hot-toast";
 import { useUser } from "@supabase/auth-helpers-react";
 import dynamic from "next/dynamic";
 import { FiAlertTriangle } from "react-icons/fi";
+import { MoonLoader } from "react-spinners";
+import Link from "next/link";
+import { TRPCClientError } from "@trpc/client";
 
 // types
 import type { ReactElement } from "react";
@@ -19,7 +22,6 @@ import FormErrorMessage from "~/components/FormErrorMessage";
 import SuccessToast from "~/components/toast/SuccessToast";
 import ErrorToast from "~/components/toast/ErrorToast";
 import Header from "~/components/workspace/Header";
-import PageLoader from "~/components/layout/PageLoader";
 
 const LeaveModal = dynamic(() => import("~/components/modal/LeaveModal"), {
   loading: () => null,
@@ -37,8 +39,7 @@ const DeleteWorkspaceModal = dynamic(
 // utils
 import { api } from "~/utils/api";
 import { useRouterId } from "~/utils/routerId";
-import Link from "next/link";
-import { TRPCClientError } from "@trpc/client";
+
 
 const Settings: NextPageWithLayout = () => {
   // constants
@@ -193,15 +194,25 @@ const Settings: NextPageWithLayout = () => {
     return null;
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <MoonLoader color="#7C3AED" />
+      </div>
+    );
+  }
+
   if (!workspace) {
     return (
       <>
-        <h1 className="text-4xl font-bold">Workspace not found</h1>
-        <Link href="/">
-          <p className="py-2 text-dark-purple hover:underline">
-            Go back to Home page
-          </p>
-        </Link>
+        <main className="flex min-h-screen w-full flex-col items-center justify-center">
+          <h1 className="text-4xl font-bold">Workspace not found</h1>
+          <Link href="/">
+            <p className="py-2 text-dark-purple hover:underline">
+              Go back to Home page
+            </p>
+          </Link>
+        </main>
       </>
     );
   }
@@ -221,92 +232,90 @@ const Settings: NextPageWithLayout = () => {
         name={workspace.name}
         id={id}
       />
-      <PageLoader isLoading={isLoading} errorMsg={error?.message}>
-        <main className="min-h-screen w-full">
-          {/* Workspace header */}
-          <Header
-            name={workspace.name}
-            imgUrl={workspace.cover_img}
-            purpose="workspace"
-          />
-          <div className="p-5">
-            {/* Update Workspace Section  */}
-            <div className="grid gap-y-5">
-              <section className="mt-2 w-full rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
-                <form
-                  className="space-y-6"
-                  autoComplete="off"
-                  onSubmit={handleSubmit(handleUpdateWorkspace)}
-                >
-                  <h5 className="text-xl font-medium text-gray-900 dark:text-white">
-                    General Settings
-                  </h5>
-                  <div>
-                    <label
-                      htmlFor="workspace-name"
-                      className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
-                    >
-                      Workspace Name
-                    </label>
-                    <input className="w-full" {...register("name")} />
-                    {errors.name && (
-                      <FormErrorMessage text={errors.name.message} />
-                    )}
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="workspace-description"
-                      className="mb-2 mt-4 block text-sm font-medium text-gray-900 dark:text-white"
-                    >
-                      Workspace Description
-                    </label>
-                    <textarea className="w-full" {...register("description")} />
-                    {errors.description && (
-                      <FormErrorMessage text={errors.description.message} />
-                    )}
-                  </div>
-                  <div className="flex justify-end space-x-3">
-                    {isDirty && (
-                      <button
-                        type="button"
-                        className="rounded-sm border border-gray-200 bg-white px-3 py-2 text-center text-sm font-medium hover:bg-grey-bg hover:text-purple-accent-1 focus:outline-none"
-                        // reverts the input values to the original values
-                        onClick={handleCancel}
-                      >
-                        Cancel
-                      </button>
-                    )}
+      <main className="min-h-screen w-full">
+        {/* Workspace header */}
+        <Header
+          name={workspace.name}
+          imgUrl={workspace.cover_img}
+          purpose="workspace"
+        />
+        <div className="p-5">
+          {/* Update Workspace Section  */}
+          <div className="grid gap-y-5">
+            <section className="mt-2 w-full rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
+              <form
+                className="space-y-6"
+                autoComplete="off"
+                onSubmit={handleSubmit(handleUpdateWorkspace)}
+              >
+                <h5 className="text-xl font-medium text-gray-900 dark:text-white">
+                  General Settings
+                </h5>
+                <div>
+                  <label
+                    htmlFor="workspace-name"
+                    className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    Workspace Name
+                  </label>
+                  <input className="w-full" {...register("name")} />
+                  {errors.name && (
+                    <FormErrorMessage text={errors.name.message} />
+                  )}
+                </div>
+                <div>
+                  <label
+                    htmlFor="workspace-description"
+                    className="mb-2 mt-4 block text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    Workspace Description
+                  </label>
+                  <textarea className="w-full" {...register("description")} />
+                  {errors.description && (
+                    <FormErrorMessage text={errors.description.message} />
+                  )}
+                </div>
+                <div className="flex justify-end space-x-3">
+                  {isDirty && (
                     <button
-                      type="submit"
-                      className={`${
-                        isDirty
-                          ? "bg-purple-accent-1 hover:bg-purple-accent-2"
-                          : "bg-gray-200"
-                      } rounded-sm px-3 py-2 text-center text-sm font-medium text-white focus:outline-none`}
-                      disabled={!isDirty || updateWorkspace.isLoading}
+                      type="button"
+                      className="rounded-sm border border-gray-200 bg-white px-3 py-2 text-center text-sm font-medium hover:bg-grey-bg hover:text-purple-accent-1 focus:outline-none"
+                      // reverts the input values to the original values
+                      onClick={handleCancel}
                     >
-                      Save
+                      Cancel
                     </button>
-                  </div>
+                  )}
+                  <button
+                    type="submit"
+                    className={`${
+                      isDirty
+                        ? "bg-purple-accent-1 hover:bg-purple-accent-2"
+                        : "bg-gray-200"
+                    } rounded-sm px-3 py-2 text-center text-sm font-medium text-white focus:outline-none`}
+                    disabled={!isDirty || updateWorkspace.isLoading}
+                  >
+                    Save
+                  </button>
+                </div>
+              </form>
+            </section>
+
+            {/* Danger Zone Section  */}
+            {renderLeaveWorkspace() || renderDeleteWorkspace() ? (
+              <section className="w-full rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
+                <form className="space-y-6" action="#">
+                  <h5 className="text-xl font-medium text-gray-900">
+                    Danger Zone
+                  </h5>
+                  {renderLeaveWorkspace()}
+                  {renderDeleteWorkspace()}
                 </form>
               </section>
-
-              {/* Danger Zone Section  */}
-              {renderLeaveWorkspace() || renderDeleteWorkspace() ? (
-                <section className="w-full rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
-                  <form className="space-y-6" action="#">
-                    <h5 className="text-xl font-medium text-gray-900">
-                      Danger Zone
-                    </h5>
-                    {renderLeaveWorkspace()}
-                    {renderDeleteWorkspace()}
-                  </form>
-                </section>
-              ) : null}
-            </div>
+            ) : null}
           </div>
-        </main>
-      </PageLoader>
+        </div>
+      </main>
     </>
   );
 };
