@@ -6,13 +6,7 @@ import dynamic from "next/dynamic";
 // icons
 import { FiHome, FiUser, FiMenu, FiSettings, FiColumns } from "react-icons/fi";
 
-const WorkspaceDropdown = dynamic(
-  () => import("../workspace/WorkspaceDropdown"),
-  {
-    loading: () => null,
-  }
-);
-
+import WorkspaceDropdown from "../workspace/WorkspaceDropdown";
 const WorkspaceModal = dynamic(() => import("../workspace/WorkspaceModal"), {
   loading: () => null,
 });
