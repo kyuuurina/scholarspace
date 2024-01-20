@@ -19,7 +19,7 @@ export const useFetchUsers = () => {
         userId: user.id,
         userName: user.name,
         userEmail: user.email,
-        userAvatarUrl: user.avatar_url,
+        userAvatarUrl: user.email,
       });
     });
   }
