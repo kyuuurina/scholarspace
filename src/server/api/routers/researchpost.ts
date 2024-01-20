@@ -211,35 +211,35 @@ export const researchpostRouter = router({
     getMyPosts: protectedProcedure
     .input(z.object({ post_id: z.string() }))
     .query(async ({ input, ctx }) => {
-      const myPosts = await ctx.prisma.research_post.findMany({
-        where: {
-          profile_id: input.post_id,
-        },
-        orderBy: {
-          created_at: 'desc', // Order by created_at in descending order
-        },
-        include: {
-          user: {
-            select: {
-              profile: true, // Include the entire profile table
+        const myPosts = await ctx.prisma.research_post.findMany({
+            where: {
+                profile_id: input.post_id,
             },
-          },
-        },
-      });
-  
-      return myPosts.map((post) => {
-        return {
-          post_id: post.post_id,
-          user_id: post.user_id,
-          category: post.category,
-          title: post.title,
-          document: post.document,
-          description: post.description,
-          author: post.author,
-          created_at: post.created_at,
-          profile: post.user,
-        };
-      });
+            orderBy: {
+                created_at: 'desc', // Order by created_at in descending order
+            },
+            include: {
+                user: {
+                    select: {
+                        profile: true, // Include the entire profile table
+                    },
+                },
+            },
+        });
+
+        return myPosts.map((post) => {
+            return {
+                post_id: post.post_id,
+                user_id: post.user_id,
+                category: post.category,
+                title: post.title,
+                document: post.document,
+                description: post.description,
+                author: post.author,
+                created_at: post.created_at,
+                user: post.user,
+            };
+        });
     }),
 
 getFollowingPosts: publicProcedure
