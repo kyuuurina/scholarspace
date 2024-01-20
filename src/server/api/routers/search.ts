@@ -10,46 +10,47 @@ import { Prisma, PrismaClient } from "@prisma/client";
 export const searchRouter = router({
 //search research post function
 searchPost: publicProcedure
-    .input(
-      z.object({
-        query: z.string(),
-      })
-    )
-    .query(async ({ input, ctx }) => {
-      const researchPosts = await ctx.prisma.research_post.findMany({
-        where: {
-          OR: [
-            { title: { contains: input.query, mode: 'insensitive' } },
-            { author: { contains: input.query, mode: 'insensitive' } },
-            { category: { contains: input.query, mode: 'insensitive' } },
-            {
-              user: {
-                profile: {
-                  some: {
-                    name: { contains: input.query, mode: 'insensitive' },
-                  },
-                },
-              },
-            },
-          ],
-        },
-        orderBy: { created_at: 'desc' },
-        include: {
-          user: {
-            select: {
-              id: true,
-              email: true,
+  .input(
+    z.object({
+      query: z.string(),
+    })
+  )
+  .query(async ({ input, ctx }) => {
+    const researchPosts = await ctx.prisma.research_post.findMany({
+      where: {
+        OR: [
+          { title: { contains: input.query, mode: 'insensitive' } },
+          { author: { contains: input.query, mode: 'insensitive' } },
+          { category: { contains: input.query, mode: 'insensitive' } },
+          {
+            user: {
               profile: {
-                select: {
-                  profile_id: true,
-                  name: true,
-                  avatar_url: true,
+                some: {
+                  name: { contains: input.query, mode: 'insensitive' },
                 },
               },
             },
           },
+        ],
+      },
+      orderBy: { created_at: 'desc' },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            profile: {
+              select: {
+                profile_id: true,
+                name: true,
+                avatar_url: true,
+              },
+            },
+          },
         },
-      });
+        profile: true, // Include the profile directly in the research post
+      },
+    });
 
       console.log("searchPost:", researchPosts);
       return researchPosts;
