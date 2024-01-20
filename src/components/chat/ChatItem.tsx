@@ -3,6 +3,7 @@ import React from 'react';
 import Link from 'next/link';
 import AvatarPlaceholder from '../avatar/AvatarPlaceholder';
 import Image from 'next/image';
+import { useUser } from '@supabase/auth-helpers-react';
 
 interface Profile {
   profile_id: string;
@@ -26,19 +27,26 @@ interface ChatItemProps {
 }
 
 const ChatItem: React.FC<ChatItemProps> = ({ chat }) => {
-  if (!chat || !chat.user_chat_user1_idTouser) {
+  const currentUser = useUser();
+
+  if (!chat || (!chat.user_chat_user1_idTouser && !chat.user_chat_user2_idTouser)) {
     console.error('Invalid chat data:', chat);
     return null;
   }
 
-  const user1 = chat.user_chat_user1_idTouser;
+  // Determine the chat partner based on the current user's ID
+  const chatPartnerProfile = currentUser?.id === chat.user_chat_user1_idTouser?.id
+    ? chat.user_chat_user2_idTouser
+    : currentUser?.id === chat.user_chat_user2_idTouser?.id
+    ? chat.user_chat_user1_idTouser
+    : null;
 
   return (
     <div className="hover:bg-gray-100 transition duration-300 ease-in-out">
-      {user1 && (
+      {chatPartnerProfile && (
         <div className="flex items-center">
           <div>
-            {user1.profile && user1.profile.map(profile => (
+            {chatPartnerProfile.profile && chatPartnerProfile.profile.map(profile => (
               <div key={profile.profile_id} className="flex items-center mb-2">
                 <Link href={`/manage-profile/${profile.profile_id}`}>
                   <div className="aspect:square h-10 w-10 cursor-pointer">
