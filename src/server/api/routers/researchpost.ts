@@ -208,38 +208,38 @@ export const researchpostRouter = router({
     }),
 
 
-getMyPosts: protectedProcedure
+    getMyPosts: protectedProcedure
     .input(z.object({ post_id: z.string() }))
     .query(async ({ input, ctx }) => {
-        const myPosts = await ctx.prisma.research_post.findMany({
-            where: {
-                profile_id: input.post_id,
+      const myPosts = await ctx.prisma.research_post.findMany({
+        where: {
+          profile_id: input.post_id,
+        },
+        orderBy: {
+          created_at: 'desc', // Order by created_at in descending order
+        },
+        include: {
+          user: {
+            select: {
+              profile: true, // Include the entire profile table
             },
-            orderBy: {
-                created_at: 'desc', // Order by created_at in descending order
-            },
-            include: {
-                user: {
-                    select: {
-                        profile: true, // Include the entire profile table
-                    },
-                },
-            },
-        });
-
-        return myPosts.map((post) => {
-            return {
-                post_id: post.post_id,
-                user_id: post.user_id,
-                category: post.category,
-                title: post.title,
-                document: post.document,
-                description: post.description,
-                author: post.author,
-                created_at: post.created_at,
-                user: post.user,
-            };
-        });
+          },
+        },
+      });
+  
+      return myPosts.map((post) => {
+        return {
+          post_id: post.post_id,
+          user_id: post.user_id,
+          category: post.category,
+          title: post.title,
+          document: post.document,
+          description: post.description,
+          author: post.author,
+          created_at: post.created_at,
+          profile: post.user?.profile, // Access the profile data through the user field
+        };
+      });
     }),
 
 getFollowingPosts: publicProcedure
@@ -355,7 +355,9 @@ getLikedPostsByUser: protectedProcedure.query(async ({ ctx }) => {
     },
     include: {
       user: {
-        include: {
+        select: {
+          id: true,
+          email: true,
           profile: {
             select: {
               profile_id: true,
@@ -365,6 +367,7 @@ getLikedPostsByUser: protectedProcedure.query(async ({ ctx }) => {
           },
         },
       },
+      profile: true, // Include the profile directly in the research post
     },
   });
 
@@ -417,10 +420,6 @@ getResearchPostsByFollowedUsers: protectedProcedure.query(async ({ ctx }) => {
           user_id: true,
           name: true,
           avatar_url: true,
-          about_me: true,
-          research_interest: true,
-          collab_status: true,
-          skills: true,
         },
       },
     },
@@ -465,10 +464,6 @@ getResearchPostRecommendations: protectedProcedure.query(async ({ ctx }) => {
                 user_id: true,
                 name: true,
                 avatar_url: true,
-                about_me: true,
-                research_interest: true,
-                collab_status: true,
-                skills: true,
               },
             },
           },
