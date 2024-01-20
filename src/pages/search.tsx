@@ -48,6 +48,8 @@ const SearchPage: NextPageWithLayout = () => {
   // Call the hook directly within the component body
   const { combinedResults, isLoading, error } = useFetchCombinedSearchResults(query);
 
+  const flattenedSearchData = combinedResults?.flat() || [];
+
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [currentPostId, setCurrentPostId] = useState<string | null>(null);
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
