@@ -38,8 +38,6 @@ searchPost: publicProcedure
           user: {
             select: {
               id: true,
-              name: true,
-              avatar_url: true,
               email: true,
               profile: {
                 select: {

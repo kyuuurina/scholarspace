@@ -38,8 +38,6 @@ async function getInfiniteResearchPosts({
       user: {
         select: {
           id: true,
-          name: true,
-          avatar_url: true,
           profile: {
             select: {
               profile_id: true,
