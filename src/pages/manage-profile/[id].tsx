@@ -62,8 +62,6 @@ import AchievementCard from "~/components/profile/AchievementCard";
 
 // network component
 import FollowButton from "~/components/network/FollowButton";
-import Button from "~/components/button/Button";
-import FollowListModal from "~/components/network/FollowListModal";
 import FollowerList from "~/components/network/FollowerList";
 import FollowingList from "~/components/network/FollowingList";
 
@@ -139,7 +137,7 @@ const ProfilePage: NextPageWithLayout = () => {
                   )}
                 </div>
 
-                <h3 className="mb-4 text-2xl font-semibold" style={{ marginLeft: "1rem", marginRight: "50rem"}}>
+                <h3 className="mb-4 text-2xl font-semibold" style={{ marginLeft: "1rem", marginRight: "30rem"}}>
                   {`${name ?? "User"}'s Profile`}
                 </h3>
     
@@ -174,14 +172,14 @@ const ProfilePage: NextPageWithLayout = () => {
                 <div>
                   <div className="flex space-x-4">
 
-                  <div className="mb-4">
+                  <div className="mb-4 mt-6">
                     {followersData ? (
                       <FollowerList profiles={flattenedFollowersData} />
                     ) : (
                       <p>Loading followers...</p>
                     )}
                   </div>
-                  <div className="mb-4">
+                  <div className="mb-4 mt-6">
                     {followingData ? (
                       <FollowingList profiles={flattenedFollowingData} />
                     ) : (

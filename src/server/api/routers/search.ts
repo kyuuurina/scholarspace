@@ -36,8 +36,11 @@ searchPost: publicProcedure
         orderBy: { created_at: 'desc' },
         include: {
           user: {
-            include: {
-              // profile: true, // Include the profile information in the result
+            select: {
+              id: true,
+              name: true,
+              avatar_url: true,
+              email: true,
               profile: {
                 select: {
                   profile_id: true,
