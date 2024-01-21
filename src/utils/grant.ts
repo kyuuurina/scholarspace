@@ -36,7 +36,7 @@ export const useFetchGrantSummary = (workspace_id: string) => {
   );
 
   // fetch projects of workspace
-  const projects = api.project.getWorkspaceProjects.useQuery(
+  const projects = api.project.listWorkspaceProjects.useQuery(
     {
       workspace_id,
     },

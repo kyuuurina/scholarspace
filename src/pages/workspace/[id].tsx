@@ -20,10 +20,7 @@ import PrimaryButton from "~/components/button/PrimaryButton";
 import ScoreChart from "~/components/chart/ScoreChart";
 import Card from "~/components/Card";
 import Header from "~/components/workspace/Header";
-import CreateProjectModal from "~/components/project/CreateProjectModal";
-import CreateGrantModal from "~/components/grant/create-grant-form";
 import MembersCard from "~/components/members/MembersCard";
-
 
 const GanttChart = dynamic(() => import("~/components/grant/GanttChart"), {
   loading: () => null,
@@ -34,6 +31,22 @@ const ProjectCard = dynamic(() => import("~/components/project/ProjectCard"), {
   loading: () => null,
   ssr: false,
 });
+
+const CreateProjectModal = dynamic(
+  () => import("~/components/project/CreateProjectModal"),
+  {
+    loading: () => null,
+    ssr: false,
+  }
+);
+
+const CreateGrantModal = dynamic(
+  () => import("~/components/grant/create-grant-form"),
+  {
+    loading: () => null,
+    ssr: false,
+  }
+);
 
 const Workspace: NextPageWithLayout = () => {
   // const projects = useFetchWorkspaceProjects();
@@ -48,11 +61,23 @@ const Workspace: NextPageWithLayout = () => {
   const { grantSummary, refetch } = useFetchGrantSummary(workspaceId);
 
   // fetch workspace details
-  const {
-    data: workspace,
-    isLoading,
-    error,
-  } = api.workspace.get.useQuery({ id: workspaceId });
+  const { data: workspace, isLoading } = api.workspace.get.useQuery({
+    id: workspaceId,
+  });
+
+  // extract the users array from workspace object
+  const usersArray =
+    workspace?.workspace_user.map((workspaceUser) => ({
+      id: workspaceUser.user.id,
+      email: workspaceUser.user.email,
+      name: workspaceUser.user.name,
+      has_avatar: workspaceUser.user.has_avatar,
+    })) || [];
+
+  // fetch projects of workspace
+  const { data: projects } = api.project.listWorkspaceProjects.useQuery({
+    workspace_id: workspaceId,
+  });
 
   if (isLoading) {
     return (
@@ -118,6 +143,9 @@ const Workspace: NextPageWithLayout = () => {
             </div>
             <div className="grid max-w-max gap-5 md:grid-cols-2">
               {/* map projects array and pass project object to project card  */}
+              {projects?.map((project) => (
+                <ProjectCard key={project.project_id} project={project} />
+              ))}
             </div>
           </div>
           {/* Right section of workspace dashboard */}
@@ -130,7 +158,7 @@ const Workspace: NextPageWithLayout = () => {
             <MembersCard
               id={workspaceId}
               name={"workspace"}
-              users={workspace.workspace_user}
+              users={usersArray}
             />
             <Card title={"Collaborative Score"} center>
               <ScoreChart name="Collaborative" score={90} />

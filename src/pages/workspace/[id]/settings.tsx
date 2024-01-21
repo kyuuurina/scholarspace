@@ -40,7 +40,6 @@ const DeleteWorkspaceModal = dynamic(
 import { api } from "~/utils/api";
 import { useRouterId } from "~/utils/routerId";
 
-
 const Settings: NextPageWithLayout = () => {
   // constants
   const user = useUser();
@@ -55,7 +54,6 @@ const Settings: NextPageWithLayout = () => {
   const {
     data: workspace,
     isLoading,
-    error,
     refetch,
   } = api.workspace.get.useQuery({
     id: id,
