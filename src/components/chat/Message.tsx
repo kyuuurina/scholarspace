@@ -1,5 +1,5 @@
 // src/components/chat/Message.tsx
-import React from 'react';
+import React, { useEffect }  from 'react';
 import { useUser } from '@supabase/auth-helpers-react';
 import { useFetchChatMessages } from '~/utils/chatmessage';
 import { api } from '~/utils/api';
@@ -21,6 +21,10 @@ const Message: React.FC<MessageProps> = ({ isCurrentUser, content, timestamp, ch
         { chat_id: chat_id },
         { enabled: !! chat_id }
     );
+
+    React.useEffect(() => {
+        refetch();
+      }, []);
 
     const messageStyle = isCurrentUser ? 'bg-purple-800 text-white' : 'bg-gray-300 text-black';
     const contentColor = isCurrentUser ? 'text-white' : 'text-black';
