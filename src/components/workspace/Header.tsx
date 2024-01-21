@@ -28,8 +28,9 @@ const Header: React.FC<HeaderProps> = ({
     <div className="flex w-full flex-wrap justify-between border-b bg-white px-5 py-2 sm:py-5">
       <Link
         href={{
-          pathname: `/${purpose === "workspace" ? "workspace" : "project"}`,
-          query: { id: id },
+          pathname: `/${
+            purpose === "workspace" ? "workspace" : "project"
+          }/${id}`,
         }}
         className="flex max-w-[70%] items-center gap-x-3"
       >
