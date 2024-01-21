@@ -293,12 +293,11 @@ model workspace {
 }
 
 model workspace_user {
-  workspaceid     String    @db.Uuid
-  userid          String    @db.Uuid
-  workspace_role  String    @default("Researcher")
-  is_collaborator Boolean?  @default(false)
-  user            user      @relation(fields: [userid], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  workspace       workspace @relation(fields: [workspaceid], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  workspaceid    String    @db.Uuid
+  userid         String    @db.Uuid
+  workspace_role String    @default("Researcher")
+  user           user      @relation(fields: [userid], references: [id], onDelete: Cascade)
+  workspace      workspace @relation(fields: [workspaceid], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@id([workspaceid, userid])
   @@schema("public")
@@ -307,6 +306,8 @@ model workspace_user {
 model user {
   id                                           String                 @id @db.Uuid
   email                                        String
+  name                                         String                 @default("example name")
+  has_avatar                                   Boolean                @default(false)
   chat_chat_user1_idTouser                     chat[]                 @relation("chat_user1_idTouser")
   chat_chat_user2_idTouser                     chat[]                 @relation("chat_user2_idTouser")
   chat_message_chat_message_recipient_idTouser chat_message[]         @relation("chat_message_recipient_idTouser")
@@ -357,7 +358,7 @@ model profile {
   research_interest   String?
   collab_status       String?               @default("Not Open For Collaboration")
   skills              String?
-  user                user                  @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user                user                  @relation(fields: [user_id], references: [id], onDelete: Cascade)
   profile_achievement profile_achievement[]
   profile_education   profile_education[]
   profile_experience  profile_experience[]
