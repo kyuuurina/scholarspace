@@ -10,9 +10,7 @@ import ProfileAvatarPlaceholder from "../avatar/ProfileAvatar";
 // import CommentsList from './CommentList'; // Import the CommentList component
 import { useForm } from "react-hook-form";
 import CommentList from "../research-post-att/PostCommentList";
-import PostComment, {
-  FormValues as CommentFormValues,
-} from "../research-post-att/PostComment";
+import PostComment, {FormValues as CommentFormValues,} from "../research-post-att/PostComment";
 import PostCommentList from "../research-post-att/PostCommentList";
 import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -301,12 +299,12 @@ const Post: React.FC<PostProps> = ({ post, onEditClick, refetch }) => {
           </div>
         )}
       </div>
-      <div className="mt-2 flex items-center md:mt-4">
+      {/* <div className="mt-2 flex items-center md:mt-4">
         <button className="mr-2 flex items-center text-xs text-gray-500 hover:text-gray-700 focus:outline-none md:text-sm">
           <FiMessageSquare size={18} className="mr-1 inline-block md:mr-2" />
           Comment
         </button>
-      </div>
+      </div> */}
       <div className="mb-2 mt-2 flex items-center md:mb-4">
         <LikeButton postId={post.post_id} />
       </div>

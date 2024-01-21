@@ -9,16 +9,16 @@ import { api } from '~/utils/api';
 
 interface MessageInputSectionProps {
   chatId: number;
-  onMessageSubmit: (formData: MessageFormValues) => void;
+  onMessageSubmit: (formData: FormValues) => void;
   refetch: () => void;
 }
 
-export type MessageFormValues = { content: string };
+export type FormValues = { content: string };
 
 const MessageInputSection: React.FC<MessageInputSectionProps> = ({ chatId, refetch }) => {
   // Zod schema for form validation
-  const schema: ZodType<MessageFormValues> = z.object({
-    content: z.string().min(3, { message: 'Comment is too short' }),
+  const schema: ZodType<FormValues> = z.object({
+    content: z.string(),
   });
 
   const {
@@ -26,55 +26,54 @@ const MessageInputSection: React.FC<MessageInputSectionProps> = ({ chatId, refet
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<MessageFormValues>({
+  } = useForm<FormValues>({
     resolver: zodResolver(schema),
   });
 
-  const [messageInput, setMessageInput] = useState('');
 
   // Fetch messages
   const messagesQuery = api.chat.getChatMessages.useQuery(
       { chat_id: chatId },
       { enabled: !! chatId }
   );
-  
+
   const messages = messagesQuery.data || [];
 
-  // Use the correct mutation function from the API
+  // send a new message
   const sendMessageMutation = api.chat.sendMessage.useMutation();
 
-  const onSubmit = async (data: MessageFormValues) => {
+  const handleMessageSubmit = async (formData: FormValues) => {
     try {
       // Use mutateAsync for async operations
-      await sendMessageMutation.mutateAsync({ chat_id: chatId, content: data.content });
-      setMessageInput('');
+      await sendMessageMutation.mutateAsync({
+        chat_id: chatId,
+        content: formData.content
+      });
       reset();
-      refetch(); // Refetch data after sending a message
+      refetch();
       await messagesQuery.refetch();
     } catch (error) {
-      // Handle error if necessary
       console.error('Error sending message:', error);
     }
   };
 
   return (
     <div className="flex items-center mt-2 sticky bottom-0 bg-white p-4">
-      <form onSubmit={handleSubmit(onSubmit)} className="w-full">
-        <input
-          type="text"
-          placeholder="Type a message..."
-          {...register('content')}
-          value={messageInput}
-          onChange={(e) => setMessageInput(e.target.value)}
-          className="p-2 border border-gray-300 rounded w-full mr-2"
-        />
+      <form onSubmit={handleSubmit(handleMessageSubmit)} className="w-full">
+      <input
+        type="text"
+        placeholder="Type a message..."
+        {...register('content')}
+        className="p-2 border border-gray-300 rounded w-full mr-2"
+      />
         {errors.content && (
           <span className="text-red-500 text-sm">{errors.content.message}</span>
         )}
         <PrimaryButton
           name="Send"
           type="submit"
-          disabled={!messageInput.trim()}
+          disabled={false}
+          // disabled={!messageInput.trim()}
         />
       </form>
     </div>

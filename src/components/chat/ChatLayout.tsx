@@ -3,14 +3,20 @@ import React, { useState, useEffect, ReactNode } from 'react';
 import ChatItem, { UserProfile } from './ChatItem';
 import ChatHeader from './ChatHeader';
 import { useFetchChatMessages } from '~/utils/chatmessage';
-import MessageInputSection from './MessageInput';
 import Message from './Message'; // Updated import
-import PrimaryButton from '../button/PrimaryButton';
 import { useUser } from '@supabase/auth-helpers-react';
 
+import { useForm } from "react-hook-form";
+import MessageInputSection, {FormValues as MessageFormValues} from './MessageInput';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z, ZodType } from "zod";
+
+import { useQuery } from "@tanstack/react-query";
+import {api} from "~/utils/api";
+
 interface ChatMessageProps {
-  message_id: bigint;
-  chat_id: bigint | null;
+  message_id: number;
+  chat_id: number | null;
   sender_id: string | null;
   content: string | null;
   timestamp: Date;
@@ -18,7 +24,7 @@ interface ChatMessageProps {
 
 interface ChatLayoutProps {
   chatList: {
-    chat_id: bigint;
+    chat_id: number;
     user_chat_user1_idTouser?: UserProfile | undefined;
     user_chat_user2_idTouser?: UserProfile | undefined;
   }[];
@@ -30,18 +36,18 @@ interface ChatLayoutProps {
       id: string;
       email: string;
     } | null;
-    message_id: bigint;
-    chat_id: bigint | null;
+    message_id: number;
+    chat_id: number | null;
     sender_id: string | null;
     content: string | null;
     timestamp: Date;
-  }[]; // Add chatMessages property
+  }[];
+  refetch:() => void;
 }
 
-const ChatLayout: React.FC<ChatLayoutProps> = ({ chatList, selectedChatId, onChatSelect, children, chatMessages: propChatMessages }) => {
+const ChatLayout: React.FC<ChatLayoutProps> = ({ chatList, selectedChatId, onChatSelect, children, chatMessages: propChatMessages, refetch }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedProfileName, setSelectedProfileName] = useState<string | null>(null);
-  const [messageInput, setMessageInput] = useState('');
 
   const user = useUser();
   // Use propChatMessages directly when selectedChatId is null
@@ -58,20 +64,54 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({ chatList, selectedChatId, onCha
     cursor: 'pointer',
   };
 
+  const schema: ZodType<MessageFormValues> = z.object({
+    content: z.string().min(3, { message: 'Comment is too short' }),
+  });
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<MessageFormValues>({
+    resolver: zodResolver(schema),
+  });
+
+  const [messageInput, setMessageInput] = useState('');
+
+  // Fetch messages
+  const messagesQuery = api.chat.getChatMessages.useQuery(
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    { chat_id: selectedChatId?.chat_id || 0},
+    { enabled: !!selectedChatId?.chat_id }
+  );
+
+  const messages = messagesQuery.data || [];
+
+  // send a new message
+  const sendMessageMutation = api.chat.sendMessage.useMutation();
+
+  const handleSendMessage = async (formData: MessageFormValues) => {
+    try {
+      await sendMessageMutation.mutateAsync({
+        chat_id: selectedChatId || 0,
+        content: formData.content
+      });
+      reset();
+      refetch();
+      await messagesQuery.refetch();
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
+  };
+
   useEffect(() => {
-    // Handle new chat selection, e.g., load messages for the selected chat
     if (selectedChatId) {
-      // Fetch messages for the selected chat
-      // The useFetchChatMessages hook already takes care of this, so no additional code needed here
     }
   }, [selectedChatId]);
 
   // Use propChatMessages when selectedChatId is null
   const messagesToDisplay = selectedChatId === null ? propChatMessages : chatMessages;
-  const handleSendMessage = (message: string) => {
-    console.log('Sending message:', message);
-    // Handle sending the message, e.g., call an API to send the message
-  };
 
 
   return (
@@ -97,7 +137,8 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({ chatList, selectedChatId, onCha
                 style={chatRowStyle}
                 onClick={() => {
                   setSelectedProfileName(chat.user_chat_user1_idTouser?.name || '');
-                  onChatSelect(Number(chat.chat_id));
+                  onChatSelect(chat.chat_id);
+                  // onChatSelect(Number(chat.chat_id));
                 }}
               >
                 <ChatItem chat={chat} />
@@ -124,11 +165,21 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({ chatList, selectedChatId, onCha
                   isCurrentUser={message.sender_id === user?.id}
                   content={message.content}
                   timestamp={message.timestamp}
+                  chat_id={Number(message.chat_id) || 0}
+                  refetch={async () => {
+                    await messagesQuery.refetch();
+                  }}
                 />
               ))}
 
               {/* Input Section */}
-              {/* <MessageInputSection chatId={selectedChatId || 0} refetch={customRefetch} /> */}
+              <MessageInputSection
+                chatId={selectedChatId || 0}
+                onMessageSubmit={handleSendMessage}
+                refetch={async () => {
+                  await messagesQuery.refetch();
+                }}
+              />
             </div>
           </div>
         {/* )} */}
