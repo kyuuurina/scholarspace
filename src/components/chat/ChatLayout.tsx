@@ -5,6 +5,7 @@ import ChatHeader from './ChatHeader';
 import { useFetchChatMessages } from '~/utils/chatmessage';
 import Message from './Message'; // Updated import
 import { useUser } from '@supabase/auth-helpers-react';
+import { MoonLoader } from 'react-spinners';
 
 import { useForm } from "react-hook-form";
 import MessageInputSection, {FormValues as MessageFormValues} from './MessageInput';
@@ -81,9 +82,8 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({ chatList, selectedChatId, onCha
 
   // Fetch messages
   const messagesQuery = api.chat.getChatMessages.useQuery(
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    { chat_id: selectedChatId?.chat_id || 0},
-    { enabled: !!selectedChatId?.chat_id }
+    { chat_id: (chatList[0]?.chat_id || 0) },
+    { enabled: !!chatList[0]?.chat_id }
   );
 
   const messages = messagesQuery.data || [];
@@ -151,26 +151,30 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({ chatList, selectedChatId, onCha
 
       {/* Message Section */}
       <div className="flex-1 pl-4">
+        <div className="flex-1 overflow-y-auto">
+          {isLoadingChatMessages && (
+            <div className="flex items-center justify-center h-full">
+              <MoonLoader color={"#ffff"} loading={true} size={20} />
+            </div>
+          )}
 
-
-        {/* {selectedProfileName && (
+          {/* {selectedProfileName && (
           <div className="flex-1 flex flex-col">
             <ChatHeader profileName={selectedProfileName} /> */}
 
-            <div className="flex-1 overflow-y-auto">
-              {/* Display chatMessages here */}
-              {messagesToDisplay.map((message) => (
+          {/* Display chatMessages here */}
+          {messagesToDisplay.map((message) => (
                 <Message
-                  key={message.message_id}
-                  isCurrentUser={message.sender_id === user?.id}
-                  content={message.content}
-                  timestamp={message.timestamp}
-                  chat_id={Number(message.chat_id) || 0}
-                  refetch={async () => {
-                    await messagesQuery.refetch();
-                  }}
-                />
-              ))}
+                key={message.message_id}
+                isCurrentUser={message.sender_id === user?.id}
+                content={message.content}
+                timestamp={message.timestamp}
+                chat_id={Number(message.chat_id) || 0}
+                refetch={async () => {
+                  await messagesQuery.refetch();
+                }}
+              />
+            ))}
 
               {/* Input Section */}
               <MessageInputSection

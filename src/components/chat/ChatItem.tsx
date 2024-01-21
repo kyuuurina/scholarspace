@@ -1,9 +1,9 @@
-// src/components/chat/ChatItem.tsx
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import AvatarPlaceholder from '../avatar/AvatarPlaceholder';
 import Image from 'next/image';
 import { useUser } from '@supabase/auth-helpers-react';
+import { MoonLoader } from "react-spinners";
 
 interface Profile {
   profile_id: string;
@@ -20,7 +20,7 @@ export interface UserProfile {
 
 interface ChatItemProps {
   chat: {
-    chat_id: bigint;
+    chat_id: number;
     user_chat_user1_idTouser?: UserProfile | undefined;
     user_chat_user2_idTouser?: UserProfile | undefined;
   };
@@ -28,12 +28,32 @@ interface ChatItemProps {
 
 const ChatItem: React.FC<ChatItemProps> = ({ chat }) => {
   const currentUser = useUser();
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    setIsLoading(true);
+    // Simulate asynchronous operation, replace with your actual loading logic
+    const fetchData = async () => {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setIsLoading(false);
+    };
+
+    void fetchData();
+  }, [chat]); // Update the dependency as needed
+
+  if (isLoading) {
+    // Render MoonLoader here while loading
+    return (
+      <div className="flex items-center justify-center">
+        <MoonLoader color={"#ffff"} loading={true} size={20} />
+      </div>
+    );
+  }
 
   if (!chat || (!chat.user_chat_user1_idTouser && !chat.user_chat_user2_idTouser)) {
     console.error('Invalid chat data:', chat);
     return null;
   }
-
   // Determine the chat partner based on the current user's ID
   const chatPartnerProfile = currentUser?.id === chat.user_chat_user1_idTouser?.id
     ? chat.user_chat_user2_idTouser

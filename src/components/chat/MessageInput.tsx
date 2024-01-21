@@ -59,22 +59,17 @@ const MessageInputSection: React.FC<MessageInputSectionProps> = ({ chatId, refet
 
   return (
     <div className="flex items-center mt-2 sticky bottom-0 bg-white p-4">
-      <form onSubmit={handleSubmit(handleMessageSubmit)} className="w-full">
-      <input
-        type="text"
-        placeholder="Type a message..."
-        {...register('content')}
-        className="p-2 border border-gray-300 rounded w-full mr-2"
-      />
+      <form onSubmit={handleSubmit(handleMessageSubmit)} className="flex w-full">
+        <input
+          type="text"
+          placeholder="Type a message..."
+          {...register('content')}
+          className="p-2 border border-gray-300 rounded w-full mr-2"
+        />
         {errors.content && (
           <span className="text-red-500 text-sm">{errors.content.message}</span>
         )}
-        <PrimaryButton
-          name="Send"
-          type="submit"
-          disabled={false}
-          // disabled={!messageInput.trim()}
-        />
+        <PrimaryButton name="Send" type="submit" disabled={false} />
       </form>
     </div>
   );
