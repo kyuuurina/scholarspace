@@ -11,6 +11,7 @@ import { useForm } from "react-hook-form";
 import MessageInputSection, {FormValues as MessageFormValues} from './MessageInput';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z, ZodType } from "zod";
+import EmptyState from './EmptyState';
 
 import { useQuery } from "@tanstack/react-query";
 import {api} from "~/utils/api";
@@ -106,19 +107,31 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({ chatList, selectedChatId, onCha
   };
 
   useEffect(() => {
+    // Update selectedProfileName when selecting a chat
     if (selectedChatId) {
+      const selectedChat = chatList.find((chat) => chat.chat_id === selectedChatId);
+  
+      if (selectedChat) {
+        const isUser1 = user?.id === selectedChat.user_chat_user1_idTouser?.id;
+        const isUser2 = user?.id === selectedChat.user_chat_user2_idTouser?.id;
+  
+        if (isUser1 && user?.id !== selectedChat.user_chat_user2_idTouser?.id) {
+          setSelectedProfileName(selectedChat.user_chat_user1_idTouser?.name || '');
+        } else if (isUser2 && user?.id !== selectedChat.user_chat_user1_idTouser?.id) {
+          setSelectedProfileName(selectedChat.user_chat_user2_idTouser?.name || '');
+        }
+      }
     }
-  }, [selectedChatId]);
+  }, [selectedChatId, chatList, user]);
 
   // Use propChatMessages when selectedChatId is null
   const messagesToDisplay = selectedChatId === null ? propChatMessages : chatMessages;
-
 
   return (
     <div className="flex h-full">
       {/* Left Pane Wrapper */}
       <div className="border-r border-gray-300 w-1/4">
-        <div className="h-full overflow-y-auto">
+        <div className="h-full overflow-y-auto flex flex-col">
           <div className="p-4">
             <input
               type="text"
@@ -129,7 +142,7 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({ chatList, selectedChatId, onCha
             />
           </div>
 
-          <div className="flex flex-col pl-4">
+          <div className="flex flex-col flex-1 pl-4">
             {filteredChatList.map((chat, index) => (
               <div
                 key={chat.chat_id}
@@ -138,10 +151,16 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({ chatList, selectedChatId, onCha
                 onClick={() => {
                   setSelectedProfileName(chat.user_chat_user1_idTouser?.name || '');
                   onChatSelect(chat.chat_id);
-                  // onChatSelect(Number(chat.chat_id));
                 }}
               >
-                <ChatItem chat={chat} />
+                <ChatItem
+                  chat={chat}
+                  isSelected={selectedChatId === chat.chat_id}
+                  onClick={() => {
+                    setSelectedProfileName(chat.user_chat_user1_idTouser?.name || '');
+                    onChatSelect(chat.chat_id);
+                  }}
+                />
                 {index < filteredChatList.length - 1 && <hr className="my-4 border-r border-gray-300" />}
               </div>
             ))}
@@ -150,21 +169,20 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({ chatList, selectedChatId, onCha
       </div>
 
       {/* Message Section */}
-      <div className="flex-1 pl-4">
-        <div className="flex-1 overflow-y-auto">
-          {isLoadingChatMessages && (
-            <div className="flex items-center justify-center h-full">
-              <MoonLoader color={"#ffff"} loading={true} size={20} />
-            </div>
-          )}
+      <div className="flex-1 pl-4 overflow-y-auto">
+        {isLoadingChatMessages && (
+          <div className="flex items-center justify-center">
+            <MoonLoader color={"#ffff"} loading={true} size={20} />
+          </div>
+        )}
 
-          {/* {selectedProfileName && (
+        {selectedChatId ? (
           <div className="flex-1 flex flex-col">
-            <ChatHeader profileName={selectedProfileName} /> */}
+            {/* <ChatHeader profileName={selectedProfileName || ''} /> */}
 
-          {/* Display chatMessages here */}
-          {messagesToDisplay.map((message) => (
-                <Message
+            {/* Display chatMessages here */}
+            {messagesToDisplay.map((message) => (
+              <Message
                 key={message.message_id}
                 isCurrentUser={message.sender_id === user?.id}
                 content={message.content}
@@ -176,19 +194,22 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({ chatList, selectedChatId, onCha
               />
             ))}
 
-              {/* Input Section */}
-              <MessageInputSection
-                chatId={selectedChatId || 0}
-                onMessageSubmit={handleSendMessage}
-                refetch={async () => {
-                  await messagesQuery.refetch();
-                }}
-              />
-            </div>
+            {/* Input Section */}
+            <MessageInputSection
+              chatId={selectedChatId || 0}
+              onMessageSubmit={handleSendMessage}
+              refetch={async () => {
+                await messagesQuery.refetch();
+              }}
+            />
           </div>
-        {/* )} */}
+        ) : (
+          // <div className="flex-1 flex items-center justify-center">
+            <EmptyState/>
+          // </div>
+        )}
       </div>
-    // </div>
+    </div>
   );
 };
 

@@ -24,9 +24,11 @@ interface ChatItemProps {
     user_chat_user1_idTouser?: UserProfile | undefined;
     user_chat_user2_idTouser?: UserProfile | undefined;
   };
+  isSelected: boolean;
+  onClick: () => void;
 }
 
-const ChatItem: React.FC<ChatItemProps> = ({ chat }) => {
+const ChatItem: React.FC<ChatItemProps> = ({ chat, isSelected, onClick }) => {
   const currentUser = useUser();
   const [isLoading, setIsLoading] = useState(true);
 
@@ -62,7 +64,12 @@ const ChatItem: React.FC<ChatItemProps> = ({ chat }) => {
     : null;
 
   return (
-    <div className="hover:bg-gray-100 transition duration-300 ease-in-out">
+    <div
+      className={`hover:bg-gray-100 transition duration-300 ease-in-out ${
+        isSelected ? 'bg-gray-200' : '' // Highlight the row if isSelected is true
+      }`}
+      onClick={onClick} // Call onClick when the row is clicked
+    >
       {chatPartnerProfile && (
         <div className="flex items-center">
           <div>
