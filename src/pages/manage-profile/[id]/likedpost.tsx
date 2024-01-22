@@ -2,9 +2,9 @@
 
 import React from 'react';
 import {useEffect, useState} from 'react';
-import {api} from "~/utils/api";
-import Image from 'next/image';
+import {api} from '~/utils/api';
 import Link from 'next/link';
+import { useUser } from '@supabase/auth-helpers-react';
 
 //utils
 import { useRouterId } from "~/utils/routerId";
@@ -36,15 +36,18 @@ import EditPostForm from '~/components/research-post/EditPostForm';
 
 
 const LikedPost: NextPageWithLayout = () => {
+
   const profile_id = useRouterId();
-  console.log("Front call",profile_id)
-  const LikedPost = useFetchLikedPost(profile_id);
-  const router = useRouter();
+
+  // Fetch user_id using getUserIdByProfileId
+  const userId = api.profile.getUserIdByProfileId.useQuery({
+    profile_id: profile_id,
+  }).data;
+  
+  // Fetch liked posts based on user_id
+  const LikedPost = useFetchLikedPost(userId || '');
 
   const { name, isLoading } = useFetchProfile();  //To print in head
-  
-
-  console.log("LikedPosttsx page router:", router)
 
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [currentPostId, setCurrentPostId] = useState<string | null>(null);
@@ -67,11 +70,10 @@ const LikedPost: NextPageWithLayout = () => {
       return <LoadingSpinner />;
     }
 
-
   return (
     <>
       <Head>
-        <title>{`${name ?? 'User'}'s Posts`}</title>
+        <title>{`${name ?? 'User'}'s Liked Posts`}</title>
       </Head>
       <ProfileTabs />
 
@@ -105,12 +107,11 @@ const LikedPost: NextPageWithLayout = () => {
           </ul>
         ) : (
           <div className="flex flex-col items-center justify-center h-50vh">
-            <FaExclamationCircle className="text-gray-500 text-4xl mb-4" />
             <p className="font-semibold text-lg text-gray-500 leading-1.5 text-center max-w-md">
-              Uh-oh, you have not created any posts yet. Create one by clicking on the button above!
+              No Liked Post
             </p>
             <p className="font-medium text-base text-gray-500 leading-1.5 text-center max-w-md">
-              Navigate to the Home Page to add a new post and share your research!
+              Browse more posts <Link href="/">here!!</Link>
             </p>
           </div>
         )}

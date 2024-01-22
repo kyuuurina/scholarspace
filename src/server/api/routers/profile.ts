@@ -367,7 +367,27 @@ const remainingUsers = await ctx.prisma.profile.findMany({
    return profile;
  }),
 
+//get user_id of a profile
+ getUserIdByProfileId : protectedProcedure
+  .input(z.object({ profile_id: z.string() }))
+  .query(async ({ input, ctx }) => {
+    const { profile_id } = input;
 
+    // Query your database to get user_id based on profile_id
+    const user = await ctx.prisma.profile.findUnique({
+      where: { profile_id },
+      select: { user_id: true },
+    });
+
+    if (!user) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "User not found.",
+      });
+    }
+
+    return user.user_id;
+  }),
 
 });
 

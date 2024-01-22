@@ -325,53 +325,58 @@ getFollowingPosts: publicProcedure
     }),
 
 // Get research posts liked by the user
-getLikedPostsByUser: protectedProcedure.query(async ({ ctx }) => {
-  const userId = ctx.user?.id;
+getLikedPostsByUser : protectedProcedure
+  .input(z.object({ user_id: z.string() })) // Added input validation
+  .query(async ({ input, ctx }) => {
+    const userId = input.user_id;
 
-  if (!userId) {
     // Handle unauthenticated user
-    return [];
-  }
+    if (!userId) {
+      throw new TRPCError({
+        code: 'UNAUTHORIZED',
+        message: 'User not authenticated',
+      });
+    }
 
-  // Get the user's liked posts
-  const likedPosts = await ctx.prisma.post_likes.findMany({
-    where: {
-      user_id: userId,
-    },
-    select: {
-      post_id: true,
-    },
-  });
-
-  // Extract post IDs
-  const likedPostIds = likedPosts.map((post) => post.post_id);
-
-  // Get research posts liked by the user
-  const likedResearchPosts = await ctx.prisma.research_post.findMany({
-    where: {
-      post_id: {
-        in: likedPostIds,
+    // Get the user's liked posts
+    const likedPosts = await ctx.prisma.post_likes.findMany({
+      where: {
+        user_id: userId,
       },
-    },
-    include: {
-      user: {
-        select: {
-          id: true,
-          email: true,
-          profile: {
-            select: {
-              profile_id: true,
-              name: true,
-              avatar_url: true,
+      select: {
+        post_id: true,
+      },
+    });
+
+    // Extract post IDs
+    const likedPostIds = likedPosts.map((post) => post.post_id);
+
+    // Get research posts liked by the user
+    const likedResearchPosts = await ctx.prisma.research_post.findMany({
+      where: {
+        post_id: {
+          in: likedPostIds,
+        },
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            profile: {
+              select: {
+                profile_id: true,
+                name: true,
+                avatar_url: true,
+              },
             },
           },
         },
+        profile: true, // Include the profile directly in the research post
       },
-      profile: true, // Include the profile directly in the research post
-    },
-  });
+    });
 
-  return likedResearchPosts;
+    return likedResearchPosts;
 }),
 
 
