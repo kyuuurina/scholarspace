@@ -13,17 +13,24 @@ interface Profile {
   skills: string | null;
 }
 
-export const useFetchFollowers = (userId: string) => {
+export const useFetchFollowers = () => {
+  const profile_id = useRouterId();
+
+  // Fetch userId using getUserIdByProfileId
+  const userId = api.profile.getUserIdByProfileId.useQuery({
+    profile_id: profile_id,
+  }).data;
+
   const {
     data: followersData,
     isLoading: followersLoading,
     error: followersError,
   } = api.follow.getFollowersList.useQuery({
-    userId,
+    userId: userId || '',
   });
 
   return {
-    followersData: followersData || [], // Assuming the structure of the response
+    followersData: followersData || [],
     followersLoading,
     followersError,
   };

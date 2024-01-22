@@ -7,6 +7,7 @@ import Image from "next/image";
 import { useUser } from "@supabase/auth-helpers-react";
 import { api } from "~/utils/api";
 import { useRouterId } from "~/utils/routerId";
+import { useFetchFollowers } from "~/utils/follow";
 
 interface Profile {
   profile_id: string;
@@ -39,14 +40,16 @@ const FollowerList: React.FC<FollowerListProps> = ({ profiles }) => {
     userId: profileId || "",
   });
 
-  // Update follower profiles state when new data is fetched
+    // Use the useFetchFollowers hook to get followers data
+    const { followersData, followersLoading, followersError } = useFetchFollowers();
+
   useEffect(() => {
-    if (fetchedProfiles) {
-      // Flatten the 2D array to a 1D array
-      const flatProfiles = fetchedProfiles.flat();
-      setFollowerProfiles(flatProfiles);
-    }
-  }, [fetchedProfiles]);
+      // Update follower profiles state when new data is fetched
+      if (followersData) {
+        const flatProfiles = followersData.flat();
+        setFollowerProfiles(flatProfiles);
+      }
+    }, [followersData]);
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -89,7 +92,7 @@ const FollowerList: React.FC<FollowerListProps> = ({ profiles }) => {
   return (
     <div>
       <button onClick={openModal}>
-        {followerCount ? followerCount.followersCount.toString() + " Followers" : "Followers"}
+      {followersData ? followersData.length.toString() + " Followers" : "Followers"}
       </button>
       <ScrollableModal show={isModalOpen} onClose={closeModal} title="Followers">
         {followerProfiles && followerProfiles.length === 0 ? (
@@ -134,7 +137,6 @@ const FollowerList: React.FC<FollowerListProps> = ({ profiles }) => {
                     Remove
                   </button>
                 )}
-                {/* Include other profile details as needed */}
               </li>
             ))}
           </ul>
