@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useRouter } from 'next/router';
 import { api } from '~/utils/api';
+import { FiMessageSquare } from 'react-icons/fi';
 
 interface MessageButtonProps {
   userId: string; // Other user's ID
@@ -51,7 +52,6 @@ const MessageButton: React.FC<MessageButtonProps> = ({ userId, chatId }) => {
 
   const handleButtonClick = () => {
     if (existingChatId) {
-      // Use the router.push inside the function
       router.push(`/chat/message/${existingChatId}`).catch((error) => {
         console.error('Error navigating to chat page:', error);
       });
@@ -59,8 +59,11 @@ const MessageButton: React.FC<MessageButtonProps> = ({ userId, chatId }) => {
   };
 
   return (
-    <button onClick={handleButtonClick} className="flex items-center">
-      Message
+    <button
+      onClick={handleButtonClick}
+      className="flex items-center bg-white text-purple-800 border border-purple-800 py-2 px-4 rounded"
+    >
+      <FiMessageSquare className="mr-2" /> Message
     </button>
   );
 };
