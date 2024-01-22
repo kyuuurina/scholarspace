@@ -65,6 +65,9 @@ import FollowButton from "~/components/network/FollowButton";
 import FollowerList from "~/components/network/FollowerList";
 import FollowingList from "~/components/network/FollowingList";
 
+//chat component
+import MessageButton from "~/components/chat/MessageButton";
+
 
 const ProfilePage: NextPageWithLayout = () => {
   const router = useRouter();
@@ -156,9 +159,17 @@ const ProfilePage: NextPageWithLayout = () => {
                   {/* Follow Button */}
                   {isNotOwner && user_id && <FollowButton userId={user_id} />}
                 </div>
+
+                <div>
+                  {/* Message Button */}
+                  {isNotOwner && user_id && <MessageButton userId={user_id} />}
+                </div>
+
                 <div className="flex space-x-4">{/*  */}</div>
               </div>
 
+
+              {/* Edit Profile */}
               <div>
                 {isEditModalOpen && (
                   <UserProfileForm

@@ -7,6 +7,7 @@ import { TRPCError } from "@trpc/server";
 import { inferAsyncReturnType } from "@trpc/server";
 import { PrismaClient } from "@prisma/client";
 
+
 const prisma = new PrismaClient();
 
 // Define the profile router

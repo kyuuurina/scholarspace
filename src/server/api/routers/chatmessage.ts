@@ -1,17 +1,17 @@
 import { z } from "zod";
 import { router, protectedProcedure } from "~/server/api/trpc";
-import { TRPCError } from "@trpc/server"; // Add this import if not present
+import { TRPCError } from "@trpc/server";
 
 export const chatRouter = router({
-  // Procedure to get or create a chat for a given pair of users
-  getOrCreateChat: protectedProcedure
+  // Procedure to get an existing chat for a given pair of users
+  validateChat: protectedProcedure
     .input(z.object({ user2_id: z.string() }))
     .query(async ({ input, ctx }) => {
       const { user2_id } = input;
       const user1_id = ctx.user?.id;
 
       // Check if a chat already exists for the given pair of users
-      let chat = await ctx.prisma.chat.findFirst({
+      const chat = await ctx.prisma.chat.findFirst({
         where: {
           OR: [
             { user1_id, user2_id },
@@ -20,21 +20,29 @@ export const chatRouter = router({
         },
       });
 
-      // If no chat exists, create a new one
-      if (!chat) {
-        try {
-          chat = await ctx.prisma.chat.create({
-            data: { user1_id, user2_id },
-          });
-        } catch (error) {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Failed to create a new chat.",
-          });
-        }
-      }
-
       return chat;
+    }),
+
+  // Procedure to create a new chat for a given pair of users
+  createChat: protectedProcedure
+    .input(z.object({ user2_id: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      const { user2_id } = input;
+      const user1_id = ctx.user?.id;
+
+      try {
+        // Create a new chat
+        const chat = await ctx.prisma.chat.create({
+          data: { user1_id, user2_id },
+        });
+
+        return chat;
+      } catch (error) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to create a new chat.",
+        });
+      }
     }),
 
 // Procedure to get the chat list for a user
@@ -42,7 +50,7 @@ getChatList: protectedProcedure
     .input(z.object({ user_id: z.string() }))
     .query(async ({ input, ctx }) => {
       const { user_id } = input;
-  
+
       // Fetch the chat list for the specified user_id
       const chatList = await ctx.prisma.chat.findMany({
         where: {
