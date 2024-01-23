@@ -53,7 +53,9 @@ const Table: React.FC<TableProps> = ({ phase_id, searchQuery }) => {
   });
 
   // GET tasks
-  const { tasks, refetch } = useFetchTasksWithProperties(phase_id);
+  const { data: tasksList, refetch } = api.task.list.useQuery({ phase_id });
+
+  console.log("tasksList", tasksList);
 
   const createProperty = api.phase.addProperty.useMutation();
 
@@ -87,11 +89,11 @@ const Table: React.FC<TableProps> = ({ phase_id, searchQuery }) => {
     }));
   };
 
-  const filteredTasks = tasks?.filter((task) =>
+  const filteredTasks = tasksList?.filter((task) =>
     task?.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  if (!tasks || !filteredTasks) {
+  if (!tasksList || !filteredTasks) {
     return null;
   }
 
@@ -203,7 +205,7 @@ const Table: React.FC<TableProps> = ({ phase_id, searchQuery }) => {
               </td>
               <td className="whitespace-nowrap border border-gray-300 px-6 py-2">
                 {/* iterate over tasks assignees */}
-                {/* <TaskAssignees
+                <TaskAssignees
                   task_id={task?.id}
                   assignees={task?.task_assignees}
                   phase_id={phase_id}
