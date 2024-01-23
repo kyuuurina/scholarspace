@@ -97,6 +97,23 @@ export const SideBar: React.FC<SideBarProps> = ({
                 </span>
               </Link>
             </li>
+
+            <li className=" rounded-sm">
+              <Link
+                href={`/chat`}
+                className="flex items-center space-x-3 rounded-md text-purple-accent-2 hover:bg-purple-800"
+                onClick={toggleSidebar}
+              >
+                <FiMessageCircle className="h-6 w-6" />
+                <span
+                  className={`transition-all duration-500 ${
+                    open ? "opacity-100" : "sr-only opacity-0"
+                  }`}
+                >
+                  Chats
+                </span>
+              </Link>
+            </li>
             <li className="rounded-sm">
               <Link
                 href="/manage-templates"

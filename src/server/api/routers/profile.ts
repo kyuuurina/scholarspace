@@ -399,7 +399,9 @@ export const profileRouter = router({
     }
 
     return user.user_id;
-  }),  // get profile by context
+  }), 
+  
+  // get profile by context
   getByContext: protectedProcedure.query(async ({ ctx }) => {
     const userId = ctx.user?.id;
 

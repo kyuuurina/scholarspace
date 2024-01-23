@@ -125,8 +125,8 @@ const ProfilePage: NextPageWithLayout = () => {
           <div className="grid gap-y-5">
             {/* User Profile Card */}
             <section className="mx-auto mt-2 w-3/4 rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
-            <div className="flex items-center">
-                <div className="relative w-20 h-20">
+              <div className="flex items-center">
+                <div className="relative w-20 h-20 mr-4">
                   {avatar_url ? (
                     <Image
                       src={`https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/avatar/${avatar_url}`}
@@ -140,34 +140,31 @@ const ProfilePage: NextPageWithLayout = () => {
                   )}
                 </div>
 
-                <h3 className="mb-4 text-2xl font-semibold" style={{ marginLeft: "1rem", marginRight: "30rem"}}>
-                  {`${name ?? "User"}'s Profile`}
-                </h3>
-    
-                <div>
-                  {isOwner && (
-                    <button
-                      onClick={handleEditClick}
-                      className="flex items-center"
-                    >
-                      Edit <FaEdit className="ml-2" />
-                    </button>
-                  )}
+                <div className="flex flex-col">
+                  <h3 className="mb-2 text-2xl font-semibold">
+                    {`${name ?? "User"}'s Profile`}
+                  </h3>
+
+                  <div>
+                    {isOwner && (
+                      <button
+                        onClick={handleEditClick}
+                        className="flex items-center"
+                      >
+                        Edit <FaEdit className="ml-2" />
+                      </button>
+                    )}
+                  </div>
                 </div>
 
-                <div>
+                <div className="flex items-center justify-end flex-grow space-x-2">
                   {/* Follow Button */}
                   {isNotOwner && user_id && <FollowButton userId={user_id} />}
-                </div>
 
-                <div>
                   {/* Message Button */}
                   {isNotOwner && user_id && <MessageButton userId={user_id} />}
                 </div>
-
-                <div className="flex space-x-4">{/*  */}</div>
               </div>
-
 
               {/* Edit Profile */}
               <div>
@@ -235,7 +232,6 @@ const ProfilePage: NextPageWithLayout = () => {
                   </div>
                 </div>
               </div>
-              <div>{/* Following Modal */}</div>
             </section>
 
             <section className="mx-auto mt-2 w-3/4 rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
