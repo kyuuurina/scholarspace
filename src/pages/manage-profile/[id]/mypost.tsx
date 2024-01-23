@@ -3,8 +3,6 @@ import { useFetchMyResearchPosts } from '~/utils/researchpost';
 
 import { useState } from 'react';
 import { api } from '~/utils/api';
-import Image from 'next/image';
-import Link from 'next/link';
 import AddNewPostButton from '~/components/research-post/AddNewPostButton';
 import router, { useRouter } from 'next/router';
 
@@ -23,7 +21,7 @@ import ErrorPage from '~/pages/error-page';
 import Layout from '~/components/layout/Layout';
 import PageLoader from '~/components/layout/PageLoader';
 import LoadingSpinner from '~/components/LoadingSpinner';
-import { FaEdit, FaExclamationCircle } from 'react-icons/fa';
+import { FaExclamationCircle } from 'react-icons/fa';
 
 //profile components
 import ProfileTabs from '~/components/profile/ProfileTabs';

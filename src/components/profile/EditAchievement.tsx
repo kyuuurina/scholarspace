@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import { type ZodType, z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useUser } from "@supabase/auth-helpers-react";
 import { v4 as uuidv4 } from "uuid";
 import { api } from "~/utils/api";
 import { useRouterId } from "~/utils/routerId";
@@ -11,12 +11,10 @@ import toast from "react-hot-toast";
 import React from "react";
 
 // types
-import type { ProfileFormData } from "~/types/profile";
 import type { AchievementFormData } from "~/types/profile";
 
 //utils
-import { useFetchProfile } from "~/utils/profile";
-import { useFetchAchievement } from "~/utils/achievement";
+
 
 // local components
 import FormErrorMessage from "../FormErrorMessage";

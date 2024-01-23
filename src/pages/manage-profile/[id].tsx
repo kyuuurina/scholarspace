@@ -2,7 +2,6 @@
 
 import React from "react";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import { api } from "~/utils/api";
 import { type ZodType, z } from "zod";
@@ -27,17 +26,11 @@ import { useFetchFollowing } from "~/utils/follow";
 // types
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "~/pages/_app";
-import type {
-  ProfileFormData,
-  EducationFormData,
-  AchievementFormData,
-  ExperienceFormData,
-} from "~/types/profile";
+
 
 // local components
 import Layout from "~/components/layout/Layout";
 import Head from "next/head";
-import FormErrorMessage from "~/components/FormErrorMessage";
 import PageLoader from "~/components/layout/PageLoader";
 import ErrorPage from "~/pages/error-page";
 import LoadingSpinner from "~/components/LoadingSpinner";
@@ -91,8 +84,8 @@ const ProfilePage: NextPageWithLayout = () => {
   const { educations, isLoading: EducationLoading, error: EducationError,} = useFetchEducation();
   const { achievements, isLoading: AchievementLoading, error: AchievementError,} = useFetchAchievement();
   const { experiences, isLoading: ExperienceLoading, error: ExperienceError,} = useFetchExperience();
-  const { followersData, followersLoading, followersError } = useFetchFollowers();
-  const { followingData, followingLoading, followingError } = useFetchFollowing();
+  const { followersData } = useFetchFollowers();
+  const { followingData} = useFetchFollowing();
 
   const flattenedFollowersData = followersData?.flat() || [];
   const flattenedFollowingData = followingData?.flat() || [];

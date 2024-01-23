@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import { type ZodType, z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useUser } from "@supabase/auth-helpers-react";
 import { v4 as uuidv4 } from "uuid";
 import { api } from "~/utils/api";
 import { useRouterId } from "~/utils/routerId";
@@ -16,8 +16,6 @@ import React from "react";
 // types
 import type { ExperienceFormData } from "~/types/profile";
 
-//utils
-import { useFetchExperience } from "~/utils/experience";
 
 // local components
 import FormErrorMessage from "../FormErrorMessage";

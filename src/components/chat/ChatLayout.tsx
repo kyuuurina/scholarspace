@@ -79,8 +79,6 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({ chatList, selectedChatId, onCha
     resolver: zodResolver(schema),
   });
 
-  const [messageInput, setMessageInput] = useState('');
-
   // Fetch messages
   const messagesQuery = api.chat.getChatMessages.useQuery(
     { chat_id: (chatList[0]?.chat_id || 0) },
