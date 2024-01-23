@@ -159,6 +159,13 @@ const Header: React.FC<HeaderProps> = ({
     }
   };
 
+  // get project
+  const { data: project } = api.project.get.useQuery({
+    project_id: id,
+  });
+
+  if (!project) return null;
+
   return (
     <>
       <TemplateModal show={isModalOpen} onClose={() => setIsModalOpen(false)} />
@@ -169,7 +176,7 @@ const Header: React.FC<HeaderProps> = ({
           <div className="flex w-fit items-center justify-center rounded-lg border border-gray-200 bg-gray-50 px-3 py-1 text-gray-700">
             <Link href="/workspace">
               <span className="ml-1 flex items-center text-xs hover:underline">
-                MYSIGSQRA
+                {project?.workspace?.name}
               </span>
             </Link>
             <span className="mx-1">/</span>
