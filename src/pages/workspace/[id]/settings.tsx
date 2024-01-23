@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { useRouter } from "next/router";
-import { api } from "~/utils/api";
 import { type ZodType, z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
 import { useUser } from "@supabase/auth-helpers-react";
-import { useFetchWorkspace } from "~/utils/workspace";
+import dynamic from "next/dynamic";
+import { FiAlertTriangle } from "react-icons/fi";
+import { MoonLoader } from "react-spinners";
+import Link from "next/link";
+import { TRPCClientError } from "@trpc/client";
 
 // types
 import type { ReactElement } from "react";
@@ -17,34 +19,50 @@ import type { WorkspaceFormData } from "~/types/workspace";
 import Layout from "~/components/layout/Layout";
 import Head from "~/components/layout/Head";
 import FormErrorMessage from "~/components/FormErrorMessage";
-import { DeleteWorkspaceModal } from "~/components/workspace/DeleteWorkspaceModal";
 import SuccessToast from "~/components/toast/SuccessToast";
 import ErrorToast from "~/components/toast/ErrorToast";
 import Header from "~/components/workspace/Header";
-import LeaveModal from "~/components/modal/LeaveModal";
+
+const LeaveModal = dynamic(() => import("~/components/modal/LeaveModal"), {
+  loading: () => null,
+  ssr: false,
+});
+
+const DeleteWorkspaceModal = dynamic(
+  () => import("~/components/workspace/DeleteWorkspaceModal"),
+  {
+    loading: () => null,
+    ssr: false,
+  }
+);
 
 // utils
-import { useGetWorkspaceRole } from "~/utils/userWorkspaces";
+import { api } from "~/utils/api";
+import { useRouterId } from "~/utils/routerId";
 
 const Settings: NextPageWithLayout = () => {
   // constants
   const user = useUser();
-  const userWorkspaceRole = useGetWorkspaceRole();
-  const router = useRouter();
-  const { id } = router.query;
+  const id = useRouterId();
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [leaveModalIsOpen, setLeaveModalIsOpen] = useState(false);
-  const userId = user?.id || "";
+  const [isUpdating, setIsUpdating] = useState(false);
+  const userId = user?.id;
 
+  // fetching data
+  // workspace data
   const {
-    name,
-    description,
-    cover_img,
+    data: workspace,
     isLoading,
-    is_personal,
-    imgUrl,
-    ownerid,
-  } = useFetchWorkspace();
+    refetch,
+  } = api.workspace.get.useQuery({
+    id: id,
+  });
+
+  // workspace role
+  const { data: workspaceRole } = api.workspace.getWorkspaceRole.useQuery({
+    workspaceId: id,
+  });
 
   // schema for form validation
   const schema: ZodType<WorkspaceFormData> = z.object({
@@ -62,10 +80,6 @@ const Settings: NextPageWithLayout = () => {
   const updateWorkspace = api.workspace.update.useMutation({
     onSuccess: () => {
       toast.custom(() => <SuccessToast message="Workspace updated" />);
-      router.reload();
-    },
-    onError: () => {
-      toast.custom(() => <ErrorToast message="Error updating workspace" />);
     },
   });
 
@@ -79,51 +93,59 @@ const Settings: NextPageWithLayout = () => {
   } = useForm<WorkspaceFormData>({
     resolver: zodResolver(schema),
     defaultValues: {
-      name: name,
-      description: description,
-      cover_img: cover_img,
+      name: workspace?.name,
+      description: workspace?.description,
+      cover_img: workspace?.cover_img,
     },
   });
 
   // set form values to workspace data
   useEffect(() => {
     if (!isLoading) {
-      setValue("name", name || "");
-      setValue("description", description || "");
-      setValue("cover_img", cover_img || "");
+      setValue("name", workspace?.name ?? "");
+      setValue("description", workspace?.description ?? "");
+      setValue("cover_img", workspace?.cover_img ?? "");
     }
   }, [isLoading, setValue]);
 
   //handlers
   const handleUpdateWorkspace = async (formData: WorkspaceFormData) => {
+    if (isUpdating) return;
+    setIsUpdating(true);
     try {
       await updateWorkspace.mutateAsync({
-        id: id as string,
+        id: id,
         ...formData,
       });
-      console.log(formData);
     } catch (error) {
-      // Handle any errors
-      console.error(error);
+      toast.custom(() => {
+        if (error instanceof TRPCClientError) {
+          return <ErrorToast message={error.message} />;
+        } else {
+          return <ErrorToast message="Error in updating workspace." />;
+        }
+      });
+    } finally {
+      reset({
+        ...formData,
+      });
+      await refetch();
     }
+    setIsUpdating(false);
   };
 
   const handleCancel = () => {
     reset({
-      name: name || "",
-      description: description || "",
-      cover_img: cover_img || "",
+      name: workspace?.name,
+      description: workspace?.description,
+      cover_img: workspace?.cover_img,
     });
   };
 
-  // loader
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
   const renderLeaveWorkspace = () => {
-    const canLeavePersonalWorkspace = is_personal && userId !== ownerid;
-    const canLeaveTeamWorkspace = !is_personal;
+    const canLeavePersonalWorkspace =
+      workspace?.is_personal && userId !== workspace?.ownerid;
+    const canLeaveTeamWorkspace = !workspace?.is_personal;
     if (canLeavePersonalWorkspace || canLeaveTeamWorkspace) {
       return (
         <div className="flex justify-between px-2 text-sm">
@@ -145,25 +167,11 @@ const Settings: NextPageWithLayout = () => {
   };
 
   const renderDeleteWorkspace = () => {
-    if (!is_personal && userWorkspaceRole === "Researcher Admin") {
+    if (!workspace?.is_personal && workspaceRole === "Researcher Admin") {
       return (
         <div className="flex flex-col rounded-sm bg-red-50 p-6 text-sm text-red-800">
           <div className="flex">
-            <svg
-              className="mr-2 h-5 w-5"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
-              ></path>
-            </svg>
+            <FiAlertTriangle />
             <div>
               <p className="mb-1 font-medium">Delete Workspace</p>
               <p className="mb-4 font-normal">
@@ -184,24 +192,51 @@ const Settings: NextPageWithLayout = () => {
     return null;
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <MoonLoader color="#7C3AED" />
+      </div>
+    );
+  }
+
+  if (!workspace) {
+    return (
+      <>
+        <main className="flex min-h-screen w-full flex-col items-center justify-center">
+          <h1 className="text-4xl font-bold">Workspace not found</h1>
+          <Link href="/">
+            <p className="py-2 text-dark-purple hover:underline">
+              Go back to Home page
+            </p>
+          </Link>
+        </main>
+      </>
+    );
+  }
+
   return (
     <>
-      <Head title={name ? `${name} Settings` : "Settings"} />
+      <Head title={workspace.name} />
       <LeaveModal
         openModal={leaveModalIsOpen}
         onClick={() => setLeaveModalIsOpen(false)}
-        name={name}
-        id={id as string}
+        name={workspace.name}
+        id={id}
       />
       <DeleteWorkspaceModal
         openModal={modalIsOpen}
         onClick={() => setModalIsOpen(false)}
-        name={name}
-        id={id as string}
+        name={workspace.name}
+        id={id}
       />
       <main className="min-h-screen w-full">
         {/* Workspace header */}
-        <Header name={name || ""} imgUrl={imgUrl} purpose="workspace" />
+        <Header
+          name={workspace.name}
+          imgUrl={workspace.cover_img}
+          purpose="workspace"
+        />
         <div className="p-5">
           {/* Update Workspace Section  */}
           <div className="grid gap-y-5">
@@ -256,7 +291,7 @@ const Settings: NextPageWithLayout = () => {
                         ? "bg-purple-accent-1 hover:bg-purple-accent-2"
                         : "bg-gray-200"
                     } rounded-sm px-3 py-2 text-center text-sm font-medium text-white focus:outline-none`}
-                    disabled={!isDirty}
+                    disabled={!isDirty || updateWorkspace.isLoading}
                   >
                     Save
                   </button>

@@ -7,7 +7,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { v4 as uuidv4 } from "uuid";
 import { api } from "~/utils/api";
-import { fetchUserWorkspaces } from "~/utils/userWorkspaces";
+import toast from "react-hot-toast";
+import { TRPCClientError } from "@trpc/client";
 
 // types
 import type { WorkspaceFormData } from "~/types/workspace";
@@ -16,6 +17,7 @@ import type { WorkspaceFormData } from "~/types/workspace";
 import FormErrorMessage from "../FormErrorMessage";
 import Modal from "../modal/Modal";
 import PrimaryButton from "../button/PrimaryButton";
+import ErrorToast from "../toast/ErrorToast";
 
 type ModalProps = {
   openModal: boolean;
@@ -34,7 +36,6 @@ const WorkspaceModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
   const supabase = useSupabaseClient();
 
   const createWorkspace = api.workspace.create.useMutation();
-  const { refetch } = fetchUserWorkspaces();
   // schema for form validation
   const schema: ZodType<WorkspaceFormData> = z.object({
     name: z
@@ -70,12 +71,9 @@ const WorkspaceModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
       if (imageValue && user) {
         formData.cover_img = imgId;
         const fileUrl = `/${imgId}`;
-        const { data, error } = await supabase.storage
+        await supabase.storage
           .from("workspace-covers")
           .upload(fileUrl, imageValue);
-
-        console.log(error);
-        console.log(data);
       }
       const response = await createWorkspace.mutateAsync({
         ...formData,
@@ -86,11 +84,17 @@ const WorkspaceModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
       await refetch();
       // Navigate to the newly created project dashboard
       await router.push(`/workspace/${response.id}`);
-      setIsSubmitting(false);
     } catch (error) {
-      // Handle any errors
-      console.error(error);
+      toast.custom(() => {
+        if (error instanceof TRPCClientError) {
+          return <ErrorToast message={error.message} />;
+        } else {
+          // Handle other types of errors or fallback to a default message
+          return <ErrorToast message="An error occurred." />;
+        }
+      });
     }
+    setIsSubmitting(false);
   };
 
   // handler for onChange input for image upload
@@ -114,6 +118,8 @@ const WorkspaceModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
       console.log(error);
     }
   };
+
+  const { refetch } = api.workspace.listUserWorkspaces.useQuery();
 
   return (
     <div>
@@ -217,7 +223,12 @@ const WorkspaceModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
             </div>
           </div>
 
-          <PrimaryButton name="Create Workspace" type="submit" />
+          <PrimaryButton
+            name="Create Workspace"
+            type="submit"
+            disabled={isSubmitting}
+            isSubmitting={isSubmitting}
+          />
         </form>
       </Modal>
     </div>

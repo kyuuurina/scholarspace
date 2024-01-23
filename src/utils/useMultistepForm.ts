@@ -6,10 +6,8 @@ export function useMultistepForm(steps: ReactElement[]) {
   function next() {
     setCurrentStepIndex((i) => {
       if (i >= steps.length - 1) {
-        console.log(i);
         return i;
       }
-      console.log(i + 1);
       return i + 1;
     });
   }
@@ -17,10 +15,8 @@ export function useMultistepForm(steps: ReactElement[]) {
   function back() {
     setCurrentStepIndex((i) => {
       if (i <= 0) {
-        console.log(i);
         return i;
       }
-      console.log(i - 1);
       return i - 1;
     });
   }

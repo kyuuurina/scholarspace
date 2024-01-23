@@ -1,15 +1,24 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 
-import { router, protectedProcedure, publicProcedure } from "~/server/api/trpc";
+import { router, protectedProcedure } from "~/server/api/trpc";
 
 export const projectRouter = router({
+  // get a project
   get: protectedProcedure
     .input(z.object({ project_id: z.string() }))
     .query(async ({ ctx, input }) => {
       const project = await ctx.prisma.project.findUnique({
         where: {
           project_id: input.project_id,
+        },
+        include: {
+          workspace: true,
+          project_users: {
+            include: {
+              user: true,
+            },
+          },
         },
       });
 
@@ -20,30 +29,11 @@ export const projectRouter = router({
         });
       }
 
-      const projectUsers = await ctx.prisma.project_users.findMany({
-        where: {
-          project_id: input.project_id,
-        },
-      });
-
-      const users = await Promise.all(
-        projectUsers.map((projectUser) =>
-          ctx.prisma.user.findUnique({
-            where: {
-              id: projectUser.user_id,
-            },
-          })
-        )
-      );
-
-      return {
-        ...project,
-        users,
-      };
+      return project;
     }),
 
-  // get projects under a workspace
-  getWorkspaceProjects: protectedProcedure
+  // list projects under a workspace
+  listWorkspaceProjects: protectedProcedure
     .input(z.object({ workspace_id: z.string() }))
     .query(async ({ ctx, input }) => {
       const workspaceUser = await ctx.prisma.workspace_user.findUnique({
@@ -71,34 +61,53 @@ export const projectRouter = router({
       return projects;
     }),
 
-  // get user role of a project
+    // get user role of a project
   getProjectUserRole: protectedProcedure
-    .input(z.object({ project_id: z.string() }))
-    .query(async ({ ctx, input }) => {
-      const projectUser = await ctx.prisma.project_users.findUnique({
+  .input(z.object({ project_id: z.string() }))
+  .query(async ({ ctx, input }) => {
+    const projectUser = await ctx.prisma.project_users.findUnique({
+      where: {
+        user_id_project_id: {
+          user_id: ctx.user.id,
+          project_id: input.project_id,
+        },
+      },
+    });
+
+    if (!projectUser) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "You are not authorized to view this project",
+      });
+    }
+
+    // return project role and is_external_collaborator
+    return {
+      project_role: projectUser.project_role,
+      is_external_collaborator: projectUser.is_external_collaborator,
+    };
+  }),
+
+  // list members of a project
+    listProjectMembers: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const { id } = input;
+
+      const members = await ctx.prisma.project_users.findMany({
         where: {
-          user_id_project_id: {
-            user_id: ctx.user.id,
-            project_id: input.project_id,
-          },
+          project_id: id,
+        },
+        include: {
+          user: true,
         },
       });
 
-      if (!projectUser) {
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "You are not authorized to view this project",
-        });
-      }
-
-      // return project role and is_external_collaborator
-      return {
-        project_role: projectUser.project_role,
-        is_external_collaborator: projectUser.is_external_collaborator,
-      };
+      return members;
     }),
 
-    
+
+  
 
   create: protectedProcedure
     .input(
@@ -248,11 +257,8 @@ export const projectRouter = router({
         },
       });
 
-      console.log(projectUser);
-
       // if user is not researcher admin, throw error
       if (projectUser?.project_role !== "Researcher Admin") {
-        console.log(projectUser?.project_role);
         throw new TRPCError({
           code: "UNAUTHORIZED",
           message: "You are not authorized to delete this project",
@@ -281,7 +287,7 @@ export const projectRouter = router({
           },
         },
       });
-      // delete all property phase 
+      // delete all property phase
       await ctx.prisma.phase_property.deleteMany({
         where: {
           phase: {
@@ -304,23 +310,7 @@ export const projectRouter = router({
       return true;
     }),
 
-  getProjectMembers: protectedProcedure
-    .input(z.object({ id: z.string() }))
-    .query(async ({ input, ctx }) => {
-      const { id } = input;
-
-      const members = await ctx.prisma.project_users.findMany({
-        where: {
-          project_id: id,
-        },
-        include: {
-          user: true,
-        },
-      });
-
-      return members;
-    }),
-
+  
   // add member to project
   addMember: protectedProcedure
     .input(

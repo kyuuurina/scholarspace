@@ -4,23 +4,30 @@ import { TRPCError } from "@trpc/server";
 import { router, protectedProcedure } from "~/server/api/trpc";
 
 export const notificationsRouter = router({
-  getSettings: protectedProcedure.query(async ({ ctx }) => {
-    try {
-      const notificationSettings =
-        await ctx.prisma.notification_settings.findUnique({
-          where: {
-            user_id: ctx.user.id,
-          },
-        });
+  getSettings: protectedProcedure
+    .input(
+      z.object({
+        user_id: z.string(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const { user_id } = input;
+      try {
+        const notificationSettings =
+          await ctx.prisma.notification_settings.findUnique({
+            where: {
+              user_id,
+            },
+          });
 
-      return notificationSettings;
-    } catch (err) {
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Internal server error",
-      });
-    }
-  }),
+        return notificationSettings;
+      } catch (err) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Internal server error",
+        });
+      }
+    }),
 
   updateWebEnbld: protectedProcedure
     .input(

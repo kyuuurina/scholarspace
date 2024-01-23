@@ -3,7 +3,10 @@ import Select, { type MultiValue } from "react-select";
 import { api } from "~/utils/api";
 import Avatar from "../avatar/avatar";
 import type { user } from "@prisma/client";
-import { useFetchProjectMembers } from "~/utils/project";
+import { MoonLoader } from "react-spinners";
+import toast from "react-hot-toast";
+import ErrorToast from "../toast/ErrorToast";
+import { TRPCClientError } from "@trpc/client";
 
 type TaskAssigneesProps = {
   task_id: string | undefined;
@@ -19,13 +22,35 @@ const TaskAssignees: React.FC<TaskAssigneesProps> = ({
   refetch,
 }) => {
   // fetch project members
-  const { userDropdown } = useFetchProjectMembers();
   // update assignees based on selected options
+  const userDropdown = [
+    {
+      value: "1",
+      label: "Person 1",
+    },
+    {
+      value: "2",
+      label: "Person 2",
+    },
+    {
+      value: "3",
+      label: "Person 3",
+    },
+    {
+      value: "4",
+      label: "Person 4",
+    },
+    {
+      value: "5",
+      label: "Person 5",
+    },
+  ];
   const updateAssignees = api.task.updateAssignees.useMutation();
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [selectedOptions, setSelectedOptions] = useState<
     MultiValue<{ value: string }>
   >([]);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const handleAssigneesChange = (
     selectedOptions: MultiValue<{ value: string }>
@@ -35,24 +60,34 @@ const TaskAssignees: React.FC<TaskAssigneesProps> = ({
   };
 
   const handleAssigneesBlur = async () => {
+    if (isUpdating) return;
+    setIsUpdating(true);
     // update assignees on blur
     if (task_id && phase_id) {
-      await updateAssignees.mutateAsync({
-        task_id,
-        assignees: selectedOptions.map((option) => option.value),
-        phase_id,
-      });
-      refetch();
+      try {
+        await updateAssignees.mutateAsync({
+          task_id,
+          assignees: selectedOptions.map((option) => option.value),
+          phase_id,
+        });
+        refetch();
+      } catch (error) {
+        toast.custom(() => {
+          if (error instanceof TRPCClientError) {
+            return <ErrorToast message={error.message} />;
+          } else {
+            // Handle other types of errors or fallback to a default message
+            return <ErrorToast message="An error occurred." />;
+          }
+        });
+      }
     }
     setIsSelectOpen(false);
+    setIsUpdating(false);
   };
 
   return (
     <div>
-      <label className="mb-2 block text-sm font-medium text-gray-900">
-        Assignees
-      </label>
-
       {isSelectOpen ? (
         <Select
           defaultValue={selectedOptions}
@@ -70,9 +105,13 @@ const TaskAssignees: React.FC<TaskAssigneesProps> = ({
           className="flex cursor-pointer flex-row space-x-3"
           onClick={() => setIsSelectOpen(!isSelectOpen)}
         >
-          {assignees.map((assignee) => (
-            <Avatar key={assignee.id} user={assignee} />
-          ))}
+          {/* {isUpdating ? (
+            <MoonLoader size={20} />
+          ) : (
+            assignees.map((assignee) => (
+              <Avatar key={assignee.id} profile={assignee} />
+            ))
+          )} */}
         </div>
       ) : (
         <button onClick={() => setIsSelectOpen(!isSelectOpen)}>

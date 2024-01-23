@@ -22,7 +22,6 @@ import Tabs from "~/components/research-post/Tab";
 import ProfileRecommendation from "~/components/profile/ProfileRecommendation";
 import { useFetchRecommendedProfiles } from "~/utils/profile";
 
-
 // search components
 import SearchBaq from "~/components/search/SearchBaq";
 
@@ -37,7 +36,7 @@ const Page: NextPageWithLayout = () => {
   const userId = useRouterId();
 
   //get user
-  const User = api.user.get.useQuery({
+  const User = api.user.getByUserId.useQuery({
     id: userId,
   });
 
@@ -47,52 +46,51 @@ const Page: NextPageWithLayout = () => {
   const [currentPostId, setCurrentPostId] = useState<string | null>(null);
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
 
+  // query key for refetch
+  const postQueryKey = ["getPost", currentPostId]; // Assuming have a valid post ID
+  const { data: updatedPostData, refetch: refetchPost } = useQuery(
+    postQueryKey,
+    { enabled: false } // Disable automatic fetching on mount
+  );
 
-// query key for refetch
-    const postQueryKey = ['getPost', currentPostId]; // Assuming have a valid post ID
-    const { data: updatedPostData, refetch: refetchPost } = useQuery(
-      postQueryKey,
-      { enabled: false } // Disable automatic fetching on mount
-    );
+  // Research post recommendation
+  const {
+    postRecommendations,
+    isLoadingPostRecommendations,
+    errorPostRecommendations,
+  } = useFetchPostRecommendations();
 
-// Research post recommendation
-const {
-  postRecommendations,
-  isLoadingPostRecommendations,
-  errorPostRecommendations,
-} = useFetchPostRecommendations();
+  // Profile recommendation
+  const {
+    recommendedProfiles,
+    isLoadingRecommendedProfiles,
+    errorRecommendedProfiles,
+  } = useFetchRecommendedProfiles(user?.id);
 
-// Profile recommendation
-const {
-  recommendedProfiles,
-  isLoadingRecommendedProfiles,
-  errorRecommendedProfiles,
-} = useFetchRecommendedProfiles(user?.id);
+  const [searchResults, setSearchResults] = useState<string[]>([]);
+  const handleSearch = (results: string[]) => {
+    setSearchResults(results);
 
-const [searchResults, setSearchResults] = useState<string[]>([]);
-const handleSearch = (results: string[]) => {
-  setSearchResults(results);
-
-  // Redirect to the search results page
-  void (async () => {
     // Redirect to the search results page
-    await router.push({
-      pathname: "/search",
-      query: { results: JSON.stringify(results) },
-    });
-  })();
-};
+    void (async () => {
+      // Redirect to the search results page
+      await router.push({
+        pathname: "/search",
+        query: { results: JSON.stringify(results) },
+      });
+    })();
+  };
 
-if (errorPostRecommendations) {
-  return <div>Error fetching post recommendations</div>;
-}
+  if (errorPostRecommendations) {
+    return <div>Error fetching post recommendations</div>;
+  }
 
 if (errorRecommendedProfiles) {
   return <div>Error fetching recommended profiles</div>;
 }
 
 
-// Render EditPostForm component
+  // Render EditPostForm component
   const handleEditClick = (postId: string) => {
     setEditModalOpen(true);
     setCurrentPostId(postId);
@@ -104,7 +102,7 @@ if (errorRecommendedProfiles) {
 
   return (
     <div className="w-full max-w-screen-xl p-8">
-      <div className="grid grid-cols-12 gap-6 mx-auto">
+      <div className="mx-auto grid grid-cols-12 gap-6">
         {/* All Following Tabs (2/3 width) */}
         <div className="col-span-9">
           <SearchBaq />
@@ -131,15 +129,15 @@ if (errorRecommendedProfiles) {
         </div>
 
         {/* Suggested Profiles (1/4 width, Rightmost column) */}
-        <div className="col-span-3 sticky top-0">
-          <section className="border rounded p-4 mt-4">
-            <h2 className="text-xl font-bold mb-4">Suggested Profiles</h2>
+        <div className="sticky top-0 col-span-3">
+          <section className="mt-4 rounded border p-4">
+            <h2 className="mb-4 text-xl font-bold">Suggested Profiles</h2>
             {isLoadingRecommendedProfiles ? (
               <p>Loading recommended profiles...</p>
             ) : errorRecommendedProfiles ? (
               <p>Error fetching recommended profiles</p>
             ) : (
-              <ul className="list-none list-inside space-y-4">
+              <ul className="list-inside list-none space-y-4">
                 {recommendedProfiles.map((profile) => (
                   <li key={profile.profile_id}>
                     <ProfileRecommendation profiles={profile} />
@@ -153,7 +151,6 @@ if (errorRecommendedProfiles) {
     </div>
   );
 };
-
 
 console.log("Profile Recommendation:", ProfileRecommendation);
 

@@ -10,6 +10,7 @@ type EditableRowProps = {
 const EditableRow: React.FC<EditableRowProps> = ({ phase_id }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedValue, setEditedValue] = useState("");
+  const [adding, setAdding] = useState(false);
   const inputRef = useClickAway(() => {
     setIsEditing(false);
   });
@@ -34,6 +35,8 @@ const EditableRow: React.FC<EditableRowProps> = ({ phase_id }) => {
   };
 
   const handleKeyPress = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (adding) return;
+    setAdding(true);
     if (e.key === "Enter" && editedValue.trim() !== "") {
       // Assuming you have a function to handle creating a task
       await createTask.mutateAsync({
@@ -44,6 +47,7 @@ const EditableRow: React.FC<EditableRowProps> = ({ phase_id }) => {
       setIsEditing(false);
       await refetch();
     }
+    setAdding(false);
   };
 
   return (
