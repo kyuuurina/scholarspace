@@ -39,6 +39,18 @@ export const taskRouter = router({
         where: {
           phase_id,
         },
+        include: {
+          phase: {
+            include: {
+              phase_property: true,
+            },
+          },
+          property_phase_task: true,
+          task_assignees: true,
+        },
+        orderBy: {
+          created_at: "desc",
+        },
       });
 
       return tasks;
