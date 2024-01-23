@@ -183,7 +183,7 @@ const TaskDrawer: React.FC<TaskDrawerProps> = ({ task, onClose, refetch }) => {
               />
             </div>
             {/* set task reminder */}
-            <SetReminder refetch={refetch} />
+            <SetReminder refetch={refetch} task_id={task?.id} />
             {task?.property_phase_task.map((property) => {
               // Find the corresponding phase_property based on phase_id
               const correspondingPhaseProperty =
