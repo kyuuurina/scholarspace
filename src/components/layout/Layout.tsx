@@ -18,7 +18,9 @@ export default function Layout({ children }: LayoutProps) {
     setOpen(!open);
   };
 
-  const { data: profileData } = api.profile.getByContext.useQuery();
+  const { data: profileData } = api.profile.getProfileByUserId.useQuery({
+    user_id: user?.id ?? "",
+  });
   const { data: userData } = api.user.get.useQuery();
 
   useEffect(() => {
