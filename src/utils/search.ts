@@ -1,8 +1,6 @@
 import { api } from "./api";
 import { useRouterId } from "./routerId";
 
-
-//search post
 // search post
 export const useFetchSearchPostResults = (query: string) => {
     const searchPostResults = api.search.searchPost.useQuery(
@@ -60,13 +58,3 @@ export const useFetchSearchPostResults = (query: string) => {
       error: searchPostResults.error || searchProfileResults.error,
     };
   };
-
-
-
-
-
-
-
-
-
-

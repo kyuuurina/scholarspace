@@ -13,38 +13,67 @@ interface Profile {
   skills: string | null;
 }
 
-export const useFetchFollowers = (userId: string) => {
+export const useFetchFollowers = () => {
+  const profile_id = useRouterId();
+
+  // Fetch userId using getUserIdByProfileId
+  const userId = api.profile.getUserIdByProfileId.useQuery({
+    profile_id: profile_id,
+  }).data;
+
   const {
     data: followersData,
     isLoading: followersLoading,
     error: followersError,
   } = api.follow.getFollowersList.useQuery({
-    userId,
+    userId: userId || '',
   });
 
   return {
-    followersData: followersData || [], // Assuming the structure of the response
+    followersData: followersData || [],
     followersLoading,
     followersError,
   };
 };
 
 //fetch following list
-export const useFetchFollowing = (userId: string) => {
+export const useFetchFollowing = () => {
+  const profile_id = useRouterId();
+
+  // Fetch userId using getUserIdByProfileId
+  const userId = api.profile.getUserIdByProfileId.useQuery({
+    profile_id: profile_id,
+  }).data;
+
   const {
     data: followingData,
     isLoading: followingLoading,
     error: followingError,
   } = api.follow.getFollowingList.useQuery({
-    userId,
+    userId: userId || '',
   });
 
   return {
-    followingData: followingData || [], // Assuming the structure of the response
+    followingData: followingData || [],
     followingLoading,
     followingError,
   };
 };
+// export const useFetchFollowing = (userId: string) => {
+//   const {
+//     data: followingData,
+//     isLoading: followingLoading,
+//     error: followingError,
+//   } = api.follow.getFollowingList.useQuery({
+//     userId,
+//   });
+
+//   return {
+//     followingData: followingData || [], // Assuming the structure of the response
+//     followingLoading,
+//     followingError,
+//   };
+// };
 
 
 

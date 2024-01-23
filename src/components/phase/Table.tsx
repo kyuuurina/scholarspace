@@ -1,16 +1,15 @@
 // hooks
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 // utils
 import { api } from "~/utils/api";
-import { useFetchTasksWithProperties } from "~/utils/task";
+import { useRouterId } from "~/utils/routerId";
 
 // local components
 import EditableCell from "./EditableCell";
 import PropertyCell from "./PropertyCell";
 import StatusBadge from "./StatusBadge";
-import Avatar from "../avatar/avatar";
 import EditableRow from "./EditableRow";
 import TaskDrawer from "./TaskDrawer";
 import TaskAssignees from "./TaskAssignees";
@@ -29,6 +28,7 @@ const variants = {
 const Table: React.FC<TableProps> = ({ phase_id, searchQuery }) => {
   const [isAddColumnVisible, setAddColumnVisible] = useState(false);
   const [editedHeader, setEditedHeader] = useState("");
+  const id = useRouterId();
   const [editingCell, setEditingCell] = useState<{
     rowIndex: number;
     columnIndex: number;
@@ -52,9 +52,13 @@ const Table: React.FC<TableProps> = ({ phase_id, searchQuery }) => {
     phase_id,
   });
 
+  // GET tasks
+  const { data: tasksList, refetch } = api.task.list.useQuery({ phase_id });
+
+  console.log("tasksList", tasksList);
+
   const createProperty = api.phase.addProperty.useMutation();
 
-  const { tasks, refetch } = useFetchTasksWithProperties(phase_id);
   const handleHeaderChange = async (
     event:
       | React.ChangeEvent<HTMLInputElement>
@@ -85,9 +89,13 @@ const Table: React.FC<TableProps> = ({ phase_id, searchQuery }) => {
     }));
   };
 
-  const filteredTasks = tasks.filter((task) =>
+  const filteredTasks = tasksList?.filter((task) =>
     task?.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  if (!tasksList || !filteredTasks) {
+    return null;
+  }
 
   return (
     <div>
@@ -152,7 +160,7 @@ const Table: React.FC<TableProps> = ({ phase_id, searchQuery }) => {
           </tr>
         </thead>
         <tbody>
-          {filteredTasks.map((task, rowIndex) => (
+          {filteredTasks?.map((task, rowIndex) => (
             <tr key={task?.id} className="border border-gray-300">
               <td className="whitespace-nowrap border border-gray-300 px-6">
                 <div className="flex items-center">
@@ -199,15 +207,17 @@ const Table: React.FC<TableProps> = ({ phase_id, searchQuery }) => {
                 {/* iterate over tasks assignees */}
                 <TaskAssignees
                   task_id={task?.id}
-                  assignees={task?.assignees}
+                  assignees={task?.task_assignees}
                   phase_id={phase_id}
                   refetch={refetch}
+                  project_id={id}
                 />
               </td>
               {/* iterate properties and render column, */}
               {propertiesQuery?.data?.map((property, columnIndex) => {
-                const matchingProperty = task?.properties?.find(
-                  (property) => property.id === BigInt(columnIndex)
+                const matchingProperty = task?.property_phase_task?.find(
+                  (property_phase_task) =>
+                    property_phase_task.property_id === property.id
                 );
 
                 return (

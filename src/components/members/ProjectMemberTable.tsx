@@ -1,8 +1,7 @@
-import type { WorkspaceMember } from "~/types/member";
-
-import MemberRow from "./MemberRow";
+import type { ProjectMember } from "~/types/member";
+import ProjectMemberRow from "./ProjectMemberRow";
 type MemberTableProps = {
-  filteredMembers: WorkspaceMember[] | undefined;
+  filteredMembers: ProjectMember[] | undefined;
   handleRoleChange: (memberId: string, newRole: string) => void;
   handleDeleteMember: (memberId: string) => void;
   userWorkspaceRole: string | null | undefined;
@@ -44,22 +43,17 @@ const MemberTable: React.FC<MemberTableProps> = ({
         </tr>
       </thead>
       <tbody>
-        {filteredMembers.map(
-          (member) => (
-            console.log(member),
-            (
-              <MemberRow
-                key={member?.userid}
-                member={member}
-                handleRoleChange={handleRoleChange}
-                handleDeleteMember={handleDeleteMember}
-                userWorkspaceRole={userWorkspaceRole}
-                isPersonal={isPersonal}
-                ownerId={ownerId}
-              />
-            )
-          )
-        )}
+        {filteredMembers.map((member) => (
+          <ProjectMemberRow
+            key={member?.user_id}
+            member={member}
+            handleRoleChange={handleRoleChange}
+            handleDeleteMember={handleDeleteMember}
+            userWorkspaceRole={userWorkspaceRole}
+            isPersonal={isPersonal}
+            ownerId={ownerId}
+          />
+        ))}
       </tbody>
     </table>
   );

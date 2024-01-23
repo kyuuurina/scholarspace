@@ -19,6 +19,7 @@ import Modal from "../modal/Modal";
 import PrimaryButton from "../button/PrimaryButton";
 import SuccessToast from "../toast/SuccessToast";
 import ErrorToast from "../toast/ErrorToast";
+import { TRPCClientError } from "@trpc/client";
 
 type ModalProps = {
   openModal: boolean;
@@ -40,7 +41,6 @@ const CreateProjectModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
   const createProject = api.project.create.useMutation({
     onSuccess: () => {
       toast.custom(() => <SuccessToast message="Project created" />);
-      router.reload();
     },
     onError: (error) => {
       toast.custom(() => <ErrorToast message={error.toString()} />);
@@ -101,11 +101,17 @@ const CreateProjectModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
 
       // Navigate to the newly created project dashboard
       await router.push(`/project/${response.project_id}`);
-      setIsSubmitting(false);
     } catch (error) {
-      // Handle any errors
-      setIsSubmitting(false);
+      toast.custom(() => {
+        if (error instanceof TRPCClientError) {
+          return <ErrorToast message={error.message} />;
+        } else {
+          // Handle other types of errors or fallback to a default message
+          return <ErrorToast message="An error occurred." />;
+        }
+      });
     }
+    setIsSubmitting(false);
   };
 
   // handler for onChange input for image upload
@@ -232,7 +238,12 @@ const CreateProjectModal: React.FC<ModalProps> = ({ openModal, onClick }) => {
             </div>
           </div>
 
-          <PrimaryButton name="Create Project" type="submit" />
+          <PrimaryButton
+            name="Create Project"
+            type="submit"
+            disabled={isSubmitting}
+            isSubmitting={isSubmitting}
+          />
         </form>
       </Modal>
     </div>

@@ -165,7 +165,7 @@ const UserProfileForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
           className="flex flex-col gap-4"
           onSubmit={handleSubmit(handleUpdateProfile)}
         >
-          <div>
+          {/* <div>
             <label
               htmlFor="avatar_url"
               className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
@@ -176,7 +176,7 @@ const UserProfileForm: React.FC<ModalProps> = ({ openModal, onClick }) => {
             {errors.avatar_url && (
               <FormErrorMessage text={errors.avatar_url.message} />
             )}
-          </div>
+          </div> */}
 
           <div>
             <label

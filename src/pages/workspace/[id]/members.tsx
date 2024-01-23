@@ -1,16 +1,22 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import toast from "react-hot-toast";
-import { FiUserPlus } from "react-icons/fi";
+import { FiUserPlus, FiSearch } from "react-icons/fi";
+import dynamic from "next/dynamic";
 
 // local components
 import Head from "~/components/layout/Head";
 import Layout from "~/components/layout/Layout";
 import Header from "~/components/workspace/Header";
-import MemberModal from "~/components/members/MemberModal";
 import MemberTable from "~/components/members/MemberTable";
 import SuccessToast from "~/components/toast/SuccessToast";
 import ErrorToast from "~/components/toast/ErrorToast";
+import { MoonLoader } from "react-spinners";
+
+const MemberModal = dynamic(() => import("~/components/members/MemberModal"), {
+  loading: () => null,
+  ssr: false,
+});
 
 // types
 import type { ReactElement } from "react";
@@ -18,17 +24,23 @@ import type { NextPageWithLayout } from "~/pages/_app";
 
 // utils
 import { api } from "~/utils/api";
-import { useFetchWorkspace, useFetchWorkspaceMembers } from "~/utils/workspace";
 import { useRouterId } from "~/utils/routerId";
+import Link from "next/link";
+import { TRPCClientError } from "@trpc/client";
 
 const Members: NextPageWithLayout = () => {
   const router = useRouter();
   const workspaceId = useRouterId();
-  const { name, imgUrl, is_personal, ownerid } = useFetchWorkspace();
+
+  const { data: workspace, refetch } = api.workspace.get.useQuery({
+    id: workspaceId,
+  });
   const [modalIsOpen, setModalIsOpen] = useState(false);
 
-  // members in the workspace
-  const { workspaceMembers } = useFetchWorkspaceMembers();
+  const { data: workspaceMembers, isLoading } =
+    api.workspace.listWorkspaceMembers.useQuery({
+      id: workspaceId,
+    });
 
   // search bar functions
   const [searchQuery, setSearchQuery] = useState("");
@@ -36,26 +48,27 @@ const Members: NextPageWithLayout = () => {
     setSearchQuery(event.target.value);
   };
 
-  const filteredMembers = workspaceMembers.filter((member) => {
-    if (!member.memberEmail) {
-      return; // Skip this member if it's null or undefined
-    }
-
-    let memberName = "";
-    if (member.memberName) {
-      memberName = member.memberName.toLowerCase();
-    }
-
-    const memberEmail = member.memberEmail.toLowerCase();
-    const query = searchQuery.toLowerCase();
-    return memberName.includes(query) || memberEmail.includes(query);
+  const filteredMembers = workspaceMembers?.filter((member) => {
+    // filter according to name and email
+    return (
+      member.user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      member.user.email.toLowerCase().includes(searchQuery.toLowerCase())
+    );
   });
+
+  // useEffect filtered members when refetch is called and workspaceMembers is updated
+  useEffect(() => {
+    if (workspaceMembers) {
+      filteredMembers;
+    }
+  }, [workspaceMembers]);
 
   // add member
   const addMember = api.workspace.addWorkspaceMember.useMutation({
     onSuccess: () => {
       toast.custom(() => <SuccessToast message="Member added" />);
       router.reload();
+      setModalIsOpen(false);
     },
   });
 
@@ -67,7 +80,14 @@ const Members: NextPageWithLayout = () => {
         role: data.role,
       });
     } catch (error) {
-      console.error("Failed to add member:", error);
+      toast.custom(() => {
+        if (error instanceof TRPCClientError) {
+          return <ErrorToast message={error.message} />;
+        } else {
+          // Handle other types of errors or fallback to a default message
+          return <ErrorToast message="An error occurred." />;
+        }
+      });
     }
   };
 
@@ -82,9 +102,6 @@ const Members: NextPageWithLayout = () => {
     onSuccess: () => {
       toast.custom(() => <SuccessToast message="Role updated" />);
     },
-    onError: (error) => {
-      toast.custom(() => <ErrorToast message={error.message} />);
-    },
   });
   const handleRoleChange = (memberId: string, newRole: string) => {
     updateRole
@@ -93,11 +110,19 @@ const Members: NextPageWithLayout = () => {
         userId: memberId,
         role: newRole,
       })
-      .then(() => {
-        router.reload();
+      .then(async () => {
+        await refetch();
       })
       .catch((error) => {
-        console.error("Failed to update role:", error);
+        toast.custom(() => {
+          if (error instanceof TRPCClientError) {
+            return <ErrorToast message={error.message} />;
+          } else {
+            // Handle other types of errors or fallback to a default message
+            return <ErrorToast message="An error occurred." />;
+          }
+        });
+        router.reload();
       });
   };
 
@@ -118,7 +143,14 @@ const Members: NextPageWithLayout = () => {
         router.reload();
       })
       .catch((error) => {
-        console.error("Failed to delete member:", error);
+        toast.custom(() => {
+          if (error instanceof TRPCClientError) {
+            return <ErrorToast message={error.message} />;
+          } else {
+            // Handle other types of errors or fallback to a default message
+            return <ErrorToast message="An error occurred." />;
+          }
+        });
       });
   };
 
@@ -127,10 +159,32 @@ const Members: NextPageWithLayout = () => {
     workspaceId: workspaceId,
   });
 
+  if (isLoading || !workspaceMembers) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <MoonLoader color="#7C3AED" />
+      </div>
+    );
+  }
+  if (!workspace) {
+    return (
+      <>
+        <main className="flex min-h-screen w-full flex-col items-center justify-center">
+          <h1 className="text-4xl font-bold">Workspace not found</h1>
+          <Link href="/">
+            <p className="py-2 text-dark-purple hover:underline">
+              Go back to Home page
+            </p>
+          </Link>
+        </main>
+      </>
+    );
+  }
+
   return (
     <>
       {/* add member modal */}
-      <Head title={name} />
+      <Head title={workspace?.name} />
       <MemberModal
         openModal={modalIsOpen}
         onClose={() => setModalIsOpen(false)}
@@ -139,7 +193,11 @@ const Members: NextPageWithLayout = () => {
       />
 
       <main className="min-h-screen w-full">
-        <Header name={name || ""} imgUrl={imgUrl} purpose="workspace" />
+        <Header
+          name={workspace?.name}
+          imgUrl={workspace?.cover_img}
+          purpose="workspace"
+        />
         <div className="p-5">
           <div className="relative overflow-x-auto rounded-lg shadow-md">
             {/* search and add member section  */}
@@ -147,19 +205,7 @@ const Members: NextPageWithLayout = () => {
               <label className="sr-only">Search</label>
               <div className="relative mr-4">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                  <svg
-                    className="h-5 w-5 text-gray-500"
-                    aria-hidden="true"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                      clipRule="evenodd"
-                    ></path>
-                  </svg>
+                  <FiSearch />
                 </div>
                 <input
                   type="text"
@@ -188,8 +234,8 @@ const Members: NextPageWithLayout = () => {
               handleRoleChange={handleRoleChange}
               handleDeleteMember={handleDeleteMember}
               userWorkspaceRole={workspaceRole.data}
-              isPersonal={is_personal}
-              ownerId={ownerid}
+              isPersonal={workspace?.is_personal}
+              ownerId={workspace?.ownerid}
             />
           </div>
         </div>

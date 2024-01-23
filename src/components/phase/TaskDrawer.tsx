@@ -3,9 +3,10 @@ import React, { useState } from "react";
 
 // utils
 import { api } from "~/utils/api";
+import { useRouterId } from "~/utils/routerId";
 
 // types
-import type { taskRow } from "~/types/task";
+import type { taskList } from "~/types/task";
 import type { phase_property } from "@prisma/client";
 
 // components
@@ -20,7 +21,7 @@ import TaskAssignees from "./TaskAssignees";
 import TaskProperty from "./TaskProperty";
 
 type TaskDrawerProps = {
-  task: taskRow;
+  task: taskList;
   onClose: () => void;
   properties: phase_property[] | undefined;
   refetch: () => void;
@@ -28,7 +29,7 @@ type TaskDrawerProps = {
 
 const TaskDrawer: React.FC<TaskDrawerProps> = ({ task, onClose, refetch }) => {
   const [taskStatus, setTaskStatus] = useState("pending");
-
+  const id = useRouterId();
   const handleContentClick = (
     event: React.MouseEvent<HTMLDivElement> | undefined
   ) => {
@@ -138,22 +139,33 @@ const TaskDrawer: React.FC<TaskDrawerProps> = ({ task, onClose, refetch }) => {
               </label>
               <TaskAssignees
                 task_id={task?.id}
-                assignees={task?.assignees}
+                assignees={task?.task_assignees}
                 phase_id={task?.phase_id}
                 refetch={refetch}
+                project_id={id}
               />
             </div>
-            {/* render properties input fields */}
-            {task?.properties.map((property) => (
-              <TaskProperty
-                key={property.property_id}
-                task_id={task?.id}
-                property_id={property.property_id}
-                value={property.value}
-                refetch={refetch}
-                label={property.name}
-              />
-            ))}
+            {task?.property_phase_task.map((property) => {
+              // Find the corresponding phase_property based on phase_id
+              const correspondingPhaseProperty =
+                task?.phase.phase_property.find(
+                  (phaseProperty) => phaseProperty.id === property.property_id
+                );
+
+              if (!correspondingPhaseProperty) {
+                return null;
+              }
+              return (
+                <TaskProperty
+                  key={property.index}
+                  task_id={task?.id}
+                  property_id={property.property_id}
+                  value={property.value}
+                  refetch={refetch}
+                  label={correspondingPhaseProperty?.name}
+                />
+              );
+            })}
           </div>
         </div>
       </div>

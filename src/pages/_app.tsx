@@ -7,16 +7,16 @@ import { api } from "~/utils/api";
 import Head from "~/components/layout/Head";
 import { Toaster } from "react-hot-toast";
 import ErrorBoundary from "~/components/ErrorBoundary";
-import "~/styles/globals.css";
 import { Inter } from "next/font/google";
-import "@mantine/tiptap/styles.css";
-import { MantineProvider, MantineTheme } from "@mantine/core";
-// supabase helpers for authentication and authorization
+import { MantineProvider } from "@mantine/core";
 import { createPagesBrowserClient } from "@supabase/auth-helpers-nextjs";
 import {
   SessionContextProvider,
   type Session,
 } from "@supabase/auth-helpers-react";
+
+import "~/styles/globals.css";
+import "@mantine/tiptap/styles.css";
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;

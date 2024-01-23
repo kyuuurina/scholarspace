@@ -1,12 +1,12 @@
 import { api } from "~/utils/api";
-import type { taskRow } from "~/types/task";
+import type { taskList } from "~/types/task";
 import { useState, useEffect } from "react";
 import { useFetchTasksWithProperties } from "~/utils/task";
 import { set } from "zod";
 import MoonLoader from "react-spinners/MoonLoader";
 
 type StatusBadgeProps = {
-  task?: taskRow;
+  task?: taskList;
   status?: string;
   setStatus?: (status: string) => void;
 };

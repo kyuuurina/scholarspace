@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import Select, { type MultiValue } from "react-select";
 import { api } from "~/utils/api";
 import Avatar from "../avatar/avatar";
-import type { user } from "@prisma/client";
-import { useFetchProjectMembers } from "~/utils/project";
+import type { TaskAssigneeWithUser } from "~/types/task";
 import { MoonLoader } from "react-spinners";
 import toast from "react-hot-toast";
 import ErrorToast from "../toast/ErrorToast";
@@ -11,8 +10,9 @@ import { TRPCClientError } from "@trpc/client";
 
 type TaskAssigneesProps = {
   task_id: string | undefined;
-  assignees: user[] | undefined;
+  assignees: TaskAssigneeWithUser[] | undefined;
   phase_id?: string | undefined;
+  project_id: string;
   refetch: () => void;
 };
 
@@ -21,10 +21,17 @@ const TaskAssignees: React.FC<TaskAssigneesProps> = ({
   assignees,
   phase_id,
   refetch,
+  project_id,
 }) => {
-  // fetch project members
-  const { userDropdown } = useFetchProjectMembers();
+  // fetch project members and stor in userDropdown
   // update assignees based on selected options
+  const { data: projectUsers } = api.project.listProjectMembers.useQuery({
+    id: project_id,
+  });
+  const userDropdown = projectUsers?.map((user) => ({
+    value: user.user.id,
+    label: user.user.name,
+  }));
   const updateAssignees = api.task.updateAssignees.useMutation();
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [selectedOptions, setSelectedOptions] = useState<
@@ -89,7 +96,7 @@ const TaskAssignees: React.FC<TaskAssigneesProps> = ({
             <MoonLoader size={20} />
           ) : (
             assignees.map((assignee) => (
-              <Avatar key={assignee.id} user={assignee} />
+              <Avatar key={assignee.assignee_id} user={assignee.user} />
             ))
           )}
         </div>

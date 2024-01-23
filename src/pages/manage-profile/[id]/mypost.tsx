@@ -24,9 +24,6 @@ import Layout from '~/components/layout/Layout';
 import PageLoader from '~/components/layout/PageLoader';
 import LoadingSpinner from '~/components/LoadingSpinner';
 import { FaEdit, FaExclamationCircle } from 'react-icons/fa';
-import SuccessToast from "~/components/toast/SuccessToast";
-import ErrorToast from "~/components/toast/ErrorToast";
-import ConfirmationDialog from '~/components/ConfirmationDialog';
 
 //profile components
 import ProfileTabs from '~/components/profile/ProfileTabs';
@@ -37,14 +34,13 @@ import EditPostForm from '~/components/research-post/EditPostForm';
 
 const MyPost: NextPageWithLayout = () => {
   const profile_id = useRouterId();
-  console.log("Front call",profile_id)
+  console.log("Front call", profile_id);
   const myPostLists = useFetchMyResearchPosts(profile_id);
   const router = useRouter();
 
-  const { name, isLoading } = useFetchProfile();  //To print in head
-  
+  const { name, isLoading } = useFetchProfile(); //To print in head
 
-  console.log("MyPost.tsx page router:", router)
+  console.log("MyPost.tsx page router:", router);
 
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [currentPostId, setCurrentPostId] = useState<string | null>(null);
@@ -57,13 +53,25 @@ const MyPost: NextPageWithLayout = () => {
     { enabled: false } // Disable automatic fetching on mount
   );
 
+  // Render EditPostForm component
+  const handleEditClick = (postId: string) => {
+    setEditModalOpen(true);
+    setCurrentPostId(postId);
+  };
 
-    // Render EditPostForm component
-    const handleEditClick = (postId: string) => {
-      setEditModalOpen(true);
-      setCurrentPostId(postId);
-    };
+  if (myPostLists.isLoading) {
+    return <LoadingSpinner />;
+  }
 
+  //no posts message
+  const noPostsMessage = (
+    <div className="flex flex-col items-center justify-center h-screen">
+      {/* <FaExclamationCircle className="text-gray-500 text-5xl mb-4" /> */}
+      <p className="font-semibold text-2xl text-gray-500 leading-1.5 text-center max-w-md">
+        Uh-oh, no research posts have been created yet!
+      </p>
+    </div>
+  );
 
   return (
     <>
@@ -74,8 +82,7 @@ const MyPost: NextPageWithLayout = () => {
 
       <div className="container mx-auto mt-8">
         <AddNewPostButton className="mb-4" />
-        {/* if loading */}
-        {myPostLists.isLoading && <LoadingSpinner />}
+        {/* if error*/}
         {myPostLists.error && (
           <div className="flex flex-col items-center justify-center h-50vh">
             <FaExclamationCircle className="text-gray-500 text-4xl mb-4" />
@@ -92,26 +99,18 @@ const MyPost: NextPageWithLayout = () => {
               <li key={post.post_id} className="mb-4">
                 {/* Add left and right padding to the Post component */}
                 <div className="p-4 rounded-md">
-                <Post
-                  post={post}
-                  onEditClick={() => handleEditClick(post.post_id)}
-                  refetch={refetchPost}
-                   />
+                  <Post
+                    post={post}
+                    onEditClick={() => handleEditClick(post.post_id)}
+                    refetch={refetchPost}
+                  />
                   {/* <Post post={post} /> */}
                 </div>
               </li>
             ))}
           </ul>
         ) : (
-          <div className="flex flex-col items-center justify-center h-50vh">
-            <FaExclamationCircle className="text-gray-500 text-4xl mb-4" />
-            <p className="font-semibold text-lg text-gray-500 leading-1.5 text-center max-w-md">
-              Uh-oh, you have not created any posts yet. Create one by clicking on the button above!
-            </p>
-            <p className="font-medium text-base text-gray-500 leading-1.5 text-center max-w-md">
-              Navigate to the Home Page to add a new post and share your research!
-            </p>
-          </div>
+          noPostsMessage
         )}
 
         {/* Render EditPostForm component */}

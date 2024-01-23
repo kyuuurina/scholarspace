@@ -1,4 +1,14 @@
-import type { user } from "@prisma/client";
+import type {
+  user,
+  phase,
+  phase_property,
+  property_phase_task,
+  task_assignees,
+} from "@prisma/client";
+
+type TaskAssigneeWithUser = task_assignees & {
+  user: user;
+};
 
 type taskRow =
   | {
@@ -7,14 +17,14 @@ type taskRow =
       description: string | null;
       created_at: Date;
       status: string;
-      assignees:
-        | {
-            id: string;
-            name: string | null;
-            avatar_url: string | null;
-            email: string | null;
-          }[]
-        | undefined;
+      // assignees:
+      //   | {
+      //       id: string;
+      //       name: string | null;
+      //       avatar_url: string | null;
+      //       email: string | null;
+      //     }[]
+      //   | undefined;
       phase_id: string;
       end_at: Date | null;
       deadline: Date | null;
@@ -56,4 +66,29 @@ type TaskFormData = {
     | undefined;
 };
 
-export type { taskRow, userDropdown, TaskFormData };
+type taskList =
+  | {
+      attachments: string[] | null;
+      created_at: Date;
+      deadline: Date | null;
+      description: string | null;
+      end_at: Date | null;
+      id: string;
+      name: string;
+      phase_id: string;
+      status: string;
+      phase: {
+        phase_property: phase_property[];
+      } & phase;
+      property_phase_task: property_phase_task[];
+      task_assignees: TaskAssigneeWithUser[];
+    }
+  | undefined;
+
+export type {
+  taskRow,
+  userDropdown,
+  TaskFormData,
+  taskList,
+  TaskAssigneeWithUser,
+};
