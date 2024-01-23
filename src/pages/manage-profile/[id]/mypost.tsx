@@ -3,7 +3,6 @@
 import React from 'react';
 import {useState} from 'react';
 import {api} from '~/utils/api';
-import Link from 'next/link';
 import { useUser } from '@supabase/auth-helpers-react';
 
 //utils
