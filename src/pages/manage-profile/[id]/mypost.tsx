@@ -33,7 +33,7 @@ import Post from '~/components/research-post/Post';
 import EditPostForm from '~/components/research-post/EditPostForm';
 
 
-const LikedPost: NextPageWithLayout = () => {
+const MyCreatedPost: NextPageWithLayout = () => {
 
   const profile_id = useRouterId();
 
@@ -43,7 +43,7 @@ const LikedPost: NextPageWithLayout = () => {
   }).data;
 
   // Fetch liked posts based on user_id
-  const LikedPost = MyPosts(userId || '');
+  const MyCreatedPost = MyPosts(userId || '');
 
   const { name, isLoading } = useFetchProfile();  //To print in head
 
@@ -63,7 +63,7 @@ const LikedPost: NextPageWithLayout = () => {
       setCurrentPostId(postId);
     };
 
-    if (LikedPost.isLoadingMyPost) {
+    if (MyCreatedPost.isLoadingMyPost) {
       return <LoadingSpinner />;
   }
 
@@ -71,7 +71,16 @@ const LikedPost: NextPageWithLayout = () => {
     <div className="flex flex-col items-center justify-center h-screen">
       {/* <FaExclamationCircle className="text-gray-500 text-5xl mb-4" /> */}
       <p className="font-semibold text-2xl text-gray-500 leading-1.5 text-center max-w-md">
-        Uh-oh, no research posts have been created yet!
+        No research posts have been created yet
+      </p>
+    </div>
+  );
+
+  const errorMessage = (
+    <div className="flex flex-col items-center justify-center h-screen">
+        <FaExclamationCircle className="text-gray-500 text-4xl mb-4" />
+        <p className="font-semibold text-lg text-gray-500 leading-1.5 text-center max-w-md">
+         Oops! Something went wrong.
       </p>
     </div>
   );
@@ -86,19 +95,14 @@ const LikedPost: NextPageWithLayout = () => {
       <div className="container mx-auto mt-8">
       <AddNewPostButton className="mb-4" />
         {/* if error*/}
-        {LikedPost.errorMyPost && (
-          <div className="flex flex-col items-center justify-center h-50vh">
-            <FaExclamationCircle className="text-gray-500 text-4xl mb-4" />
-            <p className="font-semibold text-lg text-gray-500 leading-1.5 text-center max-w-md">
-              Oops! Something went wrong.
-            </p>
-          </div>
+        {MyCreatedPost.errorMyPost && (
+          errorMessage
         )}
 
         {/* if post exist */}
-        {LikedPost.myPost.length > 0 ? (
+        {MyCreatedPost.myPost.length > 0 ? (
           <ul className="grid grid-cols-1 gap-8">
-            {LikedPost.myPost.map((post) => (
+            {MyCreatedPost.myPost.map((post) => (
               <li key={post.post_id} className="mb-4">
                 {/* Add left and right padding to the Post component */}
                 <div className="p-4 rounded-md">
@@ -106,7 +110,7 @@ const LikedPost: NextPageWithLayout = () => {
                   post={post}
                   onEditClick={() => handleEditClick(post.post_id)}
                   refetch={refetchPost}
-                   />
+                  />
                   {/* <Post post={post} /> */}
                 </div>
               </li>
@@ -130,7 +134,7 @@ const LikedPost: NextPageWithLayout = () => {
 };
 
 
-LikedPost.getLayout = function getLayout(page: ReactElement) {
+MyCreatedPost.getLayout = function getLayout(page: ReactElement) {
   return (
     <>
       <Layout>{page}</Layout>
@@ -138,4 +142,4 @@ LikedPost.getLayout = function getLayout(page: ReactElement) {
   );
 };
 
-export default LikedPost;
+export default MyCreatedPost;
