@@ -174,7 +174,7 @@ const Header: React.FC<HeaderProps> = ({
         <div className="flex flex-col space-y-2">
           {/* breadcrumb workspace and project */}
           <div className="flex w-fit items-center justify-center rounded-lg border border-gray-200 bg-gray-50 px-3 py-1 text-gray-700">
-            <Link href="/workspace">
+            <Link href={`/workspace/${project?.workspace.id}`} passHref>
               <span className="ml-1 flex items-center text-xs hover:underline">
                 {project?.workspace?.name}
               </span>
