@@ -86,7 +86,7 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
       <div className="absolute left-0 right-0 top-8 z-20 flex space-x-2">
         {selectedOptions.map((option) => (
           <div key={option.id} className="p-2">
-            <Avatar avatar_url={option.id} email={option.email} />
+            <Avatar user={option} />
           </div>
         ))}
       </div>
@@ -105,7 +105,7 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
               onClick={() => handleSelectOption(option)}
             >
               <div className="flex space-x-2">
-                <Avatar avatar_url={option.id} email={option.email} />
+                <Avatar user={option} />
                 {option.email}
               </div>
             </div>
