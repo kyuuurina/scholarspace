@@ -5,6 +5,7 @@ import SideBar from "./SideBar";
 import { Knock } from "@knocklabs/node";
 import { useUser } from "@supabase/auth-helpers-react";
 import { api } from "~/utils/api";
+import { MoonLoader } from "react-spinners";
 
 type LayoutProps = {
   children: ReactNode;
@@ -18,9 +19,10 @@ export default function Layout({ children }: LayoutProps) {
     setOpen(!open);
   };
 
-  const { data: profileData } = api.profile.getProfileByUserId.useQuery({
-    user_id: user?.id ?? "",
-  });
+  const { data: profileData, isLoading } =
+    api.profile.getProfileByUserId.useQuery({
+      user_id: user?.id ?? "",
+    });
   const { data: userData } = api.user.get.useQuery();
 
   useEffect(() => {
@@ -40,6 +42,14 @@ export default function Layout({ children }: LayoutProps) {
 
   if (!user || !profileData || !userData) {
     return null;
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <MoonLoader color="#7C3AED" />
+      </div>
+    );
   }
 
   return (
