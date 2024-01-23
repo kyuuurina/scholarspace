@@ -145,15 +145,22 @@ const ProfilePage: NextPageWithLayout = () => {
                     {`${name ?? "User"}'s Profile`}
                   </h3>
 
-                  <div>
-                    {isOwner && (
-                      <button
-                        onClick={handleEditClick}
-                        className="flex items-center"
-                      >
-                        Edit <FaEdit className="ml-2" />
-                      </button>
+                  <div className="flex space-x-4">
+
+                  <div className="mb-2 mt-1">
+                    {followersData ? (
+                      <FollowerList profiles={flattenedFollowersData} />
+                    ) : (
+                      <p>Loading followers...</p>
                     )}
+                  </div>
+                  <div className="mb-2 mt-1">
+                    {followingData ? (
+                      <FollowingList profiles={flattenedFollowingData} />
+                    ) : (
+                      <p>Loading following...</p>
+                    )}
+                  </div>
                   </div>
                 </div>
 
@@ -163,6 +170,16 @@ const ProfilePage: NextPageWithLayout = () => {
 
                   {/* Message Button */}
                   {isNotOwner && user_id && <MessageButton userId={user_id} />}
+
+                  {/* Edit Button */}
+                  {isOwner && (
+                      <button
+                        onClick={handleEditClick}
+                        className="flex items-center"
+                      >
+                        Edit <FaEdit className="ml-2" />
+                      </button>
+                    )}
                 </div>
               </div>
 
@@ -178,8 +195,8 @@ const ProfilePage: NextPageWithLayout = () => {
                   {/* ... */}
                 </div>
                 <div>
-                  <div className="flex space-x-4">
 
+                  {/* <div className="flex space-x-4">
                   <div className="mb-4 mt-6">
                     {followersData ? (
                       <FollowerList profiles={flattenedFollowersData} />
@@ -194,8 +211,9 @@ const ProfilePage: NextPageWithLayout = () => {
                       <p>Loading following...</p>
                     )}
                   </div>
-                  </div>
-                  <div className="mb-4 mt-4">
+                  </div> */}
+
+                  <div className="mb-4 mt-6">
                     <p className="text-sm text-gray-600">
                       <CollabStatusBadge collabStatus={collab_status} />
                     </p>
