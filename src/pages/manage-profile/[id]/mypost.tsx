@@ -1,51 +1,57 @@
-import React from 'react';
-import { useFetchMyResearchPosts } from '~/utils/researchpost';
+//Query all post created by user, if null, display "You have not created any post yet"
 
-import { useState } from 'react';
-import { api } from '~/utils/api';
-import AddNewPostButton from '~/components/research-post/AddNewPostButton';
-import router, { useRouter } from 'next/router';
+import React from 'react';
+import {useState} from 'react';
+import {api} from '~/utils/api';
+import Link from 'next/link';
+import { useUser } from '@supabase/auth-helpers-react';
 
 //utils
-import { useRouterId } from '~/utils/routerId';
-import { useFetchProfile } from '~/utils/profile';
+import { useRouterId } from "~/utils/routerId";
+import { useFetchProfile } from "~/utils/profile";
 import { useQuery } from '@tanstack/react-query';
 
 // types
-import type { ReactElement } from 'react';
-import type { NextPageWithLayout } from '~/pages/_app';
+import type { ReactElement } from "react";
+import type { NextPageWithLayout } from "~/pages/_app";
 
-import ErrorPage from '~/pages/error-page';
-
+import ErrorPage from "~/pages/error-page";
 //local components
-import Layout from '~/components/layout/Layout';
-import PageLoader from '~/components/layout/PageLoader';
-import LoadingSpinner from '~/components/LoadingSpinner';
-import { FaExclamationCircle } from 'react-icons/fa';
+import Layout from "~/components/layout/Layout";
+import PageLoader from "~/components/layout/PageLoader";
+import LoadingSpinner from "~/components/LoadingSpinner";
 
 //profile components
 import ProfileTabs from '~/components/profile/ProfileTabs';
-import Post from '~/components/research-post/Post';
 import Head from 'next/head';
+
+//research post components
+import AddNewPostButton from '~/components/research-post/AddNewPostButton';
+import {MyPosts} from '~/utils/researchpost';
+import { FaExclamationCircle } from 'react-icons/fa';
+import Post from '~/components/research-post/Post';
 import EditPostForm from '~/components/research-post/EditPostForm';
 
 
-const MyPost: NextPageWithLayout = () => {
+const LikedPost: NextPageWithLayout = () => {
+
   const profile_id = useRouterId();
-  console.log("Front call", profile_id);
-  const myPostLists = useFetchMyResearchPosts(profile_id);
-  const router = useRouter();
 
-  const { name, isLoading } = useFetchProfile(); //To print in head
+  // Fetch user_id using getUserIdByProfileId
+  const userId = api.profile.getUserIdByProfileId.useQuery({
+    profile_id: profile_id,
+  }).data;
 
-  console.log("MyPost.tsx page router:", router);
+  // Fetch liked posts based on user_id
+  const LikedPost = MyPosts(userId || '');
+
+  const { name, isLoading } = useFetchProfile();  //To print in head
 
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [currentPostId, setCurrentPostId] = useState<string | null>(null);
-  const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
 
   // query key for refetch
-  const postQueryKey = ['getPost', currentPostId]; // Assuming have a valid post ID
+  const postQueryKey = ['getLikedPost', currentPostId]; // Assuming have a valid post ID
   const { data: updatedPostData, refetch: refetchPost } = useQuery(
     postQueryKey,
     { enabled: false } // Disable automatic fetching on mount
@@ -53,15 +59,14 @@ const MyPost: NextPageWithLayout = () => {
 
   // Render EditPostForm component
   const handleEditClick = (postId: string) => {
-    setEditModalOpen(true);
-    setCurrentPostId(postId);
-  };
+      setEditModalOpen(true);
+      setCurrentPostId(postId);
+    };
 
-  if (myPostLists.isLoading) {
-    return <LoadingSpinner />;
+    if (LikedPost.isLoadingMyPost) {
+      return <LoadingSpinner />;
   }
 
-  //no posts message
   const noPostsMessage = (
     <div className="flex flex-col items-center justify-center h-screen">
       {/* <FaExclamationCircle className="text-gray-500 text-5xl mb-4" /> */}
@@ -79,9 +84,9 @@ const MyPost: NextPageWithLayout = () => {
       <ProfileTabs />
 
       <div className="container mx-auto mt-8">
-        <AddNewPostButton className="mb-4" />
+      <AddNewPostButton className="mb-4" />
         {/* if error*/}
-        {myPostLists.error && (
+        {LikedPost.errorMyPost && (
           <div className="flex flex-col items-center justify-center h-50vh">
             <FaExclamationCircle className="text-gray-500 text-4xl mb-4" />
             <p className="font-semibold text-lg text-gray-500 leading-1.5 text-center max-w-md">
@@ -91,17 +96,17 @@ const MyPost: NextPageWithLayout = () => {
         )}
 
         {/* if post exist */}
-        {myPostLists.myResearchPosts.length > 0 ? (
+        {LikedPost.myPost.length > 0 ? (
           <ul className="grid grid-cols-1 gap-8">
-            {myPostLists.myResearchPosts.map((post) => (
+            {LikedPost.myPost.map((post) => (
               <li key={post.post_id} className="mb-4">
                 {/* Add left and right padding to the Post component */}
                 <div className="p-4 rounded-md">
-                  <Post
-                    post={post}
-                    onEditClick={() => handleEditClick(post.post_id)}
-                    refetch={refetchPost}
-                  />
+                <Post
+                  post={post}
+                  onEditClick={() => handleEditClick(post.post_id)}
+                  refetch={refetchPost}
+                   />
                   {/* <Post post={post} /> */}
                 </div>
               </li>
@@ -125,7 +130,7 @@ const MyPost: NextPageWithLayout = () => {
 };
 
 
-MyPost.getLayout = function getLayout(page: ReactElement) {
+LikedPost.getLayout = function getLayout(page: ReactElement) {
   return (
     <>
       <Layout>{page}</Layout>
@@ -133,21 +138,4 @@ MyPost.getLayout = function getLayout(page: ReactElement) {
   );
 };
 
-export default MyPost;
-
-
-{/* <div>
-{myPostLists.myResearchPosts.length > 0 && (
-  <ul>
-    {myPostLists.myResearchPosts.map((post) => (
-      <li key={post.post_id}>
-        <h2 style={{ fontWeight: '600', fontSize: '28px', marginBottom: '8px' }}>{post.title}</h2>
-        <p style={{ fontWeight: '500', fontSize: '18px', lineHeight: '1.5', marginBottom: '16px' }}>
-          {post.description}
-        </p>
-        {/* Add more fields as needed */}
-//       </li>
-//     ))}
-//   </ul>
-// )}
-// </div> */}
+export default LikedPost;

@@ -203,39 +203,49 @@ export const researchpostRouter = router({
     }),
 
 
-    getMyPosts: protectedProcedure
-    .input(z.object({ post_id: z.string() }))
-    .query(async ({ input, ctx }) => {
-      const myPosts = await ctx.prisma.research_post.findMany({
-        where: {
-          profile_id: input.post_id,
-        },
-        orderBy: {
-          created_at: "desc", // Order by created_at in descending order
-        },
-        include: {
-          user: {
-            select: {
-              profile: true, // Include the entire profile table
+// Get research posts owned by the user
+MyNewPost : protectedProcedure
+  .input(z.object({ user_id: z.string() })) // Added input validation
+  .query(async ({ input, ctx }) => {
+    const userId = input.user_id;
+
+    // Handle unauthenticated user
+    if (!userId) {
+      throw new TRPCError({
+        code: 'UNAUTHORIZED',
+        message: 'User not authenticated',
+      });
+    }
+
+    // Get the user's research posts, sorted by created_at in descending order
+    const userResearchPosts = await ctx.prisma.research_post.findMany({
+      where: {
+        user_id: userId,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            profile: {
+              select: {
+                profile_id: true,
+                name: true,
+                avatar_url: true,
+              },
             },
           },
         },
-      });
+        profile: true, // Include the profile directly in the research post
+      },
+      orderBy: {
+        created_at: 'desc', // Sort by created_at in descending order
+      },
+    });
 
-      return myPosts.map((post) => {
-        return {
-          post_id: post.post_id,
-          user_id: post.user_id,
-          category: post.category,
-          title: post.title,
-          document: post.document,
-          description: post.description,
-          author: post.author,
-          created_at: post.created_at,
-          user: post.user,
-        };
-      });
-    }),
+    return userResearchPosts;
+  }),
+
 
   getFollowingPosts: publicProcedure
     .input(
