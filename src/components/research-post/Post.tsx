@@ -6,8 +6,6 @@ import { MoonLoader } from "react-spinners";
 import { FiEdit2, FiTrash2, FiMessageSquare} from "react-icons/fi";
 import Card from "../Card";
 import AvatarPlaceholder from "../avatar/AvatarPlaceholder";
-import ProfileAvatarPlaceholder from "../avatar/ProfileAvatar";
-// import CommentsList from './CommentList'; // Import the CommentList component
 import { useForm } from "react-hook-form";
 import CommentList from "../research-post-att/PostCommentList";
 import PostComment, {FormValues as CommentFormValues,} from "../research-post-att/PostComment";
@@ -17,7 +15,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z, ZodType } from "zod";
 import { useQuery } from "@tanstack/react-query";
 
-import router, { useRouter } from "next/router";
+import router from "next/router";
 
 // Local imports
 import SuccessToast from "../toast/SuccessToast";
@@ -27,9 +25,6 @@ import LikeButton from "../research-post/LikeButton";
 
 // Auth
 import { useUser } from "@supabase/auth-helpers-react";
-
-// Utils
-import { UseCheckProfile } from "~/utils/profile";
 
 // Data fetching
 import { api } from "~/utils/api";

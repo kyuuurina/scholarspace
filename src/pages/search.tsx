@@ -40,6 +40,8 @@ const SearchPage: NextPageWithLayout = () => {
   const [isProfileSectionOpen, setIsProfileSectionOpen] = useState(true);
   const [isPostSectionOpen, setIsPostSectionOpen] = useState(true);
 
+
+  const user = useUser();
   const supabase = useSupabaseClient();
   const session = useSession();
   const router = useRouter();
@@ -52,7 +54,6 @@ const SearchPage: NextPageWithLayout = () => {
 
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [currentPostId, setCurrentPostId] = useState<string | null>(null);
-  const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
 
   // query key for refetch
   const postQueryKey = ['getPost', currentPostId]; // Assuming have a valid post ID

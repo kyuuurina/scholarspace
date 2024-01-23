@@ -19,7 +19,6 @@ const Message: React.FC<MessageProps> = ({
   chat_id,
   refetch,
 }) => {
-  const { chatMessages, isLoadingChatMessages, errorChatMessages } = useFetchChatMessages(chat_id);
   const user = useUser();
 
   React.useEffect(() => {

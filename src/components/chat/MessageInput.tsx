@@ -69,7 +69,12 @@ const MessageInputSection: React.FC<MessageInputSectionProps> = ({ chatId, refet
         {errors.content && (
           <span className="text-red-500 text-sm">{errors.content.message}</span>
         )}
-        <PrimaryButton name="Send" type="submit" disabled={false} />
+        <PrimaryButton
+          name="Send"
+          type="submit"
+          isSubmitting={sendMessageMutation.isLoading}
+          disabled={sendMessageMutation.isLoading}
+        />
       </form>
     </div>
   );

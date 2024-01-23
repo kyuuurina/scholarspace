@@ -20,15 +20,11 @@ import ErrorPage from "~/pages/error-page";
 import Layout from "~/components/layout/Layout";
 import PageLoader from "~/components/layout/PageLoader";
 import LoadingSpinner from "~/components/LoadingSpinner";
-import PrimaryButton from "~/components/button/PrimaryButton";
-import AvatarPlaceholder from "~/components/avatar/AvatarPlaceholder";
-import { FaEdit } from 'react-icons/fa';
 
 //profile components
 import ProfileTabs from '~/components/profile/ProfileTabs';
 import Head from 'next/head';
 
-import { useRouter } from 'next/router';
 import { useFetchLikedPost } from '~/utils/researchpost';
 import { FaExclamationCircle } from 'react-icons/fa';
 import Post from '~/components/research-post/Post';
@@ -43,7 +39,7 @@ const LikedPost: NextPageWithLayout = () => {
   const userId = api.profile.getUserIdByProfileId.useQuery({
     profile_id: profile_id,
   }).data;
-  
+
   // Fetch liked posts based on user_id
   const LikedPost = useFetchLikedPost(userId || '');
 
@@ -51,7 +47,6 @@ const LikedPost: NextPageWithLayout = () => {
 
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [currentPostId, setCurrentPostId] = useState<string | null>(null);
-  const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
 
   // query key for refetch
   const postQueryKey = ['getLikedPost', currentPostId]; // Assuming have a valid post ID

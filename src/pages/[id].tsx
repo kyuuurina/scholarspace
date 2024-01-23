@@ -2,8 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
 //auth
-import { useUser } from "@supabase/auth-helpers-react";
-import { useSession, useSessionContext } from "@supabase/auth-helpers-react";
+import { useUser, useSession, useSessionContext } from "@supabase/auth-helpers-react";
 
 //utils
 import { useState, useEffect } from "react";
@@ -45,14 +44,12 @@ const FollowingPostPage: NextPageWithLayout = () => {
   const user = useUser();
   //fetch user id
   const userId = user?.id || "";
-
   const router = useRouter();
   const FollowingPostLists = useFetchFollowingResearchPosts();
 
   //
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [currentPostId, setCurrentPostId] = useState<string | null>(null);
-  const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
 
   // query key for refetch
   const postQueryKey = ["getPost", currentPostId]; // Assuming have a valid post ID

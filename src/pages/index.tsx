@@ -16,7 +16,6 @@ import { useQuery } from "@tanstack/react-query";
 import AllFollowingTabs from "~/components/research-post/AllFollowingTabs";
 import Post from "~/components/research-post/Post";
 import { useFetchPostRecommendations } from "~/utils/researchpost";
-import Tabs from "~/components/research-post/Tab";
 
 // profile components
 import ProfileRecommendation from "~/components/profile/ProfileRecommendation";
