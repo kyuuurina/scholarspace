@@ -52,9 +52,7 @@ const Table: React.FC<TableProps> = ({ phase_id, searchQuery }) => {
   });
 
   // GET tasks
-  const { data: tasksList, refetch } = api.task.list.useQuery({ phase_id });
-
-  console.log("tasksList", tasksList);
+  const { tasks, refetch } = useFetchTasksWithProperties(phase_id);
 
   const createProperty = api.phase.addProperty.useMutation();
 
@@ -88,11 +86,11 @@ const Table: React.FC<TableProps> = ({ phase_id, searchQuery }) => {
     }));
   };
 
-  const filteredTasks = tasksList?.filter((task) =>
+  const filteredTasks = tasks?.filter((task) =>
     task?.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  if (!tasksList || !filteredTasks) {
+  if (!tasks || !filteredTasks) {
     return null;
   }
 
@@ -204,17 +202,17 @@ const Table: React.FC<TableProps> = ({ phase_id, searchQuery }) => {
               </td>
               <td className="whitespace-nowrap border border-gray-300 px-6 py-2">
                 {/* iterate over tasks assignees */}
-                <TaskAssignees
+                {/* <TaskAssignees
                   task_id={task?.id}
                   assignees={task?.task_assignees}
                   phase_id={phase_id}
                   refetch={refetch}
-                />
+                /> */}
               </td>
               {/* iterate properties and render column, */}
               {propertiesQuery?.data?.map((property, columnIndex) => {
-                const matchingProperty = task?.property_phase_task?.find(
-                  (property) => property.property_id === BigInt(columnIndex)
+                const matchingProperty = task?.properties?.find(
+                  (property) => property.id === BigInt(columnIndex)
                 );
 
                 return (
