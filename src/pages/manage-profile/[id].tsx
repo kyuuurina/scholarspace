@@ -91,8 +91,8 @@ const ProfilePage: NextPageWithLayout = () => {
   const { educations, isLoading: EducationLoading, error: EducationError,} = useFetchEducation();
   const { achievements, isLoading: AchievementLoading, error: AchievementError,} = useFetchAchievement();
   const { experiences, isLoading: ExperienceLoading, error: ExperienceError,} = useFetchExperience();
-  const { followersData, followersLoading, followersError } = useFetchFollowers(profileId);
-  const { followingData, followingLoading, followingError } = useFetchFollowing(profileId);
+  const { followersData, followersLoading, followersError } = useFetchFollowers();
+  const { followingData, followingLoading, followingError } = useFetchFollowing();
 
   const flattenedFollowersData = followersData?.flat() || [];
   const flattenedFollowingData = followingData?.flat() || [];
