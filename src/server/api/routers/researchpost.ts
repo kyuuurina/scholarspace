@@ -202,7 +202,39 @@ export const researchpostRouter = router({
       return { success: true };
     }),
 
+    getMyPosts: protectedProcedure
+    .input(z.object({ post_id: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const myPosts = await ctx.prisma.research_post.findMany({
+        where: {
+          profile_id: input.post_id,
+        },
+        orderBy: {
+          created_at: "desc", // Order by created_at in descending order
+        },
+        include: {
+          user: {
+            select: {
+              profile: true, // Include the entire profile table
+            },
+          },
+        },
+      });
 
+      return myPosts.map((post) => {
+        return {
+          post_id: post.post_id,
+          user_id: post.user_id,
+          category: post.category,
+          title: post.title,
+          document: post.document,
+          description: post.description,
+          author: post.author,
+          created_at: post.created_at,
+          user: post.user,
+        };
+      });
+    }),
 // Get research posts owned by the user
 MyNewPost : protectedProcedure
   .input(z.object({ user_id: z.string() })) // Added input validation

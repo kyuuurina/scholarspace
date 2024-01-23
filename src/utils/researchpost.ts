@@ -59,6 +59,26 @@ export const useFetchFollowingResearchPosts = (limit = 30, cursor?: string) => {
   };
 };
 
+//fetch my research posts
+export const useFetchMyResearchPosts = (id: string) => {
+  console.log("Dari depam", id);
+  const myResearchPosts = api.researchpost.getMyPosts.useQuery(
+    {
+      post_id: id,
+    },
+    {
+      enabled: !!id,
+    }
+  );
+
+  const { data, isLoading, error } = myResearchPosts;
+  console.log(myResearchPosts);
+  return {
+    myResearchPosts: data || [],
+    isLoading,
+    error,
+  };
+};
 
 //fetch my research posts - new
 export const MyPosts = (user_id: string) => {
