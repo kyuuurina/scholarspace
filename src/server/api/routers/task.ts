@@ -42,11 +42,23 @@ export const taskRouter = router({
         include: {
           phase: {
             include: {
-              phase_property: true,
+              phase_property: {
+                orderBy: {
+                  id: "asc",
+                },
+              },
             },
           },
-          property_phase_task: true,
-          task_assignees: true,
+          property_phase_task: {
+            orderBy: {
+              index: "asc",
+            },
+          },
+          task_assignees: {
+            include: {
+              user: true,
+            },
+          },
         },
         orderBy: {
           created_at: "desc",
