@@ -1,5 +1,5 @@
 // src/pages/chat/index.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import type { ReactElement } from 'react';
 import type { NextPageWithLayout } from '~/pages/_app';
@@ -10,6 +10,7 @@ import { useUser } from '@supabase/auth-helpers-react';
 import { useFetchChatList } from '~/utils/chatmessage';
 import {api} from "~/utils/api";
 import { useQuery } from "@tanstack/react-query";
+
 
 const ChatPage: NextPageWithLayout = () => {
   const user = useUser();
@@ -38,6 +39,10 @@ const ChatPage: NextPageWithLayout = () => {
   );
 
   return (
+    <>
+      {/* <Head>
+        <title> Chats </title>
+      </Head> */}
     <ChatLayout
       chatList={chatList}
       onChatSelect={handleChatSelect}
@@ -45,6 +50,7 @@ const ChatPage: NextPageWithLayout = () => {
       chatMessages={[]}
       refetch={refetchMessage}
     />
+  </>
   );
 };
 
