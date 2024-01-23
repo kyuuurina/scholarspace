@@ -35,7 +35,7 @@ export const taskRouter = router({
     .query(async ({ input, ctx }) => {
       const { phase_id } = input;
 
-      const tasks = await ctx.prisma.task.findMany({
+      const tasksQuery = await ctx.prisma.task.findMany({
         where: {
           phase_id,
         },
@@ -45,6 +45,11 @@ export const taskRouter = router({
               phase_property: {
                 orderBy: {
                   id: "asc",
+                },
+              },
+              project: {
+                select: {
+                  project_users: true,
                 },
               },
             },
@@ -65,7 +70,30 @@ export const taskRouter = router({
         },
       });
 
-      return tasks;
+      // fetch role of user for this project
+      const project = await ctx.prisma.phase
+        .findUnique({
+          where: { id: phase_id },
+        })
+        .project()
+        .project_users();
+
+      const role = project?.find(
+        (user) => user.user_id === ctx.user?.id
+      )?.project_role;
+
+      // if role is student, return tasks that are assigned to them, else return all tasks
+      if (role === "Student") {
+        const tasks = tasksQuery.filter((task) =>
+          task.task_assignees.find(
+            (assignee) => assignee.assignee_id === ctx.user?.id
+          )
+        );
+        return tasks;
+      } else {
+        const tasks = tasksQuery;
+        return tasks;
+      }
     }),
 
   listByProject: protectedProcedure
@@ -514,25 +542,4 @@ export const taskRouter = router({
 
       return true;
     }),
-
-  // deleteAssignee: protectedProcedure
-  //   .input(
-  //     z.object({
-  //       task_id: z.string(),
-  //       assignee_id: z.string(),
-  //     })
-  //   )
-  //   .mutation(async ({ input, ctx }) => {
-  //     const { task_id, assignee_id } = input;
-
-  //     // delete all assignees of the task
-  //     await ctx.prisma.task_assignees.deleteMany({
-  //       where: {
-  //         task_id,
-  //         assignee_id,
-  //       },
-  //     });
-
-  //     return true;
-  //   }),
 });
