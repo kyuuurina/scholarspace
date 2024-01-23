@@ -1,11 +1,14 @@
 // libraries and hooks
 import React, { useState } from "react";
+import toast from "react-hot-toast";
+import { TRPCClientError } from "@trpc/client";
 
 // utils
 import { api } from "~/utils/api";
+import { useRouterId } from "~/utils/routerId";
 
 // types
-import type { taskRow } from "~/types/task";
+import type { taskList } from "~/types/task";
 import type { phase_property } from "@prisma/client";
 
 // components
@@ -19,9 +22,11 @@ import NullableDatePicker from "./NullableDatePicker";
 import TaskAssignees from "./TaskAssignees";
 import TaskProperty from "./TaskProperty";
 import SetReminder from "./SetReminder";
+import ErrorToast from "../toast/ErrorToast";
+import { MoonLoader } from "react-spinners";
 
 type TaskDrawerProps = {
-  task: taskRow;
+  task: taskList;
   onClose: () => void;
   properties: phase_property[] | undefined;
   refetch: () => void;
@@ -29,7 +34,8 @@ type TaskDrawerProps = {
 
 const TaskDrawer: React.FC<TaskDrawerProps> = ({ task, onClose, refetch }) => {
   const [taskStatus, setTaskStatus] = useState("pending");
-
+  const [isDeleting, setIsDeleting] = useState(false);
+  const id = useRouterId();
   const handleContentClick = (
     event: React.MouseEvent<HTMLDivElement> | undefined
   ) => {
@@ -71,9 +77,40 @@ const TaskDrawer: React.FC<TaskDrawerProps> = ({ task, onClose, refetch }) => {
           deadline: date,
         });
       } finally {
+        onClose();
         refetch();
       }
     }
+  };
+
+  // delete a task
+  const deleteTask = api.task.delete.useMutation();
+
+  const handleDelete = async () => {
+    if (isDeleting) {
+      return;
+    }
+    setIsDeleting(true);
+    if (task?.id) {
+      try {
+        await deleteTask.mutateAsync({
+          id: task.id,
+        });
+      } catch (error) {
+        toast.custom(() => {
+          if (error instanceof TRPCClientError) {
+            return <ErrorToast message={error.message} />;
+          } else {
+            // Handle other types of errors or fallback to a default message
+            return <ErrorToast message="An error occurred." />;
+          }
+        });
+      } finally {
+        onClose();
+        refetch();
+      }
+    }
+    setIsDeleting(false);
   };
   return (
     <div
@@ -139,24 +176,48 @@ const TaskDrawer: React.FC<TaskDrawerProps> = ({ task, onClose, refetch }) => {
               </label>
               <TaskAssignees
                 task_id={task?.id}
-                assignees={task?.assignees}
+                assignees={task?.task_assignees}
                 phase_id={task?.phase_id}
                 refetch={refetch}
+                project_id={id}
               />
             </div>
             {/* set task reminder */}
             <SetReminder refetch={refetch} />
-            {/* render properties input fields */}
-            {task?.properties.map((property) => (
-              <TaskProperty
-                key={property.property_id}
-                task_id={task?.id}
-                property_id={property.property_id}
-                value={property.value}
-                refetch={refetch}
-                label={property.name}
-              />
-            ))}
+            {task?.property_phase_task.map((property) => {
+              // Find the corresponding phase_property based on phase_id
+              const correspondingPhaseProperty =
+                task?.phase.phase_property.find(
+                  (phaseProperty) => phaseProperty.id === property.property_id
+                );
+
+              if (!correspondingPhaseProperty) {
+                return null;
+              }
+              return (
+                <TaskProperty
+                  key={property.index}
+                  task_id={task?.id}
+                  property_id={property.property_id}
+                  value={property.value}
+                  refetch={refetch}
+                  label={correspondingPhaseProperty?.name}
+                />
+              );
+            })}
+            <div className="flex justify-end">
+              <button
+                onClick={handleDelete}
+                className="flex items-center justify-between rounded bg-red-600 px-4 py-2 font-bold text-white hover:bg-red-700"
+              >
+                {isDeleting && (
+                  <div className="flex items-center justify-center">
+                    <MoonLoader size={15} color="white" />
+                  </div>
+                )}
+                <p>Delete</p>
+              </button>
+            </div>
           </div>
         </div>
       </div>

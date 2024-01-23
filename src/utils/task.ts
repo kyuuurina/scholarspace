@@ -88,7 +88,7 @@ export const useFetchTasksWithProperties = (phase_id: string) => {
         description: task.description,
         created_at: task.created_at,
         status: task.status,
-        assignees: taskAssignees?.map((assignee) => assignee.user),
+        // assignees: taskAssignees?.map((assignee) => assignee.user),
         phase_id: task.phase_id,
         end_at: task.end_at,
         deadline: task.deadline,

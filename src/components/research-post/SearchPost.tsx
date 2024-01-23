@@ -7,8 +7,6 @@ import Card from '../Card';
 import AvatarPlaceholder from '../avatar/AvatarPlaceholder';
 import Comment from './Comment'; // Import the Comment component
 import PostComment from './PostComment';
-import CommentsList from './CommentList';
-
 
 //data fetching
 import { api } from '~/utils/api';

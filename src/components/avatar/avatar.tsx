@@ -1,20 +1,20 @@
 import Image from "next/image";
 import AvatarPlaceholder from "./AvatarPlaceholder";
-import type { user } from "@prisma/client";
+import type { profile, user } from "@prisma/client";
+import { BASE_AVATAR_URL } from "~/utils/supabase-storage";
 
 type AvatarProps = {
-  user?: user | null;
-  avatar_url?: string | null;
-  email?: string | null;
+  profile?: profile | null;
+  user?: user;
 };
 
-const Avatar: React.FC<AvatarProps> = ({ user, avatar_url, email }) => {
-  if (avatar_url) {
-    if (email) {
+const Avatar: React.FC<AvatarProps> = ({ user, profile }) => {
+  if (user) {
+    if (user.has_avatar) {
       return (
         <Image
-          key={avatar_url}
-          src={avatar_url}
+          key={user.id}
+          src={`${BASE_AVATAR_URL}/${user.id}`}
           alt="avatar"
           width={30}
           height={30}
@@ -23,21 +23,17 @@ const Avatar: React.FC<AvatarProps> = ({ user, avatar_url, email }) => {
       );
     } else {
       return (
-        <Image
-          src={avatar_url}
-          alt={user?.name || email || "Avatar"}
-          width={32}
-          height={32}
-          className="rounded-full"
-        />
+        <div key={user.id} className="w-8 rounded-full">
+          <AvatarPlaceholder name={user.name} />
+        </div>
       );
     }
   } else {
-    if (user?.avatar_url) {
+    if (profile?.avatar_url) {
       return (
         <Image
-          key={user.avatar_url}
-          src={user.avatar_url}
+          key={profile.avatar_url}
+          src={profile.avatar_url}
           alt="avatar"
           width={30}
           height={30}
@@ -46,8 +42,8 @@ const Avatar: React.FC<AvatarProps> = ({ user, avatar_url, email }) => {
       );
     } else {
       return (
-        <div key={user?.avatar_url} className="w-8 rounded-full">
-          <AvatarPlaceholder name={user?.email || "SS"} />
+        <div key={profile?.avatar_url} className="w-8 rounded-full">
+          <AvatarPlaceholder name={profile?.name || "SS"} />
         </div>
       );
     }

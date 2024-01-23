@@ -62,10 +62,11 @@ import AchievementCard from "~/components/profile/AchievementCard";
 
 // network component
 import FollowButton from "~/components/network/FollowButton";
-import Button from "~/components/button/Button";
-import FollowListModal from "~/components/network/FollowListModal";
 import FollowerList from "~/components/network/FollowerList";
 import FollowingList from "~/components/network/FollowingList";
+
+//chat component
+import MessageButton from "~/components/chat/MessageButton";
 
 
 const ProfilePage: NextPageWithLayout = () => {
@@ -90,8 +91,8 @@ const ProfilePage: NextPageWithLayout = () => {
   const { educations, isLoading: EducationLoading, error: EducationError,} = useFetchEducation();
   const { achievements, isLoading: AchievementLoading, error: AchievementError,} = useFetchAchievement();
   const { experiences, isLoading: ExperienceLoading, error: ExperienceError,} = useFetchExperience();
-  const { followersData, followersLoading, followersError } = useFetchFollowers(profileId);
-  const { followingData, followingLoading, followingError } = useFetchFollowing(profileId);
+  const { followersData, followersLoading, followersError } = useFetchFollowers();
+  const { followingData, followingLoading, followingError } = useFetchFollowing();
 
   const flattenedFollowersData = followersData?.flat() || [];
   const flattenedFollowingData = followingData?.flat() || [];
@@ -124,8 +125,8 @@ const ProfilePage: NextPageWithLayout = () => {
           <div className="grid gap-y-5">
             {/* User Profile Card */}
             <section className="mx-auto mt-2 w-3/4 rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">
-            <div className="flex items-center">
-                <div className="relative w-20 h-20">
+              <div className="flex items-center">
+                <div className="relative w-20 h-20 mr-4">
                   {avatar_url ? (
                     <Image
                       src={`https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/avatar/${avatar_url}`}
@@ -139,28 +140,50 @@ const ProfilePage: NextPageWithLayout = () => {
                   )}
                 </div>
 
-                <h3 className="mb-4 text-2xl font-semibold" style={{ marginLeft: "1rem", marginRight: "50rem"}}>
-                  {`${name ?? "User"}'s Profile`}
-                </h3>
-    
-                <div>
-                  {isOwner && (
-                    <button
-                      onClick={handleEditClick}
-                      className="flex items-center"
-                    >
-                      Edit <FaEdit className="ml-2" />
-                    </button>
-                  )}
+                <div className="flex flex-col">
+                  <h3 className="mb-2 text-2xl font-semibold">
+                    {`${name ?? "User"}'s Profile`}
+                  </h3>
+
+                  <div className="flex space-x-4">
+
+                  <div className="mb-2 mt-1">
+                    {followersData ? (
+                      <FollowerList profiles={flattenedFollowersData} />
+                    ) : (
+                      <p>Loading followers...</p>
+                    )}
+                  </div>
+                  <div className="mb-2 mt-1">
+                    {followingData ? (
+                      <FollowingList profiles={flattenedFollowingData} />
+                    ) : (
+                      <p>Loading following...</p>
+                    )}
+                  </div>
+                  </div>
                 </div>
 
-                <div>
+                <div className="flex items-center justify-end flex-grow space-x-2">
                   {/* Follow Button */}
                   {isNotOwner && user_id && <FollowButton userId={user_id} />}
+
+                  {/* Message Button */}
+                  {isNotOwner && user_id && <MessageButton userId={user_id} />}
+
+                  {/* Edit Button */}
+                  {isOwner && (
+                      <button
+                        onClick={handleEditClick}
+                        className="flex items-center"
+                      >
+                        Edit <FaEdit className="ml-2" />
+                      </button>
+                    )}
                 </div>
-                <div className="flex space-x-4">{/*  */}</div>
               </div>
 
+              {/* Edit Profile */}
               <div>
                 {isEditModalOpen && (
                   <UserProfileForm
@@ -172,24 +195,25 @@ const ProfilePage: NextPageWithLayout = () => {
                   {/* ... */}
                 </div>
                 <div>
-                  <div className="flex space-x-4">
 
-                  <div className="mb-4">
+                  {/* <div className="flex space-x-4">
+                  <div className="mb-4 mt-6">
                     {followersData ? (
                       <FollowerList profiles={flattenedFollowersData} />
                     ) : (
                       <p>Loading followers...</p>
                     )}
                   </div>
-                  <div className="mb-4">
+                  <div className="mb-4 mt-6">
                     {followingData ? (
                       <FollowingList profiles={flattenedFollowingData} />
                     ) : (
                       <p>Loading following...</p>
                     )}
                   </div>
-                  </div>
-                  <div className="mb-4 mt-4">
+                  </div> */}
+
+                  <div className="mb-4 mt-6">
                     <p className="text-sm text-gray-600">
                       <CollabStatusBadge collabStatus={collab_status} />
                     </p>
@@ -226,7 +250,6 @@ const ProfilePage: NextPageWithLayout = () => {
                   </div>
                 </div>
               </div>
-              <div>{/* Following Modal */}</div>
             </section>
 
             <section className="mx-auto mt-2 w-3/4 rounded-sm border border-gray-200 bg-white p-4 shadow sm:p-6 md:p-8">

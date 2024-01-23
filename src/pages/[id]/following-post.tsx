@@ -32,7 +32,6 @@ import Modal from "~/components/modal/Modal";
 //research post components
 import AllFollowingTabs from "~/components/research-post/AllFollowingTabs";
 import Post from "~/components/research-post/Post";
-import UserProfileCard from "~/components/research-post/UserRecCards";
 import AddNewPostButton from "~/components/research-post/AddNewPostButton";
 import TestModal from "~/components/research-post/AddNewPostModal";
 

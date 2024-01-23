@@ -1,18 +1,12 @@
 import Link from "next/link";
 import Image from "next/image";
-
+import type { project } from "@prisma/client";
 import AvatarPlaceholder from "~/components/avatar/AvatarPlaceholder";
+import { BASE_PROJECT_COVER_URL } from "~/utils/supabase-storage";
 
 type ProjectCardProps = {
   // an object of an array of projects
-  project: {
-    project_id: string;
-    name: string;
-    description: string;
-    cover_img: string | null;
-    c_score: number;
-    p_score: number; // Make it nullable to handle potential null values
-  };
+  project: project;
 };
 
 const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
@@ -24,7 +18,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
       <div className="aspect:square">
         {project.cover_img ? (
           <Image
-            src={`https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/project-covers/${project.cover_img}`}
+            src={`${BASE_PROJECT_COVER_URL}/${project.cover_img}`}
             alt="Project cover image"
             width={100}
             height={100}

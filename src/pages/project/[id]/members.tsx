@@ -1,45 +1,51 @@
-// utils
-import { useRouterId } from "~/utils/routerId";
-import {
-  useFetchProject,
-  useFetchProjectMembers,
-  useFecthProjectRole,
-} from "~/utils/project";
-import { useState, useEffect } from "react";
-import { api } from "~/utils/api";
-import toast from "react-hot-toast";
-import { FiUserPlus } from "react-icons/fi";
-
-import { useRouter } from "next/router";
-
 // types
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "~/pages/_app";
 
-// pages
-import ErrorPage from "~/pages/error-page";
+// utils
+import { api } from "~/utils/api";
+import { useRouterId } from "~/utils/routerId";
+import Link from "next/link";
+import { TRPCClientError } from "@trpc/client";
+import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
+import { FiUserPlus, FiSearch } from "react-icons/fi";
+import dynamic from "next/dynamic";
+import { useRouter } from "next/router";
+import { MoonLoader } from "react-spinners";
 
 // components
 import Layout from "~/components/layout/Layout";
 import Head from "~/components/layout/Head";
 import Header from "~/components/workspace/Header";
-import MemberModal from "~/components/members/MemberModal";
-import LoadingSpinner from "~/components/LoadingSpinner";
-import MemberTable from "~/components/members/MemberTable";
+import ProjectMemberTable from "~/components/members/ProjectMemberTable";
 import SuccessToast from "~/components/toast/SuccessToast";
 import ErrorToast from "~/components/toast/ErrorToast";
+const MemberModal = dynamic(() => import("~/components/members/MemberModal"), {
+  loading: () => null,
+  ssr: false,
+});
 
 const ProjectMember: NextPageWithLayout = () => {
-  const { name, description, isLoading, error, imgUrl, c_score, p_score } =
-    useFetchProject();
-
-  const { project_role } = useFecthProjectRole();
-
-  const { projectMembers } = useFetchProjectMembers();
   const router = useRouter();
-
   const id = useRouterId();
-  const [searchQuery, setSearchQuery] = useState("");
+
+  // fetch project
+  const { data: project, refetch } = api.project.get.useQuery({
+    project_id: id,
+  });
+
+  // fetch project members
+  const { data: projectMembers, isLoading } =
+    api.project.listProjectMembers.useQuery({
+      id,
+    });
+
+  // fetch project role of authenticated user
+  const { data: project_role } = api.project.getProjectUserRole.useQuery({
+    project_id: id,
+  });
+
   const [modalIsOpen, setModalIsOpen] = useState(false);
 
   // add member
@@ -47,6 +53,7 @@ const ProjectMember: NextPageWithLayout = () => {
     onSuccess: () => {
       toast.custom(() => <SuccessToast message="Member added" />);
       router.reload();
+      setModalIsOpen(false);
     },
   });
 
@@ -58,7 +65,14 @@ const ProjectMember: NextPageWithLayout = () => {
         project_role: data.role,
       });
     } catch (error) {
-      console.error("Failed to add member:", error);
+      toast.custom(() => {
+        if (error instanceof TRPCClientError) {
+          return <ErrorToast message={error.message} />;
+        } else {
+          // Handle other types of errors or fallback to a default message
+          return <ErrorToast message="An error occurred." />;
+        }
+      });
     }
   };
 
@@ -69,33 +83,31 @@ const ProjectMember: NextPageWithLayout = () => {
   }, [addMember.error]);
 
   // search bar functions
+  const [searchQuery, setSearchQuery] = useState("");
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value);
   };
 
   const filteredMembers = projectMembers?.filter((member) => {
-    if (!member?.memberEmail) {
-      return; // Skip this member if it's null or undefined
-    }
-
-    let memberName = "";
-    if (member.memberName) {
-      memberName = member.memberName.toLowerCase();
-    }
-
-    const memberEmail = member.memberEmail.toLowerCase();
-    const query = searchQuery.toLowerCase();
-    return memberName.includes(query) || memberEmail.includes(query);
+    // filter according to name and email
+    return (
+      member.user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      member.user.email.toLowerCase().includes(searchQuery.toLowerCase())
+    );
   });
+
+  // useEffect filtered members when refetch is called and workspaceMembers is updated
+  useEffect(() => {
+    if (projectMembers) {
+      filteredMembers;
+    }
+  }, [projectMembers]);
 
   // update member role
   const updateRole = api.project.updateMemberRole.useMutation({
     onSuccess: () => {
       toast.custom(() => <SuccessToast message="Member role updated" />);
       router.reload();
-    },
-    onError: (error) => {
-      toast.custom(() => <ErrorToast message={error.message} />);
     },
   });
 
@@ -106,11 +118,19 @@ const ProjectMember: NextPageWithLayout = () => {
         user_id: memberId,
         project_role: newRole,
       })
-      .then(() => {
-        router.reload();
+      .then(async () => {
+        await refetch();
       })
       .catch((error) => {
-        console.error("Failed to update member role:", error);
+        toast.custom(() => {
+          if (error instanceof TRPCClientError) {
+            return <ErrorToast message={error.message} />;
+          } else {
+            // Handle other types of errors or fallback to a default message
+            return <ErrorToast message="An error occurred." />;
+          }
+        });
+        router.reload();
       });
   };
 
@@ -118,10 +138,6 @@ const ProjectMember: NextPageWithLayout = () => {
   const deleteMember = api.project.deleteMember.useMutation({
     onSuccess: () => {
       toast.custom(() => <SuccessToast message="Member removed" />);
-      router.reload();
-    },
-    onError: (error) => {
-      toast.custom(() => <ErrorToast message={error.message} />);
     },
   });
 
@@ -135,21 +151,42 @@ const ProjectMember: NextPageWithLayout = () => {
         router.reload();
       })
       .catch((error) => {
-        console.error("Failed to delete member:", error);
+        toast.custom(() => {
+          if (error instanceof TRPCClientError) {
+            return <ErrorToast message={error.message} />;
+          } else {
+            // Handle other types of errors or fallback to a default message
+            return <ErrorToast message="An error occurred." />;
+          }
+        });
       });
   };
 
-  if (isLoading) {
-    return <LoadingSpinner />;
+  if (isLoading || !projectMembers) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <MoonLoader color="#7C3AED" />
+      </div>
+    );
   }
-
-  if (error) {
-    return <ErrorPage error={error.message} />;
+  if (!project) {
+    return (
+      <>
+        <main className="flex min-h-screen w-full flex-col items-center justify-center">
+          <h1 className="text-4xl font-bold">Workspace not found</h1>
+          <Link href="/">
+            <p className="py-2 text-dark-purple hover:underline">
+              Go back to Home page
+            </p>
+          </Link>
+        </main>
+      </>
+    );
   }
 
   return (
     <>
-      <Head title={name} />
+      <Head title={project?.name} />
       <MemberModal
         openModal={modalIsOpen}
         onClose={() => setModalIsOpen(false)}
@@ -158,7 +195,11 @@ const ProjectMember: NextPageWithLayout = () => {
       />
       <main className="flex flex-col">
         {/* Project header */}
-        <Header name={name || ""} imgUrl={imgUrl} purpose="project" />
+        <Header
+          name={project?.name}
+          imgUrl={project?.cover_img}
+          purpose="project"
+        />
         <div className="p-5">
           <div className="relative overflow-x-auto rounded-lg shadow-md">
             {/* search and add member section  */}
@@ -166,19 +207,7 @@ const ProjectMember: NextPageWithLayout = () => {
               <label className="sr-only">Search</label>
               <div className="relative mr-4">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                  <svg
-                    className="h-5 w-5 text-gray-500"
-                    aria-hidden="true"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                      clipRule="evenodd"
-                    ></path>
-                  </svg>
+                  <FiSearch />
                 </div>
                 <input
                   type="text"
@@ -188,7 +217,7 @@ const ProjectMember: NextPageWithLayout = () => {
                   onChange={handleSearch}
                 />
               </div>
-              {project_role === "Researcher Admin" && (
+              {project_role?.project_role === "Researcher Admin" && (
                 <button
                   onClick={() => {
                     setModalIsOpen(true);
@@ -202,11 +231,11 @@ const ProjectMember: NextPageWithLayout = () => {
             </div>
 
             {/* member table  */}
-            <MemberTable
+            <ProjectMemberTable
               filteredMembers={filteredMembers}
               handleRoleChange={handleRoleChange}
               handleDeleteMember={handleDeleteMember}
-              userWorkspaceRole={project_role}
+              userWorkspaceRole={project_role?.project_role}
               isPersonal={false}
               ownerId={null}
               externalCollab={true}

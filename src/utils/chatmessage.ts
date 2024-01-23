@@ -1,4 +1,5 @@
 // add import in api.ts
+import { useQuery } from '@tanstack/react-query';
 import { api } from './api';
 
 // Fetch the chat list for a specific user
@@ -18,5 +19,25 @@ export const useFetchChatList = (userId: string) => {
     chatList: chatListData || [],
     isLoadingChatList,
     errorChatList,
+  };
+};
+
+// Fetch messages for a specific chat
+export const useFetchChatMessages = (chatId: number) => {
+  const chatMessages = api.chat.getChatMessages.useQuery(
+    {
+      chat_id: chatId,
+    },
+    {
+      enabled: !!chatId,
+    }
+  );
+
+  const { data: chatMessagesData, isLoading: isLoadingChatMessages, error: errorChatMessages } = chatMessages;
+
+  return {
+    chatMessages: chatMessagesData || [],
+    isLoadingChatMessages,
+    errorChatMessages,
   };
 };

@@ -16,7 +16,7 @@ type ModalProps = {
   id: string;
 };
 
-export const DeleteWorkspaceModal: React.FC<ModalProps> = ({
+const DeleteWorkspaceModal: React.FC<ModalProps> = ({
   openModal,
   onClick,
   name = "workspace",
@@ -86,3 +86,6 @@ export const DeleteWorkspaceModal: React.FC<ModalProps> = ({
     </div>
   );
 };
+
+export default DeleteWorkspaceModal;
+

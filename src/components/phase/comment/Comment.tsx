@@ -60,10 +60,7 @@ const Comment: React.FC<CommentProps> = ({
   }, [comment.value, setValue]);
 
   // get user from api
-  const { data: user } = api.user.get.useQuery(
-    { id: user_id },
-    { enabled: !!user_id }
-  );
+  const { data: user } = api.user.get.useQuery();
 
   const handleUpdateComment = async (formData: { value: string }) => {
     // Send the edit request to the server
@@ -133,8 +130,8 @@ const Comment: React.FC<CommentProps> = ({
       <div className="mb-2 flex items-center justify-between">
         <div className="flex items-center">
           <p className="mr-3 inline-flex items-center text-sm font-semibold text-gray-900 dark:text-white">
-            {user && <Avatar avatar_url={user.avatar_url} email={user.email} />}
-            <span className="ml-2">{user?.name}</span>
+            {/* {user && <Avatar avatar_url={user.avatar_url} email={user.email} />} */}
+            <span className="ml-2">{user?.email}</span>
           </p>
           <p className="text-sm text-gray-600 dark:text-gray-400">
             <time

@@ -1,15 +1,24 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 
-import { router, protectedProcedure, publicProcedure } from "~/server/api/trpc";
+import { router, protectedProcedure } from "~/server/api/trpc";
 
 export const projectRouter = router({
+  // get a project
   get: protectedProcedure
     .input(z.object({ project_id: z.string() }))
     .query(async ({ ctx, input }) => {
       const project = await ctx.prisma.project.findUnique({
         where: {
           project_id: input.project_id,
+        },
+        include: {
+          workspace: true,
+          project_users: {
+            include: {
+              user: true,
+            },
+          },
         },
       });
 
@@ -20,30 +29,11 @@ export const projectRouter = router({
         });
       }
 
-      const projectUsers = await ctx.prisma.project_users.findMany({
-        where: {
-          project_id: input.project_id,
-        },
-      });
-
-      const users = await Promise.all(
-        projectUsers.map((projectUser) =>
-          ctx.prisma.user.findUnique({
-            where: {
-              id: projectUser.user_id,
-            },
-          })
-        )
-      );
-
-      return {
-        ...project,
-        users,
-      };
+      return project;
     }),
 
-  // get projects under a workspace
-  getWorkspaceProjects: protectedProcedure
+  // list projects under a workspace
+  listWorkspaceProjects: protectedProcedure
     .input(z.object({ workspace_id: z.string() }))
     .query(async ({ ctx, input }) => {
       const workspaceUser = await ctx.prisma.workspace_user.findUnique({
@@ -96,6 +86,24 @@ export const projectRouter = router({
         project_role: projectUser.project_role,
         is_external_collaborator: projectUser.is_external_collaborator,
       };
+    }),
+
+  // list members of a project
+  listProjectMembers: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const { id } = input;
+
+      const members = await ctx.prisma.project_users.findMany({
+        where: {
+          project_id: id,
+        },
+        include: {
+          user: true,
+        },
+      });
+
+      return members;
     }),
 
   create: protectedProcedure
@@ -299,23 +307,6 @@ export const projectRouter = router({
       return true;
     }),
 
-  getProjectMembers: protectedProcedure
-    .input(z.object({ id: z.string() }))
-    .query(async ({ input, ctx }) => {
-      const { id } = input;
-
-      const members = await ctx.prisma.project_users.findMany({
-        where: {
-          project_id: id,
-        },
-        include: {
-          user: true,
-        },
-      });
-
-      return members;
-    }),
-
   // add member to project
   addMember: protectedProcedure
     .input(
@@ -419,6 +410,8 @@ export const projectRouter = router({
           },
         });
       }
+
+      // add user to
 
       return true;
     }),
@@ -581,5 +574,20 @@ export const projectRouter = router({
       });
 
       return true;
+    }),
+
+  listProjectsByUserId: protectedProcedure
+    .input(z.object({ user_id: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const projects = await ctx.prisma.project_users.findMany({
+        where: {
+          user_id: input.user_id,
+        },
+        include: {
+          project: true,
+        },
+      });
+
+      return projects;
     }),
 });

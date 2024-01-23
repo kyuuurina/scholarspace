@@ -1,5 +1,6 @@
 import { api } from "./api";
 import { useRouterId } from "./routerId";
+import { useUser } from '@supabase/auth-helpers-react';
 
 export const useFetchResearchPost = () => {
   const id: string = useRouterId();
@@ -112,40 +113,37 @@ export const useFetchResearchPostsByFollowedUsers = () => {
 };
 
 
-export const useFetchLikedPost = (id: string) => {
+// export const useFetchLikedPost = (id: string) => {
+//   const {
+//     data: myLikedPosts,
+//     isLoading: isLoadingLikedpost,
+//     error: errorLikedpost }
+//     = api.researchpost.getLikedPostsByUser.useQuery();
+
+//   return {
+//     myLikedPosts: myLikedPosts || [],
+//     isLoadingLikedpost,
+//     errorLikedpost,
+//   };
+// };
+
+export const useFetchLikedPost = (user_id: string) => {
   const {
     data: myLikedPosts,
     isLoading: isLoadingLikedpost,
     error: errorLikedpost,
-  } = api.researchpost.getLikedPostsByUser.useQuery();
-
+  } = api.researchpost.getLikedPostsByUser.useQuery(
+    {
+      user_id: user_id,
+    },
+    {
+      enabled: !!user_id,
+    }
+  );
 
   return {
-      myLikedPosts: myLikedPosts || [],
-      isLoadingLikedpost,
-      errorLikedpost,
+    myLikedPosts: myLikedPosts || [],
+    isLoadingLikedpost,
+    errorLikedpost,
   };
 };
-
-//hook for fetching user's research posts
-// export const useFetchUserResearchPosts = (userId: string) => {
-//     const userResearchPosts = api.researchpost.getMyPosts.useQuery(
-//         {
-//             user_id: userId,
-//         },
-//         {
-//             enabled: !!userId,
-//         }
-//     );
-
-//     return {
-//         category,
-//         title,
-//         author,
-//         description,
-//         document,
-//         isLoading,
-//         error,
-//         imgUrl,
-//     };
-// };

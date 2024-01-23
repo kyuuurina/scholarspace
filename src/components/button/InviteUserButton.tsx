@@ -15,7 +15,6 @@ const InviteUserButton: React.FC<InviteUserButtonProps> = ({
   email,
   onSuccess,
 }) => {
-  const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const supabase = createClient(
@@ -30,7 +29,6 @@ const InviteUserButton: React.FC<InviteUserButtonProps> = ({
     const { error } = await supabase.auth.admin.inviteUserByEmail(email);
     if (error) {
       toast.custom(() => <ErrorToast message="Error inviting user" />);
-      setErrorMessage(error.message);
     } else {
       toast.custom(() => <SuccessToast message="Successfully invited user" />);
       onSuccess && onSuccess();

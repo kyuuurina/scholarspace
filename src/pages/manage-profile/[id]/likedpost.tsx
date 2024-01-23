@@ -2,9 +2,9 @@
 
 import React from 'react';
 import {useEffect, useState} from 'react';
-import {api} from "~/utils/api";
-import Image from 'next/image';
+import {api} from '~/utils/api';
 import Link from 'next/link';
+import { useUser } from '@supabase/auth-helpers-react';
 
 //utils
 import { useRouterId } from "~/utils/routerId";
@@ -29,23 +29,25 @@ import ProfileTabs from '~/components/profile/ProfileTabs';
 import Head from 'next/head';
 
 import { useRouter } from 'next/router';
-import { useFetchResearchPost } from '~/utils/researchpost';
 import { useFetchLikedPost } from '~/utils/researchpost';
 import { FaExclamationCircle } from 'react-icons/fa';
 import Post from '~/components/research-post/Post';
 import EditPostForm from '~/components/research-post/EditPostForm';
 
 
-const MyPost: NextPageWithLayout = () => {
+const LikedPost: NextPageWithLayout = () => {
+
   const profile_id = useRouterId();
-  console.log("Front call",profile_id)
-  const LikedPost = useFetchLikedPost(profile_id);
-  const router = useRouter();
+
+  // Fetch user_id using getUserIdByProfileId
+  const userId = api.profile.getUserIdByProfileId.useQuery({
+    profile_id: profile_id,
+  }).data;
+  
+  // Fetch liked posts based on user_id
+  const LikedPost = useFetchLikedPost(userId || '');
 
   const { name, isLoading } = useFetchProfile();  //To print in head
-  
-
-  console.log("LikedPosttsx page router:", router)
 
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [currentPostId, setCurrentPostId] = useState<string | null>(null);
@@ -64,17 +66,19 @@ const MyPost: NextPageWithLayout = () => {
       setCurrentPostId(postId);
     };
 
+    if (LikedPost.isLoadingLikedpost) {
+      return <LoadingSpinner />;
+    }
 
   return (
     <>
       <Head>
-        <title>{`${name ?? 'User'}'s Posts`}</title>
+        <title>{`${name ?? 'User'}'s Liked Posts`}</title>
       </Head>
       <ProfileTabs />
 
       <div className="container mx-auto mt-8">
-        {/* if loading */}
-        {LikedPost. isLoadingLikedpost && <LoadingSpinner />}
+        {/* if error*/}
         {LikedPost.errorLikedpost && (
           <div className="flex flex-col items-center justify-center h-50vh">
             <FaExclamationCircle className="text-gray-500 text-4xl mb-4" />
@@ -103,12 +107,11 @@ const MyPost: NextPageWithLayout = () => {
           </ul>
         ) : (
           <div className="flex flex-col items-center justify-center h-50vh">
-            <FaExclamationCircle className="text-gray-500 text-4xl mb-4" />
             <p className="font-semibold text-lg text-gray-500 leading-1.5 text-center max-w-md">
-              Uh-oh, you have not created any posts yet. Create one by clicking on the button above!
+              No Liked Post
             </p>
             <p className="font-medium text-base text-gray-500 leading-1.5 text-center max-w-md">
-              Navigate to the Home Page to add a new post and share your research!
+              Browse more posts <Link href="/">here!!</Link>
             </p>
           </div>
         )}
@@ -127,7 +130,7 @@ const MyPost: NextPageWithLayout = () => {
 };
 
 
-MyPost.getLayout = function getLayout(page: ReactElement) {
+LikedPost.getLayout = function getLayout(page: ReactElement) {
   return (
     <>
       <Layout>{page}</Layout>
@@ -135,4 +138,4 @@ MyPost.getLayout = function getLayout(page: ReactElement) {
   );
 };
 
-export default MyPost;
+export default LikedPost;
