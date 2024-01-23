@@ -542,4 +542,20 @@ export const taskRouter = router({
 
       return true;
     }),
+
+  delete: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { id } = input;
+
+      const task = await ctx.prisma.task.delete({
+        where: { id },
+      });
+
+      return task;
+    }),
 });
