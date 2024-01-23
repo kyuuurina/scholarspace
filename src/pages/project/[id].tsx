@@ -1,6 +1,7 @@
 // utils
 import { useRouterId } from "~/utils/routerId";
 import { api } from "~/utils/api";
+import { useFetchProjectSummary } from "~/utils/project";
 
 // types
 import type { ReactElement } from "react";
@@ -22,7 +23,7 @@ import Link from "next/link";
 
 const Project: NextPageWithLayout = () => {
   const id = useRouterId();
-
+  const { projectSummary, refetch } = useFetchProjectSummary(id);
   const { data: project, isLoading } = api.project.get.useQuery({
     project_id: id,
   });
@@ -72,7 +73,7 @@ const Project: NextPageWithLayout = () => {
         <div className="grid p-5 md:grid-cols-12 md:gap-x-5">
           {/* Left section of workspace dashboard */}
           <div className="w-full md:col-span-8">
-            {/* <GanttChart projectSummary={projectSummary} refetch={refetch} /> */}
+            <GanttChart projectSummary={projectSummary} refetch={refetch} />
           </div>
           {/* Right section of workspace dashboard */}
           <div className="grid w-full gap-y-2 py-5 md:col-span-4 md:py-1">
