@@ -8,13 +8,13 @@ import { useUser } from '@supabase/auth-helpers-react';
 import { MoonLoader } from 'react-spinners';
 
 import { useForm } from "react-hook-form";
-import MessageInputSection, {FormValues as MessageFormValues} from './MessageInput';
+import MessageInputSection, { FormValues as MessageFormValues } from './MessageInput';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z, ZodType } from "zod";
 import EmptyState from './EmptyState';
 
 import { useQuery } from "@tanstack/react-query";
-import {api} from "~/utils/api";
+import { api } from "~/utils/api";
 
 interface ChatMessageProps {
   message_id: number;
@@ -44,7 +44,7 @@ interface ChatLayoutProps {
     content: string | null;
     timestamp: Date;
   }[];
-  refetch:() => void;
+  refetch: () => void;
 }
 
 const ChatLayout: React.FC<ChatLayoutProps> = ({ chatList, selectedChatId, onChatSelect, children, chatMessages: propChatMessages, refetch }) => {
@@ -88,7 +88,12 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({ chatList, selectedChatId, onCha
   const messages = messagesQuery.data || [];
 
   // send a new message
-  const sendMessageMutation = api.chat.sendMessage.useMutation();
+  const sendMessageMutation = api.chat.sendMessage.useMutation({
+    onSuccess: async () => {
+      // When the sendMessageMutation is successful, refetch the messages
+      await messagesQuery.refetch();
+    },
+  });
 
   const handleSendMessage = async (formData: MessageFormValues) => {
     try {
@@ -108,11 +113,11 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({ chatList, selectedChatId, onCha
     // Update selectedProfileName when selecting a chat
     if (selectedChatId) {
       const selectedChat = chatList.find((chat) => chat.chat_id === selectedChatId);
-  
+
       if (selectedChat) {
         const isUser1 = user?.id === selectedChat.user_chat_user1_idTouser?.id;
         const isUser2 = user?.id === selectedChat.user_chat_user2_idTouser?.id;
-  
+
         if (isUser1 && user?.id !== selectedChat.user_chat_user2_idTouser?.id) {
           setSelectedProfileName(selectedChat.user_chat_user1_idTouser?.name || '');
         } else if (isUser2 && user?.id !== selectedChat.user_chat_user1_idTouser?.id) {
@@ -139,7 +144,7 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({ chatList, selectedChatId, onCha
               className="p-2 border border-gray-300 rounded w-full"
             />
           </div>
-
+  
           <div className="flex flex-col flex-1 pl-4">
             {filteredChatList.map((chat, index) => (
               <div
@@ -165,47 +170,50 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({ chatList, selectedChatId, onCha
           </div>
         </div>
       </div>
-
+  
       {/* Message Section */}
-      <div className="flex-1 pl-4 overflow-y-auto">
+      <div className="flex-1 pl-4 flex flex-col">
         {isLoadingChatMessages && (
           <div className="flex items-center justify-center">
             <MoonLoader color={"#ffff"} loading={true} size={20} />
           </div>
         )}
-
+  
         {selectedChatId ? (
-          <div className="flex-1 flex flex-col">
-            {/* <ChatHeader profileName={selectedProfileName || ''} /> */}
-
-            {/* Display chatMessages here */}
-            {messagesToDisplay.map((message) => (
-              <Message
-                key={message.message_id}
-                isCurrentUser={message.sender_id === user?.id}
-                content={message.content}
-                timestamp={message.timestamp}
-                chat_id={Number(message.chat_id) || 0}
-                refetch={async () => {
-                  await messagesQuery.refetch();
-                }}
-              />
-            ))}
-
-            {/* Input Section */}
-            <MessageInputSection
-              chatId={selectedChatId || 0}
-              onMessageSubmit={handleSendMessage}
-              refetch={async () => {
-                await messagesQuery.refetch();
-              }}
-            />
+          <div className="flex-1 overflow-y-auto">
+            {/* Messages Container */}
+            <div className="messages-container overflow-y-auto flex-1">
+              {/* Display chatMessages here */}
+              {messagesToDisplay.map((message) => (
+                <Message
+                  key={message.message_id}
+                  isCurrentUser={message.sender_id === user?.id}
+                  content={message.content}
+                  timestamp={message.timestamp}
+                  chat_id={Number(message.chat_id) || 0}
+                  refetch={async () => {
+                    await messagesQuery.refetch();
+                  }}
+                />
+              ))}
+            </div>
           </div>
         ) : (
           // <div className="flex-1 flex items-center justify-center">
-            <EmptyState/>
+            <EmptyState />
           // </div>
         )}
+  
+        {/* Input Section */}
+        <div className="message-input-container sticky bottom-0 bg-white p-4">
+          <MessageInputSection
+            chatId={selectedChatId || 0}
+            onMessageSubmit={handleSendMessage}
+            refetch={async () => {
+              await messagesQuery.refetch();
+            }}
+          />
+        </div>
       </div>
     </div>
   );
