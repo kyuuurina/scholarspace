@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 // utils
 import { api } from "~/utils/api";
-import { useFetchTasksWithProperties } from "~/utils/task";
+import { useRouterId } from "~/utils/routerId";
 
 // local components
 import EditableCell from "./EditableCell";
@@ -28,6 +28,7 @@ const variants = {
 const Table: React.FC<TableProps> = ({ phase_id, searchQuery }) => {
   const [isAddColumnVisible, setAddColumnVisible] = useState(false);
   const [editedHeader, setEditedHeader] = useState("");
+  const id = useRouterId();
   const [editingCell, setEditingCell] = useState<{
     rowIndex: number;
     columnIndex: number;
@@ -207,12 +208,14 @@ const Table: React.FC<TableProps> = ({ phase_id, searchQuery }) => {
                   assignees={task?.task_assignees}
                   phase_id={phase_id}
                   refetch={refetch}
-                /> */}
+                  project_id={id}
+                />
               </td>
               {/* iterate properties and render column, */}
               {propertiesQuery?.data?.map((property, columnIndex) => {
-                const matchingProperty = task?.properties?.find(
-                  (property) => property.id === BigInt(columnIndex)
+                const matchingProperty = task?.property_phase_task?.find(
+                  (property_phase_task) =>
+                    property_phase_task.property_id === property.id
                 );
 
                 return (
