@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import ScrollableModal from "./ScrollableModal";
@@ -7,6 +7,7 @@ import Image from "next/image";
 import { useUser } from "@supabase/auth-helpers-react";
 import { api } from "~/utils/api";
 import { useRouterId } from "~/utils/routerId";
+import { useFetchFollowing } from "~/utils/follow";
 
 interface Profile {
   profile_id: string;
@@ -25,6 +26,7 @@ interface FollowingListProps {
 
 const FollowingList: React.FC<FollowingListProps> = ({ profiles }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [followingProfiles, setFollowingProfiles] = useState<Profile[]>(profiles);
   const user = useUser();
   const router = useRouter();
 
@@ -33,6 +35,21 @@ const FollowingList: React.FC<FollowingListProps> = ({ profiles }) => {
   const { data: followingCount, refetch: refetchFollowingCount } = api.follow.getFollowingCount.useQuery({
     userId: profileId || "", // Use the profileId of the user being viewed
   });
+
+  const { data: fetchedProfiles, refetch: refetchFollowingProfiles } = api.follow.getFollowingList.useQuery({
+    userId: profileId || "",
+  });
+
+  // Use the useFetchFollowings hook to get followers data
+  const { followingData, followingLoading, followingError } = useFetchFollowing();
+
+  useEffect(() => {
+    // Update follower profiles state when new data is fetched
+    if (followingData) {
+      const flatProfiles = followingData.flat();
+      setFollowingProfiles(flatProfiles);
+    }
+  }, [followingData]);
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -55,8 +72,8 @@ const handleProfileLinkClick = async (profileId: string) => {
 
   return (
     <div>
-      <button onClick={openModal}>
-        {followingCount ? followingCount.followingCount.toString() + " Following" : "Following"}
+      <button onClick={openModal} className="font-semibold">
+      {followingData ? followingData.length.toString() + " Followings" : "Followings"}
       </button>
       <ScrollableModal show={isModalOpen} onClose={closeModal} title="Following">
         {profiles && profiles.length === 0 ? (

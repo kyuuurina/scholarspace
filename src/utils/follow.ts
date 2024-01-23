@@ -37,21 +37,43 @@ export const useFetchFollowers = () => {
 };
 
 //fetch following list
-export const useFetchFollowing = (userId: string) => {
+export const useFetchFollowing = () => {
+  const profile_id = useRouterId();
+
+  // Fetch userId using getUserIdByProfileId
+  const userId = api.profile.getUserIdByProfileId.useQuery({
+    profile_id: profile_id,
+  }).data;
+
   const {
     data: followingData,
     isLoading: followingLoading,
     error: followingError,
   } = api.follow.getFollowingList.useQuery({
-    userId,
+    userId: userId || '',
   });
 
   return {
-    followingData: followingData || [], // Assuming the structure of the response
+    followingData: followingData || [],
     followingLoading,
     followingError,
   };
 };
+// export const useFetchFollowing = (userId: string) => {
+//   const {
+//     data: followingData,
+//     isLoading: followingLoading,
+//     error: followingError,
+//   } = api.follow.getFollowingList.useQuery({
+//     userId,
+//   });
+
+//   return {
+//     followingData: followingData || [], // Assuming the structure of the response
+//     followingLoading,
+//     followingError,
+//   };
+// };
 
 
 

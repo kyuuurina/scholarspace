@@ -40,8 +40,8 @@ const FollowerList: React.FC<FollowerListProps> = ({ profiles }) => {
     userId: profileId || "",
   });
 
-    // Use the useFetchFollowers hook to get followers data
-    const { followersData, followersLoading, followersError } = useFetchFollowers();
+  // Use the useFetchFollowers hook to get followers data
+  const { followersData, followersLoading, followersError } = useFetchFollowers();
 
   useEffect(() => {
       // Update follower profiles state when new data is fetched
@@ -91,7 +91,7 @@ const FollowerList: React.FC<FollowerListProps> = ({ profiles }) => {
 
   return (
     <div>
-      <button onClick={openModal}>
+      <button onClick={openModal} className="font-semibold">
       {followersData ? followersData.length.toString() + " Followers" : "Followers"}
       </button>
       <ScrollableModal show={isModalOpen} onClose={closeModal} title="Followers">
