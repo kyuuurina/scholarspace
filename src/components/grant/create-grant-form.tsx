@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { type ZodType, z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { api } from "~/utils/api";
 import { TRPCClientError } from "@trpc/client";
 
@@ -54,6 +53,7 @@ const CreateGrantModal: React.FC<ModalProps> = ({
     handleSubmit,
     reset,
     setValue,
+    getValues,
     formState: { errors },
   } = useForm<GrantFormData>({
     resolver: zodResolver(schema),
@@ -61,7 +61,7 @@ const CreateGrantModal: React.FC<ModalProps> = ({
 
   // handle when a project is selected
   const handleProjectSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    // if selected exists in array, remove it
+    // if selected exists in array, remove it, else push to selectedProjects array
     if (selectedProjects.includes(e.target.value)) {
       const index = selectedProjects.indexOf(e.target.value);
       if (index > -1) {
@@ -70,7 +70,10 @@ const CreateGrantModal: React.FC<ModalProps> = ({
     } else {
       selectedProjects.push(e.target.value);
     }
+    setValue("project_id", selectedProjects);
+    console.log(getValues("project_id"));
   };
+
   // get projects of workspace
   const projects = api.project.listWorkspaceProjects.useQuery({
     workspace_id: id,
