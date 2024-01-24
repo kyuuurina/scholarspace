@@ -30,7 +30,9 @@ const SetReminder: React.FC<SetReminderProps> = ({ task, refetch }) => {
       recipients: [user?.id || ""],
       scheduled_at: date.toISOString(),
       data: {
-        message: "Task 1",
+        message: `Reminder for task ${
+          task?.name ?? ""
+        } - ${date.toISOString()}`,
         isWebEnabled: data?.web_enbld,
         isEmailEnabled: data?.email_enbld,
       },
