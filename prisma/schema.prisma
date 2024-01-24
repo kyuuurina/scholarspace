@@ -550,6 +550,7 @@ model task {
   end_at              DateTime?             @db.Timestamptz(6)
   attachments         String[]
   deadline            DateTime?             @db.Timestamptz(6)
+  reminder            DateTime?             @db.Timestamptz(6)
   comment             comment[]
   property_phase_task property_phase_task[]
   phase               phase                 @relation(fields: [phase_id], references: [id], onDelete: NoAction)
@@ -716,11 +717,11 @@ model phase_template {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model task_reminder {
-  id      String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  days    BigInt
-  hours   BigInt
-  task_id String @db.Uuid
-  task    task   @relation(fields: [task_id], references: [id], onDelete: Cascade)
+  id       String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  task_id  String   @db.Uuid
+  schedule DateTime @db.Timestamptz(6)
+  task     task     @relation(fields: [task_id], references: [id], onDelete: Cascade)
+
 
   @@schema("public")
 }

@@ -53,7 +53,7 @@ export const grantRouter = router({
       // iterate each project_id
       if (input.project_id && input.project_id.length > 0) {
         await Promise.all(
-          (input.project_id || []).map(async (project_id) => {
+          (input.project_id).map(async (project_id) => {
             await ctx.prisma.project.update({
               where: {
                 project_id: project_id,
