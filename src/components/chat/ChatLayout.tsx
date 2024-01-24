@@ -15,6 +15,7 @@ import EmptyState from './EmptyState';
 
 import { useQuery } from "@tanstack/react-query";
 import { api } from "~/utils/api";
+import { useRouter } from 'next/router'
 
 interface ChatMessageProps {
   message_id: number;
@@ -48,6 +49,7 @@ interface ChatLayoutProps {
 }
 
 const ChatLayout: React.FC<ChatLayoutProps> = ({ chatList, selectedChatId, onChatSelect, children, chatMessages: propChatMessages, refetch }) => {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
   const QueryKey = ["getChatMessages", selectedChatId];
   const [selectedProfileName, setSelectedProfileName] = useState<string | null>(null);
@@ -96,6 +98,7 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({ chatList, selectedChatId, onCha
     onSuccess: async () => {
       // When the sendMessageMutation is successful, refetch the messages
       await messagesQuery.refetch();
+      router.reload();
     },
   });
 
@@ -103,11 +106,11 @@ const ChatLayout: React.FC<ChatLayoutProps> = ({ chatList, selectedChatId, onCha
     try {
       await sendMessageMutation.mutateAsync({
         chat_id: selectedChatId || 0,
-        content: formData.content
+        content: formData.content,
       });
       reset();
       refetch();
-      await refetchMessage();
+      await refetchMessage(); // Trigger the refetch for the sent message
       await messagesQuery.refetch();
     } catch (error) {
       console.error('Error sending message:', error);
