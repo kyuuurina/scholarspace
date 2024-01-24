@@ -20,16 +20,6 @@ const WorkspaceModal = dynamic(() => import("../workspace/WorkspaceModal"), {
   loading: () => null,
 });
 
-const WorkspaceNavButton = dynamic(
-  () => import("../workspace/WorkspaceNavButton"),
-  {
-    loading: () => null,
-  }
-);
-
-const ProjectNavButton = dynamic(() => import("../project/ProjectNavButton"), {
-  loading: () => null,
-});
 
 type NavbarProps = {
   toggleSidebar: () => void;
@@ -73,10 +63,6 @@ const NavBar: React.FC<NavbarProps> = ({ toggleSidebar, profile }) => {
     avatarUrl = `https://ighnwriityuokisyadjb.supabase.co/storage/v1/object/public/avatar/${profile.avatar_url}`;
   }
 
-  const isWorkspacePage1 = router.pathname.startsWith("/workspace");
-  const isProjectPage = router.pathname.startsWith("/project");
-  const isWorkspacePage = isWorkspacePage1 || isProjectPage;
-
   return (
     <>
       <WorkspaceModal
@@ -110,10 +96,6 @@ const NavBar: React.FC<NavbarProps> = ({ toggleSidebar, profile }) => {
                 alt="Scholarspace logo"
               />
             </Link>
-            {isWorkspacePage && (
-              <WorkspaceNavButton onClick={() => setModalIsOpen(true)} />
-            )}
-            {isProjectPage && <ProjectNavButton />}
           </div>
 
           <div className="flex items-center gap-x-4 text-white">

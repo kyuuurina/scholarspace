@@ -21,10 +21,7 @@ const Settings: NextPageWithLayout = () => {
       actor: user?.id || "",
       recipients: [user?.id || ""],
       data: {
-        task: {
-          value: "Task 1",
-        },
-        variableKey: "Preview data value",
+        message: "This is a test notification",
         isWebEnabled: data?.web_enbld,
         isEmailEnabled: data?.email_enbld,
       },

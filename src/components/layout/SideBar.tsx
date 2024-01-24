@@ -2,9 +2,19 @@
 import { useState } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
+import { api } from "~/utils/api";
+import { useUser } from "@supabase/auth-helpers-react";
 
 // icons
-import { FiHome, FiUser, FiMenu, FiSettings, FiColumns, FiMessageCircle } from "react-icons/fi";
+import {
+  FiHome,
+  FiUser,
+  FiMenu,
+  FiSettings,
+  FiColumns,
+  FiMessageCircle,
+  FiBriefcase,
+} from "react-icons/fi";
 
 import WorkspaceDropdown from "../workspace/WorkspaceDropdown";
 const WorkspaceModal = dynamic(() => import("../workspace/WorkspaceModal"), {
@@ -23,7 +33,7 @@ export const SideBar: React.FC<SideBarProps> = ({
   profileId,
 }) => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
-
+  const user = useUser();
   if (!profileId) {
     return (
       <div
@@ -39,6 +49,10 @@ export const SideBar: React.FC<SideBarProps> = ({
       </div>
     );
   }
+
+  const { data: projects } = api.project.listProjectsByUserId.useQuery({
+    user_id: user?.id ?? "",
+  });
 
   return (
     <>
@@ -153,6 +167,39 @@ export const SideBar: React.FC<SideBarProps> = ({
                 <WorkspaceDropdown onClick={() => setModalIsOpen(true)} />
               </li>
             )}
+            <li>
+              <div className="flex items-center space-x-3 text-purple-accent-2">
+                <FiBriefcase className="h-6 w-6" />
+                <span
+                  className={`transition-all duration-500 ${
+                    open ? "opacity-100" : "sr-only opacity-0"
+                  }`}
+                >
+                  Projects
+                </span>
+              </div>
+              <ul className="h-48 min-w-full space-y-3 overflow-y-auto py-2 pl-8 text-sm">
+                {/* iterate through projects to go to project/[id] */}
+                {projects?.map((project) => (
+                  <li key={project.project_id}>
+                    <Link
+                      href={`/project/${project.project_id}`}
+                      className="flex items-center space-x-3 rounded-md text-white hover:bg-purple-800"
+                      onClick={toggleSidebar}
+                    >
+                      <span
+                        className={`line-clamp-1 transition-all duration-500 ${
+                          open ? "opacity-100" : "sr-only opacity-0"
+                        }`}
+                      >
+                        {/* add square here */}
+                        🔵 {" " + project.project.name}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </li>
           </ul>
         </div>
       </div>

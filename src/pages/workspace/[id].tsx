@@ -59,7 +59,7 @@ const Workspace: NextPageWithLayout = () => {
     workspaceId: workspaceId,
   });
   const { grantSummary, refetch } = useFetchGrantSummary(workspaceId);
-
+  console.log(grantSummary);
   // fetch workspace details
   const { data: workspace, isLoading } = api.workspace.get.useQuery({
     id: workspaceId,

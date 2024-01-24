@@ -1,5 +1,7 @@
 // libraries and hooks
 import React, { useState } from "react";
+import toast from "react-hot-toast";
+import { TRPCClientError } from "@trpc/client";
 
 // utils
 import { api } from "~/utils/api";
@@ -19,6 +21,9 @@ import NonNullableDatePicker from "./NonNullableDatePicker";
 import NullableDatePicker from "./NullableDatePicker";
 import TaskAssignees from "./TaskAssignees";
 import TaskProperty from "./TaskProperty";
+import SetReminder from "./SetReminder";
+import ErrorToast from "../toast/ErrorToast";
+import { MoonLoader } from "react-spinners";
 
 type TaskDrawerProps = {
   task: taskList;
@@ -29,6 +34,7 @@ type TaskDrawerProps = {
 
 const TaskDrawer: React.FC<TaskDrawerProps> = ({ task, onClose, refetch }) => {
   const [taskStatus, setTaskStatus] = useState("pending");
+  const [isDeleting, setIsDeleting] = useState(false);
   const id = useRouterId();
   const handleContentClick = (
     event: React.MouseEvent<HTMLDivElement> | undefined
@@ -71,9 +77,40 @@ const TaskDrawer: React.FC<TaskDrawerProps> = ({ task, onClose, refetch }) => {
           deadline: date,
         });
       } finally {
+        onClose();
         refetch();
       }
     }
+  };
+
+  // delete a task
+  const deleteTask = api.task.delete.useMutation();
+
+  const handleDelete = async () => {
+    if (isDeleting) {
+      return;
+    }
+    setIsDeleting(true);
+    if (task?.id) {
+      try {
+        await deleteTask.mutateAsync({
+          id: task.id,
+        });
+      } catch (error) {
+        toast.custom(() => {
+          if (error instanceof TRPCClientError) {
+            return <ErrorToast message={error.message} />;
+          } else {
+            // Handle other types of errors or fallback to a default message
+            return <ErrorToast message="An error occurred." />;
+          }
+        });
+      } finally {
+        onClose();
+        refetch();
+      }
+    }
+    setIsDeleting(false);
   };
   return (
     <div
@@ -106,7 +143,7 @@ const TaskDrawer: React.FC<TaskDrawerProps> = ({ task, onClose, refetch }) => {
             {/* Comments Section */}
             {task && <CommentsSection task_id={task?.id} refetch={refetch} />}
           </div>
-          <div className="space-y-4">
+          <div className="col-span-1 grid space-y-4">
             <div>
               <label className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
                 Status
@@ -145,6 +182,8 @@ const TaskDrawer: React.FC<TaskDrawerProps> = ({ task, onClose, refetch }) => {
                 project_id={id}
               />
             </div>
+            {/* set task reminder */}
+            <SetReminder refetch={refetch} task={task} />
             {task?.property_phase_task.map((property) => {
               // Find the corresponding phase_property based on phase_id
               const correspondingPhaseProperty =
@@ -166,6 +205,19 @@ const TaskDrawer: React.FC<TaskDrawerProps> = ({ task, onClose, refetch }) => {
                 />
               );
             })}
+            <div className="flex justify-end">
+              <button
+                onClick={handleDelete}
+                className="flex items-center justify-between rounded bg-red-600 px-4 py-2 font-bold text-white hover:bg-red-700"
+              >
+                {isDeleting && (
+                  <div className="flex items-center justify-center">
+                    <MoonLoader size={15} color="white" />
+                  </div>
+                )}
+                <p>Delete</p>
+              </button>
+            </div>
           </div>
         </div>
       </div>

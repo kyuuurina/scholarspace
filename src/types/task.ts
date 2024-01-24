@@ -77,6 +77,7 @@ type taskList =
       name: string;
       phase_id: string;
       status: string;
+      reminder: Date | null;
       phase: {
         phase_property: phase_property[];
       } & phase;
