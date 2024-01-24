@@ -562,13 +562,12 @@ export const taskRouter = router({
   createTaskReminder: protectedProcedure
     .input(
       z.object({
-        days: z.number(),
-        hours: z.number(),
+        schedule: z.date(),
         task_id: z.string(),
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const { days, hours, task_id } = input;
+      const { schedule, task_id } = input;
 
       // check if task has a deadline, if no throw trpc error
       const task = await ctx.prisma.task.findUnique({
@@ -584,8 +583,7 @@ export const taskRouter = router({
 
       const reminder = await ctx.prisma.task_reminder.create({
         data: {
-          days,
-          hours,
+          schedule,
           task_id,
         },
       });
@@ -609,5 +607,23 @@ export const taskRouter = router({
       });
 
       return reminders;
+    }),
+
+  updateTaskReminder: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        reminderData: z.date(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { id, reminderData } = input;
+
+      const reminder = await ctx.prisma.task.update({
+        where: { id },
+        data: { reminder: reminderData },
+      });
+
+      return reminder;
     }),
 });
