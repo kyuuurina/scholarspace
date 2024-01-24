@@ -88,7 +88,7 @@ const FollowingPostPage: NextPageWithLayout = () => {
     return <p>Error: Unable to fetch research posts</p>;
   }
 
-  
+
 
   // Render EditPostForm component
   const handleEditClick = (postId: string) => {
@@ -111,6 +111,10 @@ const FollowingPostPage: NextPageWithLayout = () => {
             ) : errorResearchPostsByFollowedUsers ? (
               <p className="text-lg font-medium text-gray-500 text-center mt-8">
                 Error Fetching Research Posts by Followed Users
+              </p>
+            ) : FollowingPostLists.followingResearchPosts.length === 0 ? (
+              <p className="text-lg font-medium text-gray-500 text-center mt-8">
+                No Posts. Follow more people and get to see their work!
               </p>
             ) : (
               researchPostsByFollowedUsers.map((post) => (
