@@ -144,9 +144,11 @@ const NavBar: React.FC<NavbarProps> = ({ toggleSidebar, profile }) => {
                     <div>{profile.name}</div>
                   </div>
                   <ul className="py-2 text-sm text-gray-700">
-                    <li className="px-5 py-3 hover:bg-gray-100">
-                      <p>Manage Account</p>
-                    </li>
+                    {/* <li className="px-5 py-3 hover:bg-gray-100"
+                     onClick={() => setIsUserOverlayVisible(false)}
+                    >
+                      <Link href="/manage-account">Manage Account</Link>
+                    </li> */}
                     <li
                       className="px-5 py-3 hover:bg-gray-100"
                       onClick={() => setIsUserOverlayVisible(false)}

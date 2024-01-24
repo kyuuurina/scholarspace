@@ -722,6 +722,7 @@ model task_reminder {
   schedule DateTime @db.Timestamptz(6)
   task     task     @relation(fields: [task_id], references: [id], onDelete: Cascade)
 
+
   @@schema("public")
 }
 

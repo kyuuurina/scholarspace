@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import TestPostModal from "./AddNewPostModal"; // Import your modal component
+import TestPostModal from "./AddNewPostModal";
 
 //routing
 import Router from "next/router";
@@ -9,7 +9,6 @@ import { useRouter } from "next/router";
 import { useUser } from "@supabase/auth-helpers-react";
 
 // Utils
-import { UseCheckProfile } from "~/utils/profile";
 import { useRouterId } from "~/utils/routerId";
 import { api } from "~/utils/api";
 
