@@ -1,6 +1,5 @@
 import { api } from "./api";
 import { useRouterId } from "./routerId";
-import { useUser } from '@supabase/auth-helpers-react';
 
 export const useFetchResearchPost = () => {
   const id: string = useRouterId();
@@ -37,6 +36,29 @@ export const useFetchResearchPost = () => {
   };
 };
 
+//fetch following posts
+export const useFetchFollowingResearchPosts = (limit = 30, cursor?: string) => {
+  const followingResearchPosts = api.researchpost.getFollowingPosts.useQuery(
+    {
+      limit,
+      cursor,
+    },
+    {
+      //`enabled: true` if to fetch data immediately.
+      enabled: true,
+    }
+  );
+
+  const { data, isLoading, error } = followingResearchPosts;
+
+  return {
+    followingResearchPosts: data?.researchPosts || [], // Corrected: Access the correct property
+    isLoading,
+    error,
+    refetch: followingResearchPosts.refetch,
+  };
+};
+
 //fetch my research posts
 export const useFetchMyResearchPosts = (id: string) => {
   console.log("Dari depam", id);
@@ -58,26 +80,26 @@ export const useFetchMyResearchPosts = (id: string) => {
   };
 };
 
-//fetch following posts
-export const useFetchFollowingResearchPosts = (limit = 30, cursor?: string) => {
-  const followingResearchPosts = api.researchpost.getFollowingPosts.useQuery(
+//fetch my research posts - new
+export const MyPosts = (user_id: string) => {
+  console.log("Dari depam", user_id);
+  const {
+    data: myPost,
+    isLoading: isLoadingMyPost,
+    error: errorMyPost,
+  } = api.researchpost.MyNewPost.useQuery(
     {
-      limit,
-      cursor,
+      user_id: user_id,
     },
     {
-      //`enabled: true` if to fetch data immediately.
-      enabled: true,
+      enabled: !!user_id,
     }
   );
 
-  const { data, isLoading, error } = followingResearchPosts;
-
   return {
-    followingResearchPosts: data?.researchPosts || [], // Corrected: Access the correct property
-    isLoading,
-    error,
-    refetch: followingResearchPosts.refetch,
+    myPost: myPost || [],
+    isLoadingMyPost,
+    errorMyPost,
   };
 };
 

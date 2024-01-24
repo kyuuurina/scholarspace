@@ -1,6 +1,6 @@
 // MessageButton.tsx
 import React, { useState, useEffect } from 'react';
-import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useUser} from "@supabase/auth-helpers-react";
 import { useRouter } from 'next/router';
 import { api } from '~/utils/api';
 import { FiMessageSquare } from 'react-icons/fi';

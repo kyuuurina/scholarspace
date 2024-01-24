@@ -1,10 +1,7 @@
 
 
 import { z } from "zod";
-import { TRPCError } from "@trpc/server";
 import { router, protectedProcedure, publicProcedure } from "~/server/api/trpc";
-import { Prisma, PrismaClient } from "@prisma/client";
-
 
 
 export const searchRouter = router({

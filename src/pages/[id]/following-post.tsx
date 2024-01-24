@@ -1,6 +1,5 @@
 //auth
-import { useUser } from "@supabase/auth-helpers-react";
-import { useSession, useSessionContext } from "@supabase/auth-helpers-react";
+import { useUser, useSession, useSessionContext } from "@supabase/auth-helpers-react";
 
 //react
 import { useState, useEffect } from "react";
@@ -25,15 +24,12 @@ import Layout from "~/components/layout/Layout";
 import Head from "~/components/layout/Head";
 import LoadingSpinner from "~/components/LoadingSpinner";
 import Link from "next/link";
-import Card from "~/components/Card";
-import AvatarPlaceholder from "~/components/avatar/AvatarPlaceholder";
 import Modal from "~/components/modal/Modal";
 
 //research post components
 import AllFollowingTabs from "~/components/research-post/AllFollowingTabs";
 import Post from "~/components/research-post/Post";
 import AddNewPostButton from "~/components/research-post/AddNewPostButton";
-import TestModal from "~/components/research-post/AddNewPostModal";
 
 //profile recommendation
 import { useFetchRecommendedProfiles } from "~/utils/profile";
@@ -92,7 +88,7 @@ const FollowingPostPage: NextPageWithLayout = () => {
     return <p>Error: Unable to fetch research posts</p>;
   }
 
-  
+
 
   // Render EditPostForm component
   const handleEditClick = (postId: string) => {
@@ -115,6 +111,10 @@ const FollowingPostPage: NextPageWithLayout = () => {
             ) : errorResearchPostsByFollowedUsers ? (
               <p className="text-lg font-medium text-gray-500 text-center mt-8">
                 Error Fetching Research Posts by Followed Users
+              </p>
+            ) : FollowingPostLists.followingResearchPosts.length === 0 ? (
+              <p className="text-lg font-medium text-gray-500 text-center mt-8">
+                No Posts. Follow more people and get to see their work!
               </p>
             ) : (
               researchPostsByFollowedUsers.map((post) => (

@@ -554,6 +554,7 @@ model task {
   property_phase_task property_phase_task[]
   phase               phase                 @relation(fields: [phase_id], references: [id], onDelete: NoAction)
   task_assignees      task_assignees[]
+  task_reminder       task_reminder[]
 
   @@schema("public")
 }
@@ -709,6 +710,17 @@ model phase_template {
   phase_template_properties String[] @default(["Property 1"])
   user_id                   String   @db.Uuid
   user                      user     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model task_reminder {
+  id      String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  days    BigInt
+  hours   BigInt
+  task_id String @db.Uuid
+  task    task   @relation(fields: [task_id], references: [id], onDelete: Cascade)
 
   @@schema("public")
 }

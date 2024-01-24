@@ -41,3 +41,23 @@ export const useFetchChatMessages = (chatId: number) => {
     errorChatMessages,
   };
 };
+
+
+// export const useFetchChatMessages = (chatId: number) => {
+//   const chatMessages = api.chat.getChatMessages.useQuery<ChatMessage[]>(
+//     {
+//       chat_id: chatId,
+//     },
+//     {
+//       enabled: !!chatId,
+//     }
+//   );
+
+//   const { data: chatMessagesData, isLoading: isLoadingChatMessages, error: errorChatMessages } = chatMessages;
+
+//   return {
+//     chatMessages: chatMessagesData || [],
+//     isLoadingChatMessages,
+//     errorChatMessages,
+//   };
+// };

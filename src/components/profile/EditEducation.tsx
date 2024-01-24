@@ -12,9 +12,6 @@ import React from "react";
 // types
 import type { EducationFormData } from "~/types/profile";
 
-//utils
-import { useFetchEducation } from "~/utils/education";
-
 // local components
 import FormErrorMessage from "../FormErrorMessage";
 import PrimaryButton from "../button/PrimaryButton";
