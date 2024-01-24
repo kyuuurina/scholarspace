@@ -1,11 +1,11 @@
 // src/components/chat/MessageInputSection.tsx
-import React, { useState } from 'react';
+import React from 'react';
 import PrimaryButton from '../button/PrimaryButton';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { z, ZodType } from 'zod';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { api } from '~/utils/api';
+import { useRouter } from 'next/router';
 
 interface MessageInputSectionProps {
   chatId: number;
@@ -15,7 +15,9 @@ interface MessageInputSectionProps {
 
 export type FormValues = { content: string };
 
-const MessageInputSection: React.FC<MessageInputSectionProps> = ({ chatId, refetch }) => {
+const MessageInputSection: React.FC<MessageInputSectionProps> = ({ chatId, onMessageSubmit, refetch }) => {
+
+  const router = useRouter();
   // Zod schema for form validation
   const schema: ZodType<FormValues> = z.object({
     content: z.string(),
@@ -30,14 +32,11 @@ const MessageInputSection: React.FC<MessageInputSectionProps> = ({ chatId, refet
     resolver: zodResolver(schema),
   });
 
-
   // Fetch messages
   const messagesQuery = api.chat.getChatMessages.useQuery(
-      { chat_id: chatId },
-      { enabled: !! chatId }
+    { chat_id: chatId },
+    { enabled: !!chatId }
   );
-
-  const messages = messagesQuery.data || [];
 
   // send a new message
   const sendMessageMutation = api.chat.sendMessage.useMutation();
@@ -47,11 +46,13 @@ const MessageInputSection: React.FC<MessageInputSectionProps> = ({ chatId, refet
       // Use mutateAsync for async operations
       await sendMessageMutation.mutateAsync({
         chat_id: chatId,
-        content: formData.content
+        content: formData.content,
       });
       reset();
+      router.reload();
       refetch();
       await messagesQuery.refetch();
+      onMessageSubmit(formData); // Call the onMessageSubmit prop here
     } catch (error) {
       console.error('Error sending message:', error);
     }
