@@ -178,7 +178,11 @@ export const SideBar: React.FC<SideBarProps> = ({
                   Projects
                 </span>
               </div>
-              <ul className="h-48 min-w-full space-y-3 overflow-y-auto py-2 pl-8 text-sm">
+              <ul
+                className={`h-48 min-w-full space-y-3 overflow-y-auto py-2 pl-8 text-sm ${
+                  open ? "opacity-100" : "sr-only opacity-0"
+                }`}
+              >
                 {/* iterate through projects to go to project/[id] */}
                 {projects?.map((project) => (
                   <li key={project.project_id}>
