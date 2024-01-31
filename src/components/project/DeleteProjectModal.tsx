@@ -16,6 +16,7 @@ type ModalProps = {
   onClick: () => void;
   name?: string | null;
   id: string;
+  workspace_id: string;
 };
 
 const DeleteProjectModal: React.FC<ModalProps> = ({
@@ -23,6 +24,7 @@ const DeleteProjectModal: React.FC<ModalProps> = ({
   onClick,
   name = "project",
   id,
+  workspace_id,
 }) => {
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
@@ -44,7 +46,7 @@ const DeleteProjectModal: React.FC<ModalProps> = ({
     } finally {
       setIsDeleting(false);
       // go to workspace dashboard
-      // void router.push(`/workspace/${workspace_id ?? "/"}`);
+      void router.push(`/workspace/${workspace_id}`);
       toast.custom(() => <SuccessToast message="Project deleted" />);
     }
   };

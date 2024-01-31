@@ -220,6 +220,7 @@ const ProjectSettings: NextPageWithLayout = () => {
         onClick={() => setDeleteModalIsOpen(false)}
         name={project?.name}
         id={project_id}
+        workspace_id={project?.workspace_id}
       />
       <main className="min-h-screen w-full">
         {/* Workspace header */}
