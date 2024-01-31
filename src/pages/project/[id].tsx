@@ -7,6 +7,11 @@ import { useFetchProjectSummary } from "~/utils/project";
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "~/pages/_app";
 
+// libraries
+import React from "react";
+import { MoonLoader } from "react-spinners";
+import Link from "next/link";
+
 // components
 import Layout from "~/components/layout/Layout";
 import Head from "~/components/layout/Head";
@@ -15,11 +20,6 @@ import Card from "~/components/Card";
 import MembersCard from "~/components/members/MembersCard";
 import ScoreChart from "~/components/chart/ScoreChart";
 import GanttChart from "~/components/project/GanttChart";
-
-// libraries
-import React from "react";
-import { MoonLoader } from "react-spinners";
-import Link from "next/link";
 
 const Project: NextPageWithLayout = () => {
   const id = useRouterId();

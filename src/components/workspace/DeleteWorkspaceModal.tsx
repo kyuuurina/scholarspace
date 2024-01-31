@@ -88,4 +88,3 @@ const DeleteWorkspaceModal: React.FC<ModalProps> = ({
 };
 
 export default DeleteWorkspaceModal;
-
