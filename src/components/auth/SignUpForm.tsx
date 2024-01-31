@@ -3,7 +3,7 @@ import { useSessionContext } from "@supabase/auth-helpers-react";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { setCookie } from "cookies-next";
-
+import { api } from "~/utils/api";
 import { GoogleButton } from "~/components/auth/GoogleButton";
 import { MoonLoader } from "react-spinners";
 
@@ -16,6 +16,7 @@ const SignUpForm: React.FC = () => {
   const { supabaseClient } = useSessionContext();
 
   const router = useRouter();
+  const { data: user, refetch } = api.user.getUserByEmail.useQuery({ email });
 
   let NEXT_PUBLIC_APP_URL: string;
   if (process.env.NEXT_PUBLIC_APP_URL)
@@ -25,6 +26,16 @@ const SignUpForm: React.FC = () => {
     // clear error message
     setErrorMessage(undefined);
     setLoading(true);
+    refetch();
+
+    // if user already exists, prompt them to login instead
+    if (user) {
+      setErrorMessage(
+        "An account with this email already exists. Please login instead."
+      );
+      setLoading(false);
+      return;
+    }
 
     const {
       data: { session },
