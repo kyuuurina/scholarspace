@@ -11,7 +11,7 @@ import ErrorToast from "~/components/toast/ErrorToast";
 import { TRPCClientError } from "@trpc/client";
 import toast from "react-hot-toast";
 import { DeleteButton } from "~/components/button/DeleteButton";
-
+import Modal from "~/components/modal/Modal";
 const ManageTemplates: NextPageWithLayout = () => {
   // get templates of the user
   const { data: templates, refetch: refetchTemplates } =
@@ -25,10 +25,15 @@ const ManageTemplates: NextPageWithLayout = () => {
   const [addProperties, setAddProperties] = useState<string[]>([]);
   const [addPhaseName, setAddPhaseName] = useState("Phase Title"); // New state for editable header
   const [adding, setAdding] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     setSelectedTemplate(templates?.[0] ?? null);
   }, [templates]);
+
+  useEffect(() => {
+    setAddProperties([]);
+  }, [selectedTemplate]);
 
   const handleAddColumnClick = () => {
     setIsAddColumnVisible(!isAddColumnVisible); // Step 2
@@ -117,226 +122,264 @@ const ManageTemplates: NextPageWithLayout = () => {
   };
 
   return (
-    <div className="w-full max-w-screen-xl p-8">
-      <h1 className="truncate pb-4 text-2xl font-bold sm:text-4xl">
-        Manage Templates
-      </h1>
-      <div className="grid grid-cols-4 gap-4">
-        <div className="col-span-1">
-          <ul className="mb-4 rounded-lg border border-gray-100 bg-gray-50 p-5">
-            {templates?.map((template) => (
+    <>
+      {selectedTemplate && (
+        <Modal
+          show={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false);
+          }}
+          title="Delete Template"
+        >
+          <div>
+            <p className="text-md mb-2">
+              This will permanently delete the template.
+            </p>
+            <p className="mb-2">
+              Please confirm that you want to delete this template.
+            </p>
+          </div>
+          <DeleteButton
+            onClick={async () => {
+              await handleDeleteTemplate(selectedTemplate.id);
+              setIsModalOpen(false);
+            }}
+            name="Delete Template"
+          />
+          {/* Cancel button */}
+          <button
+            className="p-5 text-sm text-gray-500 hover:text-gray-700"
+            onClick={() => {
+              setIsModalOpen(false);
+            }}
+          >
+            Cancel
+          </button>
+        </Modal>
+      )}
+      <div className="w-full max-w-screen-xl p-8">
+        <h1 className="truncate pb-4 text-2xl font-bold sm:text-4xl">
+          Manage Templates
+        </h1>
+        <div className="grid grid-cols-4 gap-4">
+          <div className="col-span-1">
+            <ul className="mb-4 rounded-lg border border-gray-100 bg-gray-50 p-5">
+              {templates?.map((template) => (
+                <li
+                  className="block cursor-pointer items-center p-3 hover:bg-gray-100 sm:flex"
+                  key={template.id}
+                  onClick={() => {
+                    setSelectedTemplate(template), setIsAdding(false);
+                  }}
+                >
+                  <p className="font-medium text-gray-900">{template.name}</p>
+                </li>
+              ))}
               <li
                 className="block cursor-pointer items-center p-3 hover:bg-gray-100 sm:flex"
-                key={template.id}
+                key={1}
                 onClick={() => {
-                  setSelectedTemplate(template), setIsAdding(false);
+                  setIsAdding(true), setSelectedTemplate(null);
                 }}
               >
-                <p className="font-medium text-gray-900">{template.name}</p>
+                <p className="flex items-center justify-center space-x-3 font-medium text-purple-900">
+                  <FiPlusCircle />
+                  <span>Add Template</span>
+                </p>
               </li>
-            ))}
-            <li
-              className="block cursor-pointer items-center p-3 hover:bg-gray-100 sm:flex"
-              key={1}
-              onClick={() => {
-                setIsAdding(true), setSelectedTemplate(null);
-              }}
-            >
-              <p className="flex items-center justify-center space-x-3 font-medium text-purple-900">
-                <FiPlusCircle />
-                <span>Add Template</span>
-              </p>
-            </li>
-          </ul>
-        </div>
-        <div className="col-span-3 ">
-          {selectedTemplate && (
-            <div>
-              <div className="flex justify-between py-2">
-                <h1 className="text-2xl font-semibold text-gray-700">
-                  {selectedTemplate.name}
-                </h1>
-                <DeleteButton
-                  onClick={async () => {
-                    await handleDeleteTemplate(selectedTemplate.id);
-                  }}
-                  name="Delete Template"
-                />
+            </ul>
+          </div>
+          <div className="col-span-3 ">
+            {selectedTemplate && (
+              <div>
+                <div className="flex justify-between py-2">
+                  <h1 className="text-2xl font-semibold text-gray-700">
+                    {selectedTemplate.name}
+                  </h1>
+                  {selectedTemplate.id !== templates?.[0]?.id && (
+                    <DeleteButton
+                      onClick={() => {
+                        setIsModalOpen(true);
+                      }}
+                      name="Delete Template"
+                    />
+                  )}
+                </div>
+                <table className="max-w-min border border-gray-200 text-left text-sm text-gray-700">
+                  <thead className="bg-gray-50 text-xs uppercase text-gray-700">
+                    <tr className="whitespace-nowrap border border-gray-300 px-6 py-4">
+                      {selectedTemplate.phase_template_properties.map(
+                        (property) => (
+                          <th
+                            className="border border-gray-300 px-6 py-4"
+                            key={property}
+                          >
+                            {property}
+                          </th>
+                        )
+                      )}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="border border-gray-300 px-6 py-4">
+                      {selectedTemplate.phase_template_properties.map(
+                        (property) => (
+                          <td
+                            className="border border-gray-300 px-6 py-4"
+                            key={property}
+                          >
+                            <span> </span>
+                          </td>
+                        )
+                      )}
+                    </tr>
+                    <tr className="border border-gray-300 px-6 py-4">
+                      {selectedTemplate.phase_template_properties.map(
+                        (property) => (
+                          <td
+                            className="border border-gray-300 px-6 py-4"
+                            key={property}
+                          >
+                            <span> </span>
+                          </td>
+                        )
+                      )}
+                    </tr>
+                    <tr className="border border-gray-300 px-6 py-4">
+                      {selectedTemplate.phase_template_properties.map(
+                        (property) => (
+                          <td
+                            className="border border-gray-300 px-6 py-4"
+                            key={property}
+                          >
+                            <span> </span>
+                          </td>
+                        )
+                      )}
+                    </tr>
+                  </tbody>
+                </table>
               </div>
-              <table className="max-w-min border border-gray-200 text-left text-sm text-gray-700">
-                <thead className="bg-gray-50 text-xs uppercase text-gray-700">
-                  <tr className="whitespace-nowrap border border-gray-300 px-6 py-4">
-                    {selectedTemplate.phase_template_properties.map(
-                      (property) => (
+            )}
+
+            {isAdding && (
+              <div>
+                <h1 className="truncate pb-4 text-2xl font-bold sm:text-4xl">
+                  {isAdding ? (
+                    <input
+                      type="text"
+                      value={addPhaseName}
+                      onChange={handleAddPhaseNameChange}
+                    />
+                  ) : (
+                    addPhaseName
+                  )}
+                </h1>
+                <table className="max-w-min border border-gray-200 text-left text-sm text-gray-700">
+                  <thead className="bg-gray-50 text-xs uppercase text-gray-700">
+                    <tr className="whitespace-nowrap border border-gray-300 px-6 py-4">
+                      {addProperties.map((property, index) => (
                         <th
-                          className="border border-gray-300 px-6 py-4"
-                          key={property}
+                          key={index}
+                          scope="col"
+                          className="border border-gray-300 px-6 py-3"
                         >
                           {property}
                         </th>
-                      )
-                    )}
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr className="border border-gray-300 px-6 py-4">
-                    {selectedTemplate.phase_template_properties.map(
-                      (property) => (
-                        <td
-                          className="border border-gray-300 px-6 py-4"
-                          key={property}
-                        >
-                          <span> </span>
-                        </td>
-                      )
-                    )}
-                  </tr>
-                  <tr className="border border-gray-300 px-6 py-4">
-                    {selectedTemplate.phase_template_properties.map(
-                      (property) => (
-                        <td
-                          className="border border-gray-300 px-6 py-4"
-                          key={property}
-                        >
-                          <span> </span>
-                        </td>
-                      )
-                    )}
-                  </tr>
-                  <tr className="border border-gray-300 px-6 py-4">
-                    {selectedTemplate.phase_template_properties.map(
-                      (property) => (
-                        <td
-                          className="border border-gray-300 px-6 py-4"
-                          key={property}
-                        >
-                          <span> </span>
-                        </td>
-                      )
-                    )}
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          )}
-
-          {isAdding && (
-            <div>
-              <h1 className="truncate pb-4 text-2xl font-bold sm:text-4xl">
-                {isAdding ? (
-                  <input
-                    type="text"
-                    value={addPhaseName}
-                    onChange={handleAddPhaseNameChange}
-                  />
-                ) : (
-                  addPhaseName
-                )}
-              </h1>
-              <table className="max-w-min border border-gray-200 text-left text-sm text-gray-700">
-                <thead className="bg-gray-50 text-xs uppercase text-gray-700">
-                  <tr className="whitespace-nowrap border border-gray-300 px-6 py-4">
-                    {addProperties.map((property, index) => (
+                      ))}
                       <th
-                        key={index}
                         scope="col"
                         className="border border-gray-300 px-6 py-3"
                       >
-                        {property}
+                        {isAddColumnVisible ? (
+                          <input
+                            type="text"
+                            value={editedHeader}
+                            autoFocus
+                            onBlur={handleHeaderBlur}
+                            onChange={(event) => {
+                              event.persist();
+                              setEditedHeader(event.target.value);
+                            }}
+                            onKeyUp={(event) => {
+                              if (event.key === "Enter") {
+                                handleHeaderChange(event);
+                              }
+                            }}
+                          />
+                        ) : (
+                          <span
+                            className="cursor-pointer font-normal text-gray-500"
+                            onClick={() => handleAddColumnClick()}
+                          >
+                            Add a property here...
+                          </span>
+                        )}
                       </th>
-                    ))}
-                    <th
-                      scope="col"
-                      className="border border-gray-300 px-6 py-3"
-                    >
-                      {isAddColumnVisible ? (
-                        <input
-                          type="text"
-                          value={editedHeader}
-                          autoFocus
-                          onBlur={handleHeaderBlur}
-                          onChange={(event) => {
-                            event.persist();
-                            setEditedHeader(event.target.value);
-                          }}
-                          onKeyUp={(event) => {
-                            if (event.key === "Enter") {
-                              handleHeaderChange(event);
-                            }
-                          }}
-                        />
-                      ) : (
-                        <span
-                          className="cursor-pointer font-normal text-gray-500"
-                          onClick={() => handleAddColumnClick()}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="border border-gray-300 px-6 py-4">
+                      {addProperties.map((property, index) => (
+                        <td
+                          key={index}
+                          className="border border-gray-300 px-6 py-4"
                         >
-                          Add a property here...
-                        </span>
-                      )}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr className="border border-gray-300 px-6 py-4">
-                    {addProperties.map((property, index) => (
-                      <td
-                        key={index}
-                        className="border border-gray-300 px-6 py-4"
-                      >
-                        <span> </span>
-                      </td>
-                    ))}
-                  </tr>
-                  <tr className="border border-gray-300 px-6 py-4">
-                    {addProperties.map((property, index) => (
-                      <td
-                        key={index}
-                        className="border border-gray-300 px-6 py-4"
-                      >
-                        <span> </span>
-                      </td>
-                    ))}
-                  </tr>
-                  <tr className="border border-gray-300 px-6 py-4">
-                    {addProperties.map((property, index) => (
-                      <td
-                        key={index}
-                        className="border border-gray-300 px-6 py-4"
-                      >
-                        <span> </span>
-                      </td>
-                    ))}
-                  </tr>
-                </tbody>
-              </table>
-              {!isAddColumnVisible && (
-                <div className="flex items-center justify-start space-x-5 py-4">
-                  <button
-                    onClick={() => handleCancel()}
-                    className="rounded-lg border border-purple-accent-1 bg-white px-3 py-2 text-center text-sm font-medium text-purple-accent-1 hover:border-none hover:bg-purple-accent-2 hover:text-white focus:outline-none"
-                    disabled={
-                      addPhaseName.trim() === "" || addProperties.length === 0
-                    }
-                  >
-                    Reset
-                  </button>
+                          <span> </span>
+                        </td>
+                      ))}
+                    </tr>
+                    <tr className="border border-gray-300 px-6 py-4">
+                      {addProperties.map((property, index) => (
+                        <td
+                          key={index}
+                          className="border border-gray-300 px-6 py-4"
+                        >
+                          <span> </span>
+                        </td>
+                      ))}
+                    </tr>
+                    <tr className="border border-gray-300 px-6 py-4">
+                      {addProperties.map((property, index) => (
+                        <td
+                          key={index}
+                          className="border border-gray-300 px-6 py-4"
+                        >
+                          <span> </span>
+                        </td>
+                      ))}
+                    </tr>
+                  </tbody>
+                </table>
+                {!isAddColumnVisible && (
+                  <div className="flex items-center justify-start space-x-5 py-4">
+                    <button
+                      onClick={() => handleCancel()}
+                      className="rounded-lg border border-purple-accent-1 bg-white px-3 py-2 text-center text-sm font-medium text-purple-accent-1 hover:border-none hover:bg-purple-accent-2 hover:text-white focus:outline-none"
+                      disabled={
+                        addPhaseName.trim() === "" || addProperties.length === 0
+                      }
+                    >
+                      Reset
+                    </button>
 
-                  <PrimaryButton
-                    name="Save"
-                    onClick={() => onSubmit()}
-                    disabled={
-                      addPhaseName.trim() === "" ||
-                      addProperties.length === 0 ||
-                      adding
-                    }
-                  />
-                </div>
-              )}
-            </div>
-          )}
+                    <PrimaryButton
+                      name="Save"
+                      onClick={() => onSubmit()}
+                      disabled={
+                        addPhaseName.trim() === "" ||
+                        addProperties.length === 0 ||
+                        adding
+                      }
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
