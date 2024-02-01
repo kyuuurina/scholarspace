@@ -1,6 +1,5 @@
 import type { comment } from "@prisma/client";
 import { api } from "~/utils/api";
-import Avatar from "../../avatar/avatar";
 import { FiMoreHorizontal } from "react-icons/fi";
 import CommentActions from "./CommentActions";
 import React, { useState, useEffect } from "react";
@@ -15,6 +14,8 @@ import ErrorToast from "~/components/toast/ErrorToast";
 import { TRPCClientError } from "@trpc/client";
 import { FiMessageSquare } from "react-icons/fi";
 import ReactionButton from "./ReactionButton";
+import dynamic from "next/dynamic";
+const DeleteCommentModal = dynamic(() => import("./DeleteCommentModal"));
 
 type CommentProps = {
   comment: comment;
@@ -31,6 +32,7 @@ const Comment: React.FC<CommentProps> = ({
   const [showActions, setShowActions] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [isReplyMode, setIsReplyMode] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const editComment = api.comment.edit.useMutation();
   const createReplyComment = api.comment.createReply.useMutation();
@@ -126,139 +128,148 @@ const Comment: React.FC<CommentProps> = ({
     }
   };
   return (
-    <div className="mb-1 border-t border-gray-200 bg-white p-4 text-base dark:border-gray-700 dark:bg-gray-900">
-      <div className="mb-2 flex items-center justify-between">
-        <div className="flex items-center">
-          <p className="mr-3 inline-flex items-center text-sm font-semibold text-gray-900 dark:text-white">
-            {/* {user && <Avatar avatar_url={user.avatar_url} email={user.email} />} */}
-            <span className="ml-2">{user?.email}</span>
-          </p>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            <time
-              dateTime={created_at.toLocaleString()}
-              title={created_at.toLocaleString()}
-            >
-              {new Date(created_at).toLocaleDateString("en-GB", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </time>
-          </p>
-        </div>
-        <div className="relative">
-          <div
-            className="fa-icons cursor-pointer rounded-md p-2"
-            onClick={() => setShowActions(true)}
-          >
-            <FiMoreHorizontal />
+    <>
+      <DeleteCommentModal
+        isModalOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        handleDelete={handleDeleteComment}
+      />
+      <div className="mb-1 border-t border-gray-200 bg-white p-4 text-base dark:border-gray-700 dark:bg-gray-900">
+        <div className="mb-2 flex items-center justify-between">
+          <div className="flex items-center">
+            <p className="mr-3 inline-flex items-center text-sm font-semibold text-gray-900 dark:text-white">
+              {/* {user && <Avatar avatar_url={user.avatar_url} email={user.email} />} */}
+              <span className="ml-2">{user?.email}</span>
+            </p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              <time
+                dateTime={created_at.toLocaleString()}
+                title={created_at.toLocaleString()}
+              >
+                {new Date(created_at).toLocaleDateString("en-GB", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </time>
+            </p>
           </div>
-          {showActions && (
+          <div className="relative">
             <div
-              className="absolute left-0 top-full"
-              ref={ref as React.MutableRefObject<HTMLDivElement>}
+              className="fa-icons cursor-pointer rounded-md p-2"
+              onClick={() => setShowActions(true)}
             >
-              <CommentActions
-                onEditClick={() => {
-                  setIsEditMode(true);
-                  setShowActions(false);
-                }}
-                onDeleteClick={async () => {
-                  await handleDeleteComment();
-                }}
-              />
+              <FiMoreHorizontal />
             </div>
-          )}
-        </div>
-      </div>
-      {isEditMode ? (
-        <div>
-          <TextEditor
-            documentValue={comment.value}
-            setDocumentValue={(value) => setValue("value", value)}
-          />
-          <div className="flex justify-between">
-            <div>
-              {errors.value && <FormErrorMessage text={errors.value.message} />}
-            </div>
-            <div className="flex justify-end">
-              <button className="px-3" onClick={() => setIsEditMode(false)}>
-                Cancel
-              </button>
-              <form
-                onSubmit={async (e) => {
-                  e.preventDefault();
-                  await handleSubmit(handleUpdateComment)(e);
-                }}
-                autoComplete="off"
+            {showActions && (
+              <div
+                className="absolute left-0 top-full"
+                ref={ref as React.MutableRefObject<HTMLDivElement>}
               >
-                <button type="submit" className="btn btn-primary">
-                  Save
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-      ) : isReplyMode && canReply ? (
-        <div>
-          <div
-            className="pb-2 font-normal"
-            dangerouslySetInnerHTML={{
-              __html: comment.value || "Add a comment here....",
-            }}
-          />
-          <TextEditor
-            documentValue={""}
-            setDocumentValue={(value) => setValue("value", value)}
-          />
-          <div className="flex justify-between">
-            <div>
-              {errors.value && <FormErrorMessage text={errors.value.message} />}
-            </div>
-            <div className="flex justify-end">
-              <button className="px-3" onClick={() => setIsReplyMode(false)}>
-                Cancel
-              </button>
-              <form
-                onSubmit={async (e) => {
-                  e.preventDefault();
-                  await handleSubmit(handleCreateReplyComment)(e);
-                }}
-                autoComplete="off"
-              >
-                <button type="submit" className="btn btn-primary">
-                  Reply
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div>
-          <div
-            className="pb-2 font-normal"
-            dangerouslySetInnerHTML={{
-              __html: comment.value || "Add a comment here....",
-            }}
-          />
-          <div className="mt-1 flex items-center justify-start space-x-3">
-            {canReply && (
-              <div className="flex items-center">
-                <button
-                  type="button"
-                  className="flex items-center space-x-1 text-sm text-gray-500 hover:underline"
-                  onClick={() => setIsReplyMode(true)}
-                >
-                  <FiMessageSquare />
-                  <span>Reply</span>
-                </button>
+                <CommentActions
+                  onEditClick={() => {
+                    setIsEditMode(true);
+                    setShowActions(false);
+                  }}
+                  onDeleteClick={() => setIsModalOpen(true)}
+                />
               </div>
             )}
-            <ReactionButton commentId={id} />
           </div>
         </div>
-      )}
-    </div>
+        {isEditMode ? (
+          <div>
+            <TextEditor
+              documentValue={comment.value}
+              setDocumentValue={(value) => setValue("value", value)}
+            />
+            <div className="flex justify-between">
+              <div>
+                {errors.value && (
+                  <FormErrorMessage text={errors.value.message} />
+                )}
+              </div>
+              <div className="flex justify-end">
+                <button className="px-3" onClick={() => setIsEditMode(false)}>
+                  Cancel
+                </button>
+                <form
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    await handleSubmit(handleUpdateComment)(e);
+                  }}
+                  autoComplete="off"
+                >
+                  <button type="submit" className="btn btn-primary">
+                    Save
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        ) : isReplyMode && canReply ? (
+          <div>
+            <div
+              className="pb-2 font-normal"
+              dangerouslySetInnerHTML={{
+                __html: comment.value || "Add a comment here....",
+              }}
+            />
+            <TextEditor
+              documentValue={""}
+              setDocumentValue={(value) => setValue("value", value)}
+            />
+            <div className="flex justify-between">
+              <div>
+                {errors.value && (
+                  <FormErrorMessage text={errors.value.message} />
+                )}
+              </div>
+              <div className="flex justify-end">
+                <button className="px-3" onClick={() => setIsReplyMode(false)}>
+                  Cancel
+                </button>
+                <form
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    await handleSubmit(handleCreateReplyComment)(e);
+                  }}
+                  autoComplete="off"
+                >
+                  <button type="submit" className="btn btn-primary">
+                    Reply
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div>
+            <div
+              className="pb-2 font-normal"
+              dangerouslySetInnerHTML={{
+                __html: comment.value || "Add a comment here....",
+              }}
+            />
+            <div className="mt-1 flex items-center justify-start space-x-3">
+              {canReply && (
+                <div className="flex items-center">
+                  <button
+                    type="button"
+                    className="flex items-center space-x-1 text-sm text-gray-500 hover:underline"
+                    onClick={() => setIsReplyMode(true)}
+                  >
+                    <FiMessageSquare />
+                    <span>Reply</span>
+                  </button>
+                </div>
+              )}
+              <ReactionButton commentId={id} />
+            </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 };
 
