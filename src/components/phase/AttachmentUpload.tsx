@@ -1,19 +1,15 @@
-import { type ZodType, z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import { useEffect, useState, useRef } from "react";
-import { useClickAway } from "@uidotdev/usehooks";
-import { v4 as uuidv4 } from "uuid";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
-import type { FileObject } from "@supabase/storage-js";
+import toast from "react-hot-toast";
+import { TRPCClientError } from "@trpc/client";
 
 // utils
 import { api } from "~/utils/api";
 import { useFetchProjectId } from "~/utils/phase";
 
 // components
-import FormErrorMessage from "~/components/FormErrorMessage";
 import AttachmentListing from "./AttachmentListing";
+import ErrorToast from "../toast/ErrorToast";
 
 type AttachmentUploadProps = {
   id: string | undefined;
@@ -29,7 +25,6 @@ const AttachmentUpload: React.FC<AttachmentUploadProps> = ({
   refetch,
 }) => {
   const [newAttachments, setNewAttachments] = useState<File[] | null>(null);
-  const [newAttachmentIds, setNewAttachmentIds] = useState<string[]>([]);
   const [oldAttachments, setOldAttachments] = useState<string[] | null>();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -46,7 +41,6 @@ const AttachmentUpload: React.FC<AttachmentUploadProps> = ({
   };
 
   const handleOnSubmit = async () => {
-    const newIds: string[] = [];
     if (newAttachments && id && phaseId && project_id) {
       for (const file of newAttachments) {
         attachments?.push(file.name);
@@ -57,9 +51,15 @@ const AttachmentUpload: React.FC<AttachmentUploadProps> = ({
           const { data, error } = await supabase.storage
             .from("task-attachments")
             .upload(fileUrl, file);
-          console.log(data, error);
         } catch (error) {
-          console.log(error);
+          toast.custom(() => {
+            if (error instanceof TRPCClientError) {
+              return <ErrorToast message={error.message} />;
+            } else {
+              // Handle other types of errors or fallback to a default message
+              return <ErrorToast message="An error occurred." />;
+            }
+          });
         }
       }
 
@@ -70,7 +70,6 @@ const AttachmentUpload: React.FC<AttachmentUploadProps> = ({
         });
       }
       setNewAttachments(null);
-      setNewAttachmentIds([]);
       // Reset file input value
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
@@ -87,19 +86,52 @@ const AttachmentUpload: React.FC<AttachmentUploadProps> = ({
     project_id ?? ""
   }/${phaseId ?? ""}/${id ?? ""}/`;
 
+  // handle Delete
+  const handleDelete = async (oldFile: string) => {
+    if (oldFile && id && phaseId && project_id) {
+      const fileUrl = `/${project_id}/${phaseId}/${id}/${oldFile}`;
+
+      try {
+        const { data, error } = await supabase.storage
+          .from("task-attachments")
+          .remove([fileUrl]);
+      } catch (error) {
+        toast.custom(() => {
+          if (error instanceof TRPCClientError) {
+            return <ErrorToast message={error.message} />;
+          } else {
+            // Handle other types of errors or fallback to a default message
+            return <ErrorToast message="An error occurred." />;
+          }
+        });
+      }
+      setNewAttachments(null);
+
+      // upload new set of attachments after deletion
+      // need to remove the deleted attachment from attachments array
+      const newAttachments = attachments?.filter((file) => file !== oldFile);
+      if (newAttachments) {
+        await uploadAttachments.mutateAsync({
+          id,
+          attachments: newAttachments,
+        });
+      }
+      refetch && refetch();
+    }
+  };
+
   return (
     <div className="flex flex-col">
       <div className="max-w-40 max-h-[40rem] space-y-4 overflow-auto truncate">
         {/* iterate newAttachments */}
         {oldAttachments &&
           oldAttachments.map((file) => {
-            // const sizeStr = file.size.toString();
-
             return (
               <AttachmentListing
                 key={file}
                 name={file}
                 fileLink={fileLink + file}
+                onDelete={() => handleDelete(file)}
               />
             );
           })}

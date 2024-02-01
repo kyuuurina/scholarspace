@@ -559,56 +559,6 @@ export const taskRouter = router({
       return task;
     }),
 
-  createTaskReminder: protectedProcedure
-    .input(
-      z.object({
-        schedule: z.date(),
-        task_id: z.string(),
-      })
-    )
-    .mutation(async ({ input, ctx }) => {
-      const { schedule, task_id } = input;
-
-      // check if task has a deadline, if no throw trpc error
-      const task = await ctx.prisma.task.findUnique({
-        where: { id: task_id },
-      });
-
-      if (!task?.deadline) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Please add a deadline to your task!",
-        });
-      }
-
-      const reminder = await ctx.prisma.task_reminder.create({
-        data: {
-          schedule,
-          task_id,
-        },
-      });
-
-      return reminder;
-    }),
-
-  listTaskReminders: protectedProcedure
-    .input(
-      z.object({
-        task_id: z.string(),
-      })
-    )
-    .query(async ({ input, ctx }) => {
-      const { task_id } = input;
-
-      const reminders = await ctx.prisma.task_reminder.findMany({
-        where: {
-          task_id,
-        },
-      });
-
-      return reminders;
-    }),
-
   updateTaskReminder: protectedProcedure
     .input(
       z.object({

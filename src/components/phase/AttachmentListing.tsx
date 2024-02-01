@@ -5,22 +5,24 @@ import {
   FaFileWord,
   FaFileDownload,
   FaImage,
+  FaTrash,
+  FaEdit,
 } from "react-icons/fa";
 
 type AttachmentListingProps = {
   name?: string;
-  size?: string;
   type?: string;
   fileLink: string;
+  onDelete?: () => void; // onDelete callback function
 };
 
 import Link from "next/link";
 
 const AttachmentListing: React.FC<AttachmentListingProps> = ({
   name,
-  size,
   type,
   fileLink,
+  onDelete,
 }) => {
   const fileTypeToKeyword = {
     "application/pdf": "PDF",
@@ -51,15 +53,24 @@ const AttachmentListing: React.FC<AttachmentListingProps> = ({
   }[type ?? ""];
 
   return (
-    <div className="mb-2 flex items-start rounded-xl bg-gray-50 p-4 dark:bg-gray-700">
+    <div className="mb-2 flex max-w-md items-start rounded-xl bg-gray-50 p-4 dark:bg-gray-700">
       <div className="me-2 flex-shrink-0">
-        <div className="flex space-x-2">
-          <span className="flex items-center gap-2 truncate text-sm font-medium text-gray-900 dark:text-white">
+        <div className="flex max-w-sm space-x-2">
+          <span className="line-clamp-1 flex items-center gap-2 truncate text-sm font-medium text-gray-900 dark:text-white">
             {name}
           </span>
           <Link href={fileLink} target="_blank" rel="noopener noreferrer">
             <FaFileDownload className="fa-icons inline-block h-3 w-3" />
           </Link>
+          {onDelete && (
+            <button
+              className="cursor-pointer"
+              onClick={onDelete}
+              title="Delete"
+            >
+              <FaTrash className="fa-icons inline-block h-3 w-3 text-red-500" />
+            </button>
+          )}
         </div>
       </div>
     </div>
