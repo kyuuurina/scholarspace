@@ -2,8 +2,6 @@
 import { useRouterId } from "~/utils/routerId";
 import { useRouter } from "next/router";
 
-// import phases type from prisma client
-
 // types
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "~/pages/_app";
@@ -18,12 +16,10 @@ import Header from "~/components/phase/Header";
 import Table from "~/components/phase/Table";
 
 import { useState, useEffect } from "react";
-import PrimaryButton from "~/components/button/PrimaryButton";
 
 const Phase: NextPageWithLayout = () => {
   // get project id from router
   const id = useRouterId();
-  const router = useRouter();
 
   const {
     data: project,

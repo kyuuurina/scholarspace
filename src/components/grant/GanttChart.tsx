@@ -26,8 +26,6 @@ const GanttChart: React.FC<GanttChartProps> = ({ grantSummary, refetch }) => {
     workspaceId: workspaceId,
   });
   const test: Task[] = [];
-
-  const tasks: Task[] = initTest();
   function initTest() {
     let displayCount = 1;
     grantSummary.grants?.map((grant) => {

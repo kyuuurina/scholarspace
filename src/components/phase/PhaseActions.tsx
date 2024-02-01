@@ -6,6 +6,10 @@ import ErrorToast from "../toast/ErrorToast";
 import { TRPCClientError } from "@trpc/client";
 import { MoonLoader } from "react-spinners";
 import { useState } from "react";
+import dynamic from "next/dynamic";
+const DeletePhaseModal = dynamic(() => import("./DeletePhaseModal"), {
+  ssr: false,
+});
 
 type CellProps = {
   phase_id: string;
@@ -23,7 +27,7 @@ const PhaseActions: React.FC<CellProps> = ({
   const deletePhase = api.phase.deletePhase.useMutation();
   const router = useRouter();
   const projectId = useRouterId();
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
 
   const handleRename = () => {
@@ -58,30 +62,42 @@ const PhaseActions: React.FC<CellProps> = ({
   };
 
   return (
-    <div
-      className="absolute z-30 flex w-full flex-col rounded-lg border border-gray-200 bg-white text-gray-900"
-      style={{ top: "100%", left: "0" }}
-    >
-      <button
-        type="button"
-        className="relative inline-flex w-full items-center rounded-t-lg border-b border-gray-200 px-2 py-1 text-sm font-medium hover:bg-gray-100 hover:text-blue-700 focus:z-10 "
-        onClick={handleRename}
+    <>
+      <DeletePhaseModal
+        handleDelete={handleDelete}
+        onClose={() => {
+          setIsCellActionOpen(false);
+          setIsModalOpen(false);
+        }}
+        isModalOpen={isModalOpen}
+      />
+      <div
+        className="absolute z-30 flex w-full flex-col rounded-lg border border-gray-200 bg-white text-gray-900"
+        style={{ top: "100%", left: "0" }}
       >
-        Rename
-      </button>
-      <button
-        type="button"
-        className="relative inline-flex w-full items-center border-b border-gray-200 px-2 py-1 text-sm font-medium hover:bg-gray-100 hover:text-blue-700 focus:z-10 "
-        onClick={handleDelete}
-      >
-        {isDeleteLoading && (
-          <div className="absolute left-0 top-0 flex h-full w-full items-center justify-center bg-white opacity-50">
-            <MoonLoader size={20} color={"#1f2937"} />
-          </div>
-        )}
-        Delete
-      </button>
-    </div>
+        <button
+          type="button"
+          className="relative inline-flex w-full items-center rounded-t-lg border-b border-gray-200 px-2 py-1 text-sm font-medium hover:bg-gray-100 hover:text-blue-700 focus:z-10 "
+          onClick={handleRename}
+        >
+          Rename
+        </button>
+        <button
+          type="button"
+          className="relative inline-flex w-full items-center border-b border-gray-200 px-2 py-1 text-sm font-medium hover:bg-gray-100 hover:text-blue-700 focus:z-10 "
+          onClick={() => {
+            setIsModalOpen(true);
+          }}
+        >
+          {isDeleteLoading && (
+            <div className="absolute left-0 top-0 flex h-full w-full items-center justify-center bg-white opacity-50">
+              <MoonLoader size={20} color={"#1f2937"} />
+            </div>
+          )}
+          Delete
+        </button>
+      </div>
+    </>
   );
 };
 
