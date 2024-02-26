@@ -1,6 +1,6 @@
 // utils
 import { useRouterId } from "~/utils/routerId";
-import { useFetchGrantSummary } from "~/utils/grant";
+// import { useFetchGrantSummary } from "~/utils/grant";
 import Link from "next/link";
 import { MoonLoader } from "react-spinners";
 
@@ -58,8 +58,8 @@ const Workspace: NextPageWithLayout = () => {
   const workspaceRole = api.workspace.getWorkspaceRole.useQuery({
     workspaceId: workspaceId,
   });
-  const { grantSummary, refetch } = useFetchGrantSummary(workspaceId);
-  console.log(grantSummary);
+  // const { grantSummary, refetch } = useFetchGrantSummary(workspaceId);
+  // console.log(grantSummary);
   // fetch workspace details
   const { data: workspace, isLoading } = api.workspace.get.useQuery({
     id: workspaceId,
@@ -111,11 +111,11 @@ const Workspace: NextPageWithLayout = () => {
         openModal={modalIsOpen}
         onClick={() => setModalIsOpen(false)}
       />
-      <CreateGrantModal
+      {/* <CreateGrantModal
         openModal={grantModalIsOpen}
         onClick={() => setGrantModalIsOpen(false)}
         refetch={refetch}
-      />
+      /> */}
       <main className="flex flex-col">
         {/* Workspace header */}
         <Header
@@ -127,9 +127,9 @@ const Workspace: NextPageWithLayout = () => {
           {/* Left section of workspace dashboard */}
           {/* Projects Section */}
           <div className="w-full md:col-span-8">
-            {grantSummary !== undefined && (
+            {/* {grantSummary !== undefined && (
               <GanttChart grantSummary={grantSummary} refetch={refetch} />
-            )}
+            )} */}
             <div className="mb-5 flex items-center justify-between">
               <h5 className="text-xl font-medium text-gray-900 ">Projects</h5>
               {workspaceRole.data === "Researcher Admin" && (
